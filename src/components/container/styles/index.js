@@ -1,14 +1,18 @@
 import styled from 'styled-components/macro';
 
 export const Container = styled.div`
-    max-width: 1500px;
+    max-width: 1550px;
     margin: 0 auto;
-`
+    width: 100%;
+    background: #333;
+    color: #fff;
+`;
 
 export const Item = styled.div`
-   width:  ${({ width }) => width};
-   padding:  ${({ padding }) => padding};
-`
+    position: 'relative';
+    width:  ${({ width }) => width};
+    padding:  ${({ padding }) => padding};
+`;
 
 export const Pane = styled.div`
     
@@ -17,6 +21,8 @@ export const Pane = styled.div`
 
 export const Link = styled.a`
     color: ${({ color = '#fff' }) => color};
+    text-decoration: none;
+    list-style-type: none;
 `;
 
 export const Inner = styled.div`
@@ -25,6 +31,10 @@ export const Inner = styled.div`
 
 export const InnerFluid = styled.div`
     padding: 0;
+`;
+
+export const MiddleInner = styled.div`
+    transform: translate(-50%,-50%),
 `;
 
 export const Flex = styled.div`

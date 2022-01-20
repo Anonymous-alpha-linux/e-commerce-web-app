@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Item, Pane, Inner, Grid, Flex } from './styles'
+import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner } from './styles'
 
 export default function ContainerComponent({ children, ...restProps }) {
     return (
@@ -37,4 +37,12 @@ ContainerComponent.Inner = function ({ children, ...restProps }) {
     return <Inner {...restProps}>
         {children}
     </Inner>
+}
+
+ContainerComponent.MiddleInner = function ({ children, ...restProps }) {
+    return <MiddleInner {...restProps}>{children}</MiddleInner>
+}
+
+ContainerComponent.Link = function ({ children, ...restProps }) {
+    return <Link href={restProps.path}>{children}</Link>
 }

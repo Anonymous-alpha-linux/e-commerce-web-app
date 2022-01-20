@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Home",
+        "path": "/"
+    },
+    {
+        "name": "Product",
+        "path": "/product"
+    },
+    {
+        "name": "Category",
+        "path": "/category"
+    },
+    {
+        "name": "Event",
+        "path": "/event"
+    },
+    {
+        "name": "Q&A",
+        "path": "/question"
+    }
+]

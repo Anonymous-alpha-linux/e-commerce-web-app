@@ -1,0 +1,1 @@
+export { default as mainAPI } from './shoe-zone-config'
