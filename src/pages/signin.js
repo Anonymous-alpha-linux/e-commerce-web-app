@@ -40,7 +40,7 @@ export default function Login() {
             <Form.Title children="Log in or Get out!">
             </Form.Title>
             <Form.Input placeholder="Email" type='text' name="email" onChange={inputHandler}></Form.Input>
-            <Form.Input placeholder="Password" type='text' name="password" onChange={inputHandler}></Form.Input>
+            <Form.Input placeholder="Password" type='password' name="password" onChange={inputHandler}></Form.Input>
             <Form.Link>Forgot your Password?</Form.Link>
             <Form.Button
                 onClick={submitHandler} style={{
