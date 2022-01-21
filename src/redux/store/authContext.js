@@ -39,12 +39,12 @@ export default function AuthenticationContext({ children }) {
         console.log('user access token', user.accessToken);
         try {
             setLoading(true);
-            axios.get(mainAPI.LOCALHOST_AUTH, {
+            axios.get(mainAPI.LOCALHOST_AUTH || mainAPI.CLOUD_API_AUTH, {
                 headers: {
                     'Authorization': `Bearer ${user.accessToken}`
                 }
             }).then(response => {
-                console.log('get response from', mainAPI.LOCALHOST_AUTH);
+                console.log('get response from', mainAPI.LOCALHOST_AUTH || mainAPI.CLOUD_API_AUTH);
                 setResponse(response.data);
                 setLoading(false);
             })
@@ -61,7 +61,7 @@ export default function AuthenticationContext({ children }) {
 
     const login = React.useCallback(
         async (data) => {
-            return axios.post(mainAPI.LOCALHOST_LOGIN,
+            return axios.post(mainAPI.LOCALHOST_LOGIN || mainAPI.CLOUD_API_LOGIN,
                 data,
                 {
                     headers: {
@@ -83,9 +83,9 @@ export default function AuthenticationContext({ children }) {
         , [response])
 
     const register = React.useCallback(async (data) => {
-        return axios.post(mainAPI.LOCALHOST_REGISTER, { ...data })
+        return axios.post(mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, { ...data })
             .then(response => {
-                console.log('get response from', mainAPI.LOCALHOST_REGISTER, 'response data from register', response.data);
+                console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', response.data);
                 localStorage.setItem('accessToken', response.data.accessToken);
                 setResponse(response.data);
                 setUser({
@@ -97,9 +97,9 @@ export default function AuthenticationContext({ children }) {
     const logout = React.useCallback(async () => {
         try {
             setLoading(true);
-            return axios.get(mainAPI.LOCALHOST_LOGOUT)
+            return axios.get(mainAPI.LOCALHOST_LOGOUT || mainAPI.CLOUD_API_LOGOUT)
                 .then(res => {
-                    console.log('get response from', mainAPI.LOCALHOST_LOGOUT);
+                    console.log('get response from', mainAPI.LOCALHOST_LOGOUT || mainAPI.CLOUD_API_LOGOUT);
                     setLoading(false);
                     setResponse(res.data)
                     localStorage.removeItem('accessToken')

@@ -9,8 +9,12 @@ let api = {
 
     CLOUD_API: "https://shoe-zone-api-app.herokuapp.com/api/v1/",
     CLOUD_API_AUTH: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/login",
+    CLOUD_API_LOGIN: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/login",
     CLOUD_API_REGISTER: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/register",
+    CLOUD_API_LOGOUT: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/logout",
     CLOUD_API_CUSTOMER: "https://shoe-zone-api-app.herokuapp.com/api/v1/customer",
+    CLOUD_API_ADMIN: "https://shoe-zone-api-app.herokuapp.com/api/v1/admin",
+    CLOUD_API_STAFF: "https://shoe-zone-api-app.herokuapp.com/api/v1/staff",
 }
 
 export default api;
