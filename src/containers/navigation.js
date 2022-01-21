@@ -5,15 +5,13 @@ import NavData from '../fixtures/nav-links.json';
 import { useAuthorizationContext } from '../hooks';
 
 export default function Navigation() {
-    const { user } = useAuthorizationContext();
-
-    console.log(user);
-    
+    const { response, loading, logout } = useAuthorizationContext();
+    console.log('response', response);
     return (
         <ContainerComponent>
             <ContainerComponent.Grid columns={3}>
                 <ContainerComponent.Item>
-                    <h1>This is logo</h1>
+                    <p>This is logo</p>
                 </ContainerComponent.Item>
                 <ContainerComponent.Item>
                     <ContainerComponent.MiddleInner>
@@ -29,7 +27,11 @@ export default function Navigation() {
                     </ContainerComponent.MiddleInner>
                 </ContainerComponent.Item>
                 <ContainerComponent.Item>
-                    {user.isLoggedIn && <h1>This is Cart</h1> || <Link to={'/login'}>Login</Link>}
+                    {loading && <p>loading...</p>
+                        || response.isLoggedIn && <p>This is Cart
+                            <Link to={'/'} onClick={logout}>Logout</Link>
+                        </p>
+                        || <><Link to={'/login'}>Login</Link></>}
                 </ContainerComponent.Item>
             </ContainerComponent.Grid>
         </ContainerComponent>

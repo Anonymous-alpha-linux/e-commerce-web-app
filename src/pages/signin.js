@@ -1,36 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from '../components';
 import { mainAPI } from '../config';
 import { useAuthorizationContext } from '../hooks';
 import axios from 'axios';
 
 export default function Login() {
-    const { user, setUser } = useAuthorizationContext();
+    const { user, response, setUser, setResponse } = useAuthorizationContext();
     const [input, setInput] = useState({});
     const [error, setError] = useState('');
 
     const submitHandler = (e) => {
         e.preventDefault();
         console.log('start submit');
+        axios.post(mainAPI.LOCALHOST_LOGIN,
+            { ...input })
+            .then(response => {
+                console.log(response);
+                setResponse(
+                    response.data
+                );
+                setUser(oldUser => {
+                    localStorage.setItem('accessToken',
+                        response.data.accessToken
+                    );
+                    const accessToken = localStorage.getItem('accessToken');
+                    console.log(accessToken);
 
-        axios.post(mainAPI.CLOUD_API_AUTH, { ...input }).then(response => {
-            console.log(response);
-            setUser({
-                ...response.data
-            });
-            this.props.history.push('/home');
-        }).catch(err => setError(err.message));
+                    return {
+                        accessToken: localStorage.getItem('accessToken'),
+                    }
+                })
+            }).catch(err => setError(err.message));
+
     }
 
     const inputHandler = (e) => {
-        setInput(input => {
-            input[e.target.name] = e.target.value;
+        setInput(oldInput => {
             return {
-                ...input,
+                ...oldInput,
+                [e.target.name]: e.target.value
             }
-        });
+        })
     }
-
 
     return <Form method={'POST'} >
         <Form.Logo image="https://cdn.shopify.com/s/files/1/1811/9799/t/6/assets/logo.png?v=15221948588626818280">
@@ -39,8 +50,20 @@ export default function Login() {
         <Form.Container>
             <Form.Title children="Log in or Get out!">
             </Form.Title>
-            <Form.Input placeholder="Email" type='text' name="email" onChange={inputHandler}></Form.Input>
-            <Form.Input placeholder="Password" type='text' name="password" onChange={inputHandler}></Form.Input>
+            <Form.Input
+                placeholder="Email"
+                type='text'
+                name="email"
+                onChange={inputHandler}
+                value={input.name}
+            ></Form.Input>
+            <Form.Input
+                placeholder="Password"
+                type='password'
+                name="password"
+                onChange={inputHandler}
+            // value={input.password}
+            ></Form.Input>
             <Form.Link>Forgot your Password?</Form.Link>
             <Form.Button
                 onClick={submitHandler} style={{
