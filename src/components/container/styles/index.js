@@ -8,6 +8,17 @@ export const Container = styled.div`
     color: #fff;
 `;
 
+export const BackDrop = styled.div`
+    width: 100vw;
+    height: 100vh;
+    background-color: #333;
+    opacity: .8;
+    position: fixed;
+    top:0;
+    left: 0;
+`;
+
+
 export const Item = styled.div`
     position: 'relative';
     width:  ${({ width }) => width};

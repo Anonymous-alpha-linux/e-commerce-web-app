@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner } from './styles'
+import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner, BackDrop } from './styles'
 
 // 1. define the default component
 export default function ContainerComponent({ children, ...restProps }) {
@@ -20,6 +20,12 @@ ContainerComponent.Grid = function ({ children, columns = 3, ...restProps }) {
     return <Grid className='container__grid' columns={columns} {...restProps}>
         {children}
     </Grid>
+}
+
+ContainerComponent.BackDrop = function ({ children, ...restProps }) {
+    return <BackDrop {...restProps}>
+        {children}
+    </BackDrop>
 }
 
 ContainerComponent.Item = function ({ children, width = '100%', padding = '10px', ...restProps }) {

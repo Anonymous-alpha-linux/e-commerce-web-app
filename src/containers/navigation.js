@@ -2,11 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ContainerComponent } from '../components';
 import NavData from '../fixtures/nav-links.json';
-import { useAuthorizationContext } from '../hooks';
+import { useAuthorizationContext } from '../redux';
 
 export default function Navigation() {
     const { response, loading, logout } = useAuthorizationContext();
-    console.log('response', response);
+    console.log('islogged', response.isLoggedIn);
     return (
         <ContainerComponent>
             <ContainerComponent.Grid columns={3}>
@@ -28,10 +28,14 @@ export default function Navigation() {
                 </ContainerComponent.Item>
                 <ContainerComponent.Item>
                     {loading && <p>loading...</p>
-                        || response.isLoggedIn && <p>This is Cart
+                        || response.isLoggedIn && <ContainerComponent.Flex>
+                            <p>
+                                {response.role}<br />
+                                {response.account}
+                            </p>
                             <Link to={'/'} onClick={logout}>Logout</Link>
-                        </p>
-                        || <><Link to={'/login'}>Login</Link></>}
+                        </ContainerComponent.Flex>
+                        || <Link to={'/login'}>Login</Link>}
                 </ContainerComponent.Item>
             </ContainerComponent.Grid>
         </ContainerComponent>

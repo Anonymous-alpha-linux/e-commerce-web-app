@@ -1,27 +1,28 @@
 import { Fragment } from "react";
-import { Home, Login, Register } from './pages';
+import { Home, Login, ProtectedPage, PublicPage, Register } from './pages';
 import { Nav } from './containers'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './scss/main.scss';
-import { AuthenticateContext } from "./hooks";
+import { AuthenticateContext } from "./redux";
 function App() {
   return (
     <Fragment>
-      <AuthenticateContext>
-        <BrowserRouter>
+      <BrowserRouter>
+        <AuthenticateContext>
           <Nav></Nav>
           <Routes>
-            <Route path="/" element={<Home></Home>}></Route>
-            <Route path="/product" element={<Home></Home>}></Route>
-            <Route path="/category" element={<Home></Home>}></Route>
-            <Route path="/event" element={<Home></Home>}></Route>
-            <Route path="/question" element={<Home></Home>}></Route>
-            <Route path="/login" element={<Login></Login>}></Route>
-            <Route path="/register" element={<Register></Register>}></Route>
+            <Route path="/" element={<Home></Home>}>
+              <Route path="/login" element={<Login></Login>}></Route>
+              <Route path="/register" element={<Register></Register>}></Route>
+            </Route>
+
+            <Route path="/auth" element={<ProtectedPage></ProtectedPage>}>
+            </Route>
+
             <Route path="/*" element={<h1>Error Handling...</h1>}></Route>
           </Routes>
-        </BrowserRouter>
-      </AuthenticateContext>
+        </AuthenticateContext>
+      </BrowserRouter>
     </Fragment>
   );
 }
