@@ -71,8 +71,8 @@ export default function AuthenticationContext({ children }) {
     }, [user]);
 
     const login = async (data, callback) => {
-        const loginApi = mainAPI.LOCALHOST_LOGIN;
-        // const login_api = mainAPI.CLOUD_API_LOGIN;
+        // const loginApi = mainAPI.LOCALHOST_LOGIN;
+        const loginApi = mainAPI.CLOUD_API_LOGIN;
 
         return axios.post(loginApi,
             data,
