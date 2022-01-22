@@ -81,7 +81,7 @@ const Login = () => {
                     }}>
                     sign in
                 </Form.Button>
-                <Form.Button href={'/register'}
+                <Form.Button href={'register'}
                     style={{
                         background: '#f2f2f2'
                     }}>
