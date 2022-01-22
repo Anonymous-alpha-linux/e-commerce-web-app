@@ -1,27 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ContainerComponent, Form } from '../components';
 import { useAuthorizationContext } from '../redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
-const Login = React.memo(() => {
-    const { response, login } = useAuthorizationContext();
-    const [loading, setLoading] = useState(true);
+const Login = () => {
+    const { login, setLoading, user, setUser } = useAuthorizationContext();
     const [input, setInput] = useState({});
     const [error, setError] = useState('');
+
     const location = useLocation();
-    const navigate = useNavigate();
+
     let from = location.state?.from?.pathname || '/';
 
     const submitHandler = (e) => {
         e.preventDefault();
-        try {
-            login(input);
-
-            if (!response.isLoggedIn) throw new Error("You must login first !");
-
-        } catch (error) {
-            setError(e.message);
-        }
+        // if (!response.isLoggedIn) throw new Error("You must login first !");
+        login(input, (res) => {
+            console.log('login', res);
+            setUser(oldUser => {
+                return {
+                    ...oldUser,
+                    ...res.data
+                }
+            });
+        }).catch(err => {
+            setError(err.message);
+        })
+        setLoading(false);
     }
 
     const inputHandler = React.useCallback((e) => {
@@ -33,14 +38,9 @@ const Login = React.memo(() => {
         })
     }, [setInput])
 
-    useEffect(() => {
-        if (response.isLoggedIn) {
-            navigate(from, { replace: true });
-        }
-        setLoading(false);
-    }, [response]);
-
-    if (loading) return <h1>Loading...</h1>
+    if (user.isLoggedIn) {
+        return <Navigate to={from} state={{ from: location }} replace />;
+    }
 
     return <ContainerComponent>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
@@ -91,6 +91,6 @@ const Login = React.memo(() => {
             </Form.Container>
         </Form>
     </ContainerComponent>
-})
+}
 
-export default Login;
+export default React.memo(Login);

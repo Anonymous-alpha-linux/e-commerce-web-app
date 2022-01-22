@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ContainerComponent, Form } from '../components'
 import { useAuthorizationContext } from '../redux';
 
 export default function Register() {
-    const { response, register } = useAuthorizationContext();
-    const [loading, setLoading] = useState(true);
+    const { user, setUser, register } = useAuthorizationContext();
     const [input, setInput] = useState({});
     const [error, setError] = useState('');
+
     const location = useLocation();
-    const navigate = useNavigate();
+
     let from = location.state?.from?.pathname || '/';
 
     const submitHandler = (e) => {
@@ -18,14 +18,18 @@ export default function Register() {
             console.log("start register");
             if (!input.username || !input.username || !input.password) throw new Error("Fulfill input");
             if (input.password !== input['repeat-password']) throw new Error("Your confirm password is incorrectly")
-            register(input);
+            register(input, response => {
+                localStorage.setItem('accessToken', response.data.accessToken);
+                setUser({
+                    ...user,
+                    ...response.data,
+                });
+            });
 
         } catch (error) {
             setError(error.message);
         }
     }
-
-
     const inputHandler = React.useCallback((e) => {
         setInput(oldInput => {
             return {
@@ -35,17 +39,13 @@ export default function Register() {
         })
     }, [setInput]);
 
-    useEffect(() => {
-        if (response.isLoggedIn) {
-            navigate(from, { replace: true });
-        }
-        setLoading(false);
-    }, [response]);
+    if (user.isLoggedIn) {
+        return <Navigate to={from} state={{ from: location }} replace>
+        </Navigate>
+    }
 
-    if (loading) return <h1>Loading...</h1>
     return <ContainerComponent>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
-
         <Form method={'POST'}
             onSubmit={submitHandler}
             style={{
