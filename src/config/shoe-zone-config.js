@@ -8,7 +8,7 @@ let api = {
     LOCALHOST_STAFF: "http://localhost:4000/api/v1/staff",
 
     CLOUD_API: "https://shoe-zone-api-app.herokuapp.com/api/v1/",
-    CLOUD_API_AUTH: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/login",
+    CLOUD_API_AUTH: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth",
     CLOUD_API_LOGIN: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/login",
     CLOUD_API_REGISTER: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/register",
     CLOUD_API_LOGOUT: "https://shoe-zone-api-app.herokuapp.com/api/v1/auth/logout",
