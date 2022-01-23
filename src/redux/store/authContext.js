@@ -30,15 +30,11 @@ export default function AuthenticationContext({ children }) {
     const [user, setUser] = useState({
         accessToken: localStorage.getItem('accessToken') || 'a.b.c'
     });
-    const [response, setResponse] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
 
-
-    console.log('re-render authcontext');
     useEffect(() => {
-        console.log('Chạy qua vòng effect của authentication');
         auth().then(() => {
             setLoading(true);
         }).finally(() => {
@@ -47,20 +43,19 @@ export default function AuthenticationContext({ children }) {
         return () => {
             cancelTokenSource.cancel();
         };
-
-    }, [response]);
+    }, []);
 
     const auth = async () => {
-        // const authApi = mainAPI.CLOUD_API_AUTH;
-        const authApi = mainAPI.LOCALHOST_AUTH;
-        console.log('user access token', user.accessToken);
+        const authApi = mainAPI.CLOUD_API_AUTH;
+        // const authApi = mainAPI.LOCALHOST_AUTH;
+
         return axios.get(authApi, {
             cancelToken: cancelTokenSource.token,
             headers: {
                 'Authorization': `Bearer ${user.accessToken}`
             }
         }).then(response => {
-            console.log('Dữ liệu authentication', response.data);
+
             setUser({
                 ...response.data
             })
@@ -69,9 +64,9 @@ export default function AuthenticationContext({ children }) {
         })
     };
 
-    const login = async (data) => {
-        const loginApi = mainAPI.LOCALHOST_LOGIN;
-        // const loginApi = mainAPI.CLOUD_API_LOGIN;
+    const login = async (data, callback) => {
+        // const loginApi = mainAPI.LOCALHOST_LOGIN;
+        const loginApi = mainAPI.CLOUD_API_LOGIN;
 
         return axios.post(loginApi,
             data,
@@ -81,32 +76,33 @@ export default function AuthenticationContext({ children }) {
                 }
             }).then(res => {
                 localStorage.setItem('accessToken', res.data.accessToken);
-                setResponse({
+                setUser({
                     ...res.data
                 });
             }).catch(error => setError(error.message));
     };
 
     const register = async (data, callback) => {
-        // const registerApi = mainAPI.CLOUD_API_REGISTER;
-        const registerApi = mainAPI.LOCALHOST_REGISTER;
+        const registerApi = mainAPI.CLOUD_API_REGISTER;
+        // const registerApi = mainAPI.LOCALHOST_REGISTER;
         return axios.post(registerApi, { ...data })
             .then(res => {
-                console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', response.data);
-                localStorage.setItem('accessToken', response.data.accessToken);
-                setResponse({ ...res.data });
-                callback(response);
+                // console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', res.data);
+                localStorage.setItem('accessToken', res.data.accessToken);
+                setUser({ ...res.data });
             }).catch(error => setError(error.message));
     }
 
     const logout = React.useCallback(async () => {
         try {
-            // const lgoutApi = mainAPI.CLOUD_API_LOGOUT;
-            const lgoutApi = mainAPI.LOCALHOST_LOGOUT;
+            const lgoutApi = mainAPI.CLOUD_API_LOGOUT;
+            // const lgoutApi = mainAPI.LOCALHOST_LOGOUT;
+
             return axios.get(lgoutApi)
                 .then(res => {
+
                     localStorage.removeItem('accessToken');
-                    setResponse({ ...res.data });
+                    setUser(res.data);
                 })
         } catch (err) {
             setLoading(false);

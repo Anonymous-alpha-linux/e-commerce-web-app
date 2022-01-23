@@ -11,7 +11,6 @@ const Login = () => {
     const location = useLocation();
     let from = location.state?.from?.pathname || '/';
 
-    console.log('re-render login', from);
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -26,6 +25,8 @@ const Login = () => {
             }
         })
     }, [input, setInput])
+
+    // if (user.role === 'admin') return <Navigate to={'/admin'} state={{ from: location }} replace />;
 
     if (user.isLoggedIn) {
         return <Navigate to={from} state={{ from: location }} replace />;

@@ -33,7 +33,7 @@ export default function Navigation() {
     )
 }
 
-const AuthStatus = React.memo(({ ...restProps }) => {
+const AuthStatus = React.memo(() => {
     const { user, logout } = useAuthorizationContext();
 
     if (!user.isLoggedIn) return <Link to={'/login'} onClick={logout}>Login</Link>

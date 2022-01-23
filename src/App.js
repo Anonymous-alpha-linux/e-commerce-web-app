@@ -1,29 +1,59 @@
 import { Fragment } from "react";
-import { Home, Login, ProtectedPage, Register } from './pages';
-import { Nav } from './containers'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './scss/main.scss';
-import { AuthenticateContext } from "./redux";
+
+
+import { Home, Login, ProtectedPage, Register, Nav, Layout, Staff, Customer, AdminSidebar, Admin } from './pages';
+import { useAuthorizationContext } from "./redux";
+
 function App() {
+  const { user } = useAuthorizationContext();
+
   return (
     <Fragment>
       <BrowserRouter>
-        <AuthenticateContext>
-          <Nav></Nav>
-          <Routes>
+        {user.role === "admin" && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
+        <Routes>
+          <Route path="/" element={<Home></Home>}>
+            <Route path="login" element={<Login></Login>}></Route>
+            <Route path="register" element={<Register></Register>}></Route>
+            {
+              user.role === 'admin' &&
+              <Route path=""
+                index
+                element={<ProtectedPage authorized={['admin']}>
+                  <Admin></Admin>
+                </ProtectedPage>}>
+              </Route> ||
 
-            <Route path="/" element={<Home></Home>}>
-              <Route path="login" element={<Login></Login>}></Route>
-              <Route path="register" element={<Register></Register>}></Route>
-            </Route>
+              user.role === "staff" &&
+              <Route path=""
+                index
+                element={<ProtectedPage authorized={['admin', 'staff']}>
+                  <Staff></Staff>
+                </ProtectedPage>}>
+              </Route> ||
 
-            <Route path="/auth" element={<ProtectedPage></ProtectedPage>}>
-            </Route>
+              <Route path=""
+                index
+                element={<ProtectedPage>
+                  <Customer></Customer>
+                </ProtectedPage>}>
+              </Route>
+            }
 
-            <Route path="/*" element={<h1>Error Handling...</h1>}>
+          </Route>
+
+          <Route path="/admin" element={<ProtectedPage authorized={["admin"]}> <Home></Home> </ProtectedPage>}>
+            <Route path="" index element={<ProtectedPage authorized={['admin']}>
+              <Admin></Admin>
+            </ProtectedPage>}>
             </Route>
-          </Routes>
-        </AuthenticateContext>
+          </Route>
+
+          <Route path="/*" element={<h1>Error Handling...</h1>}>
+          </Route>
+        </Routes>
       </BrowserRouter>
     </Fragment>
   );
