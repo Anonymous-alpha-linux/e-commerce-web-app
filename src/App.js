@@ -36,20 +36,18 @@ function App() {
 
               <Route path=""
                 index
-                element={<ProtectedPage>
-                  <Customer></Customer>
-                </ProtectedPage>}>
+                element={<Customer></Customer>}>
               </Route>
             }
 
           </Route>
 
-          <Route path="/admin" element={<ProtectedPage authorized={["admin"]}> <Home></Home> </ProtectedPage>}>
+          {/* <Route path="/admin" element={<ProtectedPage authorized={["admin"]}> <Home></Home> </ProtectedPage>}>
             <Route path="" index element={<ProtectedPage authorized={['admin']}>
               <Admin></Admin>
             </ProtectedPage>}>
             </Route>
-          </Route>
+          </Route> */}
 
           <Route path="/*" element={<h1>Error Handling...</h1>}>
           </Route>
