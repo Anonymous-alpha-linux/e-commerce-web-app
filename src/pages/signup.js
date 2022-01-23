@@ -1,31 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { ContainerComponent, Form } from '../components'
 import { useAuthorizationContext } from '../redux';
 
-export default function Register() {
-    const { user, setUser, register } = useAuthorizationContext();
+function Register() {
+    const { user, register } = useAuthorizationContext();
     const [input, setInput] = useState({});
     const [error, setError] = useState('');
 
     const location = useLocation();
 
     let from = location.state?.from?.pathname || '/';
-
+    console.log('login');
     const submitHandler = (e) => {
         e.preventDefault();
         try {
             console.log("start register");
             if (!input.username || !input.username || !input.password) throw new Error("Fulfill input");
             if (input.password !== input['repeat-password']) throw new Error("Your confirm password is incorrectly")
-            register(input, response => {
-                localStorage.setItem('accessToken', response.data.accessToken);
-                setUser({
-                    ...user,
-                    ...response.data,
-                });
-            });
-
+            register(input);
         } catch (error) {
             setError(error.message);
         }
@@ -44,7 +37,7 @@ export default function Register() {
         </Navigate>
     }
 
-    return <ContainerComponent>
+    return <>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <Form method={'POST'}
             onSubmit={submitHandler}
@@ -91,5 +84,7 @@ export default function Register() {
                 {error && <p>{error}</p>}
             </Form.Container>
         </Form>
-    </ContainerComponent>
+    </>
 }
+
+export default React.memo(Register);

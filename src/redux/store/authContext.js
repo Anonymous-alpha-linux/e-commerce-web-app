@@ -28,51 +28,50 @@ export default function AuthenticationContext({ children }) {
     //     accessToken: localStorage.getItem('accessToken') || ''
     // });
     const [user, setUser] = useState({
-        accessToken: localStorage.getItem('accessToken') || ''
+        accessToken: localStorage.getItem('accessToken') || 'a.b.c'
     });
-    const [loading, setLoading] = useState(true);
     const [response, setResponse] = useState({});
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
 
+
+    console.log('re-render authcontext');
     useEffect(() => {
-        setLoading(true);
-        auth(response => {
-            console.log('from authentication', response);
-            setUser(oldUser => {
-                return {
-                    ...oldUser,
-                    ...response.data,
-                }
-            });
+        console.log('Chạy qua vòng effect của authentication');
+        auth().then(() => {
+            setLoading(true);
         }).finally(() => {
             setLoading(false);
         })
-
         return () => {
             cancelTokenSource.cancel();
         };
 
-    }, []);
+    }, [response]);
 
-    const auth = React.useCallback(async (callback) => {
-        return axios.get(mainAPI.CLOUD_API_AUTH, {
+    const auth = async () => {
+        // const authApi = mainAPI.CLOUD_API_AUTH;
+        const authApi = mainAPI.LOCALHOST_AUTH;
+        console.log('user access token', user.accessToken);
+        return axios.get(authApi, {
             cancelToken: cancelTokenSource.token,
             headers: {
                 'Authorization': `Bearer ${user.accessToken}`
             }
-        }).then(
-            response => {
-                callback(response);
-            },
-        ).catch(error => {
+        }).then(response => {
+            console.log('Dữ liệu authentication', response.data);
+            setUser({
+                ...response.data
+            })
+        }).catch(error => {
             setError(error.message);
         })
-    }, [user]);
+    };
 
-    const login = async (data, callback) => {
+    const login = async (data) => {
         const loginApi = mainAPI.LOCALHOST_LOGIN;
-        // const login_api = mainAPI.CLOUD_API_LOGIN;
+        // const loginApi = mainAPI.CLOUD_API_LOGIN;
 
         return axios.post(loginApi,
             data,
@@ -82,27 +81,38 @@ export default function AuthenticationContext({ children }) {
                 }
             }).then(res => {
                 localStorage.setItem('accessToken', res.data.accessToken);
-                callback(res);
+                setResponse({
+                    ...res.data
+                });
             }).catch(error => setError(error.message));
     };
 
     const register = async (data, callback) => {
-        return axios.post(mainAPI.CLOUD_API_REGISTER, { ...data })
-            .then(response => {
+        // const registerApi = mainAPI.CLOUD_API_REGISTER;
+        const registerApi = mainAPI.LOCALHOST_REGISTER;
+        return axios.post(registerApi, { ...data })
+            .then(res => {
                 console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', response.data);
+                localStorage.setItem('accessToken', response.data.accessToken);
+                setResponse({ ...res.data });
                 callback(response);
             }).catch(error => setError(error.message));
     }
 
     const logout = React.useCallback(async () => {
         try {
-            return axios.get(mainAPI.CLOUD_API_LOGOUT)
+            // const lgoutApi = mainAPI.CLOUD_API_LOGOUT;
+            const lgoutApi = mainAPI.LOCALHOST_LOGOUT;
+            return axios.get(lgoutApi)
                 .then(res => {
-                    setLoading(false);
                     localStorage.removeItem('accessToken');
-                    setUser(res.data);
+                    setResponse({ ...res.data });
                 })
-        } catch (error) {
+        } catch (err) {
+            setLoading(false);
+            setError(err.message);
+        }
+        finally {
             setLoading(false);
         }
     }, [user]);
@@ -113,7 +123,6 @@ export default function AuthenticationContext({ children }) {
         <AuthenticationContextAPI.Provider value={{
             loading,
             user,
-            response,
             error,
             login,
             logout,
@@ -121,7 +130,6 @@ export default function AuthenticationContext({ children }) {
             setError,
             setLoading,
             setUser,
-            setResponse
         }}>
             {children}
         </AuthenticationContextAPI.Provider>

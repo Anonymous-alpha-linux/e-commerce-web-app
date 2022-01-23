@@ -4,29 +4,18 @@ import { useAuthorizationContext } from '../redux';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const { login, setLoading, user, setUser } = useAuthorizationContext();
+    const { login, user } = useAuthorizationContext();
     const [input, setInput] = useState({});
     const [error, setError] = useState('');
 
     const location = useLocation();
-
     let from = location.state?.from?.pathname || '/';
 
-    const submitHandler = (e) => {
+    console.log('re-render login', from);
+
+    const submitHandler = async (e) => {
         e.preventDefault();
-        // if (!response.isLoggedIn) throw new Error("You must login first !");
-        login(input, (res) => {
-            console.log('login', res);
-            setUser(oldUser => {
-                return {
-                    ...oldUser,
-                    ...res.data
-                }
-            });
-        }).catch(err => {
-            setError(err.message);
-        })
-        setLoading(false);
+        await login(input);
     }
 
     const inputHandler = React.useCallback((e) => {
@@ -36,13 +25,13 @@ const Login = () => {
                 [e.target.name]: e.target.value
             }
         })
-    }, [setInput])
+    }, [input, setInput])
 
     if (user.isLoggedIn) {
         return <Navigate to={from} state={{ from: location }} replace />;
     }
 
-    return <ContainerComponent>
+    return <>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <Form method={'POST'}
             onSubmit={submitHandler}
@@ -90,7 +79,7 @@ const Login = () => {
                 {error && <p>{error}</p>}
             </Form.Container>
         </Form>
-    </ContainerComponent>
+    </>
 }
 
 export default React.memo(Login);
