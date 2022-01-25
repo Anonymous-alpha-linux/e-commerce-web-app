@@ -1,3 +1,18 @@
+:root{
+  --primary-font: "Jost", "Helvetica", "Arial", sans-serif;
+  --primary-color: rgb(231, 231, 231);
+  --secondary-color: rgb(27, 27, 27);
+  --gray-light-color: rgb(229, 223, 217);
+  --gray-dark-color: rgb(153, 153, 153);
+  --black-color: rgb(49, 49, 49);
+
+  --header--gadient: linear-gradient(
+    to bottom,
+    #25211e 0,
+    rgba(37, 33, 30, 0) 100%
+  );
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
