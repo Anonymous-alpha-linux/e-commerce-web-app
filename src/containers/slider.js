@@ -1,6 +1,6 @@
 import React from 'react';
 import { Slider } from '../components';
-import users from '../fixtures/users.json';
+import users from '../fixtures/roles';
 
 export default function SliderContainer() {
     return <Slider>

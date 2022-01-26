@@ -2,7 +2,7 @@ import React from 'react'
 import { Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthorizationContext } from '../redux'
 
-export default function ProtectedRoute({ children, authorized = ['admin', 'staff', 'merchant', 'customer'], ...restProps }) {
+export default function ProtectedRoute({ children, authorized = ['admin', 'staff', 'QA_manager', 'QA_coordinator'], ...restProps }) {
 
     const { user } = useAuthorizationContext();
     const location = useLocation();
