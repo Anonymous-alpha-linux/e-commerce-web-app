@@ -1,11 +1,11 @@
 import styled from 'styled-components/macro';
 
 export const Container = styled.div`
-    max-width: 1550px;
+    max-width: 100%;
     margin: 0 auto;
     width: 100%;
     background: #333;
-    color: #fff;
+    color: var(--primary-color);
 `;
 
 export const BackDrop = styled.div`
@@ -20,9 +20,9 @@ export const BackDrop = styled.div`
 
 
 export const Item = styled.div`
-    position: 'relative';
+    position: relative;
     width:  ${({ width }) => width};
-    padding:  ${({ padding }) => padding};
+    // padding:  ${({ padding }) => padding};
 `;
 
 export const Pane = styled.div`
@@ -31,9 +31,11 @@ export const Pane = styled.div`
 
 
 export const Link = styled.a`
-    color: ${({ color = '#fff' }) => color};
+    color: ${({ color = 'var(--primary-color)' }) => color};
+    // font-size: 20px;
     text-decoration: none;
     list-style-type: none;
+    padding: 5px
 `;
 
 export const Inner = styled.div`
@@ -50,10 +52,11 @@ export const MiddleInner = styled.div`
 
 export const Flex = styled.div`
     display: flex;
+    flex-direction: column;
     direction: ${({ dir }) => dir};
 `;
 
 export const Grid = styled.div`
     display: grid;
-    grid-template-columns: ${({ columns }) => `repeat(${columns}, minmax(310px, 1fr))`};
+    grid-template-columns: ${({ columns }) => `repeat(${columns}, minmax(auto, 1fr))`};
 `
