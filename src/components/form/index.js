@@ -58,3 +58,11 @@ Form.Button = function ({ children, ...restProp }) {
     )
 }
 
+Form.Textarea = function ({ children, ...restProp }) {
+    return (
+        <textarea className="form__textarea" {...restProp}>
+            {children}
+        </textarea>
+    )
+}
+
