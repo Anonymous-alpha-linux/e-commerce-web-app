@@ -1,7 +1,7 @@
 import styled from 'styled-components/macro';
 
 export const Container = styled.div`
-    max-width: 1550px;
+    max-width: 100%;
     margin: 0 auto;
     width: 100%;
     background: #333;
@@ -9,8 +9,8 @@ export const Container = styled.div`
 `;
 
 export const BackDrop = styled.div`
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: #333;
     opacity: .8;
     position: fixed;
@@ -20,9 +20,9 @@ export const BackDrop = styled.div`
 
 
 export const Item = styled.div`
-    position: 'relative';
+    position: relative;
     width:  ${({ width }) => width};
-    padding:  ${({ padding }) => padding};
+    // padding:  ${({ padding }) => padding};
 `;
 
 export const Pane = styled.div`
@@ -34,6 +34,7 @@ export const Link = styled.a`
     color: ${({ color = '#fff' }) => color};
     text-decoration: none;
     list-style-type: none;
+    padding:  0 30px;
 `;
 
 export const Inner = styled.div`
@@ -55,5 +56,5 @@ export const Flex = styled.div`
 
 export const Grid = styled.div`
     display: grid;
-    grid-template-columns: ${({ columns }) => `repeat(${columns}, minmax(310px, 1fr))`};
+    grid-template-columns: ${({ columns }) => `repeat(${columns}, minmax(auto, 1fr))`};
 `
