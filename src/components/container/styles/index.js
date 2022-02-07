@@ -5,7 +5,7 @@ export const Container = styled.div`
     margin: 0 auto;
     width: 100%;
     background: #333;
-    color: #fff;
+    color: var(--primary-color);
 `;
 
 export const BackDrop = styled.div`
@@ -31,10 +31,15 @@ export const Pane = styled.div`
 
 
 export const Link = styled.a`
-    color: ${({ color = '#fff' }) => color};
+    color: ${({ color = 'var(--primary-color)' }) => color};
+    // font-size: 20px;
     text-decoration: none;
     list-style-type: none;
+<<<<<<< HEAD
     padding:  0 30px;
+=======
+    padding: 5px
+>>>>>>> 8579232af23b549d231d31e80ed6eb822def4d3d
 `;
 
 export const Inner = styled.div`
@@ -51,6 +56,7 @@ export const MiddleInner = styled.div`
 
 export const Flex = styled.div`
     display: flex;
+    flex-direction: column;
     direction: ${({ dir }) => dir};
 `;
 
