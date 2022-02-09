@@ -35,11 +35,7 @@ export const Link = styled.a`
     // font-size: 20px;
     text-decoration: none;
     list-style-type: none;
-<<<<<<< HEAD
-    padding:  0 30px;
-=======
     padding: 5px
->>>>>>> 8579232af23b549d231d31e80ed6eb822def4d3d
 `;
 
 export const Inner = styled.div`

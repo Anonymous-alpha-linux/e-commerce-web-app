@@ -36,10 +36,10 @@ export default function Staff() {
                     <ContainerComponent.Item>
                         <p>Thump down</p>
                     </ContainerComponent.Item>
-                    <ContainerComponent.Item>
+                </ContainerComponent.Grid>
+                <ContainerComponent.Item>
                         <p>Comment</p>
                     </ContainerComponent.Item>
-                </ContainerComponent.Grid>
             </ContainerComponent>
 
             {/* Post model */}
