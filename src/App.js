@@ -2,7 +2,6 @@ import { Fragment } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './scss/main.scss';
 
-
 import { Home, Login, ProtectedPage, Register, ForgetPassword, Nav, Staff, QACoordinator, AdminSidebar, Admin, QAManager } from './pages';
 import { useAuthorizationContext } from "./redux";
 

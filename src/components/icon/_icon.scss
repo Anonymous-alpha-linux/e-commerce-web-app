@@ -1,0 +1,16 @@
+.icon {
+  &__circleIcon {
+    padding: 5px;
+    border-radius: 50%;
+    background-color: #fff;
+    color: #333;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 23px;
+  }
+}

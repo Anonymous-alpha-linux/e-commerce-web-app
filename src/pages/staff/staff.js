@@ -1,7 +1,10 @@
 import React from 'react';
+import Profile from './profile';
+import Workspace from './workspace';
 
 export default function Staff() {
-    return <div>
-        This is staff page
-    </div>;
+    return <>
+        <Workspace></Workspace>
+        <Profile></Profile>
+    </>;
 }

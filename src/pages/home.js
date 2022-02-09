@@ -6,6 +6,8 @@ import { useAuthorizationContext } from '../redux';
 export default function Home() {
     return (
         <ContainerComponent>
+            <ContainerComponent.Hero>
+            </ContainerComponent.Hero>
             <Outlet></Outlet>
         </ContainerComponent>
     )
