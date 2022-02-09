@@ -1,55 +1,67 @@
 import React from 'react';
-import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner, BackDrop } from './styles'
+import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner, BackDrop, Hero } from './styles'
 
 // 1. define the default component
 export default function ContainerComponent({ children, ...restProps }) {
     return (
-        <Container className='container__root' {...restProps}>
+        <div className='container__root' {...restProps}>
             {children}
-        </Container>
+        </div>
     )
 }
 
 ContainerComponent.Flex = function ({ children, ...restProps }) {
-    return <Flex className='container__flex' {...restProps}>
+    return <div className='container__flex' {...restProps}>
         {children}
-    </Flex>
+    </div>
 }
 
 ContainerComponent.Grid = function ({ children, columns = 3, ...restProps }) {
-    return <Grid className='container__grid' columns={columns} {...restProps}>
+    return <div className='container__grid' {...restProps}>
         {children}
-    </Grid>
+    </div>
+}
+
+ContainerComponent.GridThreeColumns = function ({ children, ...props }) {
+    return <div className="container__gridThreeColumns" {...props}>
+        {children}
+    </div>
 }
 
 ContainerComponent.BackDrop = function ({ children, ...restProps }) {
-    return <BackDrop {...restProps}>
+    return <div className="container__backdrop" {...restProps}>
         {children}
-    </BackDrop>
+    </div>
 }
 
 ContainerComponent.Item = function ({ children, width = '100%', padding = '10px', ...restProps }) {
-    return <Item width={width} padding={padding} {...restProps}>
+    return <div className="container__item" width={width} padding={padding} {...restProps}>
         {children}
-    </Item>
+    </div>
 }
 
 ContainerComponent.Pane = function ({ children, ...restProps }) {
-    return <Pane {...restProps}>
+    return <div className="container__pane" {...restProps}>
         {children}
-    </Pane>
+    </div>
 }
 
 ContainerComponent.Inner = function ({ children, ...restProps }) {
-    return <Inner {...restProps}>
+    return <div className="container__inner" {...restProps}>
         {children}
-    </Inner>
+    </div>
 }
 
 ContainerComponent.MiddleInner = function ({ children, ...restProps }) {
-    return <MiddleInner {...restProps}>{children}</MiddleInner>
+    return <div className="container__middleInner" {...restProps}>{children}</div>
 }
 
 ContainerComponent.Link = function ({ children, ...restProps }) {
-    return <Link href={restProps.path}>{children}</Link>
+    return <a className="container__link" href={restProps.path}>{children}</a>
 }
+
+ContainerComponent.Hero = React.forwardRef(function ({ children, ...restProps }, ref) {
+    return <div className="container__hero" ref={ref} {...restProps}>
+        {children}
+    </div>
+})

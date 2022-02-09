@@ -38,6 +38,9 @@ const Login = () => {
             onSubmit={submitHandler}
             style={{
                 position: 'absolute',
+                width: '95%',
+                maxWidth: '550px',
+                minWidth: '335px',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%,-50%)',
