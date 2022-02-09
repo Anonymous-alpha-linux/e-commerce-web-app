@@ -18,7 +18,7 @@ export default function Navigation() {
         const screen = document.getElementById('root');
         const { width, height } = screen.getBoundingClientRect();
 
-        window.addEventListener('resize', () => {
+        screen.onload(() => {
             console.log('resize');
             if (width <= 375) {
                 setScreenColumn(2);
