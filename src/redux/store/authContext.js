@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect, useReducer } fro
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
+import { unstable_batchedUpdates } from 'react-dom';
 
 
 const AuthenticationContextAPI = createContext();
@@ -11,7 +12,7 @@ export default function AuthenticationContext({ children }) {
     const [user, setUser] = useState({
         accessToken: localStorage.getItem('accessToken') || 'a.b.c'
     });
-    const [socket, setSocket] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();

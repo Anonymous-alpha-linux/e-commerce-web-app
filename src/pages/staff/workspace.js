@@ -6,4 +6,4 @@ export default function Workspace() {
     return <ContainerComponent>
         <PostContainer></PostContainer>
     </ContainerComponent>;
-}
+}   
