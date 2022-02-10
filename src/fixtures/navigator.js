@@ -5,27 +5,33 @@ import { FiLogOut } from 'react-icons/fi';
 const navigators = [
     {
         icon: <IoHomeSharp></IoHomeSharp>,
-        label: 'home'
+        label: 'home',
+        link: 'home'
     },
     {
         icon: <RiHistoryLine></RiHistoryLine>,
-        label: 'my posts'
+        label: 'my posts',
+        link: 'history'
     },
     {
         icon: <FaUserAlt></FaUserAlt>,
-        label: 'user'
+        label: 'user',
+        link: 'profile'
     },
     {
         icon: <FaUsers></FaUsers>,
-        label: 'group'
+        label: 'group',
+        link: 'group'
     },
     {
         icon: <FaUserTie></FaUserTie>,
-        label: 'manager'
+        label: 'manager',
+        link: 'manager'
     },
     {
         icon: <FiLogOut></FiLogOut>,
-        label: 'logout'
+        label: 'logout',
+        link: 'logout'
     }
 ]
 export default navigators;

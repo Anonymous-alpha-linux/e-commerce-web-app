@@ -4,3 +4,4 @@ export { default as Button } from './button';
 export { default as Slider } from './slider';
 export { default as Table } from './table';
 export { default as Icon } from './icon';
+export { default as Text } from './text';
