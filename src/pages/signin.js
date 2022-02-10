@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ContainerComponent, Form } from '../components';
 import { useAuthorizationContext } from '../redux';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 const Login = () => {
     const { login, user } = useAuthorizationContext();
@@ -38,6 +38,9 @@ const Login = () => {
             onSubmit={submitHandler}
             style={{
                 position: 'absolute',
+                width: '95%',
+                maxWidth: '550px',
+                minWidth: '335px',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%,-50%)',
@@ -62,7 +65,7 @@ const Login = () => {
                     onChange={inputHandler}
                 // value={input.password}
                 ></Form.Input>
-                <Form.Link>Forgot your Password?</Form.Link>
+                <Form.Link href='/reset_password'>Forgot your Password?</Form.Link>
                 <Form.Button
                     onClick={submitHandler}
                     style={{

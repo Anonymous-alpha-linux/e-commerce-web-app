@@ -27,6 +27,7 @@ export default function AuthenticationContext({ children }) {
     // const [user, dispatchUser] = useReducer(AuthReducer, {
     //     accessToken: localStorage.getItem('accessToken') || ''
     // });
+    // user {accessToken,isLoggedIn: true, role}
     const [user, setUser] = useState({
         accessToken: localStorage.getItem('accessToken') || 'a.b.c'
     });
@@ -55,7 +56,6 @@ export default function AuthenticationContext({ children }) {
                 'Authorization': `Bearer ${user.accessToken}`
             }
         }).then(response => {
-
             setUser({
                 ...response.data
             })

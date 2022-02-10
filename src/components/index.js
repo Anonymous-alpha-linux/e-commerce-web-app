@@ -3,4 +3,4 @@ export { default as Form } from './form';
 export { default as ButtonComponent } from './button';
 export { default as Slider } from './slider';
 export { default as Table } from './table';
-export { default as Textarea } from './textarea'
+export { default as Icon } from './icon';
