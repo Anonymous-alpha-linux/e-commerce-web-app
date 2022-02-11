@@ -27,15 +27,15 @@ export default function AuthenticationContext({ children }) {
         };
     }, []);
 
-    useEffect(() => {
-        const socket = io('http://localhost:4000');
-        socket.on('test', msg => console.log(msg));
-        socket.emit("notify", (res) => console.log('res', res));
+    // useEffect(() => {
+    //     const socket = io('http://localhost:4000');
+    //     socket.on('test', msg => console.log(msg));
+    //     socket.emit("notify", (res) => console.log('res', res));
 
-        return () => {
-            socket.disconnect();
-        }
-    }, [])
+    //     return () => {
+    //         socket.disconnect();
+    //     }
+    // }, [])
 
 
     const auth = async () => {
