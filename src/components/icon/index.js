@@ -1,6 +1,4 @@
 import React from 'react';
-
-
 export default function IconComponent({ children, ...restProps }) {
     return <div className='icon__root'  {...restProps}>
         {children}
