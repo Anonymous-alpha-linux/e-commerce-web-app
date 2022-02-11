@@ -31,11 +31,10 @@ export default function AuthenticationContext({ children }) {
         const socket = io('http://localhost:4000');
         socket.on('test', msg => console.log(msg));
         socket.emit("notify", (res) => console.log('res', res));
-
         return () => {
             socket.disconnect();
         }
-    }, [])
+    }, [])  
 
 
     const auth = async () => {
