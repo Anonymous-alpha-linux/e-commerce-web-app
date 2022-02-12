@@ -8,4 +8,4 @@ export default function Workspace() {
         <PostContainer></PostContainer>
         <Comment></Comment>
     </ContainerComponent>;
-}
+}   
