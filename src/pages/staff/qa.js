@@ -1,4 +1,5 @@
-import React from 'react'
+
+    import React from 'react'
 
 export default function QA() {
     return (
@@ -6,4 +7,5 @@ export default function QA() {
             {/* Accordion */}
         </>
     )
+        
 }
