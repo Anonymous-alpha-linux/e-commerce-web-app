@@ -8,3 +8,9 @@ export default function Admin() {
         </h1>
     </div>;
 }
+
+Admin.About = function () {
+    return <div>
+        <h1>This is admin about</h1>
+    </div>
+}

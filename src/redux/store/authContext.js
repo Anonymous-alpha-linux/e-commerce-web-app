@@ -2,34 +2,16 @@ import axios from 'axios';
 import React, { createContext, useContext, useState, useEffect, useReducer } from 'react';
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
+import { io } from 'socket.io-client';
 
 
 const AuthenticationContextAPI = createContext();
 
-const AuthReducer = (state, action) => {
-    switch (action.type) {
-        case "authenticate":
-            break;
-        case "login":
-            break;
-        case "register":
-            break;
-        case "logout":
-            break;
-        case "forget":
-            break;
-        default:
-            break;
-    }
-}
-
 export default function AuthenticationContext({ children }) {
-    // const [user, dispatchUser] = useReducer(AuthReducer, {
-    //     accessToken: localStorage.getItem('accessToken') || ''
-    // });
     const [user, setUser] = useState({
         accessToken: localStorage.getItem('accessToken') || 'a.b.c'
     });
+    const [socket, setSocket] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
@@ -45,6 +27,17 @@ export default function AuthenticationContext({ children }) {
         };
     }, []);
 
+    useEffect(() => {
+        const socket = io('http://localhost:4000');
+        socket.on('test', msg => console.log(msg));
+        socket.emit("notify", (res) => console.log('res', res));
+
+        return () => {
+            socket.disconnect();
+        }
+    }, [])
+
+
     const auth = async () => {
         const authApi = mainAPI.CLOUD_API_AUTH;
         // const authApi = mainAPI.LOCALHOST_AUTH;
@@ -55,7 +48,6 @@ export default function AuthenticationContext({ children }) {
                 'Authorization': `Bearer ${user.accessToken}`
             }
         }).then(response => {
-
             setUser({
                 ...response.data
             })

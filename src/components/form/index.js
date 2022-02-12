@@ -57,4 +57,14 @@ Form.Button = function ({ children, ...restProp }) {
         </a>
     )
 }
+Form.Message = function ({ children, ...restProps }) {
+    return <p className='form__message' {...restProps}>{children}</p>
+}
 
+Form.ErrorMessage = function ({ children, ...restProp }) {
+    return <p className='form__errorMsg' {...restProp}>{children} </p>
+}
+
+Form.TextArea = function ({ children, ...restProp }) {
+    return <textarea cols={12} {...restProp}>{children}</textarea>
+}
