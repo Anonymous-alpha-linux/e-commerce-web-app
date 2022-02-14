@@ -3,6 +3,7 @@ import { ButtonComponent, ContainerComponent, Form, Icon, MessageBox, Text } fro
 import ConditionContainer from './condition';
 
 import { AiOutlineCloudUpload } from 'react-icons/ai';
+import UploadForm from './uploadpreview';
 
 export default function PostModal() {
     const [openCondition, setOpenCondition] = React.useState(false)
@@ -11,7 +12,7 @@ export default function PostModal() {
         padding: '20px'
     }}>
         <ContainerComponent.Inner>
-            <ContainerComponent.Pane>
+            <Form>
                 <ContainerComponent.Pane>
                     <Text.Title>Post Modal</Text.Title>
                     <Text.Subtitle>Author name: Staff</Text.Subtitle>
@@ -37,6 +38,7 @@ export default function PostModal() {
                         </ContainerComponent.Item>
                     </ContainerComponent.Flex>
 
+                    
                     <ContainerComponent.Flex>
                         <ContainerComponent.Item>
                             <Icon
@@ -52,11 +54,18 @@ export default function PostModal() {
                                 padding: '20px'
                             }}
                         >
-                            <ButtonComponent.Upload>
-                                Upload your content
-                            </ButtonComponent.Upload>
+                            {/* uploadpreview */}
+                            <UploadForm></UploadForm>
                         </ContainerComponent.Item>
                     </ContainerComponent.Flex>
+
+                    {/* <ContainerComponent
+                        style= {{
+                            background: 'white'
+                        }}
+                    >
+                        <ContainerComponent.Grid></ContainerComponent.Grid>
+                    </ContainerComponent> */}
 
                     
 
@@ -88,7 +97,7 @@ export default function PostModal() {
                         Summit
                     </ButtonComponent.Summit>
                 </ContainerComponent.Pane>
-            </ContainerComponent.Pane>
+            </Form>
         </ContainerComponent.Inner>
     </ContainerComponent>
 }
