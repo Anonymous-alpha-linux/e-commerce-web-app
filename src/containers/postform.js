@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Container } from 'react-bootstrap';
 import { ContainerComponent, Text, Form, Icon } from '../components';
 import { PostModal } from '../containers';
 

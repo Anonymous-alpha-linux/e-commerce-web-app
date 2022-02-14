@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner, BackDrop, Hero } from './styles'
+// import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner, BackDrop, Hero } from './styles'
 
 // 1. define the default component
 export default function ContainerComponent({ children, ...restProps }) {
