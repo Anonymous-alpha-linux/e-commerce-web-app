@@ -1,8 +1,9 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { Container } from 'react-bootstrap';
 import {ContainerComponent, Text, Form, Icon} from '../components';
 
 export default function PostForm() {
+const [openModal , setOpenModal] = useState(false);
     return <ContainerComponent style={{
         padding: '10px',
     }}>
@@ -15,9 +16,11 @@ export default function PostForm() {
             <ContainerComponent.Item>
             <ContainerComponent.Pane>
                 <Text.Title style={{fontSize: '10px'}}>Staff Name</Text.Title>
-                <Form.Input placeholder="Post your idea"></Form.Input>
+                <Form.Input placeholder="Post your idea" onClick={()=>setOpenModal(!openModal)}></Form.Input>
             </ContainerComponent.Pane>
             </ContainerComponent.Item>
         </ContainerComponent.Flex>
+
+{openModal && <div className="modal">This si modal</div>}
     </ContainerComponent>
 }
