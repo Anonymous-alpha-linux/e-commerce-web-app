@@ -4,10 +4,12 @@ import { useAuthorizationContext } from '../redux';
 
 export default function PostModal() {
     const { socket } = useAuthorizationContext();
+
     const submitHandler = (e) => {
         e.preventDefault();
         socket.emit("post", "posted a new post");
     }
+
     return (
         <ContainerComponent>
             <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
@@ -15,7 +17,7 @@ export default function PostModal() {
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
-                transform: 'translate(-50%,-50%)',
+                transform: 'translate(-50%,-50%)'
             }}>
                 <Form onSubmit={submitHandler}>
                     <Text>This is Form Modal</Text>
