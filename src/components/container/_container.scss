@@ -5,6 +5,7 @@
     width: 100%;
     background: #333;
     color: #fff;
+    font-size: 14px;
   }
 
   &__flex {
@@ -18,7 +19,6 @@
       grid-template-columns: repeat(2, 1fr);
     }
   }
-
   &__gridThreeColumns {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -34,10 +34,6 @@
     color: #333;
     text-decoration: none;
     list-style-type: none;
-  }
-
-  &__inner {
-    padding: 0 20px;
   }
 
   &__innerFluid {

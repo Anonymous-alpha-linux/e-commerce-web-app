@@ -34,6 +34,8 @@ const Login = () => {
 
     return <>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
+        <ContainerComponent.Hero>
+        </ContainerComponent.Hero>
         <Form method={'POST'}
             onSubmit={submitHandler}
             style={{

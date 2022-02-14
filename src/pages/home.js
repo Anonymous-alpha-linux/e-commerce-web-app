@@ -5,8 +5,6 @@ import { ContainerComponent } from '../components';
 export default function Home() {
     return (
         <ContainerComponent>
-            <ContainerComponent.Hero>
-            </ContainerComponent.Hero>
             <Outlet></Outlet>
         </ContainerComponent>
     )
