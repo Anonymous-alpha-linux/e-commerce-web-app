@@ -10,6 +10,11 @@ export default function ContainerComponent({ children, ...restProps }) {
     )
 }
 
+ContainerComponent.Absolute = function ({ children, ...restProps }) {
+    return <div className='container__absolute'>
+        {children}
+    </div>
+}
 ContainerComponent.Flex = function ({ children, ...restProps }) {
     return <div className='container__flex' {...restProps}>
         {children}

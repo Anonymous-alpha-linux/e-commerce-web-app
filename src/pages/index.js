@@ -5,7 +5,6 @@ export { default as Register } from './signup';
 export { default as ForgetPassword } from './forgot.password';
 export { default as Loading } from './loading';
 export { default as ProtectedPage } from './page.protected';
-export { default as PublicPage } from './page.public';
 export { default as Layout } from './layout';
 export { Nav } from '../containers';
 
@@ -13,8 +12,8 @@ export { Nav } from '../containers';
 // 2. QA coordinator
 export * from './QAcoordinator';
 // 3. Admin
-export * from './admin';
+export * from './Admin';
 // 4. Staff
-export * from './staff';
+export * from './Staff';
 // 5. QA manager
 export * from './QAManager';

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
 import { ContainerComponent, Icon } from '../components';
 import NavData from '../fixtures/nav-links.json';
 import navigators from '../fixtures/navigator';
@@ -16,7 +17,7 @@ export default function Navigation() {
 
     const responsiveHandler = () => {
         const { width } = window.screen;
-        if (width <= 480) {
+        if (width <= '480px') {
             setScreenColumn(2);
         }
         else {
@@ -30,15 +31,15 @@ export default function Navigation() {
             responsiveHandler();
         })
         return () => {
-            window.removeEventListener('resize');
+            window.removeEventListener('resize', responsiveHandler);
         }
-    }, [window.screen]);
+    }, [window.screen.width]);
+    console.log(screenColumn > 3);
 
     return <ContainerComponent>
         <ContainerComponent.Grid columns={screenColumn}>
             <ContainerComponent.Item>
             </ContainerComponent.Item>
-
             {screenColumn > 2 && <ContainerComponent.Item>
                 <ContainerComponent.MiddleInner>
                     <ContainerComponent.Flex>
@@ -52,7 +53,6 @@ export default function Navigation() {
                     </ContainerComponent.Flex>
                 </ContainerComponent.MiddleInner>
             </ContainerComponent.Item>}
-
             <ContainerComponent.Item>
                 <AuthStatus
                     setOpenNavigator={setOpenNavigator}
@@ -111,14 +111,17 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNavigator }
                 <IoNotificationsOutline></IoNotificationsOutline>
             </Icon.CircleIcon>
         </ContainerComponent.Item>
-        {screenColumn < 3 ?
-            <ContainerComponent.Item>
+        <ContainerComponent.Item>
+            {
+                screenColumn < 3 &&
                 <Icon.CircleIcon onClick={() => setOpenNavigator(!openNavigator)}>
                     <BsList></BsList>
                 </Icon.CircleIcon>
-            </ContainerComponent.Item> :
-            <ContainerComponent.Item>
+                ||
                 <Link to={'/'} onClick={logout}>Logout</Link>
-            </ContainerComponent.Item>}
+            }
+        </ContainerComponent.Item>
+
+
     </ContainerComponent.Flex>
 });

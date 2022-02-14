@@ -38,6 +38,8 @@ function Register() {
     }
 
     return <>
+        <ContainerComponent.Hero>
+        </ContainerComponent.Hero>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <Form method={'POST'}
             onSubmit={submitHandler}

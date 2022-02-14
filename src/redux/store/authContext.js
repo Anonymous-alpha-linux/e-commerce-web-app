@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { createContext, useContext, useState, useEffect, useReducer } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
@@ -19,23 +19,25 @@ export default function AuthenticationContext({ children }) {
     useEffect(() => {
         auth().then(() => {
             setLoading(true);
+            const socket = io(mainAPI.LOCALHOST_HOST, {
+                auth: {
+                    accessToken: user.accessToken
+                }
+            }).on("test", (msg) => {
+                console.log(msg);
+                setSocket(socket);
+            }).on("connect_error", err => {
+                console.log(err.message);
+                socket.disconnect();
+            })
         }).finally(() => {
             setLoading(false);
         })
         return () => {
             cancelTokenSource.cancel();
+            socket.disconnect();
         };
     }, []);
-
-    useEffect(() => {
-        const socket = io('http://localhost:4000');
-        socket.on('test', msg => console.log(msg));
-        socket.emit("notify", (res) => console.log('res', res));
-        return () => {
-            socket.disconnect();
-        }
-    }, [])  
-
 
     const auth = async () => {
         const authApi = mainAPI.CLOUD_API_AUTH;
@@ -111,6 +113,8 @@ export default function AuthenticationContext({ children }) {
             loading,
             user,
             error,
+            socket,
+            setSocket,
             login,
             logout,
             register,
