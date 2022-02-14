@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
+import { unstable_batchedUpdates } from 'react-dom';
 
 
 const AuthenticationContextAPI = createContext();
@@ -11,7 +12,7 @@ export default function AuthenticationContext({ children }) {
     const [user, setUser] = useState({
         accessToken: localStorage.getItem('accessToken') || 'a.b.c'
     });
-    const [socket, setSocket] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
@@ -39,6 +40,20 @@ export default function AuthenticationContext({ children }) {
         };
     }, []);
 
+<<<<<<< HEAD
+=======
+    // useEffect(() => {
+    //     const socket = io('http://localhost:4000');
+    //     socket.on('test', msg => console.log(msg));
+    //     socket.emit("notify", (res) => console.log('res', res));
+
+    //     return () => {
+    //         socket.disconnect();
+    //     }
+    // }, [])
+
+
+>>>>>>> 214104fe73bd7a877829f26cc93e5b1444beaee1
     const auth = async () => {
         const authApi = mainAPI.CLOUD_API_AUTH;
         // const authApi = mainAPI.LOCALHOST_AUTH;

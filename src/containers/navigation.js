@@ -88,6 +88,15 @@ const Navigator = () => {
     )
 }
 
+const Notification = () => {
+    return (
+        <ContainerComponent>
+            <ContainerComponent></ContainerComponent>
+        </ContainerComponent>
+    )
+}
+
+
 const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNavigator }) => {
     const { user, logout } = useAuthorizationContext();
 
