@@ -3,7 +3,7 @@ import React from 'react';
 export default function Form({ children, action, method, onSubmit, ...restProp }) {
     return (
         <div className='form' {...restProp}>
-            <form action={action} method={method} onSubmit={onSubmit}>
+            <form action={action} method={method} onSubmit={onSubmit} encType={restProp.encType}>
                 {children}
             </form>
         </div>
@@ -69,10 +69,13 @@ Form.TextArea = function ({ children, ...restProp }) {
     return <textarea cols={12} {...restProp}>{children}</textarea>
 }
 
-Form.Select = function ({ dropdown, children, ...restProp }) {
-    return <select className="form__select" id="dropdown" {...restProp}>{children}</select>
+Form.Select = function ({ children, ...restProp }) {
+    return <select className="form__select" {...restProp}>{children}</select>
 }
 
+Form.Option = function ({ children, ...props }) {
+    return <option {...props} className='form__option' value={children}>{children}</option>
+}
 
 Form.Checkbox = function ({ children, ...restProp }) {
     return (

@@ -22,4 +22,3 @@ ButtonComponent.Upload = function ({ children, ...restProp }) {
         </a>
     )
 }
-

@@ -2,105 +2,86 @@ import React from 'react';
 import { ButtonComponent, ContainerComponent, Form, Icon, MessageBox, Text } from '../components';
 import ConditionContainer from './condition';
 
-import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { FaChevronLeft } from "react-icons/fa";
 import UploadForm from './uploadpreview';
 
-export default function PostModal() {
+export default function PostModal({ setOpenModal }) {
     const [openCondition, setOpenCondition] = React.useState(false)
-
-    return <ContainerComponent.Section style={{
-
+    return <ContainerComponent.Section className="postModal__container" style={{
+        position: 'fixed',
+        top: '50px',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: 10000,
+        padding: '10px',
+        background: '#fff',
+        overflowY: 'scroll',
+        paddingBottom: '50px'
     }}>
-        <ContainerComponent.Inner>
-            <Form style={{
-                width: '90%',
-
+        <Form encType='multipart/form-data' style={{
+            borderRadius: '20px',
+            background: '#fff',
+        }}>
+            <Text onClick={() => setOpenModal(modal => !modal)}>
+                <Text.Middle>
+                    <Icon style={{ display: 'inline' }}>
+                        <FaChevronLeft></FaChevronLeft>
+                    </Icon>
+                </Text.Middle>
+                <Text.Middle style={{
+                    verticalAlign: 'text-top'
+                }}>
+                    Back
+                </Text.Middle>
+            </Text>
+            <Text.Title style={{
+                textAlign: 'right'
+            }}>Post Modal</Text.Title>
+            <Text.Label>Author name: <Text.Middle>
+                <Text.Bold>Staff</Text.Bold>
+            </Text.Middle>
+            </Text.Label>
+            <Form.TextArea
+                style={{
+                    width: '100%',
+                    height: '100px'
+                }}
+            ></Form.TextArea>
+            <Text.Line>
+                <Text.Middle>
+                    <Form.Checkbox></Form.Checkbox>
+                </Text.Middle>
+                <Text.Middle>
+                    Private Post
+                </Text.Middle>
+            </Text.Line>
+            <ContainerComponent.Pane className="upload__input" style={{
+                padding: '10px 0'
             }}>
-                <ContainerComponent.Pane>
-                    <Text.Title>Post Modal</Text.Title>
-                    <Text.Subtitle>Author name: Staff</Text.Subtitle>
-                    <Form.TextArea
+                <UploadForm></UploadForm>
+            </ContainerComponent.Pane>
+            <Text.Line>
+                <Text.Middle>
+                    <Form.Checkbox></Form.Checkbox>
+                </Text.Middle>
+                <Text.Middle>
+                    <Text.Paragraph
+                        onClick={() => setOpenCondition(!openCondition)}
                         style={{
-                            width: '100%',
-                            height: '100px'
+                            color: 'blue',
+                            margin: '0'
                         }}
-                    ></Form.TextArea>
-
-                    <ContainerComponent.Flex>
-                        <ContainerComponent.Item>
-                            <Form.Checkbox></Form.Checkbox>
-                        </ContainerComponent.Item>
-                        <ContainerComponent.Item>
-                            <ContainerComponent.Pane>
-                                <Text.Paragraph
-                                    style={{
-                                        margin: '0'
-                                    }}
-                                >Private Post</Text.Paragraph>
-                            </ContainerComponent.Pane>
-                        </ContainerComponent.Item>
-                    </ContainerComponent.Flex>
-
-
-                    <ContainerComponent.Flex>
-                        <ContainerComponent.Item>
-                            <Icon
-                                style={{
-                                    fontSize: '30px'
-                                }}
-                            >
-                                <AiOutlineCloudUpload></AiOutlineCloudUpload>
-                            </Icon>
-                        </ContainerComponent.Item>
-                        <ContainerComponent.Item
-                            style={{
-                                padding: '20px'
-                            }}
-                        >
-                            {/* uploadpreview */}
-                            <UploadForm></UploadForm>
-                        </ContainerComponent.Item>
-                    </ContainerComponent.Flex>
-
-                    {/* <ContainerComponent
-                        style= {{
-                            background: 'white'
-                        }}
-                    >
-                        <ContainerComponent.Grid></ContainerComponent.Grid>
-                    </ContainerComponent> */}
-
-
-
-                    <ContainerComponent.Flex>
-                        <ContainerComponent.Item>
-                            <Form.Checkbox></Form.Checkbox>
-                        </ContainerComponent.Item>
-                        <ContainerComponent.Item>
-                            <ContainerComponent.Pane>
-                                <Text.Paragraph
-                                    onClick={() => setOpenCondition(!openCondition)}
-                                    style={{
-                                        color: 'blue',
-                                        margin: '0'
-                                    }}
-                                >Condition and Term</Text.Paragraph>
-                            </ContainerComponent.Pane>
-                        </ContainerComponent.Item>
-                        {openCondition && <ConditionContainer></ConditionContainer>}
-                    </ContainerComponent.Flex>
-
-                    <MessageBox.TextMessage>
-                        Message Box Text
-                    </MessageBox.TextMessage>
-
-                    <ContainerComponent.Item></ContainerComponent.Item>
-
-                    <ButtonComponent.Submit>
-                        Submit
-                    </ButtonComponent.Submit>
-                </ContainerComponent.Pane>
-            </Form>
-        </ContainerComponent.Inner>
+                    >Condition and Term</Text.Paragraph>
+                </Text.Middle>
+            </Text.Line>
+            {openCondition && <ConditionContainer></ConditionContainer>}
+            <MessageBox.TextMessage>
+                Message Box Text
+            </MessageBox.TextMessage>
+            <ButtonComponent.Submit>
+                Submit
+            </ButtonComponent.Submit>
+        </Form>
     </ContainerComponent.Section>
 }

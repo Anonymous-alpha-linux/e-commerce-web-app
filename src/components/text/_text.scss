@@ -1,0 +1,43 @@
+.text {
+  font-size: 14px;
+  margin: 0;
+  display: inline-block;
+  &__title {
+    font-size: 15px;
+    margin: 2px 0;
+  }
+  &__line {
+    font-size: 14px;
+  }
+  &__subtitle {
+    font-size: 13px;
+  }
+  &__date {
+    color: rgb(141, 141, 141);
+    font-size: 12px;
+    margin: 0;
+  }
+  &__paragraph {
+    font-size: 13px;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+  &__middle {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+  }
+  &__center {
+    text-align: center;
+    margin: 0;
+  }
+  &__bold {
+    font-weight: bold;
+  }
+  &__camel {
+    text-transform: capitalize;
+  }
+  &__uppercase {
+    text-transform: uppercase;
+  }
+}

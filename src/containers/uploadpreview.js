@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Text} from '../components';
+import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { FaTimes } from 'react-icons/fa';
+import { ContainerComponent, Form, List, Preview, Text, Icon } from '../components';
 // import apiConfig from '../config/api.json';
 
-const UploadForm = React.forwardRef(({ children, props }, ref) => {
+const UploadPreview = React.forwardRef(({ children, props }, ref) => {
     const [files, setFiles] = useState([]);
     const [rerender, setRerender] = useState(false);
     const [message, setMessage] = useState("");
@@ -26,7 +28,6 @@ const UploadForm = React.forwardRef(({ children, props }, ref) => {
     const submitHandler = (e) => {
         e.preventDefault();
         const formData = new FormData();
-
         const headers = {
             'Content-Type': 'multipart/form-data'
         };
@@ -44,6 +45,9 @@ const UploadForm = React.forwardRef(({ children, props }, ref) => {
         //         }, 3000);
         //     })
         //     .catch(err => setError(err.message));
+    }
+    const removeItem = (id) => {
+        setFiles(files => files.filter((file, index) => index !== id));
     }
     useEffect(() => {
         setTimeout(() => {
@@ -74,60 +78,80 @@ const UploadForm = React.forwardRef(({ children, props }, ref) => {
             })
             return files;
         })
-
     }, [files]);
 
-    return <>
-        <Form encType='multipart/form-data' onSubmit={submitHandler}>
-            <Text htmlFor='files'>Upload Files:</Text>
-            <Form.Input type='file'
-                name="files"
-                id='files'
-                onChange={(e) => {
-                    setFiles(files => {
-                        let image = 'https://image.shutterstock.com/image-vector/file-iconvector-illustration-flat-design-260nw-1402633574.jpg';
-                        const newFiles = [...files];
-                        try {
-                            Array.from(e.target.files).forEach(file => {
-                                let size = file.size / 1024;
-                                if (isOverflowFile(files, size)) {
-                                    alert("File size is overflow");
-                                    throw new Error("File size is overflow");
-                                }
-                                newFiles.push({
-                                    file,
-                                    image,
-                                    size
-                                })
-                            });
-                        } catch (error) {
-                            setError(error.message);
-                        }
+    return <ContainerComponent.Section className="form-upload__container">
+        <Text.Label htmlFor='files'>Upload Files:</Text.Label>
+        <Text.Line>
+            <Text.Middle>
+                <Icon
+                    style={{
+                        fontSize: '30px'
+                    }}>
+                    <AiOutlineCloudUpload></AiOutlineCloudUpload>
+                </Icon>
+            </Text.Middle>
+            <Text.Middle>
+                <Form.Input type='file'
+                    name="files"
+                    id='files'
+                    onChange={(e) => {
+                        setFiles(files => {
+                            let image = 'https://image.shutterstock.com/image-vector/file-iconvector-illustration-flat-design-260nw-1402633574.jpg';
+                            const newFiles = [...files];
+                            try {
+                                Array.from(e.target.files).forEach(file => {
+                                    let size = file.size / 1024;
+                                    if (isOverflowFile(files, size)) {
+                                        alert("File size is overflow");
+                                        throw new Error("File size is overflow");
+                                    }
+                                    newFiles.push({
+                                        file,
+                                        image,
+                                        size
+                                    })
+                                });
+                            } catch (error) {
+                                setError(error.message);
+                            }
 
-                        return newFiles;
-                    });
-                }}
-                ref={ref} multiple />
-            <div className="upload-preview">
+                            return newFiles;
+                        });
+                    }}
+                    ref={ref} multiple />
+            </Text.Middle>
+            <Preview>
                 {!files.length ?
-                    <span className="upload-preview__placeholder">
+                    <Text.Title className="upload-preview__placeholder">
                         Document Preview
-                    </span> :
-                    <ol>
+                    </Text.Title> :
+                    <ContainerComponent.Flex>
                         {
                             files.map((file, index) => {
-                                return <li className='upload-preview-item' key={index}>
-                                    <img src={file.image}></img>
-                                </li>
+                                return <ContainerComponent.Item className='upload-preview-item' key={index} style={{
+                                    position: 'relative',
+                                    flexGrow: 1
+                                }}>
+                                    <Icon style={{
+                                        position: 'position',
+                                        right: 0,
+                                        top: 0
+                                    }}
+                                        onClick={() => removeItem(index)}>
+                                        <FaTimes></FaTimes>
+                                    </Icon>
+                                    <Preview.Images image={file.image} alt={"preview file"}></Preview.Images>
+                                </ContainerComponent.Item>
                             })
                         }
-                    </ol>}
-            </div>
-            {message && <p>{message}</p>}
-            {error && <p>{error}</p>}
-            <Form.Input type='submit' value={'Submit'}></Form.Input>
-        </Form>
-    </>
+                    </ContainerComponent.Flex>}
+            </Preview>
+        </Text.Line>
+        {message && <p>{message}</p>}
+        {error && <p>{error}</p>}
+        <Form.Input type='submit' value={'Submit'}></Form.Input>
+    </ContainerComponent.Section>
 });
 
-export default UploadForm;
+export default UploadPreview;
