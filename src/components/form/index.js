@@ -68,3 +68,11 @@ Form.ErrorMessage = function ({ children, ...restProp }) {
 Form.TextArea = function ({ children, ...restProp }) {
     return <textarea cols={12} {...restProp}>{children}</textarea>
 }
+
+Form.Checkbox = function ({ children, ...restProp }) {
+    return (
+        <input type={'checkbox'} className="form__checkbox" {...restProp}>
+            {children}
+        </input>
+    )
+}
