@@ -1,0 +1,54 @@
+.form {
+  width: 30%;
+  margin: 0 auto;
+  padding: 50px;
+  min-width: 330px;
+  max-width: 400px;
+  background-color: #fff;
+  color: #333;
+  &__container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  &__logo {
+    text-align: center;
+  }
+  &__input {
+    font-size: 14px;
+    padding: 15px 10px;
+  }
+  &__link {
+    text-align: left;
+    text-decoration: none;
+    color: #444;
+    &:hover {
+      color: #ffb400;
+    }
+  }
+  &__button {
+    text-transform: capitalize;
+    padding: 15px 0;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #e8eced;
+    text-align: center;
+    &:hover {
+      background-color: #ffb400 !important;
+      transition: all 0.15s linear;
+    }
+  }
+  &__title {
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 28px;
+    padding-top: 20px;
+    margin-bottom: 10px;
+    border-top: 2px solid black;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    text-align: center;
+  }
+  &__image {
+    margin: 0;
+  }
+}
