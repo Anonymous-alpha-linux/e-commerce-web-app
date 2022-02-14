@@ -7,8 +7,14 @@ export default function ButtonComponent({ children, ...restProps }) {
 
 ButtonComponent.Submit = function ({ children, ...restProp }) {
     return (
-        <a className="button__submit" {...restProp}>
+        <a className="button__submit" {...restProp}></a>
+    )
+}
+ButtonComponent.Upload = function ({ children, ...restProp }) {
+    return (
+        <a className="button__upload" {...restProp}>
             {children}
         </a>
     )
 }
+

@@ -7,7 +7,7 @@ import { BsFillPersonFill } from "react-icons/bs";
 
 export default function Post() {
   return (
-    <ContainerComponent
+    <ContainerComponent.Section
       style={{
         padding: "20px",
       }}
@@ -56,6 +56,6 @@ export default function Post() {
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
       </ContainerComponent.Inner>
-    </ContainerComponent>
+    </ContainerComponent.Section>
   );
 }

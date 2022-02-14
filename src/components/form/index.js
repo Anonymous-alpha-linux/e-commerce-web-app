@@ -74,3 +74,10 @@ Form.Select = function ({ dropdown, children, ...restProp }) {
 }
 
 
+Form.Checkbox = function ({ children, ...restProp }) {
+    return (
+        <input type={'checkbox'} className="form__checkbox" {...restProp}>
+            {children}
+        </input>
+    )
+}

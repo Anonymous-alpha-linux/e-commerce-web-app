@@ -1,10 +1,11 @@
 import React,{useState} from 'react';
 import { Container } from 'react-bootstrap';
 import {ContainerComponent, Text, Form, Icon} from '../components';
+import {PostModal} from '../containers';
 
 export default function PostForm() {
 const [openModal , setOpenModal] = useState(false);
-    return <ContainerComponent style={{
+    return <ContainerComponent.Section style={{
         padding: '10px',
     }}>
         <ContainerComponent.Flex style={{alignItems: 'center'}}>
@@ -20,7 +21,6 @@ const [openModal , setOpenModal] = useState(false);
             </ContainerComponent.Pane>
             </ContainerComponent.Item>
         </ContainerComponent.Flex>
-
-{openModal && <div className="modal">This si modal</div>}
-    </ContainerComponent>
+{openModal && <PostModal></PostModal>}
+    </ContainerComponent.Section>
 }
