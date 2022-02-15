@@ -1,0 +1,13 @@
+.table {
+  &__header {
+    &--bold {
+      font-weight: bold;
+    }
+
+    @include tablet {
+    }
+
+    @include desktop {
+    }
+  }
+}

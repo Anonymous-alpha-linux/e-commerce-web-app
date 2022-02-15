@@ -5,7 +5,7 @@ import { FiSend } from "react-icons/fi";
 import { BsFillPersonFill } from "react-icons/bs";
 
 export default function Comment() {
-    return <ContainerComponent.Section className="comment__container" style={{
+    return <ContainerComponent.Section className="comment__section" style={{
         padding: '10px'
     }}>
         <ContainerComponent.Pane className="comment__header">
@@ -23,7 +23,6 @@ export default function Comment() {
                 </ContainerComponent.Item>
             </ContainerComponent.Flex>
         </ContainerComponent.Pane>
-
         <ContainerComponent.Pane className="comment__body">
             <ContainerComponent.Flex style={{ alignItems: 'center', flexWrap: 'nowrap' }}>
                 <ContainerComponent.Item>
@@ -56,13 +55,11 @@ export default function Comment() {
                 </ContainerComponent.Item>
             </ContainerComponent.Flex>
         </ContainerComponent.Pane>
-
         <ContainerComponent.Pane className="comment__log" style={{
             paddingTop: '12px'
         }}>
             <Comment.Tab></Comment.Tab>
         </ContainerComponent.Pane>
-
         <ContainerComponent.Pane className="comment__footer">
             <Text.Subtitle style={{ textAlign: 'center', width: '100%', margin: '10px 0' }}>
                 More...

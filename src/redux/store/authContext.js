@@ -20,9 +20,9 @@ export default function AuthenticationContext({ children }) {
 
     useEffect(() => {
         auth().then(() => {
-            // setLoading(true);
-            // const socketHost = mainAPI.CLOUD_API_HOST;
-            const socketHost = mainAPI.LOCALHOST_HOST;
+            setLoading(true);
+            const socketHost = mainAPI.CLOUD_API_HOST;
+            // const socketHost = mainAPI.LOCALHOST_HOST;
             const socket = io(socketHost, {
                 auth: {
                     accessToken: user.accessToken
