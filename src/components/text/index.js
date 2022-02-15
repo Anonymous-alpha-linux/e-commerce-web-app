@@ -28,6 +28,7 @@ Text.Line = ({ children, ...props }) => {
     return <div className='text__line' {...props}>{children}</div>
 }
 Text.MiddleLine = ({ children, ...props }) => <span className='text__middleLine' {...props}>{children}</span>
+Text.RightLine = ({ children, ...props }) => <span className='text__rightLine' {...props}>{children}</span>
 Text.CenterLine = ({ children, ...props }) => <span className='text__centerLine' {...props}>{children}</span>
 Text.Group = ({ children, ...props }) => <span className='text__group' {...props}>{children}</span>
 Text.Middle = ({ children, ...props }) => {

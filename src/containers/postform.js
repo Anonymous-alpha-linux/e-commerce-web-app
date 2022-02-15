@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { ContainerComponent, Text, Form, Icon } from '../components';
 import { PostModal } from '../containers';
 import { IoLogoApple } from 'react-icons/io5'
+import { useAuthorizationContext } from '../redux';
 
 export default function PostForm() {
-    const [openModal, setOpenModal] = useState(false);
+    const [openModal, setOpenModal] = useState(false),
+        { user } = useAuthorizationContext();
+
     return <ContainerComponent.Section
         className="post-form__container"
         style={{
@@ -20,7 +23,7 @@ export default function PostForm() {
             <ContainerComponent.Item style={{
                 flexGrow: 1
             }}>
-                <Text.Title>Staff Name</Text.Title>
+                <Text.Title>{user.account}</Text.Title>
                 <Form.Input placeholder="Post your idea" onClick={() => setOpenModal(!openModal)}></Form.Input>
             </ContainerComponent.Item>
         </ContainerComponent.Flex>

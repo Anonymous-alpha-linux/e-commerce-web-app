@@ -5,18 +5,7 @@ import { FaTimes } from 'react-icons/fa';
 import { ContainerComponent, Form, List, Preview, Text, Icon } from '../components';
 // import apiConfig from '../config/api.json';
 
-const UploadPreview = React.forwardRef(({ children, props }, ref) => {
-    const [files, setFiles] = useState([]);
-    const [rerender, setRerender] = useState(false);
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
-
-    const validateFile = (file) => {
-        const imageRegex = new RegExp("image/*");
-        if (imageRegex.test(file.type))
-            return "image";
-        return "others";
-    }
+const UploadPreview = React.forwardRef(({ files =[], setFiles }, ref) => {
     const isOverflowFile = (currentFileList, fileSize) => {
         const currentSize = currentFileList.reduce((prev, curr) => {
 
@@ -25,61 +14,9 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
 
         return currentSize + fileSize > 50000;
     }
-    const submitHandler = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        const headers = {
-            'Content-Type': 'multipart/form-data'
-        };
-        files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
-            console.log(file);
-            formData.append("files", file);
-        })
-        // axios.post(`${apiConfig.UPLOAD_API}`, formData, {
-        //     headers: headers
-        // })
-        //     .then(res => {
-        //         setMessage(res.data.message)
-        //         setTimeout(() => {
-        //             setMessage('');
-        //         }, 3000);
-        //     })
-        //     .catch(err => setError(err.message));
-    }
-    const removeItem = (id) => {
+    const removeItem = (files, id) => {
         setFiles(files => files.filter((file, index) => index !== id));
     }
-    useEffect(() => {
-        setTimeout(() => {
-            setError('');
-        }, 3000)
-        setFiles(files => {
-            files.forEach((file, index) => {
-                const fileReader = new FileReader();
-                if (validateFile(file.file) === 'image') {
-
-                    fileReader.readAsDataURL(file.file);
-                    fileReader.onload = () => {
-
-                        const updateFileObject = Object.assign({}, {
-                            ...file,
-                            image: fileReader.result
-                        });
-                        files.splice(index, 1, updateFileObject);
-                        setRerender(rerender => !rerender);
-                    }
-                    fileReader.onabort = () => {
-                        alert("Failed to read file", fileReader.abort);
-                    }
-                    fileReader.onerror = () => {
-                        alert("Failed to read file", fileReader.error);
-                    }
-                }
-            })
-            return files;
-        })
-    }, [files]);
-
     return <ContainerComponent.Section className="form-upload__container">
         <Text.Label htmlFor='files'>Upload Files:</Text.Label>
         <Text.Line style={{
@@ -115,13 +52,14 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
                                     })
                                 });
                             } catch (error) {
-                                setError(error.message);
+                                throw new Error(error.message);
                             }
 
                             return newFiles;
                         });
                     }}
-                    ref={ref} multiple />
+                    ref={ref}
+                    multiple />
             </Text.MiddleLine>
             <Preview>
                 {!files.length ?
@@ -146,7 +84,7 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
                                         right: 0,
                                         top: 0
                                     }}
-                                        onClick={() => removeItem(index)}>
+                                        onClick={() => removeItem(files, index)}>
                                         <FaTimes></FaTimes>
                                     </Icon>
                                     <Preview.Images image={file.image} alt={"preview file"}></Preview.Images>
@@ -156,8 +94,6 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
                     </ContainerComponent.Flex>}
             </Preview>
         </Text.Line>
-        {message && <p>{message}</p>}
-        {error && <p>{error}</p>}
     </ContainerComponent.Section>
 });
 

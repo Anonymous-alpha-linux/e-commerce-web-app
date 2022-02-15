@@ -74,12 +74,12 @@ Form.Select = function ({ children, ...restProp }) {
 }
 
 Form.Option = function ({ children, ...props }) {
-    return <option {...props} className='form__option' value={children}>{children}</option>
+    return <option {...props} className='form__option' value={props.value}>{children}</option>
 }
 
 Form.Checkbox = function ({ children, ...restProp }) {
     return (
-        <input type={'checkbox'} className="form__checkbox" {...restProp}>
+        <input type='checkbox' className="form__checkbox" {...restProp}>
             {children}
         </input>
     )

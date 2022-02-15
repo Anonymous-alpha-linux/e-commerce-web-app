@@ -11,29 +11,29 @@ const AuthenticationContextAPI = createContext();
 export default function AuthenticationContext({ children }) {
     const [socket, setSocket] = useState(null);
     const [user, setUser] = useState({
-        accessToken: localStorage.getItem('accessToken') || 'a.b.c'
+        accessToken: localStorage.getItem('accessToken') || 'a.b.c',
     });
-
+    const [requestHeader, setHeaderRequest] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
 
     useEffect(() => {
         auth().then(() => {
-            setLoading(true);
-            const socketHost = mainAPI.CLOUD_API_AUTH;
-            // const socketHost = mainAPI.LOCALHOST_AUTH;
+            // setLoading(true);
+            // const socketHost = mainAPI.CLOUD_API_HOST;
+            const socketHost = mainAPI.LOCALHOST_HOST;
             const socket = io(socketHost, {
                 auth: {
                     accessToken: user.accessToken
                 }
-            }).on("test", (msg) => {
+            }).on("join", (msg) => {
                 console.log(msg);
-                // setSocket(socket);
+                setSocket(socket);
             }).on("connect_error", err => {
                 console.log(err.message);
                 socket.disconnect();
-            })
+            });
         }).finally(() => {
             setLoading(false);
         })
@@ -43,6 +43,11 @@ export default function AuthenticationContext({ children }) {
         };
     }, []);
 
+    useEffect(() => {
+        setHeaderRequest({
+            'Authorization': `Bearer ${user.accessToken}`
+        })
+    }, [user]);
 
     const auth = async () => {
         const authApi = mainAPI.CLOUD_API_AUTH;
@@ -62,13 +67,14 @@ export default function AuthenticationContext({ children }) {
         })
     };
 
-    const login = async (data, callback) => {
+    function login(data) {
         // const loginApi = mainAPI.LOCALHOST_LOGIN;
         const loginApi = mainAPI.CLOUD_API_LOGIN;
 
         return axios.post(loginApi,
             data,
             {
+                cancelToken: cancelTokenSource.token,
                 headers: {
                     'Authorization': `Bearer ${user.accessToken}`
                 }
@@ -80,10 +86,12 @@ export default function AuthenticationContext({ children }) {
             }).catch(error => setError(error.message));
     };
 
-    const register = async (data, callback) => {
+    const register = async (data) => {
         const registerApi = mainAPI.CLOUD_API_REGISTER;
         // const registerApi = mainAPI.LOCALHOST_REGISTER;
-        return axios.post(registerApi, { ...data })
+        return axios.post(registerApi, { ...data }, {
+            cancelToken: cancelTokenSource.token
+        })
             .then(res => {
                 // console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', res.data);
                 localStorage.setItem('accessToken', res.data.accessToken);
@@ -91,14 +99,15 @@ export default function AuthenticationContext({ children }) {
             }).catch(error => setError(error.message));
     }
 
-    const logout = React.useCallback(async () => {
+    const logout = React.useCallback(async function () {
         try {
-            const lgoutApi = mainAPI.CLOUD_API_LOGOUT;
+            const logoutApi = mainAPI.CLOUD_API_LOGOUT;
             // const lgoutApi = mainAPI.LOCALHOST_LOGOUT;
 
-            return axios.get(lgoutApi)
+            return axios.get(logoutApi, {
+                cancelToken: cancelTokenSource.token
+            })
                 .then(res => {
-
                     localStorage.removeItem('accessToken');
                     setUser(res.data);
                 })
@@ -119,6 +128,7 @@ export default function AuthenticationContext({ children }) {
             user,
             error,
             socket,
+            cancelTokenSource,
             setSocket,
             login,
             logout,
@@ -131,8 +141,6 @@ export default function AuthenticationContext({ children }) {
         </AuthenticationContextAPI.Provider>
     )
 }
-
-
 export const useAuthorizationContext = () => {
     return useContext(AuthenticationContextAPI);
 }

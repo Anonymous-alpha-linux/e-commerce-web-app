@@ -10,7 +10,7 @@ export default function Post() {
     const [openComment, setOpenComment] = useState(false);
     return (
         <ContainerComponent.Section
-            className="post__container"
+            className="post__section"
             style={{
                 padding: "20px",
             }}>
