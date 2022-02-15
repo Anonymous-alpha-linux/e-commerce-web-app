@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 
-export default function TagsInput({ filter, forParent }) {
+export default function TagsInput({ filter, forParent = null }) {
   const [text, setText] = useState("");
   const [tags, setTags] = useState([]);
 
-  useEffect(() => {
-    forParent(tags);
-  }, [tags]);
+  // useEffect(() => {
+  //   forParent(tags);
+  // }, [tags]);
 
   let inputDiv;
 
@@ -95,7 +95,6 @@ export default function TagsInput({ filter, forParent }) {
             return target.toUpperCase().includes(text.toUpperCase()) ? (
               <div
                 key={index}
-                className={style.target}
                 onClick={(e) =>
                   setText(() => {
                     inputDiv.focus();
