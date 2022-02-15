@@ -7,7 +7,6 @@ export const BackDrop = styled.div`
 
 
 export const Item = styled.div`
-
 `;
 
 export const Pane = styled.div`
@@ -16,7 +15,6 @@ export const Pane = styled.div`
 
 
 export const Link = styled.a`
-
 `;
 
 export const Inner = styled.div`

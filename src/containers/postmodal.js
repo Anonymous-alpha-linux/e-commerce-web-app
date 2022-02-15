@@ -8,11 +8,14 @@ import UploadForm from './uploadpreview';
 export default function PostModal() {
     const [openCondition, setOpenCondition] = React.useState(false)
 
-    return <ContainerComponent style={{
-        padding: '20px'
+    return <ContainerComponent.Section style={{
+
     }}>
         <ContainerComponent.Inner>
-            <Form>
+            <Form style={{
+                width: '90%',
+
+            }}>
                 <ContainerComponent.Pane>
                     <Text.Title>Post Modal</Text.Title>
                     <Text.Subtitle>Author name: Staff</Text.Subtitle>
@@ -93,11 +96,11 @@ export default function PostModal() {
 
                     <ContainerComponent.Item></ContainerComponent.Item>
                     
-                    <ButtonComponent.Summit>
-                        Summit
-                    </ButtonComponent.Summit>
+                    <ButtonComponent.Submit>
+                        Submit
+                    </ButtonComponent.Submit>
                 </ContainerComponent.Pane>
             </Form>
         </ContainerComponent.Inner>
-    </ContainerComponent>
+    </ContainerComponent.Section>
 }
