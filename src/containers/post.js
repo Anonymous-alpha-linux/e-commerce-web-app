@@ -54,31 +54,31 @@ export default function Post() {
             }}>
                 <ContainerComponent.GridThreeColumns>
                     <ContainerComponent.Item>
-                        <Text.Center>
+                        <Text.MiddleLine>
                             <Icon.CircleIcon style={{
                                 marginRight: '10px'
                             }}>
                                 <FaThumbsUp />
                             </Icon.CircleIcon>
-                            <Text>240</Text>
-                        </Text.Center>
+                            240
+                        </Text.MiddleLine>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <Text.Center>
+                        <Text.CenterLine>
                             <Icon.CircleIcon style={{
                                 marginRight: '10px'
                             }}>
                                 <FaThumbsDown />
                             </Icon.CircleIcon>
-                            <Text>240</Text>
-                        </Text.Center>
+                            240
+                        </Text.CenterLine>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <Text.Center>
-                            <Text.Middle>
+                        <Text.MiddleLine>
+                            <Text.Center>
                                 Comment
-                            </Text.Middle>
-                        </Text.Center>
+                            </Text.Center>
+                        </Text.MiddleLine>
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>

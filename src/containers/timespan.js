@@ -14,35 +14,32 @@ export default function Timespan() {
             }}
         >
             <Text>Time to close Workspace</Text>
-            <Text.Bold>
-                <ContainerComponent.Flex
-                    style={{
-                        // alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <ContainerComponent.Item>
-                        <Text.Date>200</Text.Date>
-                    </ContainerComponent.Item>
+            <ContainerComponent.Flex
+                style={{
+                    // alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <ContainerComponent.Item>
+                    <Text.Date>200</Text.Date>
+                </ContainerComponent.Item>
 
-                    <ContainerComponent.Item>
-                        <Text>:</Text>
-                    </ContainerComponent.Item>
+                <ContainerComponent.Item>
+                    <Text>:</Text>
+                </ContainerComponent.Item>
 
-                    <ContainerComponent.Item>
-                        <Text.Date>45</Text.Date>
-                    </ContainerComponent.Item>
+                <ContainerComponent.Item>
+                    <Text.Date>45</Text.Date>
+                </ContainerComponent.Item>
 
-                    <ContainerComponent.Item>
-                        <Text>:</Text>
-                    </ContainerComponent.Item>
+                <ContainerComponent.Item>
+                    <Text>:</Text>
+                </ContainerComponent.Item>
 
-                    <ContainerComponent.Item>
-                        <Text.Date>44</Text.Date>
-                    </ContainerComponent.Item>
-                </ContainerComponent.Flex>
-            </Text.Bold>
-
+                <ContainerComponent.Item>
+                    <Text.Date>44</Text.Date>
+                </ContainerComponent.Item>
+            </ContainerComponent.Flex>
         </ContainerComponent.Inner>
     </ContainerComponent.Section>
 }

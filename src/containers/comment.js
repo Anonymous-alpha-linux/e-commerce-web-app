@@ -45,13 +45,13 @@ export default function Comment() {
                         <Form.Input placeholder="Post your idea" style={{
                             width: '80%'
                         }}></Form.Input>
-                        <Text.Middle>
-                            <Text.Center>
+                        <Text.MiddleLine>
+                            <Text.CenterLine>
                                 <Icon.CircleIcon>
                                     <FiSend />
                                 </Icon.CircleIcon>
-                            </Text.Center>
-                        </Text.Middle>
+                            </Text.CenterLine>
+                        </Text.MiddleLine>
                     </Text.Line>
                 </ContainerComponent.Item>
             </ContainerComponent.Flex>
@@ -73,27 +73,27 @@ export default function Comment() {
 
 Comment.Tab = function ({ children, ...props }) {
     return <>
-        <Text.Middle>
+        <Text.Group>
             <Icon.CircleIcon>
                 <BsFillPersonFill />
             </Icon.CircleIcon>
-        </Text.Middle>
-        <Text>
-            <Text.Middle>
+        </Text.Group>
+        <Text.Group>
+            <Text.MiddleLine>
                 <Text.Bold style={{ margin: 0 }}>
                     Staff Name
                 </Text.Bold>
-            </Text.Middle>
-            <Text.Middle>
+            </Text.MiddleLine>
+            <Text.MiddleLine>
                 <Text.Date style={{
                     marginLeft: '8px'
                 }}>20:30</Text.Date>
-            </Text.Middle>
+            </Text.MiddleLine>
             <Text.Line>
                 <Text.Paragraph style={{
                     margin: '8px 0'
                 }}>Nice Content. Good job Bro!</Text.Paragraph>
             </Text.Line>
-        </Text>
+        </Text.Group>
     </>
 }

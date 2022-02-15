@@ -4,8 +4,8 @@ import { ContainerComponent } from '../components';
 
 export default function Home() {
     return (
-        <ContainerComponent>
+        <>
             <Outlet></Outlet>
-        </ContainerComponent>
+        </>
     )
 }

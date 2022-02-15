@@ -18,7 +18,7 @@ export default function Navigation() {
 
     const responsiveHandler = () => {
         const { width } = window.screen;
-        console.log(width);
+
         if (width <= 480) {
             setScreenColumn(2);
         }
@@ -36,7 +36,7 @@ export default function Navigation() {
             window.removeEventListener('resize', responsiveHandler);
         }
     }, [window.screen.width]);
-    console.log(screenColumn > 3);
+
 
     return <ContainerComponent className="navigation__container" style={{
         background: '#163d3c',
@@ -70,7 +70,7 @@ export default function Navigation() {
                 </ContainerComponent.Flex>
             </ContainerComponent.Item>
             {screenColumn > 2 && <ContainerComponent.Item>
-                <ContainerComponent.MiddleInner>
+                {/* <ContainerComponent.MiddleInner>
                     <ContainerComponent.Flex>
                         {NavData.map((link, index) => {
                             return <ContainerComponent.Link
@@ -80,21 +80,21 @@ export default function Navigation() {
                             </ContainerComponent.Link>
                         })}
                     </ContainerComponent.Flex>
-                </ContainerComponent.MiddleInner>
+                </ContainerComponent.MiddleInner> */}
             </ContainerComponent.Item>}
             <ContainerComponent.Item>
                 <AuthStatus
                     screenColumn={screenColumn}
-                    setOpenNavigator={setOpenNavigator}
-                    openNavigator={openNavigator}
+                    openNavigator={() => setOpenNavigator(true)}
                 ></AuthStatus>
             </ContainerComponent.Item>
         </ContainerComponent.Grid>
-        {openNavigator && <Navigator></Navigator>}
+        {openNavigator && <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>}
     </ContainerComponent>
 }
 
-const Navigator = () => {
+const Navigator = ({ closeNavigator }) => {
+
     return (
         <ContainerComponent style={{
             position: 'fixed',
@@ -106,6 +106,8 @@ const Navigator = () => {
             color: '#fff',
             padding: '10px'
         }}>
+            <ContainerComponent.BackDrop onClick={closeNavigator}>
+            </ContainerComponent.BackDrop>
             <ContainerComponent.GridThreeColumns>
                 {navigators.map((navigate, index) => (
                     <ContainerComponent.Item key={index + 1}>
@@ -113,12 +115,11 @@ const Navigator = () => {
                             <Icon.CircleIcon>
                                 {navigate.icon}
                             </Icon.CircleIcon>
-                            <Icon.Label>
-                                <Text.Camel>
-                                    <Text.Bold>
-                                        {navigate.label}
-                                    </Text.Bold>
-                                </Text.Camel>
+                            <Icon.Label style={{
+                                fontWeight: 'bold',
+                                textTransform: 'capitalize'
+                            }}>
+                                {navigate.label}
                             </Icon.Label>
                         </ContainerComponent.MiddleInner>
                     </ContainerComponent.Item>))}
@@ -128,7 +129,7 @@ const Navigator = () => {
 }
 
 
-const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNavigator }) => {
+const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
     const { user, logout } = useAuthorizationContext();
 
     if (!user.isLoggedIn) return <div style={{
@@ -155,7 +156,7 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNavigator }
         <ContainerComponent.Item>
             {
                 screenColumn < 3 &&
-                <Icon.CircleIcon onClick={() => setOpenNavigator(!openNavigator)}>
+                <Icon.CircleIcon onClick={openNavigator}>
                     <BsList></BsList>
                 </Icon.CircleIcon>
                 ||

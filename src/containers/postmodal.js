@@ -25,24 +25,24 @@ export default function PostModal({ setOpenModal }) {
             borderRadius: '20px',
             background: '#fff',
         }}>
-            <Text onClick={() => setOpenModal(modal => !modal)}>
-                <Text.Middle>
+            <Text.Line onClick={() => setOpenModal(modal => !modal)}>
+                <Text.MiddleLine>
                     <Icon style={{ display: 'inline' }}>
                         <FaChevronLeft></FaChevronLeft>
                     </Icon>
-                </Text.Middle>
+                </Text.MiddleLine>
                 <Text.Middle style={{
                     verticalAlign: 'text-top'
                 }}>
                     Back
                 </Text.Middle>
-            </Text>
+            </Text.Line>
             <Text.Title style={{
                 textAlign: 'right'
             }}>Post Modal</Text.Title>
-            <Text.Label>Author name: <Text.Middle>
+            <Text.Label>Author name: <Text.MiddleLine>
                 <Text.Bold>Staff</Text.Bold>
-            </Text.Middle>
+            </Text.MiddleLine>
             </Text.Label>
             <Form.TextArea
                 style={{
@@ -64,10 +64,10 @@ export default function PostModal({ setOpenModal }) {
                 <UploadForm></UploadForm>
             </ContainerComponent.Pane>
             <Text.Line>
-                <Text.Middle>
+                <Text.MiddleLine>
                     <Form.Checkbox></Form.Checkbox>
-                </Text.Middle>
-                <Text.Middle>
+                </Text.MiddleLine>
+                <Text.MiddleLine>
                     <Text.Paragraph
                         onClick={() => setOpenCondition(true)}
                         style={{
@@ -75,7 +75,7 @@ export default function PostModal({ setOpenModal }) {
                             margin: '0'
                         }}
                     >Condition and Term</Text.Paragraph>
-                </Text.Middle>
+                </Text.MiddleLine>
             </Text.Line>
             {openCondition && <ConditionContainer closeCondition={() => setOpenCondition(false)}></ConditionContainer>}
             {error && <MessageBox.TextMessage>

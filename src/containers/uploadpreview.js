@@ -85,15 +85,15 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
         <Text.Line style={{
             marginBottom: '10px'
         }}>
-            <Text.Middle>
+            <Text.MiddleLine>
                 <Icon
                     style={{
                         fontSize: '30px'
                     }}>
                     <AiOutlineCloudUpload></AiOutlineCloudUpload>
                 </Icon>
-            </Text.Middle>
-            <Text.Middle>
+            </Text.MiddleLine>
+            <Text.MiddleLine>
                 <Form.Input type='file'
                     name="files"
                     id='files'
@@ -122,7 +122,7 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
                         });
                     }}
                     ref={ref} multiple />
-            </Text.Middle>
+            </Text.MiddleLine>
             <Preview>
                 {!files.length ?
                     <Text.Title className="upload-preview__placeholder" style={{

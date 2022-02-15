@@ -9,6 +9,14 @@
   &__line {
     font-size: 14px;
   }
+  &__middleLine {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  &__centerLine {
+    display: block;
+    text-align: center;
+  }
   &__subtitle {
     font-size: 13px;
   }
@@ -39,5 +47,8 @@
   }
   &__uppercase {
     text-transform: uppercase;
+  }
+  &__group {
+    display: inline-block;
   }
 }
