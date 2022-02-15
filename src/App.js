@@ -1,6 +1,13 @@
 import { Fragment } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Home, Login, ProtectedPage, Register, ForgetPassword, Nav, Staff, QACoordinator, AdminSidebar, Admin, QAManager, Workspace, Profile, QA } from './pages';
+import {
+  Home, Login, ProtectedPage, Register, ForgetPassword, Nav,
+  Staff,
+  QACoordinator,
+  AdminSidebar, Admin,
+  QAManager,
+  Workspace, Profile, QA
+} from './pages';
 import { useAuthorizationContext } from "./redux";
 import { roles } from './fixtures';
 import './scss/main.scss';
@@ -53,18 +60,11 @@ function App() {
               </>
             }
           </Route>
-          {
+          {/* {
             user.role === 'admin' && <Route path="/about" element={<ProtectedPage authorized={[roles.STAFF]}>
               <Admin.About></Admin.About>
             </ProtectedPage>}></Route>
-          }
-
-          {/* <Route path="/admin" element={<ProtectedPage authorized={["admin"]}> <Home></Home> </ProtectedPage>}>
-            <Route path="" index element={<ProtectedPage authorized={['admin']}>
-              <Admin></Admin>
-            </ProtectedPage>}>
-            </Route>
-          </Route> */}
+          } */}
 
           <Route path="/*" element={<h1>404 Error: Page Not Found...</h1>}>
           </Route>

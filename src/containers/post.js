@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ContainerComponent, Icon, Text, Preview } from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
@@ -7,6 +7,7 @@ import { BsFillPersonFill } from "react-icons/bs";
 import { Comment } from ".";
 
 export default function Post() {
+    const [openComment, setOpenComment] = useState(false);
     return (
         <ContainerComponent.Section
             className="post__container"
@@ -73,16 +74,16 @@ export default function Post() {
                             240
                         </Text.CenterLine>
                     </ContainerComponent.Item>
-                    <ContainerComponent.Item>
-                        <Text.MiddleLine>
-                            <Text.Center>
+                    <ContainerComponent.Item onClick={() => setOpenComment(!openComment)}>
+                        <Text.CenterLine>
+                            <Text.MiddleLine>
                                 Comment
-                            </Text.Center>
-                        </Text.MiddleLine>
+                            </Text.MiddleLine>
+                        </Text.CenterLine>
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
-            <Comment></Comment>
+            {openComment && <Comment></Comment>}
         </ContainerComponent.Section>
     );
 }
