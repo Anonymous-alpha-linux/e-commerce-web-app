@@ -1,5 +1,6 @@
 import React from "react";
 
+<<<<<<< HEAD
 export default function Form({
   children,
   action,
@@ -14,6 +15,16 @@ export default function Form({
       </form>
     </div>
   );
+=======
+export default function Form({ children, action, method, onSubmit, ...restProp }) {
+    return (
+        <div className='form' {...restProp}>
+            <form action={action} method={method} onSubmit={onSubmit} encType={restProp.encType}>
+                {children}
+            </form>
+        </div>
+    )
+>>>>>>> a21e38ce11a718bbe729f8f482ac27b8c4e5e572
 }
 
 Form.Title = function ({ children, ...restProp }) {
@@ -87,6 +98,7 @@ Form.TextArea = function ({ children, ...restProp }) {
   );
 };
 
+<<<<<<< HEAD
 Form.Select = function ({ dropdown, children, ...restProp }) {
   return (
     <select className="form__select" id="dropdown" {...restProp}>
@@ -102,3 +114,20 @@ Form.Checkbox = function ({ children, ...restProp }) {
     </input>
   );
 };
+=======
+Form.Select = function ({ children, ...restProp }) {
+    return <select className="form__select" {...restProp}>{children}</select>
+}
+
+Form.Option = function ({ children, ...props }) {
+    return <option {...props} className='form__option' value={props.value}>{children}</option>
+}
+
+Form.Checkbox = function ({ children, ...restProp }) {
+    return (
+        <input type='checkbox' className="form__checkbox" {...restProp}>
+            {children}
+        </input>
+    )
+}
+>>>>>>> a21e38ce11a718bbe729f8f482ac27b8c4e5e572

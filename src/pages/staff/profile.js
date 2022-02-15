@@ -6,7 +6,8 @@ import { ManagerInfo } from "../../containers";
 export default function Profile() {
   return (
     <ContainerComponent>
-      <Personal></Personal>;<ManagerInfo></ManagerInfo>
+      <Personal></Personal>
+      <ManagerInfo></ManagerInfo>
     </ContainerComponent>
   );
 }
