@@ -82,7 +82,9 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
 
     return <ContainerComponent.Section className="form-upload__container">
         <Text.Label htmlFor='files'>Upload Files:</Text.Label>
-        <Text.Line>
+        <Text.Line style={{
+            marginBottom: '10px'
+        }}>
             <Text.Middle>
                 <Icon
                     style={{
@@ -123,7 +125,13 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
             </Text.Middle>
             <Preview>
                 {!files.length ?
-                    <Text.Title className="upload-preview__placeholder">
+                    <Text.Title className="upload-preview__placeholder" style={{
+                        color: '#444',
+                        fontSize: '15px',
+                        textAlign: 'center',
+                        textTransform: 'uppercase',
+                        fontStyle: 'italic'
+                    }}>
                         Document Preview
                     </Text.Title> :
                     <ContainerComponent.Flex>
@@ -150,7 +158,6 @@ const UploadPreview = React.forwardRef(({ children, props }, ref) => {
         </Text.Line>
         {message && <p>{message}</p>}
         {error && <p>{error}</p>}
-        <Form.Input type='submit' value={'Submit'}></Form.Input>
     </ContainerComponent.Section>
 });
 

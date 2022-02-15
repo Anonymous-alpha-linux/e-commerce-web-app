@@ -6,7 +6,9 @@ import { FaChevronLeft } from "react-icons/fa";
 import UploadForm from './uploadpreview';
 
 export default function PostModal({ setOpenModal }) {
-    const [openCondition, setOpenCondition] = React.useState(false)
+    const [openCondition, setOpenCondition] = React.useState(false);
+    const [error, setError] = React.useState('');
+
     return <ContainerComponent.Section className="postModal__container" style={{
         position: 'fixed',
         top: '50px',
@@ -67,7 +69,7 @@ export default function PostModal({ setOpenModal }) {
                 </Text.Middle>
                 <Text.Middle>
                     <Text.Paragraph
-                        onClick={() => setOpenCondition(!openCondition)}
+                        onClick={() => setOpenCondition(true)}
                         style={{
                             color: 'blue',
                             margin: '0'
@@ -75,13 +77,11 @@ export default function PostModal({ setOpenModal }) {
                     >Condition and Term</Text.Paragraph>
                 </Text.Middle>
             </Text.Line>
-            {openCondition && <ConditionContainer></ConditionContainer>}
-            <MessageBox.TextMessage>
-                Message Box Text
-            </MessageBox.TextMessage>
-            <ButtonComponent.Submit>
-                Submit
-            </ButtonComponent.Submit>
+            {openCondition && <ConditionContainer closeCondition={() => setOpenCondition(false)}></ConditionContainer>}
+            {error && <MessageBox.TextMessage>
+                {error}
+            </MessageBox.TextMessage>}
+            <Form.Input type='submit' value={'Submit'}></Form.Input>
         </Form>
     </ContainerComponent.Section>
 }
