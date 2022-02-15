@@ -115,8 +115,7 @@ export default function PostModal({ setOpenModal }) {
 
     useEffect(() => {
         console.log(input);
-        console.log(categories);
-    }, [input, categories]);
+    }, [input]);
 
 
 
@@ -174,14 +173,19 @@ export default function PostModal({ setOpenModal }) {
                             onChange={checkedHandler}
                         ></Form.Checkbox>
                     </Text.Middle>
-                    <Text.Middle>
-                        Private Post
-                    </Text.Middle>
+                    <Text.MiddleLine>
+                        <Text.Subtitle>
+                            Private Post
+                        </Text.Subtitle>
+                    </Text.MiddleLine>
                 </Text.MiddleLine>
                 <Text.MiddleLine style={{
                     textAlign: 'right'
                 }}>
-                    <Form.Select>
+                    <Form.Select
+                        id="category"
+                        name="category"
+                        onChange={inputHandler}>
                         {
                             categories.map((category, index) =>
                                 <Form.Option key={index + 1}
