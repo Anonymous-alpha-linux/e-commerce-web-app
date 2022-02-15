@@ -26,8 +26,7 @@ export default function TagsInput({ filter, forParent = null }) {
   };
 
   return (
-    <div
-      className="tags_container"
+    <div className="tags_container"
       style={{
         width: `inherit`,
         margin: `50px auto`,
@@ -56,7 +55,6 @@ export default function TagsInput({ filter, forParent = null }) {
             }}
           >
             {tag}
-
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
