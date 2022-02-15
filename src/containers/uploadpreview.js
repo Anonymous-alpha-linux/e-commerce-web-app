@@ -5,7 +5,7 @@ import { FaTimes } from 'react-icons/fa';
 import { ContainerComponent, Form, List, Preview, Text, Icon } from '../components';
 // import apiConfig from '../config/api.json';
 
-const UploadPreview = React.forwardRef(({ files =[], setFiles }, ref) => {
+const UploadPreview = React.forwardRef(({ files = [], setFiles }, ref) => {
     const isOverflowFile = (currentFileList, fileSize) => {
         const currentSize = currentFileList.reduce((prev, curr) => {
 
@@ -72,7 +72,7 @@ const UploadPreview = React.forwardRef(({ files =[], setFiles }, ref) => {
                     }}>
                         Document Preview
                     </Text.Title> :
-                    <ContainerComponent.Flex>
+                    <ContainerComponent.GridThreeColumns>
                         {
                             files.map((file, index) => {
                                 return <ContainerComponent.Item className='upload-preview-item' key={index} style={{
@@ -91,7 +91,7 @@ const UploadPreview = React.forwardRef(({ files =[], setFiles }, ref) => {
                                 </ContainerComponent.Item>
                             })
                         }
-                    </ContainerComponent.Flex>}
+                    </ContainerComponent.GridThreeColumns>}
             </Preview>
         </Text.Line>
     </ContainerComponent.Section>

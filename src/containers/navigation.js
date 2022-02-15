@@ -15,6 +15,7 @@ export default function Navigation() {
     const useAuth = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
+    const [openNotification, setOpenNotification] = React.useState(false);
 
     const responsiveHandler = () => {
         const { width } = window.screen;
@@ -86,6 +87,7 @@ export default function Navigation() {
                 <AuthStatus
                     screenColumn={screenColumn}
                     openNavigator={() => setOpenNavigator(true)}
+                    setOpenNotification={setOpenNotification}
                 ></AuthStatus>
             </ContainerComponent.Item>
         </ContainerComponent.Grid>
@@ -129,7 +131,7 @@ const Navigator = ({ closeNavigator }) => {
 }
 
 
-const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
+const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNotification }) => {
     const { user, logout } = useAuthorizationContext();
 
     if (!user.isLoggedIn) return <div style={{
@@ -149,7 +151,7 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
             </Icon.CircleIcon>
         </ContainerComponent.Item>
         <ContainerComponent.Item>
-            <Icon.CircleIcon>
+            <Icon.CircleIcon onClick={() => setOpenNotification(open => !open)}>
                 <IoNotificationsOutline></IoNotificationsOutline>
             </Icon.CircleIcon>
         </ContainerComponent.Item>
