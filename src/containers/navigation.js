@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ContainerComponent, Icon } from '../components';
+import { ContainerComponent, Icon, Text } from '../components';
 import NavData from '../fixtures/nav-links.json';
 import navigators from '../fixtures/navigator';
 import { useAuthorizationContext } from '../redux';
@@ -13,6 +13,7 @@ export default function Navigation() {
     const useAuth = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
+    const [openNotification, setOpenNotification] = React.useState(false);
 
     const responsiveHandler = () => {
         const { width } = window.screen;
@@ -57,10 +58,13 @@ export default function Navigation() {
                 <AuthStatus
                     setOpenNavigator={setOpenNavigator}
                     openNavigator={openNavigator}
+                    setOpenNotification={setOpenNotification}
+                    openNotification={openNotification}
                 ></AuthStatus>
             </ContainerComponent.Item>
         </ContainerComponent.Grid>
         {openNavigator && <Navigator></Navigator>}
+        {openNotification && <Notification></Notification>}
     </ContainerComponent>
 }
 
@@ -90,14 +94,47 @@ const Navigator = () => {
 
 const Notification = () => {
     return (
-        <ContainerComponent>
-            <ContainerComponent></ContainerComponent>
-        </ContainerComponent>
+        <ContainerComponent.Flex style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            flexDirection: 'column',
+            background: 'cyan',
+            color: 'black'
+        }}>
+            <Text.Title>Notification</Text.Title>
+            <ContainerComponent.Item>
+                <ContainerComponent.MiddleInner>
+                    Notification Title
+                </ContainerComponent.MiddleInner>
+                <ContainerComponent.Inner>
+                    Notification time
+                </ContainerComponent.Inner>
+            </ContainerComponent.Item>
+
+            <ContainerComponent.Item>
+                <ContainerComponent.MiddleInner>
+                    Notification Title
+                </ContainerComponent.MiddleInner>
+                <ContainerComponent.Inner>
+                    Notification time
+                </ContainerComponent.Inner>
+            </ContainerComponent.Item>
+
+            <ContainerComponent.Item>
+                <ContainerComponent.MiddleInner>
+                    Notification Title
+                </ContainerComponent.MiddleInner>
+                <ContainerComponent.Inner>
+                    Notification time
+                </ContainerComponent.Inner>
+            </ContainerComponent.Item>
+        </ContainerComponent.Flex>
     )
 }
 
 
-const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNavigator }) => {
+const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNavigator, openNotification, setOpenNotification }) => {
     const { user, logout } = useAuthorizationContext();
 
     if (!user.isLoggedIn) return <div style={{
@@ -116,7 +153,7 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator, setOpenNavigator }
             </Icon.CircleIcon>
         </ContainerComponent.Item>
         <ContainerComponent.Item>
-            <Icon.CircleIcon>
+            <Icon.CircleIcon onClick={() => setOpenNotification(!openNotification)}>
                 <IoNotificationsOutline></IoNotificationsOutline>
             </Icon.CircleIcon>
         </ContainerComponent.Item>
