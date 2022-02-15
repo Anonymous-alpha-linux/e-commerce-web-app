@@ -21,8 +21,8 @@ export default function AuthenticationContext({ children }) {
     useEffect(() => {
         auth().then(() => {
             setLoading(true);
-            const socketHost = mainAPI.CLOUD_API_AUTH;
-            // const socketHost = mainAPI.LOCALHOST_AUTH;
+            const socketHost = mainAPI.CLOUD_API_HOST;
+            // const socketHost = mainAPI.LOCALHOST_HOST;
             const socket = io(socketHost, {
                 auth: {
                     accessToken: user.accessToken
