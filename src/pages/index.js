@@ -12,8 +12,8 @@ export { Nav } from '../containers';
 // 2. QA coordinator
 export * from './QAcoordinator';
 // 3. Admin
-export * from './Admin';
+export * from './admin';
 // 4. Staff
-export * from './Staff';
+export * from './staff';
 // 5. QA manager
 export * from './QAManager';

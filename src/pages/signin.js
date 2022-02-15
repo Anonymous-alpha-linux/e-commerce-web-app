@@ -66,7 +66,7 @@ const Login = () => {
                     type='password'
                     name="password"
                     onChange={inputHandler}
-                    autocomplete='current-password'
+                    autoComplete='current-password'
                 // value={input.password}
                 ></Form.Input>
                 <Form.Link href='/reset_password'>Forgot your Password?</Form.Link>

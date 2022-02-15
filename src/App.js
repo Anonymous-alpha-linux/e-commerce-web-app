@@ -26,39 +26,33 @@ function App() {
             <Route path="reset_password" element={<ForgetPassword></ForgetPassword>}></Route>
             {
               // 1. Admin Role
-              user.role === roles.ADMIN &&
-              <Route path=""
-                index
+              (user.role === roles.ADMIN && <Route path=""
                 element={<ProtectedPage authorized={[roles.ADMIN]}>
                   <Admin></Admin>
                 </ProtectedPage>}>
-              </Route> ||
+              </Route>) ||
               // 2. QA manager
-              user.role === roles.QA_MANAGER &&
-              <Route path=""
+              (user.role === roles.QA_MANAGER && <Route path=""
                 element={<ProtectedPage authorized={[roles.QA_MANAGER]}>
                   <QAManager></QAManager>
                 </ProtectedPage>}>
-              </Route> ||
+              </Route>) ||
               // 3. QA coordinator
-              user.role === roles.QA_COORDINATOR &&
-              <Route path=""
+              (user.role === roles.QA_COORDINATOR && <Route path=""
                 element={<ProtectedPage authorized={[roles.QA_COORDINATOR]}>
                   <QACoordinator></QACoordinator>
                 </ProtectedPage>}>
-              </Route> ||
+              </Route>) ||
               // 4. Staff
-              user.role === roles.STAFF && <>
-                <Route path=""
-                  element={<ProtectedPage authorized={[roles.STAFF]}>
-                    <Staff></Staff>
-                  </ProtectedPage>}>
-                  <Route index element={<Workspace></Workspace>}></Route>
-                  <Route path="profile" element={<Profile></Profile>}></Route>
-                  <Route path="q&a" element={<QA></QA>}></Route>
-                </Route>
-              </>
-            }
+              (user.role === roles.STAFF && <Route
+                path=""
+                element={<ProtectedPage authorized={[roles.STAFF]}>
+                  <Staff></Staff>
+                </ProtectedPage>}>
+                <Route index element={<Workspace></Workspace>}></Route>
+                <Route path="profile" element={<Profile></Profile>}></Route>
+                <Route path="q&a" element={<QA></QA>}></Route>
+              </Route>)}
           </Route>
           {/* {
             user.role === 'admin' && <Route path="/about" element={<ProtectedPage authorized={[roles.STAFF]}>

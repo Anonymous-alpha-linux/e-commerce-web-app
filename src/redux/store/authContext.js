@@ -21,13 +21,15 @@ export default function AuthenticationContext({ children }) {
     useEffect(() => {
         auth().then(() => {
             setLoading(true);
-            const socket = io(mainAPI.LOCALHOST_HOST, {
+            const socketHost = mainAPI.CLOUD_API_AUTH;
+            // const socketHost = mainAPI.LOCALHOST_AUTH;
+            const socket = io(socketHost, {
                 auth: {
                     accessToken: user.accessToken
                 }
             }).on("test", (msg) => {
                 console.log(msg);
-                setSocket(socket);
+                // setSocket(socket);
             }).on("connect_error", err => {
                 console.log(err.message);
                 socket.disconnect();
@@ -40,16 +42,6 @@ export default function AuthenticationContext({ children }) {
             socket.disconnect();
         };
     }, []);
-
-    useEffect(() => {
-        const socket = io('http://localhost:4000');
-        socket.on('test', msg => console.log(msg));
-        socket.emit("notify", (res) => console.log('res', res));
-
-        return () => {
-            socket.disconnect();
-        }
-    }, [])
 
 
     const auth = async () => {
