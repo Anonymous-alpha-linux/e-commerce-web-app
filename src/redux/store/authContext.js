@@ -8,16 +8,6 @@ import { unstable_batchedUpdates } from "react-dom";
 const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
-<<<<<<< HEAD
-  const [socket, setSocket] = useState(null);
-  const [user, setUser] = useState({
-    accessToken: localStorage.getItem("accessToken") || "a.b.c",
-  });
-  const [requestHeader, setHeaderRequest] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const cancelTokenSource = axios.CancelToken.source();
-=======
     const [socket, setSocket] = useState(null);
     const [user, setUser] = useState({
         accessToken: localStorage.getItem('accessToken') || 'a.b.c',
@@ -26,7 +16,6 @@ export default function AuthenticationContext({ children }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
->>>>>>> 0d0ee115b73edec13f52562cec74819d37dba707
 
   useEffect(() => {
     auth()
