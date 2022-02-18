@@ -40,6 +40,9 @@ export default function Workspace() {
     <div className="workspace">
       <Timespan></Timespan>
       <PostForm></PostForm>
+      {
+        data.account.map()
+      }
       {/* <PostContainer></PostContainer> */}
     </div>
   );
