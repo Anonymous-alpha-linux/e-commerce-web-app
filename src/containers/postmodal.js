@@ -6,13 +6,16 @@ import { mainAPI } from '../config';
 import UploadForm from './uploadpreview';
 
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
+import TagInput from './tagsinput';
 
 export default function PostModal({ setOpenModal }) {
     const [input, setInput] = useState({
         content: '',
         private: false,
-        condition: false
+        condition: false,
+        categories: []
     })
     const [files, setFiles] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -21,8 +24,9 @@ export default function PostModal({ setOpenModal }) {
     const [error, setError] = useState("");
     const [openCondition, setOpenCondition] = React.useState(false);
     const { user } = useAuthorizationContext();
+    const navigate = useNavigate();
 
-    const staffURL = mainAPI.LOCALHOST_STAFF;
+    const staffURL = mainAPI.CLOUD_API_STAFF;
 
     const validateFile = (file) => {
         const imageRegex = new RegExp("image/*");
@@ -34,27 +38,29 @@ export default function PostModal({ setOpenModal }) {
         e.preventDefault();
         const formData = new FormData();
         const headers = {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${user.accessToken}`
         };
         files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
-            console.log(file);
             formData.append("files", file);
         })
         Object.keys(input).forEach(key => {
+            if (Array.isArray(input[key])) {
+                input[key].forEach(item => {
+                    formData.append(key, item);
+                })
+                return;
+            }
             formData.append(key, input[key]);
-            console.log(key, input[key]);
         })
         console.log(formData);
-        // axios.post(`${apiConfig.UPLOAD_API}`, formData, {
-        //     headers: headers
-        // })
-        //     .then(res => {
-        //         setMessage(res.data.message)
-        //         setTimeout(() => {
-        //             setMessage('');
-        //         }, 3000);
-        //     })
-        //     .catch(err => setError(err.message));
+        axios.post(`${staffURL}?view=post`, formData, {
+            headers: headers
+        })
+            .then(res => {
+                window.location.reload();
+            })
+            .catch(err => setError(err.message));
     }
     const inputHandler = (e) => {
         setInput(input => ({
@@ -113,12 +119,6 @@ export default function PostModal({ setOpenModal }) {
         })
     }, [files]);
 
-    useEffect(() => {
-        console.log(input);
-    }, [input]);
-
-
-
     return <ContainerComponent.Section className="postModal__container" style={{
         position: 'fixed',
         top: '50px',
@@ -132,6 +132,7 @@ export default function PostModal({ setOpenModal }) {
         paddingBottom: '50px'
     }}>
         <Form encType='multipart/form-data'
+            method={'POST'}
             onSubmit={submitHandler}
             style={{
                 borderRadius: '20px',
@@ -165,38 +166,24 @@ export default function PostModal({ setOpenModal }) {
                     height: '100px'
                 }}
             ></Form.TextArea>
-            <ContainerComponent.Flex style={{ justifyContent: 'space-between' }}>
+            <Text.Line>
+                <TagInput itemList={categories}
+                    formField={input.categories}
+                    setFormField={setInput}></TagInput>
+            </Text.Line>
+            <Text.Line>
+                <Text.Middle>
+                    <Form.Checkbox name='private'
+                        id='private'
+                        onChange={checkedHandler}
+                    ></Form.Checkbox>
+                </Text.Middle>
                 <Text.MiddleLine>
-                    <Text.Middle>
-                        <Form.Checkbox name='private'
-                            id='private'
-                            onChange={checkedHandler}
-                        ></Form.Checkbox>
-                    </Text.Middle>
-                    <Text.MiddleLine>
-                        <Text.Subtitle>
-                            Private Post
-                        </Text.Subtitle>
-                    </Text.MiddleLine>
+                    <Text.Subtitle>
+                        Private Post
+                    </Text.Subtitle>
                 </Text.MiddleLine>
-                <Text.MiddleLine style={{
-                    textAlign: 'right'
-                }}>
-                    <Form.Select
-                        id="category"
-                        name="category"
-                        onChange={inputHandler}>
-                        {
-                            categories.map((category, index) =>
-                                <Form.Option key={index + 1}
-                                    value={category._id}>
-                                    {category.name}
-                                </Form.Option>
-                            )
-                        }
-                    </Form.Select>
-                </Text.MiddleLine>
-            </ContainerComponent.Flex>
+            </Text.Line>
             <ContainerComponent.Pane className="upload__input" style={{
                 padding: '10px 0'
             }}>

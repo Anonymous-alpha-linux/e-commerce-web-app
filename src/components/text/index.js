@@ -2,10 +2,10 @@ import React from "react";
 
 export default function Text({ children, ...props }) {
   return (
-    <p className='text' {...props}>
+    <p className="text" {...props}>
       {children}
     </p>
-  )
+  );
 }
 Text.Title = function ({ children, ...props }) {
   return (

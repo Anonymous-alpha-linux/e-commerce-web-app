@@ -9,7 +9,7 @@ import {
   Workspace, Profile, QA
 } from './pages';
 import { useAuthorizationContext } from "./redux";
-import { roles } from './fixtures';
+import roles from './fixtures/roles';
 import './scss/main.scss';
 
 function App() {
@@ -54,11 +54,6 @@ function App() {
                 <Route path="q&a" element={<QA></QA>}></Route>
               </Route>)}
           </Route>
-          {/* {
-            user.role === 'admin' && <Route path="/about" element={<ProtectedPage authorized={[roles.STAFF]}>
-              <Admin.About></Admin.About>
-            </ProtectedPage>}></Route>
-          } */}
 
           <Route path="/*" element={<h1>404 Error: Page Not Found...</h1>}>
           </Route>
