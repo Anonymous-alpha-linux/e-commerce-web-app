@@ -11,4 +11,5 @@ export {default as MessageBoxContainer} from './messageBox'
 export {default as AddGroupContainer} from './addGroup'
 export { default as Filter } from "./filter";
 export { default as TagsInput } from "./tagsinput";
-export { default as NotificationContainer } from "./notification"
+export { default as NotificationContainer } from "./notification";
+export { default as Loader } from './loader';

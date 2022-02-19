@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ContainerComponent, Form, Icon, List, Text } from '../components';
 import { FaTimes } from 'react-icons/fa';
-import { Container } from "react-bootstrap";
 
 export default function TagInput({ itemList = [{
   _id: null,

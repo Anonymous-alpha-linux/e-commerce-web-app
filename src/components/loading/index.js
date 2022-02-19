@@ -1,14 +1,11 @@
 import React from "react";
-import "./load.css";
-
-export default function Loading() {
+export default function Loading({ children, ...props }) {
   return (
-    <div className="Loadingcontainer">
-      <div className="dot"></div>
-      <div className="dot"></div>
-      <div className="dot"></div>
-      <div className="dot"></div>
-      <div className="dot"></div>
+    <div className="loading__container" {...props}>
+      {children}
     </div>
   );
+}
+Loading.Dot = ({ children, ...props }) => {
+  return <div className="loading__dot" {...props}>{children}</div>
 }
