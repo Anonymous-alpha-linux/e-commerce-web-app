@@ -10,9 +10,10 @@ export default function Preview({ image, alt, children, ...restProps }) {
 
 Preview.Images = function ({ children, ...restProps }) {
     return (
-        <img className="preview__image"
-            src={restProps.image}
-            alt={restProps.alt} >
-        </img>
+       <img className="preview__image" 
+       src={restProps.image} 
+       alt={restProps.alt} 
+       style={restProps.style}>
+       </img>
     )
 }

@@ -1,14 +1,16 @@
 :root {
-  --primary-font: "Jost", "Helvetica", "Arial", sans-serif;
+  --primary-font: 'Jost', 'Helvetica', 'Arial', sans-serif;
   --primary-color: rgb(133, 132, 132);
   --secondary-color: rgb(27, 27, 27);
   --gray-light-color: rgb(229, 223, 217);
   --gray-dark-color: rgb(153, 153, 153);
   --black-color: rgb(49, 49, 49);
 
-  --header--gadient: linear-gradient(to bottom,
-      #25211e 0,
-      rgba(37, 33, 30, 0) 100%);
+  --header--gadient: linear-gradient(
+    to bottom,
+    #25211e 0,
+    rgba(37, 33, 30, 0) 100%
+  );
 }
 
 * {
@@ -20,6 +22,7 @@ body {
   font-family: var(--primary-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 }
 
 code {
