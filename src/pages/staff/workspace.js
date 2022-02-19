@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ContainerComponent } from "../../components";
-import { PostContainer, PostForm, Timespan, TagsInput } from "../../containers";
+import { PostContainer, PostForm, Timespan, TagInput } from "../../containers";
 
 let arrTest = [
   "dog",
@@ -16,7 +16,7 @@ let arrTest = [
 export default function Workspace() {
   return (
     <>
-      <TagsInput filter={arrTest}></TagsInput>
+      <TagInput filter={arrTest}></TagInput>
       <Timespan></Timespan>
       <PostForm></PostForm>
       <PostContainer></PostContainer>
