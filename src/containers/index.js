@@ -8,4 +8,5 @@ export { default as ManagerInfo } from "./managerInfo";
 export { default as Timespan } from "./timespan";
 export { default as PostModal } from "./postmodal";
 export { default as Filter } from "./filter";
-export { default as TagInput } from './tagsinput'; 
+export { default as TagsInput } from "./taginput";
+export { default as NotificationContainer } from "./notification"
