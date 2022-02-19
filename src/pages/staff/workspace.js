@@ -8,7 +8,7 @@ import { Loading } from "..";
 import { unstable_batchedUpdates } from "react-dom";
 
 export default function Workspace() {
-  const API = mainAPI.LOCALHOST_STAFF;
+  const API = mainAPI.CLOUD_API_STAFF;
   const { user, workspace, setWorkspace, cancelTokenSource } = useAuthorizationContext();
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState(null);
@@ -61,7 +61,7 @@ export default function Workspace() {
               const { _id, fileType, filePath } = attach;
               return {
                 _id,
-                image: `${mainAPI.LOCALHOST_HOST}\\${filePath}`,
+                image: `${mainAPI.CLOUD_HOST}\\${filePath}`,
                 fileType
               }
             })
