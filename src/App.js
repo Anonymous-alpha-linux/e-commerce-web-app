@@ -9,7 +9,7 @@ import {
   Workspace, Profile, QA
 } from './pages';
 import { useAuthorizationContext } from "./redux";
-import { roles } from './fixtures';
+import roles from './fixtures/roles';
 import './scss/main.scss';
 
 function App() {
