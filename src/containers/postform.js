@@ -1,23 +1,32 @@
-import React,{useState} from 'react';
-import {ContainerComponent, Text, Form, Icon} from '../components';
-import {PostModal} from '../containers';
+import React, { useState } from 'react';
+import { ContainerComponent, Text, Form, Icon } from '../components';
+import { PostModal } from '../containers';
+import { IoLogoApple } from 'react-icons/io5'
+import { useAuthorizationContext } from '../redux';
 
 export default function PostForm() {
-const [openModal , setOpenModal] = useState(false);
-    return <ContainerComponent.Section>
-        <ContainerComponent.Flex style={{alignItems: 'center'}}>
+    const [openModal, setOpenModal] = useState(false),
+        { user } = useAuthorizationContext();
+
+    return <ContainerComponent.Section
+        className="post-form__container"
+        style={{
+            padding: '10px',
+            backgroundColor: "#EEF5EB"
+        }}>
+        <ContainerComponent.Flex style={{ alignItems: 'center' }}>
             <ContainerComponent.Item>
-            <Icon.CircleIcon style={{size: '15px',}}>
-                Avatar
-            </Icon.CircleIcon>
+                <Icon.CircleIcon style={{ size: '15px', background: '#163d3c', color: '#fff' }}>
+                    <IoLogoApple></IoLogoApple>
+                </Icon.CircleIcon>
             </ContainerComponent.Item>
-            <ContainerComponent.Item>
-            <ContainerComponent.Pane>
-                <Text.Title style={{fontSize: '10px'}}>Staff Name</Text.Title>
-                <Form.Input placeholder="Post your idea" onClick={()=>setOpenModal(!openModal)}></Form.Input>
-            </ContainerComponent.Pane>
+            <ContainerComponent.Item style={{
+                flexGrow: 1
+            }}>
+                <Text.Title>{user.account}</Text.Title>
+                <Form.Input placeholder="Post your idea" onClick={() => setOpenModal(!openModal)}></Form.Input>
             </ContainerComponent.Item>
         </ContainerComponent.Flex>
-{openModal && <PostModal></PostModal>}
+        {openModal && <PostModal setOpenModal={setOpenModal}></PostModal>}
     </ContainerComponent.Section>
 }

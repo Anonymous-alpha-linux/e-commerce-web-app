@@ -1,61 +1,99 @@
-import React from "react";
-import { ContainerComponent, Form, Icon, Text, Preview } from "../components";
+import React, { useState, useEffect } from "react";
+import { ContainerComponent, Icon, Text, Preview } from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-import { BiExit } from "react-icons/bi";
+
 import { IoEarth } from "react-icons/io5";
 import { BsFillPersonFill } from "react-icons/bs";
+import { Comment } from ".";
 
-export default function Post() {
-  return (
-    <ContainerComponent.Section
-      style={{
-        padding: "20px",
-      }}
-    >
-      <Icon.CircleIcon>
-        <BiExit />
-      </Icon.CircleIcon>
-      <ContainerComponent.Inner>
-        <ContainerComponent.Pane>
-          <Icon.CircleIcon>
-            <BsFillPersonFill />
-          </Icon.CircleIcon>
-          <ContainerComponent.Pane>
-            <Text.Title>Staff Name</Text.Title>
-            <ContainerComponent.Flex>
-              <Text.Date>20: 20</Text.Date>
-              <Icon style={{ margin: "16px 10px 10px" }}>
-                <IoEarth />
-              </Icon>
-            </ContainerComponent.Flex>
-          </ContainerComponent.Pane>
-        </ContainerComponent.Pane>
-    <ContainerComponent.Pane style={{ position: "relative" }}>
-          <Text.Paragraph>
-            Một cảm xúc gì đó rất lạ, một cái chất rất khó tả ở Hải Bột, một
-            người nghệ sĩ rất “nghệ sĩ”! Anh cũng là một gã “gàn dở”, nhưng cũng
-            là một kẻ vô tư, treo ngược tâm hồn mình cheo leo ở đâu đó tận trên
-            mây, như một nhà thơ.
-          </Text.Paragraph>
-          {/* Preivew */}
-          <Preview.Images image={'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg'} alt={'background'} style={{width:"100%"}}>
-                    Avatar
-                </Preview.Images>
-        </ContainerComponent.Pane>
-        {/* {Like, Dislike} */}
-        <ContainerComponent.Flex>
-          <ContainerComponent.Item>
-            <Icon.CircleIcon>
-              <FaThumbsUp />
-            </Icon.CircleIcon>
-          </ContainerComponent.Item>
-          <ContainerComponent.Item>
-            <Icon.CircleIcon>
-              <FaThumbsDown />
-            </Icon.CircleIcon>
-          </ContainerComponent.Item>
-        </ContainerComponent.Flex>
-      </ContainerComponent.Inner>
-    </ContainerComponent.Section>
-  );
+export default function Post({ postHeader, postBody, postFooter }) {
+    const [openComment, setOpenComment] = useState(false);
+    // useEffect(() => {
+    //     console.log(postHeader, postBody, postFooter);
+    // }, [postFooter, postBody, postFooter]);
+    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`
+    return (
+        <ContainerComponent.Section
+            className="post__section"
+            style={{
+                padding: "20px",
+            }}>
+            <ContainerComponent.Pane className="post__header">
+                <ContainerComponent.InlineGroup>
+                    <Icon.Avatar style={{
+                        verticalAlign: 'middle',
+                        background: '#163d3c',
+                        color: '#fff'
+                    }}>
+                        <Preview.Images image={postHeader.image} alt={postHeader.alt}></Preview.Images>
+                    </Icon.Avatar>
+                </ContainerComponent.InlineGroup>
+                <ContainerComponent.InlineGroup style={{
+                    margin: '0 10px'
+                }}>
+                    <Text.Title>{postHeader.username}</Text.Title>
+                    <ContainerComponent.Flex>
+                        <Text.Date style={{
+                            marginRight: '8px'
+                        }}>{date}</Text.Date>
+                        <Text>
+                            <IoEarth />
+                        </Text>
+                    </ContainerComponent.Flex>
+                </ContainerComponent.InlineGroup>
+            </ContainerComponent.Pane>
+            <ContainerComponent.Pane className="post__body">
+                <Text.Paragraph>
+                    {postBody.content}
+                </Text.Paragraph>
+                <ContainerComponent.Flex>
+                    {postBody.attachment.map(attach => {
+                        const imageRegex = new RegExp("image/*");
+                        if (imageRegex.test(attach.fileType))
+                            return <ContainerComponent.Item key={attach._id} >
+                                <Preview.Images image={attach.image || 'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg'} alt={'background'}>
+                                </Preview.Images>
+                            </ContainerComponent.Item>
+                        return;
+                    })}
+                </ContainerComponent.Flex>
+            </ContainerComponent.Pane>
+            {/* {Like, Dislike} */}
+            <ContainerComponent.Pane className="post__footer" style={{
+                background: '#EEF5EB',
+                boxShadow: '1px 1px .5px solid #000'
+            }}>
+                <ContainerComponent.GridThreeColumns>
+                    <ContainerComponent.Item>
+                        <Text.MiddleLine>
+                            <Icon.CircleIcon style={{
+                                marginRight: '10px'
+                            }}>
+                                <FaThumbsUp />
+                            </Icon.CircleIcon>
+                            {postFooter.like}
+                        </Text.MiddleLine>
+                    </ContainerComponent.Item>
+                    <ContainerComponent.Item>
+                        <Text.CenterLine>
+                            <Icon.CircleIcon style={{
+                                marginRight: '10px'
+                            }}>
+                                <FaThumbsDown />
+                            </Icon.CircleIcon>
+                            {postFooter.dislike}
+                        </Text.CenterLine>
+                    </ContainerComponent.Item>
+                    <ContainerComponent.Item onClick={() => setOpenComment(!openComment)}>
+                        <Text.CenterLine>
+                            <Text.MiddleLine>
+                                Comment
+                            </Text.MiddleLine>
+                        </Text.CenterLine>
+                    </ContainerComponent.Item>
+                </ContainerComponent.GridThreeColumns>
+            </ContainerComponent.Pane>
+            {openComment && <Comment commentLogs={postFooter.comment}></Comment>}
+        </ContainerComponent.Section>
+    );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Preview({ image, alt, children, ...restProps }) {
     return (
-        <div className="preview" {... restProps}>
+        <div className="preview" {...restProps}>
             {children}
         </div>
     )

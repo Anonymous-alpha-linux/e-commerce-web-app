@@ -6,9 +6,18 @@
     width: 30px;
     height: 30px;
     text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-weight: 600;
+    font-size: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 100%;
+  }
+  &__avatar {
+    padding: 0;
+    box-sizing: content-box;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
   }
 }

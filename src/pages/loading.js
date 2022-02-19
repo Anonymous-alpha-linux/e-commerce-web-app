@@ -1,11 +1,13 @@
-import React from 'react';
-import { ContainerComponent } from "../components";
+import React from "react";
+import { ContainerComponent, Loader } from "../components";
 
 const Loading = React.memo(() => {
-    return <ContainerComponent>
-        <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
-        <h1>Loading...</h1>
-    </ContainerComponent>;
+  return (
+    <ContainerComponent>
+      <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
+      <Loader></Loader>
+    </ContainerComponent>
+  );
 });
 
 export default Loading;

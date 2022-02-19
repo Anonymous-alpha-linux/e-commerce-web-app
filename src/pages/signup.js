@@ -38,6 +38,8 @@ function Register() {
     }
 
     return <>
+        <ContainerComponent.Hero>
+        </ContainerComponent.Hero>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <ContainerComponent.Hero>
         </ContainerComponent.Hero>
@@ -51,7 +53,7 @@ function Register() {
                 zIndex: '1',
             }}
         >
-            <Form.Logo image="https://cdn.shopify.com/s/files/1/1811/9799/t/6/assets/logo.png?v=15221948588626818280"></Form.Logo>
+            <Form.Logo image=""></Form.Logo>
             <Form.Container>
                 <Form.Title children='Register or Get out!'></Form.Title>
                 <Form.Input placeholder="Username"

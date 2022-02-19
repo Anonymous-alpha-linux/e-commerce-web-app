@@ -33,6 +33,8 @@ const Login = () => {
     }
 
     return <>
+        <ContainerComponent.Hero>
+        </ContainerComponent.Hero>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <ContainerComponent.Hero>
         </ContainerComponent.Hero>
@@ -43,15 +45,16 @@ const Login = () => {
                 width: '95%',
                 maxWidth: '550px',
                 minWidth: '335px',
+                padding: '10px',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%,-50%)',
                 zIndex: '1',
             }}>
-            <Form.Logo image="https://cdn.shopify.com/s/files/1/1811/9799/t/6/assets/logo.png?v=15221948588626818280">
+            <Form.Logo image="">
             </Form.Logo>
             <Form.Container>
-                <Form.Title children="Log in or Get out!">
+                <Form.Title children="LOG IN">
                 </Form.Title>
                 <Form.Input
                     placeholder="Email"
@@ -65,6 +68,7 @@ const Login = () => {
                     type='password'
                     name="password"
                     onChange={inputHandler}
+                    autoComplete='current-password'
                 // value={input.password}
                 ></Form.Input>
                 <Form.Link href='/reset_password'>Forgot your Password?</Form.Link>
@@ -75,12 +79,6 @@ const Login = () => {
                         color: '#fff'
                     }}>
                     sign in
-                </Form.Button>
-                <Form.Button href={'register'}
-                    style={{
-                        background: '#f2f2f2'
-                    }}>
-                    register
                 </Form.Button>
                 {error && <p>{error}</p>}
             </Form.Container>

@@ -7,4 +7,7 @@ export { default as Icon } from './icon';
 export { default as Text } from './text';
 export {default as Preview} from './preview';
 export { default as MessageBox} from './messagebox'
-export {default as Message} from './message'
+export {default as Message} from './message';
+export { default as MessageBox } from "./messagebox";
+export { default as List } from "./list";
+export { default as Loader } from "./loading";
