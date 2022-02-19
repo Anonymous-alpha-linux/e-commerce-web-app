@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
+import { useAuthorizationContext } from "../redux";
 import {
   ContainerComponent,
   Form,
@@ -13,6 +14,7 @@ import {
 // import apiConfig from '../config/api.json';
 
 const UploadPreview = React.forwardRef(({ files = [], setFiles }, ref) => {
+  const { setError } = useAuthorizationContext();
   const isOverflowFile = (currentFileList, fileSize) => {
     const currentSize = currentFileList.reduce((prev, curr) => {
       return prev + curr.file.size / 1024;
@@ -64,7 +66,7 @@ const UploadPreview = React.forwardRef(({ files = [], setFiles }, ref) => {
                     });
                   });
                 } catch (error) {
-                  throw new Error(error.message);
+                  setError(error.message);
                 }
 
                 return newFiles;
