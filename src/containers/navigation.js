@@ -14,11 +14,13 @@ import {
 } from "react-icons/io5";
 import { BsList } from "react-icons/bs";
 import ConditionContainer from "./condition";
+import NotificationContainer from "./notification";
 
 export default function Navigation() {
     const useAuth = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
+    const [openNotification, setOpenNotification] = React.useState(false);
 
     const responsiveHandler = () => {
         const { width } = window.screen;
@@ -98,12 +100,15 @@ export default function Navigation() {
                     <AuthStatus
                         screenColumn={screenColumn}
                         openNavigator={() => setOpenNavigator(true)}
+                        setOpenNotification={setOpenNotification}
+                        openNotification={openNotification}
                     ></AuthStatus>
                 </ContainerComponent.Item>
             </ContainerComponent.Grid>
             {openNavigator && (
                 <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
             )}
+            {openNotification && (<NotificationContainer></NotificationContainer>)}
         </ContainerComponent>
     );
 }
@@ -146,7 +151,7 @@ const Navigator = ({ closeNavigator }) => {
     );
 };
 
-const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
+const AuthStatus = React.memo(({ screenColumn, openNavigator, openNotification, setOpenNotification }) => {
     const { user, logout } = useAuthorizationContext();
 
     if (!user.isLoggedIn)
@@ -175,7 +180,7 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
-                <Icon.CircleIcon>
+                <Icon.CircleIcon onClick={() => setOpenNotification(!openNotification)}>
                     <IoNotificationsOutline></IoNotificationsOutline>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
