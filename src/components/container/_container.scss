@@ -25,7 +25,6 @@
       grid-template-columns: repeat(2, 1fr);
     }
   }
-
   &__gridThreeColumns {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -45,10 +44,6 @@
   &__inlineGroup {
     display: inline-block;
     vertical-align: middle;
-  }
-
-  &__inner {
-    padding: 0 20px;
   }
 
   &__innerFluid {
