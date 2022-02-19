@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
-import { ContainerComponent } from "../../components";
+import { List } from "../../components";
 import { PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from '../../config';
 import { useAuthorizationContext } from "../../redux";
@@ -9,19 +9,23 @@ import { unstable_batchedUpdates } from "react-dom";
 
 export default function Workspace() {
   const API = mainAPI.LOCALHOST_STAFF;
-  const { user, data, setData, cancelTokenSource } = useAuthorizationContext();
-  const [caching, setCaching] = useState([]);
+  const { user, workspace, setWorkspace, cancelTokenSource } = useAuthorizationContext();
   const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState(null);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
-    axios.get(API + '?view=workspace&page=0', {
+    axios.get(API, {
       headers: {
         'Authorization': `Bearer ${user.accessToken}`
       },
-      cancelToken: cancelTokenSource.token
-    }).then(data => {
+      params: {
+        view: 'workspace',
+        page: page
+      }
+    }).then(res => {
       unstable_batchedUpdates(() => {
-        setData(data.data);
+        setWorkspace(res.data.workspace);
       })
     }).catch(error => console.log(error.message))
       .finally(() => setLoading(false));
@@ -31,19 +35,48 @@ export default function Workspace() {
   }, []);
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
+    if (workspace) {
+      setPosts(workspace.posts)
+    }
+  }, [workspace]);
 
   if (loading) return <Loading></Loading>
 
   return (
     <div className="workspace">
-      <Timespan></Timespan>
+      <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
-      {
-        data.account.map()
-      }
-      {/* <PostContainer></PostContainer> */}
+      <List>
+        {posts && posts.map(post => {
+          const { postAuthor, content, attachment, like, dislike, comment } = post;
+          const postHeader = {
+            image: postAuthor.profileImage,
+            alt: postAuthor.username,
+            username: postAuthor.username,
+            date: post.createdAt
+          }
+          const postBody = {
+            content,
+            attachment: attachment.map(attach => {
+              const { _id, fileType, filePath } = attach;
+              return {
+                _id,
+                image: `${mainAPI.LOCALHOST_HOST}\\${filePath}`,
+                fileType
+              }
+            })
+          }
+          const postFooter = {
+            like,
+            dislike,
+            comment
+          }
+          return <List.Item key={post._id}>
+            <PostContainer postHeader={postHeader} postBody={postBody} postFooter={postFooter}></PostContainer>
+          </List.Item>
+        }
+        )}
+      </List>
     </div>
   );
 }

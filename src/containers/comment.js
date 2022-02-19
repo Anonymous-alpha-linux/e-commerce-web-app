@@ -1,10 +1,17 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContainerComponent, Text, Icon, Form } from '../components';
 import { FaLock } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
 import { BsFillPersonFill } from "react-icons/bs";
+import { useAuthorizationContext } from '../redux';
 
-export default function Comment() {
+export default function Comment({ commentLogs, startTime, expireTime }) {
+    const { socket, user } = useAuthorizationContext();
+    const [text, setText] = useState('');
+    useEffect(() => {
+        console.log('user: ', user);
+    }, [user]);
+
     return <ContainerComponent.Section className="comment__section" style={{
         padding: '10px'
     }}>
@@ -37,7 +44,7 @@ export default function Comment() {
                     flexGrow: 1
                 }}>
                     <Text.Subtitle style={{ margin: '8px' }}>
-                        User Name
+                        {user.account}
                         <FaLock style={{ margin: '0 10px' }} />
                     </Text.Subtitle>
                     <Text.Line>
@@ -58,7 +65,10 @@ export default function Comment() {
         <ContainerComponent.Pane className="comment__log" style={{
             paddingTop: '12px'
         }}>
-            <Comment.Tab></Comment.Tab>
+            {commentLogs.map(log => {
+                return <Comment.Tab></Comment.Tab>
+            })
+            }
         </ContainerComponent.Pane>
         <ContainerComponent.Pane className="comment__footer">
             <Text.Subtitle style={{ textAlign: 'center', width: '100%', margin: '10px 0' }}>

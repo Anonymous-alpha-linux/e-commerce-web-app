@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
-import { unstable_batchedUpdates } from 'react-dom';
+
 
 
 const AuthenticationContextAPI = createContext();
@@ -13,15 +13,16 @@ export default function AuthenticationContext({ children }) {
   const [user, setUser] = useState({
     accessToken: localStorage.getItem('accessToken') || 'a.b.c',
   });
-  const [requestHeader, setHeaderRequest] = useState('');
+  const [workspace, setWorkspace] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const cancelTokenSource = axios.CancelToken.source();
 
   useEffect(() => {
     auth().then(() => {
       setLoading(true);
-      const socketHost = mainAPI.CLOUD_API_HOST;
+      const socketHost = mainAPI.CLOUD_HOST;
       // const socketHost = mainAPI.LOCALHOST_HOST;
       const socket = io(socketHost, {
         auth: {
@@ -44,10 +45,8 @@ export default function AuthenticationContext({ children }) {
   }, []);
 
   useEffect(() => {
-    setHeaderRequest({
-      'Authorization': `Bearer ${user.accessToken}`
-    })
-  }, [user]);
+    console.log(workspace)
+  }, [workspace]);
 
   const auth = async () => {
     const authApi = mainAPI.CLOUD_API_AUTH;
@@ -66,7 +65,6 @@ export default function AuthenticationContext({ children }) {
       setError(error.message);
     })
   };
-
   function login(data) {
     // const loginApi = mainAPI.LOCALHOST_LOGIN;
     const loginApi = mainAPI.CLOUD_API_LOGIN;
@@ -85,7 +83,6 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   };
-
   const register = async (data) => {
     const registerApi = mainAPI.CLOUD_API_REGISTER;
     // const registerApi = mainAPI.LOCALHOST_REGISTER;
@@ -98,7 +95,6 @@ export default function AuthenticationContext({ children }) {
         setUser({ ...res.data });
       }).catch(error => setError(error.message));
   }
-
   const logout = React.useCallback(async function () {
     try {
       const logoutApi = mainAPI.CLOUD_API_LOGOUT;
@@ -126,14 +122,16 @@ export default function AuthenticationContext({ children }) {
     <AuthenticationContextAPI.Provider value={{
       loading,
       user,
-      error,
       socket,
       cancelTokenSource,
+      workspace,
+      setWorkspace,
       setSocket,
       login,
       logout,
       register,
       setError,
+      setMessage,
       setLoading,
       setUser,
     }}>

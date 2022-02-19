@@ -15,3 +15,9 @@ IconComponent.Label = ({ children, ...props }) => {
         {children}
     </p>
 }
+
+IconComponent.Avatar = ({ children, ...props }) => {
+    return <div className="icon__avatar" {...props}>
+        {children}
+    </div>
+}
