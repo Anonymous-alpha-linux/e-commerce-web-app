@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 
-export default function TagsInput({ filter, forParent }) {
+export default function TagsInput({ filter, forParent = null }) {
   const [text, setText] = useState("");
   const [tags, setTags] = useState([]);
 
-  useEffect(() => {
-    forParent(tags);
-  }, [tags]);
+  // useEffect(() => {
+  //   forParent(tags);
+  // }, [tags]);
 
   let inputDiv;
 
