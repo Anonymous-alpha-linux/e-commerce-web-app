@@ -4,6 +4,7 @@ import ConditionContainer from './condition';
 import { useAuthorizationContext } from '../redux';
 import { mainAPI } from '../config';
 import UploadForm from './uploadpreview';
+import { Loading } from '../pages';
 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +23,7 @@ export default function PostModal({ setOpenModal }) {
     const [rerender, setRerender] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const [openCondition, setOpenCondition] = React.useState(false);
     const { user } = useAuthorizationContext();
     const navigate = useNavigate();
@@ -54,13 +56,15 @@ export default function PostModal({ setOpenModal }) {
             formData.append(key, input[key]);
         })
         console.log(formData);
+        setLoading(true);
         axios.post(`${staffURL}?view=post`, formData, {
             headers: headers
         })
             .then(res => {
                 window.location.reload();
             })
-            .catch(err => setError(err.message));
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
     }
     const inputHandler = (e) => {
         setInput(input => ({
@@ -119,6 +123,7 @@ export default function PostModal({ setOpenModal }) {
         })
     }, [files]);
 
+    if (loading) return <Loading></Loading>
     return <ContainerComponent.Section className="postModal__container" style={{
         position: 'fixed',
         top: '50px',

@@ -7,9 +7,9 @@ import { Outlet } from 'react-router-dom';
 
 export default function Staff() {
     return <>
-        <AddGroupContainer></AddGroupContainer>
+        {/* <AddGroupContainer></AddGroupContainer>
         <MessageBoxContainer></MessageBoxContainer>
-        <MessageContainer></MessageContainer>
+        <MessageContainer></MessageContainer> */}
         <Outlet></Outlet>
     </>;
 }

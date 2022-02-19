@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ContainerComponent, Text } from "../components";
+import { ButtonComponent } from "../components";
 
 export default function Timespan({
     startTime = Date.now(),
@@ -47,10 +48,11 @@ export default function Timespan({
                 style={{
                     // alignItems: 'center',
                     justifyContent: 'center',
+                    paddingTop: '10px'
                 }}
             >
                 <ContainerComponent.Item>
-                    <Text.Date>{counterTimer.days} </Text.Date>
+                    <ButtonComponent>{counterTimer.days} </ButtonComponent>
                     <Text.Bold>Days</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -59,7 +61,7 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text.Date>{`${counterTimer.hours < 10 && '0' || ''}${counterTimer.hours}`} </Text.Date>
+                    <ButtonComponent>{`${counterTimer.hours < 10 && '0' || ''}${counterTimer.hours}`} </ButtonComponent>
                     <Text.Bold>Hours</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -68,7 +70,7 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text.Date>{`${counterTimer.minutes < 10 && '0' || ''}${counterTimer.minutes}`}</Text.Date>
+                    <ButtonComponent>{`${counterTimer.minutes < 10 && '0' || ''}${counterTimer.minutes}`}</ButtonComponent>
                     <Text.Bold>Minutes</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -77,7 +79,7 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text.Date>{`${counterTimer.seconds < 10 && '0' || ''}${counterTimer.seconds}`}</Text.Date>
+                    <ButtonComponent>{`${counterTimer.seconds < 10 && '0' || ''}${counterTimer.seconds}`}</ButtonComponent>
                     <Text.Bold>Seconds</Text.Bold>
                 </ContainerComponent.Item>
             </ContainerComponent.Flex>

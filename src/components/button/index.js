@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "./styles/button";
 
 export default function ButtonComponent({ children, ...restProps }) {
-    return <a href={restProps.link} {...restProps}>{children}</a>;
+  return <a className="button" {...restProps}>{children}</a>;
 }
 
 ButtonComponent.Toggle = function ({ children, ...props }) {

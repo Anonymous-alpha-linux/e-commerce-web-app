@@ -6,11 +6,15 @@ import {
   QACoordinator,
   AdminSidebar, Admin,
   QAManager,
-  Workspace, Profile, QA
+  Workspace, Profile, QA,
+  Portal
 } from './pages';
+import { MessageContainer, NotificationContainer } from "./containers";
+
 import { useAuthorizationContext } from "./redux";
 import roles from './fixtures/roles';
 import './scss/main.scss';
+import { MessageBox } from "./components";
 
 function App() {
   const { user } = useAuthorizationContext();
@@ -52,6 +56,11 @@ function App() {
                 <Route index element={<Workspace></Workspace>}></Route>
                 <Route path="profile" element={<Profile></Profile>}></Route>
                 <Route path="q&a" element={<QA></QA>}></Route>
+                <Route path="portal/" element={<Portal></Portal>}>
+                  <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
+                  <Route path="message" element={<MessageContainer></MessageContainer>} />
+                  <Route path="message/:id" element={<MessageBox></MessageBox>} />
+                </Route>
               </Route>)}
           </Route>
 

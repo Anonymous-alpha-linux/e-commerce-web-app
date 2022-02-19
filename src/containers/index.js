@@ -7,6 +7,7 @@ export { default as Personal } from './personal'
 export { default as ManagerInfo } from './managerInfo'
 export { default as Timespan } from './timespan'
 export { default as PostModal } from './postmodal'
+export { default as MessageContainer } from './message';
 export { default as MessageBoxContainer } from './messageBox'
 export { default as AddGroupContainer } from './addGroup'
 export { default as Filter } from "./filter";

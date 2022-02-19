@@ -1,26 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
-import NavData from "../fixtures/nav-links.json";
-import navigators from "../fixtures/navigator";
-import { useAuthorizationContext } from "../redux";
-
 import { AiOutlineMessage } from "react-icons/ai";
 import {
     IoNotificationsOutline,
     IoLogoApple,
     IoSearchSharp,
 } from "react-icons/io5";
+
+
+import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
+import navigators from "../fixtures/navigator";
+import { useAuthorizationContext } from "../redux";
 import { BsList } from "react-icons/bs";
-import ConditionContainer from "./condition";
 import NotificationContainer from "./notification";
+import { MessageBoxContainer, MessageContainer } from ".";
 
 export default function Navigation() {
-    const useAuth = useAuthorizationContext();
+    const { user } = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
     const [openNotification, setOpenNotification] = React.useState(false);
+    const [openMessage, setOpenMessage] = useState(false);
 
     const responsiveHandler = () => {
         const { width } = window.screen;
@@ -41,6 +41,10 @@ export default function Navigation() {
             window.removeEventListener("resize", responsiveHandler);
         };
     }, [window.screen.width]);
+    const openHome = () => {
+        setOpenMessage(false);
+        setOpenNotification(false);
+    }
 
     return (
         <ContainerComponent
@@ -61,9 +65,11 @@ export default function Navigation() {
                         }}
                     >
                         <ContainerComponent.Item>
-                            <Icon.CircleIcon>
-                                <IoLogoApple></IoLogoApple>
-                            </Icon.CircleIcon>
+                            <Link to="/">
+                                <Icon.CircleIcon>
+                                    <IoLogoApple></IoLogoApple>
+                                </Icon.CircleIcon>
+                            </Link>
                         </ContainerComponent.Item>
                         <ContainerComponent.Item>
                             <Text
@@ -100,15 +106,16 @@ export default function Navigation() {
                     <AuthStatus
                         screenColumn={screenColumn}
                         openNavigator={() => setOpenNavigator(true)}
-                        setOpenNotification={setOpenNotification}
-                        openNotification={openNotification}
+                        openNotification={() => setOpenNotification(true)}
+                        openMessage={() => setOpenMessage(true)}
                     ></AuthStatus>
                 </ContainerComponent.Item>
             </ContainerComponent.Grid>
             {openNavigator && (
                 <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
             )}
-            {openNotification && (<NotificationContainer></NotificationContainer>)}
+            {/* {openMessage && <MessageContainer></MessageContainer>}
+            {openNotification && (<NotificationContainer></NotificationContainer>)} */}
         </ContainerComponent>
     );
 }
@@ -151,7 +158,12 @@ const Navigator = ({ closeNavigator }) => {
     );
 };
 
-const AuthStatus = React.memo(({ screenColumn, openNavigator, openNotification, setOpenNotification }) => {
+const AuthStatus = React.memo(({
+    screenColumn,
+    openNavigator,
+    openNotification,
+    openMessage
+}) => {
     const { user, logout } = useAuthorizationContext();
 
     if (!user.isLoggedIn)
@@ -176,12 +188,16 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator, openNotification, 
         >
             <ContainerComponent.Item>
                 <Icon.CircleIcon>
-                    <AiOutlineMessage></AiOutlineMessage>
+                    <Link to="/portal/message">
+                        <AiOutlineMessage></AiOutlineMessage>
+                    </Link>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
-                <Icon.CircleIcon onClick={() => setOpenNotification(!openNotification)}>
-                    <IoNotificationsOutline></IoNotificationsOutline>
+                <Icon.CircleIcon>
+                    <Link to="/portal/notification">
+                        <IoNotificationsOutline></IoNotificationsOutline>
+                    </Link>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>

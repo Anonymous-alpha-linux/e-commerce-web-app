@@ -47,3 +47,4 @@ Text.Middle = ({ children, ...props }) => {
 Text.Center = ({ children, ...props }) => <p className='text__center' {...props}>{children}</p>;
 Text.Bold = ({ children, ...props }) => <p className='text__bold' {...props}>{children}</p>
 Text.Camel = ({ children, ...props }) => <p className='text__camel' {...props}>{children}</p>
+Text.Link = ({ children, ...props }) => <a className='text__link' {...props}>{children}</a>
