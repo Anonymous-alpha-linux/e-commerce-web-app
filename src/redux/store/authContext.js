@@ -7,7 +7,6 @@ import { io } from 'socket.io-client';
 const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
-
   const [socket, setSocket] = useState(null);
   const [user, setUser] = useState({
     accessToken: localStorage.getItem('accessToken') || 'a.b.c',

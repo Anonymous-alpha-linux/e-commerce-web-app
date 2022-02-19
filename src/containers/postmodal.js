@@ -8,7 +8,7 @@ import UploadForm from './uploadpreview';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
-import { TagInput } from '.';
+import TagInput from './tagsinput';
 
 export default function PostModal({ setOpenModal }) {
     const [input, setInput] = useState({
@@ -26,7 +26,7 @@ export default function PostModal({ setOpenModal }) {
     const { user } = useAuthorizationContext();
     const navigate = useNavigate();
 
-    const staffURL = mainAPI.LOCALHOST_STAFF;
+    const staffURL = mainAPI.CLOUD_API_STAFF;
 
     const validateFile = (file) => {
         const imageRegex = new RegExp("image/*");
@@ -54,7 +54,7 @@ export default function PostModal({ setOpenModal }) {
             formData.append(key, input[key]);
         })
         console.log(formData);
-        axios.post(`${mainAPI.LOCALHOST_STAFF}?view=post`, formData, {
+        axios.post(`${staffURL}?view=post`, formData, {
             headers: headers
         })
             .then(res => {

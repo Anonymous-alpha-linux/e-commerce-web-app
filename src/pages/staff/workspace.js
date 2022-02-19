@@ -4,7 +4,7 @@ import { List } from "../../components";
 import { PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from '../../config';
 import { useAuthorizationContext } from "../../redux";
-import { Loading } from "..";
+import { Loading } from "../";
 import { unstable_batchedUpdates } from "react-dom";
 
 export default function Workspace() {
