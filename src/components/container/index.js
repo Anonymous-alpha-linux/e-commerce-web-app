@@ -1,15 +1,20 @@
 import React from 'react';
-import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner, BackDrop, Hero } from './styles'
+// import { Container, Item, Pane, Inner, Grid, Flex, Link, MiddleInner, BackDrop, Hero } from './styles'
 
 // 1. define the default component
 export default function ContainerComponent({ children, ...restProps }) {
     return (
-        <div className='container__root' {...restProps}>
+        <div {...restProps} className={`container__root ${restProps.className}`}>
             {children}
         </div>
     )
 }
 
+ContainerComponent.Absolute = function ({ children, ...restProps }) {
+    return <div className='container__absolute'>
+        {children}
+    </div>
+}
 ContainerComponent.Flex = function ({ children, ...restProps }) {
     return <div className='container__flex' {...restProps}>
         {children}
@@ -34,7 +39,7 @@ ContainerComponent.BackDrop = function ({ children, ...restProps }) {
     </div>
 }
 
-ContainerComponent.Item = function ({ children, width = '100%', padding = '10px', ...restProps }) {
+ContainerComponent.Item = function ({ children, width = '100%', padding = '5px', ...restProps }) {
     return <div className="container__item" width={width} padding={padding} {...restProps}>
         {children}
     </div>
@@ -61,10 +66,13 @@ ContainerComponent.Link = function ({ children, ...restProps }) {
 }
 
 ContainerComponent.Section = function ({ children, ...restProps }) {
-    return <div className="container__section" {...restProps}>{children}</div>
+    return <div {...restProps} className={`container__section ${restProps.className}`}>{children}</div>
 }
 ContainerComponent.Hero = React.forwardRef(function ({ children, ...restProps }, ref) {
     return <div className="container__hero" ref={ref} {...restProps}>
         {children}
     </div>
 })
+ContainerComponent.InlineGroup = function ({ children, ...props }) {
+    return <div {...props} className="container__inlineGroup">{children}</div>
+}

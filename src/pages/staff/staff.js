@@ -1,10 +1,8 @@
 import React from 'react';
-import Profile from './profile';
-import Workspace from './workspace';
+import { Outlet } from 'react-router-dom';
 
 export default function Staff() {
     return <>
-        <Workspace></Workspace>
-        <Profile></Profile>
+        <Outlet></Outlet>
     </>;
 }
