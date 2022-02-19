@@ -50,7 +50,8 @@ export default function Timespan({
                 }}
             >
                 <ContainerComponent.Item>
-                    <Text.Date>{counterTimer.days}</Text.Date>
+                    <Text.Date>{counterTimer.days} </Text.Date>
+                    <Text.Bold>Days</Text.Bold>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
@@ -58,7 +59,8 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text.Date>{`${counterTimer.hours < 10 && '0' || ''}${counterTimer.hours}`}</Text.Date>
+                    <Text.Date>{`${counterTimer.hours < 10 && '0' || ''}${counterTimer.hours}`} </Text.Date>
+                    <Text.Bold>Hours</Text.Bold>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
@@ -67,6 +69,7 @@ export default function Timespan({
 
                 <ContainerComponent.Item>
                     <Text.Date>{`${counterTimer.minutes < 10 && '0' || ''}${counterTimer.minutes}`}</Text.Date>
+                    <Text.Bold>Minutes</Text.Bold>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
@@ -75,6 +78,7 @@ export default function Timespan({
 
                 <ContainerComponent.Item>
                     <Text.Date>{`${counterTimer.seconds < 10 && '0' || ''}${counterTimer.seconds}`}</Text.Date>
+                    <Text.Bold>Seconds</Text.Bold>
                 </ContainerComponent.Item>
             </ContainerComponent.Flex>
         </ContainerComponent.Inner>
