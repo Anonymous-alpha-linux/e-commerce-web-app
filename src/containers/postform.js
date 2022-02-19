@@ -1,13 +1,10 @@
 import React,{useState} from 'react';
-import { Container } from 'react-bootstrap';
 import {ContainerComponent, Text, Form, Icon} from '../components';
 import {PostModal} from '../containers';
 
 export default function PostForm() {
 const [openModal , setOpenModal] = useState(false);
-    return <ContainerComponent.Section style={{
-        padding: '10px',
-    }}>
+    return <ContainerComponent.Section>
         <ContainerComponent.Flex style={{alignItems: 'center'}}>
             <ContainerComponent.Item>
             <Icon.CircleIcon style={{size: '15px',}}>

@@ -30,7 +30,7 @@ export default function Post() {
             </ContainerComponent.Flex>
           </ContainerComponent.Pane>
         </ContainerComponent.Pane>
-        <ContainerComponent.Pane>
+    <ContainerComponent.Pane style={{ position: "relative" }}>
           <Text.Paragraph>
             Một cảm xúc gì đó rất lạ, một cái chất rất khó tả ở Hải Bột, một
             người nghệ sĩ rất “nghệ sĩ”! Anh cũng là một gã “gàn dở”, nhưng cũng
@@ -38,7 +38,7 @@ export default function Post() {
             mây, như một nhà thơ.
           </Text.Paragraph>
           {/* Preivew */}
-          <Preview.Images image={'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg'} alt={'background'}>
+          <Preview.Images image={'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg'} alt={'background'} style={{width:"100%"}}>
                     Avatar
                 </Preview.Images>
         </ContainerComponent.Pane>

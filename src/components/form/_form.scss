@@ -1,9 +1,12 @@
 .form {
-  width: 30%;
   margin: 0 auto;
-  padding: 50px;
   background-color: #fff;
   color: #333;
+  width: 100%;
+  max-width: 320px;
+  min-width: 310px;
+  padding: 10px;
+  text
   &__container {
     display: flex;
     flex-direction: column;
@@ -14,7 +17,6 @@
   }
   &__input {
     font-size: 14px;
-    padding: 15px 10px;
   }
   &__link {
     text-align: left;
@@ -26,7 +28,6 @@
   }
   &__button {
     text-transform: capitalize;
-    padding: 15px 0;
     font-weight: 600;
     cursor: pointer;
     border: 1px solid #e8eced;
@@ -38,22 +39,21 @@
   }
   &__title {
     font-weight: 400;
-    font-size: 24px;
+    font-size: 14px;
     line-height: 28px;
-    padding-top: 20px;
     margin-bottom: 10px;
     border-top: 2px solid black;
-    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     text-align: center;
   }
   &__image {
     margin: 0;
   }
-  &__textarea{
+  &__textarea {
     font-size: 14px;
-    padding: 15px 10px;
-  &__checkbox {
-    margin: 0;
+    &__checkbox {
+      margin: 0;
+      
+    }
   }
-}
 }

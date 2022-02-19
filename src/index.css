@@ -1,5 +1,5 @@
 :root {
-  --primary-font: "Jost", "Helvetica", "Arial", sans-serif;
+  --primary-font: 'Jost', 'Helvetica', 'Arial', sans-serif;
   --primary-color: rgb(231, 231, 231);
   --secondary-color: rgb(27, 27, 27);
   --gray-light-color: rgb(229, 223, 217);
@@ -18,6 +18,7 @@ body {
   font-family: var(--primary-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 }
 
 code {

@@ -9,14 +9,13 @@ export default function PostModal() {
     const [openCondition, setOpenCondition] = React.useState(false)
 
     return <ContainerComponent.Section style={{
-
+        // position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%'
     }}>
         <ContainerComponent.Inner>
-            <Form style={{
-                width: '90%',
-
-            }}>
-                <ContainerComponent.Pane>
+            <Form>
                     <Text.Title>Post Modal</Text.Title>
                     <Text.Subtitle>Author name: Staff</Text.Subtitle>
                     <Form.TextArea
@@ -25,7 +24,7 @@ export default function PostModal() {
                             height: '100px'
                         }}
                     ></Form.TextArea>
-                    
+
                     <ContainerComponent.Flex>
                         <ContainerComponent.Item>
                             <Form.Checkbox></Form.Checkbox>
@@ -61,17 +60,6 @@ export default function PostModal() {
                             <UploadForm></UploadForm>
                         </ContainerComponent.Item>
                     </ContainerComponent.Flex>
-
-                    {/* <ContainerComponent
-                        style= {{
-                            background: 'white'
-                        }}
-                    >
-                        <ContainerComponent.Grid></ContainerComponent.Grid>
-                    </ContainerComponent> */}
-
-                    
-
                     <ContainerComponent.Flex>
                         <ContainerComponent.Item>
                             <Form.Checkbox></Form.Checkbox>
@@ -99,7 +87,7 @@ export default function PostModal() {
                     <ButtonComponent.Submit>
                         Submit
                     </ButtonComponent.Submit>
-                </ContainerComponent.Pane>
+
             </Form>
         </ContainerComponent.Inner>
     </ContainerComponent.Section>

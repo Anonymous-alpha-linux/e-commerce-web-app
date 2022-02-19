@@ -1,4 +1,5 @@
 import React from 'react';
+import { Children } from 'react/cjs/react.production.min';
 
 export default function Form({ children, action, method, onSubmit, ...restProp }) {
     return (
@@ -79,5 +80,13 @@ Form.Checkbox = function ({ children, ...restProp }) {
         <input type={'checkbox'} className="form__checkbox" {...restProp}>
             {children}
         </input>
+    )
+}
+
+Form.FrameAvatar = function({children,...restProp}){
+    return(
+        <div className='form__frameAvatar' {...restProp}>
+            {children}
+        </div>
     )
 }

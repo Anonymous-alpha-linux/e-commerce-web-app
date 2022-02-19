@@ -12,7 +12,8 @@ Preview.Images = function ({ children, ...restProps }) {
     return (
        <img className="preview__image" 
        src={restProps.image} 
-       alt={restProps.alt} >
+       alt={restProps.alt} 
+       style={restProps.style}>
        </img>
     )
 }
