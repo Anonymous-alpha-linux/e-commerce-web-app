@@ -4,8 +4,6 @@ import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
 
-
-
 const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
