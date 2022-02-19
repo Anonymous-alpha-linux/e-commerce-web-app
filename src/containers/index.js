@@ -9,4 +9,5 @@ export { default as Timespan } from "./timespan";
 export { default as PostModal } from "./postmodal";
 export { default as Filter } from "./filter";
 export { default as TagsInput } from "./tagsinput";
-export { default as NotificationContainer } from "./notification"
+export { default as NotificationContainer } from "./notification";
+export { default as Loader } from './loader';
