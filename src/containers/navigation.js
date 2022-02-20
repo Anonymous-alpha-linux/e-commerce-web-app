@@ -72,7 +72,7 @@ export default function Navigation() {
                             </Link>
                         </ContainerComponent.Item>
                         <ContainerComponent.Item>
-                            <Text
+                            <Link to="/portal/search"
                                 style={{
                                     paddingLeft: "0",
                                     color: "#fff",
@@ -83,7 +83,7 @@ export default function Navigation() {
                                 }}
                             >
                                 <IoSearchSharp></IoSearchSharp>
-                            </Text>
+                            </Link>
                         </ContainerComponent.Item>
                     </ContainerComponent.Flex>
                 </ContainerComponent.Item>
