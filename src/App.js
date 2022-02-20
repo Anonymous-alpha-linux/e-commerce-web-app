@@ -9,7 +9,7 @@ import {
   Workspace, Profile, QA,
   Portal
 } from './pages';
-import { MessageContainer, NotificationContainer, PostModal } from "./containers";
+import { AddGroupContainer, MessageContainer, NotificationContainer, PostModal, Searchbar } from "./containers";
 
 import { useAuthorizationContext } from "./redux";
 import roles from './fixtures/roles';
@@ -25,7 +25,6 @@ function App() {
       <BrowserRouter>
         {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
         <Routes>
-
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
           <Route path="logout" element={<Signout></Signout>}></Route>
@@ -64,6 +63,8 @@ function App() {
                   <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
                   <Route path="message" element={<MessageContainer></MessageContainer>} />
                   <Route path="message/:id" element={<MessageBox></MessageBox>} />
+                  <Route path="search" element={<Searchbar></Searchbar>} />
+                  <Route path="addgroup" element={<AddGroupContainer></AddGroupContainer>} />
                 </Route>
               </Route>)}
           </Route>

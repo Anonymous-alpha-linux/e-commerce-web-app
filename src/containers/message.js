@@ -1,6 +1,8 @@
 import React from 'react'
 import { ButtonComponent, ContainerComponent, Form, Icon, Message, Preview, Text } from '../components'
-import { FaSearch } from 'react-icons/fa'
+import { FaSearch } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+
 export default function MessageContainer() {
     return (
         <Message style={{ width: "100%" }}>
@@ -13,7 +15,11 @@ export default function MessageContainer() {
                     <Text.Title style={{ fontSize: "18px" }}>CHAT</Text.Title>
                     <ButtonComponent style={{ display: "flex", backgroundColor: "silver", padding: "7px", borderRadius: "10px" }}>
                         <Icon></Icon>
-                        <Text.Subtitle style={{ margin: 0 }}>Create Your Group</Text.Subtitle>
+                        <Link to="/portal/addgroup">
+                            <Text.Subtitle style={{ margin: 0 }}>
+                                Create Your Group
+                            </Text.Subtitle>
+                        </Link>
                     </ButtonComponent>
                 </ContainerComponent.Item>
                 {/* Search Form */}
