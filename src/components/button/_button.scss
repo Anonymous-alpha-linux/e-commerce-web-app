@@ -1,31 +1,35 @@
-.button{
-    &__upload {
-        background: white;
-        color: black;
-        border-radius: 0%;
-        text-transform: capitalize;
-        padding: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        border: 1px solid #e8eced;
-        text-align: center;
-        &:hover {
-            background-color: #d1caca !important;
-            transition: all 0.15s linear;
-        }
+.button {
+  background: #000;
+  color: #fff;
+  border-radius: 20px;
+  padding: 5px 20px;
+  &__upload {
+    background: white;
+    color: black;
+    border-radius: 0%;
+    text-transform: capitalize;
+    padding: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #e8eced;
+    text-align: center;
+    &:hover {
+      background-color: #d1caca !important;
+      transition: all 0.15s linear;
     }
-    &__summit {
-        background: white;
-        color: black;
-        text-transform: capitalize;
-        padding: 10px 20%;
-        font-weight: 600;
-        cursor: pointer;
-        border: 1px solid #e8eced;
-        text-align: center;
-        &:hover {
-            background-color: #d1caca !important;
-            transition: all 0.15s linear;
-        }
+  }
+  &__summit {
+    background: white;
+    color: black;
+    text-transform: capitalize;
+    padding: 10px 20%;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #e8eced;
+    text-align: center;
+    &:hover {
+      background-color: #d1caca !important;
+      transition: all 0.15s linear;
     }
+  }
 }

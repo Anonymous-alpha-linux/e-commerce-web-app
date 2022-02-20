@@ -6,11 +6,16 @@ import {
   QACoordinator,
   AdminSidebar, Admin,
   QAManager,
-  Workspace, Profile, QA
+  Workspace, Profile, QA,
+  Portal
 } from './pages';
+import { AddGroupContainer, MessageContainer, NotificationContainer, PostModal, Searchbar } from "./containers";
+
 import { useAuthorizationContext } from "./redux";
 import roles from './fixtures/roles';
 import './scss/main.scss';
+import { MessageBox } from "./components";
+import Signout from "./pages/signout";
 
 function App() {
   const { user } = useAuthorizationContext();
@@ -20,10 +25,11 @@ function App() {
       <BrowserRouter>
         {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
         <Routes>
+          <Route path="login" element={<Login></Login>}></Route>
+          <Route path="register" element={<Register></Register>}></Route>
+          <Route path="logout" element={<Signout></Signout>}></Route>
+          <Route path="reset_password" element={<ForgetPassword></ForgetPassword>}></Route>
           <Route path="/" element={<Home></Home>}>
-            <Route path="login" element={<Login></Login>}></Route>
-            <Route path="register" element={<Register></Register>}></Route>
-            <Route path="reset_password" element={<ForgetPassword></ForgetPassword>}></Route>
             {
               // 1. Admin Role
               (user.role === roles.ADMIN && <Route path=""
@@ -52,8 +58,17 @@ function App() {
                 <Route index element={<Workspace></Workspace>}></Route>
                 <Route path="profile" element={<Profile></Profile>}></Route>
                 <Route path="q&a" element={<QA></QA>}></Route>
+                <Route path="portal/" element={<Portal></Portal>}>
+                  <Route path="idea" element={<PostModal />} />
+                  <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
+                  <Route path="message" element={<MessageContainer></MessageContainer>} />
+                  <Route path="message/:id" element={<MessageBox></MessageBox>} />
+                  <Route path="search" element={<Searchbar></Searchbar>} />
+                  <Route path="addgroup" element={<AddGroupContainer></AddGroupContainer>} />
+                </Route>
               </Route>)}
           </Route>
+
 
           <Route path="/*" element={<h1>404 Error: Page Not Found...</h1>}>
           </Route>

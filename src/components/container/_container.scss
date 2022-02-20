@@ -25,7 +25,6 @@
       grid-template-columns: repeat(2, 1fr);
     }
   }
-
   &__gridThreeColumns {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -47,10 +46,6 @@
     vertical-align: middle;
   }
 
-  &__inner {
-    padding: 0 20px;
-  }
-
   &__innerFluid {
     padding: 0;
   }
@@ -69,6 +64,7 @@
     height: 20%;
     max-height: 310px;
     min-height: 220px;
+    z-index: 12;
   }
 
   &__backdrop {

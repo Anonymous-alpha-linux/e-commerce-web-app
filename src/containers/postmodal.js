@@ -4,6 +4,7 @@ import ConditionContainer from './condition';
 import { useAuthorizationContext } from '../redux';
 import { mainAPI } from '../config';
 import UploadForm from './uploadpreview';
+import { Loading } from '../pages';
 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +23,7 @@ export default function PostModal({ setOpenModal }) {
     const [rerender, setRerender] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const [openCondition, setOpenCondition] = React.useState(false);
     const { user } = useAuthorizationContext();
     const navigate = useNavigate();
@@ -37,10 +39,6 @@ export default function PostModal({ setOpenModal }) {
     const submitHandler = (e) => {
         e.preventDefault();
         const formData = new FormData();
-        const headers = {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${user.accessToken}`
-        };
         files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
             formData.append("files", file);
         })
@@ -53,14 +51,18 @@ export default function PostModal({ setOpenModal }) {
             }
             formData.append(key, input[key]);
         })
-        console.log(formData);
+        setLoading(true);
         axios.post(`${staffURL}?view=post`, formData, {
-            headers: headers
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${user.accessToken}`
+            }
         })
             .then(res => {
-                window.location.reload();
+                navigate('/');
             })
-            .catch(err => setError(err.message));
+            .catch(err => setError(err.message))
+            .finally(() => setLoading(false));
     }
     const inputHandler = (e) => {
         setInput(input => ({
@@ -119,7 +121,7 @@ export default function PostModal({ setOpenModal }) {
         })
     }, [files]);
 
-    return <ContainerComponent.Section className="postModal__container" style={{
+    if (loading) return <Loading style={{
         position: 'fixed',
         top: '50px',
         left: '0',
@@ -130,29 +132,41 @@ export default function PostModal({ setOpenModal }) {
         background: '#fff',
         overflowY: 'scroll',
         paddingBottom: '50px'
-    }}>
+    }}
+    ></Loading>
+
+    return <ContainerComponent.Section className="postModal__container">
         <Form encType='multipart/form-data'
             method={'POST'}
             onSubmit={submitHandler}
-            style={{
-                borderRadius: '20px',
-                background: '#fff',
-            }}>
-            <Text.Line onClick={() => setOpenModal(modal => !modal)}>
-                <Text.MiddleLine>
-                    <Icon style={{ display: 'inline' }}>
-                        <FaChevronLeft></FaChevronLeft>
-                    </Icon>
-                </Text.MiddleLine>
-                <Text.Middle style={{
-                    verticalAlign: 'text-top'
+            className="postModal__form">
+            <Text.Line>
+                <Text.MiddleLine onClick={() => {
+                    // setOpenModal(modal => !modal);
+                    navigate('/');
                 }}>
-                    Back
-                </Text.Middle>
+                    <Text.MiddleLine>
+                        <Icon style={{ display: 'inline' }}>
+                            <FaChevronLeft></FaChevronLeft>
+                        </Icon>
+                    </Text.MiddleLine>
+                    <Text.Middle style={{
+                        verticalAlign: 'text-top'
+                    }}>
+                        Back
+                    </Text.Middle>
+                </Text.MiddleLine>
+
+                <Text.RightLine style={{
+                    width: '80%',
+                    display: 'inline-block'
+                }}>
+                    <Text.Title style={{
+                        textAlign: 'right',
+                    }}>Post Modal</Text.Title>
+                </Text.RightLine>
+
             </Text.Line>
-            <Text.Title style={{
-                textAlign: 'right'
-            }}>Post Modal</Text.Title>
             <Text.Label>Author name: <Text.MiddleLine>
                 <Text.Bold>{user.account}</Text.Bold>
             </Text.MiddleLine>

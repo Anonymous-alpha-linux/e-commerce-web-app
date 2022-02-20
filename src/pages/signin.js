@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContainerComponent, Form } from '../components';
 import { useAuthorizationContext } from '../redux';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 
 const Login = () => {
-    const { login, user } = useAuthorizationContext();
+    const { login, user, setUser, auth } = useAuthorizationContext();
     const [input, setInput] = useState({});
     const [error, setError] = useState('');
 
     const location = useLocation();
     let from = location.state?.from?.pathname || '/';
 
-
+    useEffect(() => {
+        console.log(user);
+        setUser({
+            accessToken: 'a.b.c'
+        });
+    }, []);
     const submitHandler = async (e) => {
         e.preventDefault();
         await login(input);
     }
-
     const inputHandler = React.useCallback((e) => {
         setInput(oldInput => {
             return {
@@ -33,9 +37,9 @@ const Login = () => {
     }
 
     return <>
+        <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <ContainerComponent.Hero>
         </ContainerComponent.Hero>
-        <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <Form method={'POST'}
             onSubmit={submitHandler}
             style={{
@@ -67,17 +71,18 @@ const Login = () => {
                     name="password"
                     onChange={inputHandler}
                     autoComplete='current-password'
-                // value={input.password}
                 ></Form.Input>
-                <Form.Link href='/reset_password'>Forgot your Password?</Form.Link>
-                <Form.Button
+                <Link to='/reset_password'>Forgot your Password?</Link>
+                <Form.Input
+                    type="submit"
+                    value='sign in'
                     onClick={submitHandler}
                     style={{
                         background: 'black',
                         color: '#fff'
                     }}>
-                    sign in
-                </Form.Button>
+
+                </Form.Input>
                 {error && <p>{error}</p>}
             </Form.Container>
         </Form>

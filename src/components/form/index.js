@@ -109,9 +109,17 @@ Form.Option = function ({ children, ...props }) {
 };
 
 Form.Checkbox = function ({ children, ...restProp }) {
-  return (
-    <input type="checkbox" className="form__checkbox" {...restProp}>
-      {children}
-    </input>
-  );
-};
+    return (
+        <input type={'checkbox'} className="form__checkbox" {...restProp}>
+            {children}
+        </input>
+    )
+}
+
+Form.FrameAvatar = function({children,...restProp}){
+    return(
+        <div className='form__frameAvatar' {...restProp}>
+            {children}
+        </div>
+    )
+}

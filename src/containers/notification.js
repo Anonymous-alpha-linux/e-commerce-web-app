@@ -3,9 +3,9 @@ import { ContainerComponent, Text } from '../components';
 
 export default function NotificationContainer() {
     return (
-        <ContainerComponent.Flex 
-            classname="notification__container"
-            style = {{
+        <ContainerComponent.Flex
+            className="notification__container"
+            style={{
                 position: 'fixed',
                 width: '100%',
                 height: '75%',
@@ -13,11 +13,10 @@ export default function NotificationContainer() {
                 right: 0,
                 flexDirection: 'column',
                 background: 'white',
-                border: '3px solid black'
             }}
         >
             <Text.Title
-                style = {{ 
+                style={{
                     // color: 'white',
                     textAlign: 'center',
                     margin: '7px 0',
@@ -25,7 +24,7 @@ export default function NotificationContainer() {
                 }}
             >Notification</Text.Title>
             <ContainerComponent.Item
-                style = {{
+                style={{
                     background: 'rgb(238,245,235)',
                     marginBottom: '3px',
                     padding: '10px 20px',
@@ -33,11 +32,11 @@ export default function NotificationContainer() {
                 }}
             >
                 <Text.Subtitle
-                    style = {{fontSize: '15px'}}
+                    style={{ fontSize: '15px' }}
                 >Notification Title</Text.Subtitle>
                 <Text
-                    style ={{
-                        fontSize:'15px',
+                    style={{
+                        fontSize: '15px',
                         color: 'rgb(150,149,149)'
                     }}
                 >
@@ -46,7 +45,7 @@ export default function NotificationContainer() {
             </ContainerComponent.Item>
 
             <ContainerComponent.Item
-                style = {{
+                style={{
                     background: 'rgb(238,245,235)',
                     marginBottom: '3px',
                     padding: '10px 20px',
@@ -54,11 +53,11 @@ export default function NotificationContainer() {
                 }}
             >
                 <Text.Subtitle
-                    style = {{fontSize: '15px'}}
+                    style={{ fontSize: '15px' }}
                 >Notification Title</Text.Subtitle>
                 <Text
-                    style ={{
-                        fontSize:'15px',
+                    style={{
+                        fontSize: '15px',
                         color: 'rgb(150,149,149)'
                     }}
                 >
@@ -67,7 +66,7 @@ export default function NotificationContainer() {
             </ContainerComponent.Item>
 
             <ContainerComponent.Item
-                style = {{
+                style={{
                     background: 'rgb(238,245,235)',
                     marginBottom: '3px',
                     padding: '10px 20px',
@@ -75,11 +74,11 @@ export default function NotificationContainer() {
                 }}
             >
                 <Text.Subtitle
-                    style = {{fontSize: '15px'}}
+                    style={{ fontSize: '15px' }}
                 >Notification Title</Text.Subtitle>
                 <Text
-                    style ={{
-                        fontSize:'15px',
+                    style={{
+                        fontSize: '15px',
                         color: 'rgb(150,149,149)'
                     }}
                 >
