@@ -3,10 +3,11 @@ import { ContainerComponent, Text, Form, Icon } from '../components';
 import { PostModal } from '../containers';
 import { IoLogoApple } from 'react-icons/io5'
 import { useAuthorizationContext } from '../redux';
+import { Link } from 'react-router-dom';
 
 export default function PostForm() {
-    const [openModal, setOpenModal] = useState(false),
-        { user } = useAuthorizationContext();
+    // const [openModal, setOpenModal] = useState(false);
+    const { user } = useAuthorizationContext();
 
     return <ContainerComponent.Section
         className="post-form__container"
@@ -24,9 +25,15 @@ export default function PostForm() {
                 flexGrow: 1
             }}>
                 <Text.Title>{user.account}</Text.Title>
-                <Form.Input placeholder="Post your idea" onClick={() => setOpenModal(!openModal)}></Form.Input>
+                <Link to="/portal/idea">
+                    <Form.Input
+                        placeholder="Post your idea"
+                    // onClick={() => setOpenModal(!openModal)}
+                    >
+                    </Form.Input>
+                </Link>
             </ContainerComponent.Item>
         </ContainerComponent.Flex>
-        {openModal && <PostModal setOpenModal={setOpenModal}></PostModal>}
+        {/* {openModal && <PostModal closeModal={() => setOpenModal(false)}></PostModal>} */}
     </ContainerComponent.Section>
 }

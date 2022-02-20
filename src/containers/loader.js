@@ -8,7 +8,6 @@ export default function Loader() {
             <LoaderComponent.Dot />
             <LoaderComponent.Dot />
             <LoaderComponent.Dot />
-            <LoaderComponent.Dot />
         </LoaderComponent>
     )
 }

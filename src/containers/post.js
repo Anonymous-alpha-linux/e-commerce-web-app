@@ -5,13 +5,16 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { IoEarth } from "react-icons/io5";
 import { BsFillPersonFill } from "react-icons/bs";
 import { Comment } from ".";
+import { useAuthorizationContext } from "../redux";
 
 export default function Post({ postHeader, postBody, postFooter }) {
     const [openComment, setOpenComment] = useState(false);
+    const { socket } = useAuthorizationContext();
     // useEffect(() => {
     //     console.log(postHeader, postBody, postFooter);
     // }, [postFooter, postBody, postFooter]);
-    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`
+    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
+    
     return (
         <ContainerComponent.Section
             className="post__section"
@@ -66,9 +69,13 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 <ContainerComponent.GridThreeColumns>
                     <ContainerComponent.Item>
                         <Text.MiddleLine>
-                            <Icon.CircleIcon style={{
-                                marginRight: '10px'
-                            }}>
+                            <Icon.CircleIcon
+                                onClick={() =>{
+                                    
+                                }}
+                                style={{
+                                    marginRight: '10px'
+                                }}>
                                 <FaThumbsUp />
                             </Icon.CircleIcon>
                             {postFooter.like}

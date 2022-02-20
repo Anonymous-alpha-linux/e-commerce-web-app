@@ -16,12 +16,11 @@ export default function AuthenticationContext({ children }) {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const cancelTokenSource = axios.CancelToken.source();
-
   useEffect(() => {
     auth().then(() => {
       setLoading(true);
-      const socketHost = mainAPI.CLOUD_HOST;
-      // const socketHost = mainAPI.LOCALHOST_HOST;
+      // const socketHost = mainAPI.CLOUD_HOST;
+      const socketHost = mainAPI.LOCALHOST_HOST;
       const socket = io(socketHost, {
         auth: {
           accessToken: user.accessToken
@@ -35,16 +34,12 @@ export default function AuthenticationContext({ children }) {
       });
     }).finally(() => {
       setLoading(false);
-    })
+    });
+    console.log(user);
     return () => {
       cancelTokenSource.cancel();
-      socket.disconnect();
     };
   }, []);
-
-  useEffect(() => {
-    console.log(workspace)
-  }, [workspace]);
 
   const auth = async () => {
     const authApi = mainAPI.CLOUD_API_AUTH;
@@ -93,26 +88,7 @@ export default function AuthenticationContext({ children }) {
         setUser({ ...res.data });
       }).catch(error => setError(error.message));
   }
-  const logout = React.useCallback(async function () {
-    try {
-      const logoutApi = mainAPI.CLOUD_API_LOGOUT;
-      // const lgoutApi = mainAPI.LOCALHOST_LOGOUT;
 
-      return axios.get(logoutApi, {
-        cancelToken: cancelTokenSource.token
-      })
-        .then(res => {
-          localStorage.removeItem('accessToken');
-          setUser(res.data);
-        })
-    } catch (err) {
-      setLoading(false);
-      setError(err.message);
-    }
-    finally {
-      setLoading(false);
-    }
-  }, [user]);
 
   if (loading) return <Loading></Loading>
 
@@ -123,10 +99,11 @@ export default function AuthenticationContext({ children }) {
       socket,
       cancelTokenSource,
       workspace,
+      message,
+      error,
       setWorkspace,
       setSocket,
       login,
-      logout,
       register,
       setError,
       setMessage,

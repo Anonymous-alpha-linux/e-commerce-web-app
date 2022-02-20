@@ -13,7 +13,6 @@ export default function NotificationContainer() {
                 right: 0,
                 flexDirection: 'column',
                 background: 'white',
-                border: '3px solid black'
             }}
         >
             <Text.Title

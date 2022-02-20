@@ -12,11 +12,11 @@ import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
 import navigators from "../fixtures/navigator";
 import { useAuthorizationContext } from "../redux";
 import { BsList } from "react-icons/bs";
-import NotificationContainer from "./notification";
-import { MessageBoxContainer, MessageContainer } from ".";
+// import NotificationContainer from "./notification";
+// import { MessageBoxContainer, MessageContainer } from ".";
 
 export default function Navigation() {
-    const { user } = useAuthorizationContext();
+    // const { user } = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
     const [openNotification, setOpenNotification] = React.useState(false);
@@ -121,8 +121,10 @@ export default function Navigation() {
 }
 
 const Navigator = ({ closeNavigator }) => {
+    const { logout } = useAuthorizationContext();
     return (
         <ContainerComponent
+            className="navigator__container"
             style={{
                 position: "fixed",
                 bottom: 0,
@@ -139,18 +141,22 @@ const Navigator = ({ closeNavigator }) => {
             ></ContainerComponent.BackDrop>
             <ContainerComponent.GridThreeColumns>
                 {navigators.map((navigate, index) => (
-                    <ContainerComponent.Item key={index + 1}>
-                        <ContainerComponent.MiddleInner>
-                            <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
-                            <Icon.Label
-                                style={{
-                                    fontWeight: "bold",
-                                    textTransform: "capitalize",
-                                }}
-                            >
-                                {navigate.label}
-                            </Icon.Label>
-                        </ContainerComponent.MiddleInner>
+                    <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
+                        <Link to={navigate.link} style={{
+                            color: '#fff'
+                        }}>
+                            <ContainerComponent.MiddleInner>
+                                <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
+                                <Icon.Label
+                                    style={{
+                                        fontWeight: "bold",
+                                        textTransform: "capitalize",
+                                    }}
+                                >
+                                    {navigate.label}
+                                </Icon.Label>
+                            </ContainerComponent.MiddleInner>
+                        </Link>
                     </ContainerComponent.Item>
                 ))}
             </ContainerComponent.GridThreeColumns>
@@ -206,11 +212,15 @@ const AuthStatus = React.memo(({
                         <BsList></BsList>
                     </Icon.CircleIcon>
                 )) || (
-                        <ButtonComponent>
-                            <Link to={"/"} onClick={logout}>
-                                Logout
-                            </Link>
-                        </ButtonComponent>
+                        <Text.MiddleLine style={{ verticalAlign: 'text-bottom' }}>
+                            <ButtonComponent>
+                                <Link to={"/"} style={{
+                                    color: '#fff'
+                                }} onClick={logout}>
+                                    Logout
+                                </Link>
+                            </ButtonComponent>
+                        </Text.MiddleLine>
                     )}
             </ContainerComponent.Item>
         </ContainerComponent.Flex>

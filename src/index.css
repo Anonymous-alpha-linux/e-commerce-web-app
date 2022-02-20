@@ -6,11 +6,9 @@
   --gray-dark-color: rgb(153, 153, 153);
   --black-color: rgb(49, 49, 49);
 
-  --header--gadient: linear-gradient(
-    to bottom,
-    #25211e 0,
-    rgba(37, 33, 30, 0) 100%
-  );
+  --header--gadient: linear-gradient(to bottom,
+      #25211e 0,
+      rgba(37, 33, 30, 0) 100%);
 }
 
 * {
@@ -23,6 +21,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: #000;
 }
 
 code {

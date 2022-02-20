@@ -5,8 +5,9 @@ import { Loader } from '../containers'
 const Loading = React.memo(() => {
   return (
     <ContainerComponent>
-      <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
-      <Loader></Loader>
+      <ContainerComponent.BackDrop>
+        <Loader></Loader>
+      </ContainerComponent.BackDrop>
     </ContainerComponent>
   );
 });
