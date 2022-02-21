@@ -9,12 +9,25 @@ import { useAuthorizationContext } from "../redux";
 
 export default function Post({ postHeader, postBody, postFooter }) {
     const [openComment, setOpenComment] = useState(false);
-    const { socket } = useAuthorizationContext();
+    const { getSocket, user } = useAuthorizationContext();
+    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
+
     // useEffect(() => {
     //     console.log(postHeader, postBody, postFooter);
     // }, [postFooter, postBody, postFooter]);
-    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-    
+
+
+    const thumpupHandler = () => {
+        console.log(user);
+        getSocket().emit('like', {
+
+        });
+    }
+    const thumpdownHandler = () => {
+        getSocket().emit('dislike', {
+
+        })
+    }
     return (
         <ContainerComponent.Section
             className="post__section"
@@ -70,8 +83,8 @@ export default function Post({ postHeader, postBody, postFooter }) {
                     <ContainerComponent.Item>
                         <Text.MiddleLine>
                             <Icon.CircleIcon
-                                onClick={() =>{
-                                    
+                                onClick={() => {
+
                                 }}
                                 style={{
                                     marginRight: '10px'

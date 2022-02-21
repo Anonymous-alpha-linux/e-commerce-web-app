@@ -7,21 +7,25 @@ import {
   AdminSidebar, Admin,
   QAManager,
   Workspace, Profile, QA,
-  Portal
+  Portal,
+  WorkspaceGroup,
+  Loading
 } from './pages';
-import { AddGroupContainer, MessageContainer, NotificationContainer, PostModal, Searchbar } from "./containers";
 
-import { useAuthorizationContext } from "./redux";
+
+import { AddGroupContainer, ManagerInfo, MessageContainer, NotificationContainer, Personal, PostModal, Searchbar } from "./containers";
+import { useAuthorizationContext, WorkspaceContext } from "./redux";
 import roles from './fixtures/roles';
 import './scss/main.scss';
 import { MessageBox } from "./components";
 import Signout from "./pages/signout";
 
 function App() {
-  const { user } = useAuthorizationContext();
+  const { loading, user } = useAuthorizationContext();
+  if (loading) return <Loading></Loading>
 
   return (
-    <Fragment>
+    <WorkspaceContext>
       <BrowserRouter>
         {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
         <Routes>
@@ -50,31 +54,35 @@ function App() {
                 </ProtectedPage>}>
               </Route>) ||
               // 4. Staff
-              (user.role === roles.STAFF && <Route
-                path=""
-                element={<ProtectedPage authorized={[roles.STAFF]}>
-                  <Staff></Staff>
-                </ProtectedPage>}>
-                <Route index element={<Workspace></Workspace>}></Route>
-                <Route path="profile" element={<Profile></Profile>}></Route>
-                <Route path="q&a" element={<QA></QA>}></Route>
-                <Route path="portal/" element={<Portal></Portal>}>
-                  <Route path="idea" element={<PostModal />} />
-                  <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
-                  <Route path="message" element={<MessageContainer></MessageContainer>} />
-                  <Route path="message/:id" element={<MessageBox></MessageBox>} />
-                  <Route path="search" element={<Searchbar></Searchbar>} />
-                  <Route path="addgroup" element={<AddGroupContainer></AddGroupContainer>} />
-                </Route>
-              </Route>)}
+              (user.role === roles.STAFF &&
+                <Route
+                  path=""
+                  element={<ProtectedPage authorized={[roles.STAFF]}>
+                    <Staff></Staff>
+                  </ProtectedPage>}>
+                  <Route index element={<Workspace></Workspace>}></Route>
+                  <Route path="profile" element={<Profile></Profile>}>
+                    <Route path="personal" element={<Personal></Personal>} />
+                    <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
+                  </Route>
+                  <Route path="q&a" element={<QA></QA>}></Route>
+                  <Route path="portal/" element={<Portal></Portal>}>
+                    <Route path="idea" element={<PostModal />} />
+                    <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
+                    <Route path="message" element={<MessageContainer></MessageContainer>}>
+                      <Route path=":id" element={<MessageBox></MessageBox>}></Route>
+                    </Route>
+                    <Route path="search" element={<Searchbar></Searchbar>} />
+                    <Route path="addgroup" element={<AddGroupContainer></AddGroupContainer>} />
+                  </Route>
+                  <Route path="workspace" element={<WorkspaceGroup></WorkspaceGroup>} />
+                </Route>)}
           </Route>
-
-
           <Route path="/*" element={<h1>404 Error: Page Not Found...</h1>}>
           </Route>
         </Routes>
       </BrowserRouter>
-    </Fragment>
+    </WorkspaceContext>
   );
 }
 

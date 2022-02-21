@@ -4,19 +4,14 @@ import { useAuthorizationContext } from '../redux';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 
 const Login = () => {
-    const { login, user, setUser, auth } = useAuthorizationContext();
+    const { login, user, setUser } = useAuthorizationContext();
     const [input, setInput] = useState({});
+    const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
     const location = useLocation();
     let from = location.state?.from?.pathname || '/';
 
-    useEffect(() => {
-        console.log(user);
-        setUser({
-            accessToken: 'a.b.c'
-        });
-    }, []);
     const submitHandler = async (e) => {
         e.preventDefault();
         await login(input);
@@ -29,8 +24,6 @@ const Login = () => {
             }
         })
     }, [input, setInput])
-
-    // if (user.role === 'admin') return <Navigate to={'/admin'} state={{ from: location }} replace />;
 
     if (user.isLoggedIn) {
         return <Navigate to={from} state={{ from: location }} replace />;
@@ -56,7 +49,8 @@ const Login = () => {
             <Form.Logo image="">
             </Form.Logo>
             <Form.Container>
-                <Form.Title children="LOG IN">
+                <Form.Title>
+                    LOG IN
                 </Form.Title>
                 <Form.Input
                     placeholder="Email"
@@ -83,8 +77,10 @@ const Login = () => {
                     }}>
 
                 </Form.Input>
-                {error && <p>{error}</p>}
             </Form.Container>
+
+            {message && <Form.Message>{message}</Form.Message>}
+            {error && <Form.ErrorMessage>{error}</Form.ErrorMessage>}
         </Form>
     </>
 }

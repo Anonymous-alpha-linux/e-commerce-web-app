@@ -16,11 +16,11 @@ import { BsList } from "react-icons/bs";
 // import { MessageBoxContainer, MessageContainer } from ".";
 
 export default function Navigation() {
-    // const { user } = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
     const [openNotification, setOpenNotification] = React.useState(false);
     const [openMessage, setOpenMessage] = useState(false);
+
 
     const responsiveHandler = () => {
         const { width } = window.screen;
@@ -41,6 +41,7 @@ export default function Navigation() {
             window.removeEventListener("resize", responsiveHandler);
         };
     }, [window.screen.width]);
+
     const openHome = () => {
         setOpenMessage(false);
         setOpenNotification(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ButtonComponent, ContainerComponent, Form, Icon, MessageBox, Text } from '../components';
 import ConditionContainer from './condition';
 import { useAuthorizationContext } from '../redux';
@@ -25,10 +25,11 @@ export default function PostModal({ setOpenModal }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [openCondition, setOpenCondition] = React.useState(false);
-    const { user } = useAuthorizationContext();
+    const privateChecked = useRef(null);
+    const { user, getSocket } = useAuthorizationContext();
     const navigate = useNavigate();
 
-    const staffURL = mainAPI.CLOUD_API_STAFF;
+    const staffURL = mainAPI.LOCALHOST_STAFF;
 
     const validateFile = (file) => {
         const imageRegex = new RegExp("image/*");
@@ -45,13 +46,14 @@ export default function PostModal({ setOpenModal }) {
         Object.keys(input).forEach(key => {
             if (Array.isArray(input[key])) {
                 input[key].forEach(item => {
-                    formData.append(key, item);
+                    formData.append(key, JSON.stringify(item));
                 })
                 return;
             }
-            formData.append(key, input[key]);
+            formData.append(key, JSON.stringify(input[key]));
         })
         setLoading(true);
+
         axios.post(`${staffURL}?view=post`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -59,6 +61,10 @@ export default function PostModal({ setOpenModal }) {
             }
         })
             .then(res => {
+                getSocket().emit("notify post", {
+                    postId: res.data.postId,
+                    postURL: `/post/${res.data.postId}`
+                })
                 navigate('/');
             })
             .catch(err => setError(err.message))
@@ -86,6 +92,9 @@ export default function PostModal({ setOpenModal }) {
         }).then(res => setCategories(res.data.category))
             .catch(error => setError(error.message));
     }, [])
+    useEffect(() => {
+        console.log(input);
+    }, [input]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -167,9 +176,18 @@ export default function PostModal({ setOpenModal }) {
                 </Text.RightLine>
 
             </Text.Line>
-            <Text.Label>Author name: <Text.MiddleLine>
-                <Text.Bold>{user.account}</Text.Bold>
-            </Text.MiddleLine>
+            <Text.Label>Author name:
+                <Text.MiddleLine>
+                    <Text.Bold>{user.account}</Text.Bold>
+                </Text.MiddleLine>
+                <Text.MiddleLine style={{ marginLeft: '40px' }}>
+                    <ButtonComponent.Toggle onText="Hide"
+                        offText="Show"
+                        id="private"
+                        name="private"
+                        onClick={checkedHandler}
+                        ref={privateChecked}></ButtonComponent.Toggle>
+                </Text.MiddleLine>
             </Text.Label>
             <Form.TextArea
                 id='content'
@@ -186,12 +204,7 @@ export default function PostModal({ setOpenModal }) {
                     setFormField={setInput}></TagInput>
             </Text.Line>
             <Text.Line>
-                <Text.Middle>
-                    <Form.Checkbox name='private'
-                        id='private'
-                        onChange={checkedHandler}
-                    ></Form.Checkbox>
-                </Text.Middle>
+
                 <Text.MiddleLine>
                     <Text.Subtitle>
                         Private Post

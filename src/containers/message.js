@@ -13,14 +13,14 @@ export default function MessageContainer() {
                     justifyContent: "space-between"
                 }}>
                     <Text.Title style={{ fontSize: "18px" }}>CHAT</Text.Title>
-                    <ButtonComponent style={{ display: "flex", backgroundColor: "silver", padding: "7px", borderRadius: "10px" }}>
-                        <Icon></Icon>
-                        <Link to="/portal/addgroup">
+                    <Link to="/portal/addgroup">
+                        <ButtonComponent style={{ display: "flex", backgroundColor: "silver", padding: "7px", borderRadius: "10px" }}>
+                            <Icon></Icon>
                             <Text.Subtitle style={{ margin: 0 }}>
                                 Create Your Group
                             </Text.Subtitle>
-                        </Link>
-                    </ButtonComponent>
+                        </ButtonComponent>
+                    </Link>
                 </ContainerComponent.Item>
                 {/* Search Form */}
                 <ContainerComponent.Item>

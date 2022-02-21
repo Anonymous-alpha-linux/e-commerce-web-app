@@ -1,53 +1,24 @@
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
 import { List } from "../../components";
-import { PostContainer, PostForm, Timespan } from "../../containers";
+import { Filter, PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from '../../config';
-import { useAuthorizationContext } from "../../redux";
+import { useAuthorizationContext, useWorkspaceContext } from "../../redux";
 import { Loading } from "../";
-import { unstable_batchedUpdates } from "react-dom";
 
 export default function Workspace() {
   const API = mainAPI.CLOUD_API_STAFF;
-  const { user, workspace, setWorkspace, cancelTokenSource } = useAuthorizationContext();
-  const [loading, setLoading] = useState(true);
-  const [posts, setPosts] = useState(null);
-  const [page, setPage] = useState(0);
-
-  useEffect(() => {
-    axios.get(API, {
-      headers: {
-        'Authorization': `Bearer ${user.accessToken}`
-      },
-      params: {
-        view: 'workspace',
-        page: page
-      }
-    }).then(res => {
-      unstable_batchedUpdates(() => {
-        setWorkspace(res.data.workspace);
-      })
-    }).catch(error => console.log(error.message))
-      .finally(() => setLoading(false));
-    return () => {
-      cancelTokenSource.cancel();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (workspace) {
-      setPosts(workspace.posts)
-    }
-  }, [workspace]);
-
+  const { user, cancelTokenSource } = useAuthorizationContext();
+  const { workspace, loading } = useWorkspaceContext();
+  console.log(loading);
   if (loading) return <Loading></Loading>
 
   return (
     <div className="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
+      <Filter></Filter>
       <List>
-        {posts && posts.map(post => {
+        {workspace.posts.map(post => {
           const { postAuthor, content, attachment, like, dislike, comment } = post;
           const postHeader = {
             image: postAuthor.profileImage,

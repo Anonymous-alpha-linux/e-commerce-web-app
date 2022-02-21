@@ -17,17 +17,17 @@ const navigators = [
     {
         icon: <FaUserAlt></FaUserAlt>,
         label: 'user',
-        link: 'profile'
+        link: '/profile/personal'
     },
     {
         icon: <FaUsers></FaUsers>,
-        label: 'group',
-        link: 'group'
+        label: 'workspace',
+        link: 'workspace'
     },
     {
         icon: <FaUserTie></FaUserTie>,
         label: 'manager',
-        link: 'manager'
+        link: '/profile/manager'
     },
     {
         icon: <FiLogOut></FiLogOut>,
