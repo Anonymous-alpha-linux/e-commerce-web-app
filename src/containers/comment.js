@@ -3,7 +3,6 @@ import { ContainerComponent, Text, Icon, Form } from "../components";
 import { FaLock, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
 import { BsFillPersonFill } from "react-icons/bs";
-import { Container } from "react-bootstrap";
 
 export default function Comment() {
   return (
@@ -143,21 +142,19 @@ Comment.Tab = function ({ children, ...props }) {
         </Text.Line>
       </Text.Group>
       <Text.Line>
-      <Text.MiddleLine>
-        <Icon.CircleIcon>
-          <FaThumbsUp />
-          </Icon.CircleIcon>
-                  240
-        </Text.MiddleLine>
-        <Text.MiddleLine style={{ margin: "0 10px"}}>
-          <Icon.CircleIcon>
-        <FaThumbsDown  />
-        </Icon.CircleIcon>
-                240
-        </Text.MiddleLine>
         <Text.MiddleLine>
-            Reply
+          <Icon.CircleIcon>
+            <FaThumbsUp />
+          </Icon.CircleIcon>
+          240
         </Text.MiddleLine>
+        <Text.MiddleLine style={{ margin: "0 10px" }}>
+          <Icon.CircleIcon>
+            <FaThumbsDown />
+          </Icon.CircleIcon>
+          240
+        </Text.MiddleLine>
+        <Text.MiddleLine>Reply</Text.MiddleLine>
       </Text.Line>
     </>
   );
