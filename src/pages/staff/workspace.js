@@ -2,19 +2,21 @@ import React, { useEffect, useState } from "react";
 import { List } from "../../components";
 import { Filter, PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from '../../config';
-import { useAuthorizationContext, useWorkspaceContext } from "../../redux";
+import { usePostContext, useWorkspaceContext } from "../../redux";
 import { Loading } from "../";
 
 export default function Workspace() {
   const API = mainAPI.CLOUD_API_STAFF;
-  const { user, cancelTokenSource } = useAuthorizationContext();
   const { workspace, loading } = useWorkspaceContext();
-  console.log(loading);
+  // const { posts, postLoading } = usePostContext()
+
   if (loading) return <Loading></Loading>
 
   return (
     <div className="workspace">
-      <Timespan expireTime={workspace.expireTime}></Timespan>
+      <Timespan
+        expireTime={workspace.expireTime}>
+      </Timespan>
       <PostForm></PostForm>
       <Filter></Filter>
       <List>
@@ -32,7 +34,7 @@ export default function Workspace() {
               const { _id, fileType, filePath } = attach;
               return {
                 _id,
-                image: `${mainAPI.CLOUD_HOST}\\${filePath}`,
+                image: `${mainAPI.LOCALHOST_HOST}\\${filePath}`,
                 fileType
               }
             })
@@ -43,7 +45,9 @@ export default function Workspace() {
             comment
           }
           return <List.Item key={post._id}>
-            <PostContainer postHeader={postHeader} postBody={postBody} postFooter={postFooter}></PostContainer>
+            <PostContainer postHeader={postHeader}
+              postBody={postBody}
+              postFooter={postFooter}></PostContainer>
           </List.Item>
         }
         )}

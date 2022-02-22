@@ -2,12 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { ContainerComponent, Form, Icon, List, Text } from '../components';
 import { FaTimes } from 'react-icons/fa';
 
-export default function TagInput({ itemList = [{
-  _id: null,
-  name: 'There are no values',
-}],
-  formField = [],
-  setFormField }) {
+export default function TagInput({ itemList, formField = [], setFormField }) {
   const [openInput, setOpenInput] = useState(false);
 
   const handleClickSection = (e) => {

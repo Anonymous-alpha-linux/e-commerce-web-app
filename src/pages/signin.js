@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { ContainerComponent, Form } from '../components';
 import { useAuthorizationContext } from '../redux';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const { login, user, setUser } = useAuthorizationContext();
+    const { login, user } = useAuthorizationContext();
     const [input, setInput] = useState({});
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const location = useLocation();
     let from = location.state?.from?.pathname || '/';
@@ -15,6 +16,11 @@ const Login = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         await login(input);
+        if (user.isLoggedIn) {
+            navigate('/', {
+                replace: true,
+            });
+        }
     }
     const inputHandler = React.useCallback((e) => {
         setInput(oldInput => {
@@ -26,7 +32,7 @@ const Login = () => {
     }, [input, setInput])
 
     if (user.isLoggedIn) {
-        return <Navigate to={from} state={{ from: location }} replace />;
+        return <Navigate to={'/'} state={{ from: location }} replace />;
     }
 
     return <>

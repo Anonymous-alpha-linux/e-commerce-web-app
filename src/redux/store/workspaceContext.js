@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useReducer } from 'react'
 import axios from 'axios';
 import { mainAPI } from '../../config';
-import { useAuthorizationContext } from '..';
 import actions from '../reducers/actions';
-import { unstable_batchedUpdates } from "react-dom";
+import { useAuthorizationContext } from '.';
 
 const WorkspaceContextAPI = createContext();
 const workspaceReducer = (state, action) => {
@@ -16,7 +15,8 @@ const workspaceReducer = (state, action) => {
         case actions.WORKSPACE_ACTION:
             return {
                 ...state,
-                ...action.payload
+                ...action.payload,
+                workspaceLoading: false
             };
         case actions.SET_POST_ACTION:
             return {
@@ -42,45 +42,38 @@ const initialWorkspacePage = {
 
 export default function WorkspaceContext({ children }) {
     const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
-    const { user, cancelTokenSource } = useAuthorizationContext();
-    console.log(user);
+    const { user } = useAuthorizationContext();
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-
+    const cancelTokenSource = axios.CancelToken.source();
+    const { NODE_ENV } = process.env;
     useEffect(() => {
         try {
-            onLoadWorkspace()
+            onLoadWorkspace();
         } catch (error) {
             setError(error.message);
         }
         return () => {
             cancelTokenSource.cancel();
         }
-    }, []);
+    }, [user]);
 
     function onLoadWorkspace() {
-        // const workspaceAPI = mainAPI.CLOUD_API_STAFF;
-        // axios.get(workspaceAPI).then(res => {
-        // }).catch(error => setError(error.message));
-
-        axios.get(mainAPI.CLOUD_API_STAFF, {
+        const workspaceAPI = NODE_ENV === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
+        axios.get(workspaceAPI, {
             headers: {
-                'Authorization': `Bearer ${user.accessToken}`
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
             },
             params: {
                 view: 'workspace',
                 page: workspaceState.page
             }
         }).then(res => {
-            return Promise.resolve(setWorkspace({
+            setWorkspace({
                 type: actions.WORKSPACE_ACTION,
                 payload: res.data.workspace
-            }));
+            });
         }).catch(error => setError(error.message))
-            .finally(setWorkspace({
-                type: actions.SET_LOADING,
-                loading: false
-            }));
     }
 
     const contextValue = { workspace: workspaceState, loading: workspaceState.workspaceLoading };

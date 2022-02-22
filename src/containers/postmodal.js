@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ButtonComponent, ContainerComponent, Form, Icon, MessageBox, Text } from '../components';
 import ConditionContainer from './condition';
-import { useAuthorizationContext } from '../redux';
+import { useAuthorizationContext, usePostContext } from '../redux';
 import { mainAPI } from '../config';
 import UploadForm from './uploadpreview';
 import { Loading } from '../pages';
@@ -16,37 +16,40 @@ export default function PostModal({ setOpenModal }) {
         content: '',
         private: false,
         condition: false,
-        categories: []
+        categories: [],
+        files: [],
     })
-    const [files, setFiles] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [rerender, setRerender] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [openCondition, setOpenCondition] = React.useState(false);
+    const [openCondition, setOpenCondition] = useState(false);
     const privateChecked = useRef(null);
-    const { user, getSocket } = useAuthorizationContext();
     const navigate = useNavigate();
+    const { user, getSocket } = useAuthorizationContext();
+    const { categories } = usePostContext();
 
-    const staffURL = mainAPI.LOCALHOST_STAFF;
+    const { NODE_ENV } = process.env;
+    const staffURL = NODE_ENV === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
 
-    const validateFile = (file) => {
-        const imageRegex = new RegExp("image/*");
-        if (imageRegex.test(file.type))
-            return "image";
-        return "others";
-    }
+
+    const isOverflowFile = (currentFileList, fileSize) => {
+        const currentSize = currentFileList.reduce((prev, file) => {
+            return prev + file.size / 1024;
+        }, 0);
+
+        return currentSize + fileSize > 50000;
+    };
     const submitHandler = (e) => {
         e.preventDefault();
         const formData = new FormData();
-        files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
+        input.files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
             formData.append("files", file);
-        })
+        });
         Object.keys(input).forEach(key => {
             if (Array.isArray(input[key])) {
                 input[key].forEach(item => {
-                    formData.append(key, JSON.stringify(item));
+                    formData.append(key, item);
                 })
                 return;
             }
@@ -54,10 +57,13 @@ export default function PostModal({ setOpenModal }) {
         })
         setLoading(true);
 
-        axios.post(`${staffURL}?view=post`, formData, {
+        return axios.post(staffURL, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${user.accessToken}`
+            },
+            params: {
+                view: 'post'
             }
         })
             .then(res => {
@@ -69,66 +75,46 @@ export default function PostModal({ setOpenModal }) {
             })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
-    }
+    };
     const inputHandler = (e) => {
         setInput(input => ({
             ...input,
             [e.target.name]: e.target.value,
-        }))
-    }
+        }));
+    };
     const checkedHandler = (e) => {
         setInput(input => ({
             ...input,
             [e.target.name]: e.target.checked,
         }))
+    };
+    const pushInputHandler = (e) => {
+        try {
+            const filter = Array.from(e.target.files).map(file => {
+                console.log(file.size);
+                let size = file.size / 1024;
+                if (isOverflowFile(input.files, size)) {
+                    alert("File size is overflow");
+                    setError("File size is overflow");
+                    return;
+                }
+                return file;
+            }).filter(file => file);
+            console.log(filter);
+            setInput(input => {
+                return {
+                    ...input,
+                    files: [...input.files, ...filter]
+                };
+            });
+        } catch (error) {
+            setError(error.message);
+        }
     }
 
     useEffect(() => {
-        const categoryURL = `${staffURL}?view=category`;
-        axios.get(categoryURL, {
-            headers: {
-                'Authorization': `Bearer ${user.accessToken}`
-            }
-        }).then(res => setCategories(res.data.category))
-            .catch(error => setError(error.message));
-    }, [])
-    useEffect(() => {
         console.log(input);
     }, [input]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setError('');
-        }, 3000)
-        setTimeout(() => {
-            setMessage('');
-        }, 3000)
-        setFiles(files => {
-            files.forEach((file, index) => {
-                const fileReader = new FileReader();
-                if (validateFile(file.file) === 'image') {
-
-                    fileReader.readAsDataURL(file.file);
-                    fileReader.onload = () => {
-
-                        const updateFileObject = Object.assign({}, {
-                            ...file,
-                            image: fileReader.result
-                        });
-                        files.splice(index, 1, updateFileObject);
-                        setRerender(rerender => !rerender);
-                    }
-                    fileReader.onabort = () => {
-                        alert("Failed to read file", fileReader.abort);
-                    }
-                    fileReader.onerror = () => {
-                        alert("Failed to read file", fileReader.error);
-                    }
-                }
-            })
-            return files;
-        })
-    }, [files]);
 
     if (loading) return <Loading style={{
         position: 'fixed',
@@ -149,7 +135,7 @@ export default function PostModal({ setOpenModal }) {
             method={'POST'}
             onSubmit={submitHandler}
             className="postModal__form">
-            <Text.Line>
+            <Text.Line className="postModal__header">
                 <Text.MiddleLine onClick={() => {
                     // setOpenModal(modal => !modal);
                     navigate('/');
@@ -176,7 +162,7 @@ export default function PostModal({ setOpenModal }) {
                 </Text.RightLine>
 
             </Text.Line>
-            <Text.Label>Author name:
+            <Text.Label className="postModal__label">Author name:
                 <Text.MiddleLine>
                     <Text.Bold>{user.account}</Text.Bold>
                 </Text.MiddleLine>
@@ -198,25 +184,18 @@ export default function PostModal({ setOpenModal }) {
                     height: '100px'
                 }}
             ></Form.TextArea>
-            <Text.Line>
+            <Text.Line className="postModal__category">
                 <TagInput itemList={categories}
                     formField={input.categories}
                     setFormField={setInput}></TagInput>
             </Text.Line>
-            <Text.Line>
-
-                <Text.MiddleLine>
-                    <Text.Subtitle>
-                        Private Post
-                    </Text.Subtitle>
-                </Text.MiddleLine>
-            </Text.Line>
             <ContainerComponent.Pane className="upload__input" style={{
                 padding: '10px 0'
             }}>
-                <UploadForm files={files} setFiles={setFiles}></UploadForm>
+                <UploadForm files={input.files}
+                    setFiles={pushInputHandler}></UploadForm>
             </ContainerComponent.Pane>
-            <Text.Line>
+            <Text.Line className="postModal__conditional">
                 <Text.MiddleLine>
                     <Form.Checkbox id='condition'
                         name='condition'

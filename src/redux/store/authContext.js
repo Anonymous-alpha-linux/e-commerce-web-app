@@ -4,7 +4,7 @@ import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
 import actions from '../reducers/actions';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { unstable_batchedUpdates } from 'react-dom'
 
 const AuthenticationContextAPI = createContext();
 const initialAuth = {
@@ -17,28 +17,41 @@ export const authReducer = (state, action) => {
     case actions.SET_LOADING:
       return {
         ...state,
-        authLoading: action.authLoading
+        authLoading: true
       };
     case actions.AUTHENTICATE_ACTION:
       return {
         ...state,
-        ...action.payload
+        ...action.payload,
+        authLoading: false
       };
     case actions.AUTHENTICATE_FAILED:
       return {
-        ...state
+        ...state,
+        authLoading: false
       };
     case actions.LOGIN_ACTION:
-      localStorage.setItem('accessToken', action.payload.accessToken);
       return {
         ...state,
         ...action.payload,
-        isLoggedIn: true
+        isLoggedIn: true,
+        authLoading: false
+      };
+    case actions.LOGIN_FAILED:
+      return {
+        ...state,
+        isLoggedIn: false,
+        authLoading: false
       };
     case actions.FORGET_PASS_ACTION:
       return {
         ...state,
         ...action.payload
+      };
+    case actions.LOGOUT_ACTION:
+      return {
+        ...initialAuth,
+        authLoading: false
       };
     default:
       return state;
@@ -62,6 +75,7 @@ export default function AuthenticationContext({ children }) {
       onLoadUser();
     }
     catch (error) {
+      console.log(error.message);
       setError(error.message);
     }
     // .then(() => {
@@ -87,7 +101,9 @@ export default function AuthenticationContext({ children }) {
       cancelTokenSource.cancel();
     };
   }, []);
-
+  useEffect(() => {
+    console.log(user)
+  }, [user]);
   // useEffect(() => {
   //   if (socket) {
   //     socket.emit("start", {
@@ -98,47 +114,36 @@ export default function AuthenticationContext({ children }) {
   //       console.log(data);
   //     })
   //   }
-  //   setUser({
-  //     type: actions.SET_LOADING,
-  //     authLoading: true
-  //   });
   // }, [socket]);
-
   const getSocket = () => {
     if (!socket) {
       throw new Error("Socket cannot be accessible!");
     }
     return socket;
-  }
-  const onLoadUser = async () => {
-    console.log(NODE_ENV);
-    const authApi = NODE_ENV === 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
-
+  };
+  const onLoadUser = () => {
+    const authApi = NODE_ENV !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
     return axios.get(authApi, {
       cancelToken: cancelTokenSource.token,
       headers: {
         'Authorization': `Bearer ${user.accessToken}`
       }
     }).then(response => {
-      console.log(response);
       setUser({
-        type: actions.LOGIN_ACTION,
-        payload: response.data
+        type: actions.AUTHENTICATE_ACTION,
+        payload: response.data,
       });
-
     }).catch(error => {
-      setError(error.message);
-    }).finally(() => {
-      setUser({
-        type: actions.SET_LOADING,
-        authLoading: false
-      })
+      unstable_batchedUpdates(() => {
+        setUser({
+          type: actions.AUTHENTICATE_FAILED,
+        });
+        setError(error.message);
+      });
     })
   };
   function login(data) {
-    // const loginApi = mainAPI.LOCALHOST_LOGIN;
-    const loginApi = mainAPI.CLOUD_API_LOGIN;
-
+    const loginApi = NODE_ENV === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
       data,
       {
@@ -147,15 +152,17 @@ export default function AuthenticationContext({ children }) {
           'Authorization': `Bearer ${user.accessToken}`
         }
       }).then(res => {
-        // setUser({
-        //   ...res.data
-        // });
-
-        setUser({
+        localStorage.setItem('accessToken', res.data.accessToken);
+        return setUser({
           type: actions.LOGIN_ACTION,
           payload: res.data
         });
-      }).catch(error => (error.message));
+      }).then(end => {
+        console.log('load again');
+        return onLoadUser();
+      }).catch(error => setUser({
+        type: actions.AUTHENTICATE_FAILED,
+      }));
   };
   // const register = async (data) => {
   //   const registerApi = mainAPI.CLOUD_API_REGISTER;
@@ -171,8 +178,20 @@ export default function AuthenticationContext({ children }) {
   //       type: actions.ERROR_ACTION,
   //       error: error.message
   //     }));
-  // }
-
+  // };
+  async function logout() {
+    const logoutApi = NODE_ENV === 'development' ? mainAPI.CLOUD_API_LOGOUT : mainAPI.LOCALHOST_LOGOUT;
+    return axios
+      .get(logoutApi, {
+        cancelToken: cancelTokenSource.token
+      })
+      .then(res => {
+        localStorage.clear();
+        setUser({
+          type: actions.LOGOUT_ACTION,
+        });
+      }).catch(error => setError(error.message));
+  }
   return (
     <AuthenticationContextAPI.Provider value={{
       loading: user.authLoading,
@@ -181,7 +200,8 @@ export default function AuthenticationContext({ children }) {
       error,
       cancelTokenSource,
       getSocket,
-      login
+      login,
+      logout,
     }}>
       {children}
     </AuthenticationContextAPI.Provider>

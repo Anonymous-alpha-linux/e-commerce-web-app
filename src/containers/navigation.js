@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineMessage } from "react-icons/ai";
 import {
     IoNotificationsOutline,
@@ -18,8 +18,9 @@ import { BsList } from "react-icons/bs";
 export default function Navigation() {
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
-    const [openNotification, setOpenNotification] = React.useState(false);
-    const [openMessage, setOpenMessage] = useState(false);
+    const navigate = useNavigate();
+    // const [openNotification, setOpenNotification] = React.useState(false);
+    // const [openMessage, setOpenMessage] = useState(false);
 
 
     const responsiveHandler = () => {
@@ -42,10 +43,10 @@ export default function Navigation() {
         };
     }, [window.screen.width]);
 
-    const openHome = () => {
-        setOpenMessage(false);
-        setOpenNotification(false);
-    }
+    // const openHome = () => {
+    //     setOpenMessage(false);
+    //     setOpenNotification(false);
+    // }
 
     return (
         <ContainerComponent
@@ -66,11 +67,11 @@ export default function Navigation() {
                         }}
                     >
                         <ContainerComponent.Item>
-                            <Link to="/">
-                                <Icon.CircleIcon>
-                                    <IoLogoApple></IoLogoApple>
-                                </Icon.CircleIcon>
-                            </Link>
+                            <Icon.CircleIcon onClick={() => navigate('/', {
+                                replace: true
+                            })}>
+                                <IoLogoApple></IoLogoApple>
+                            </Icon.CircleIcon>
                         </ContainerComponent.Item>
                         <ContainerComponent.Item>
                             <Link to="/portal/search"
@@ -107,8 +108,8 @@ export default function Navigation() {
                     <AuthStatus
                         screenColumn={screenColumn}
                         openNavigator={() => setOpenNavigator(true)}
-                        openNotification={() => setOpenNotification(true)}
-                        openMessage={() => setOpenMessage(true)}
+                    // openNotification={() => setOpenNotification(true)}
+                    // openMessage={() => setOpenMessage(true)}
                     ></AuthStatus>
                 </ContainerComponent.Item>
             </ContainerComponent.Grid>
@@ -122,7 +123,6 @@ export default function Navigation() {
 }
 
 const Navigator = ({ closeNavigator }) => {
-    const { logout } = useAuthorizationContext();
     return (
         <ContainerComponent
             className="navigator__container"
@@ -135,8 +135,7 @@ const Navigator = ({ closeNavigator }) => {
                 background: "#333",
                 color: "#fff",
                 padding: "10px",
-            }}
-        >
+            }}>
             <ContainerComponent.BackDrop
                 onClick={closeNavigator}
             ></ContainerComponent.BackDrop>
@@ -173,7 +172,8 @@ const AuthStatus = React.memo(({
 }) => {
     const { user, logout } = useAuthorizationContext();
 
-    if (!user.isLoggedIn)
+
+    if (!user.isLoggedIn) {
         return (
             <div
                 style={{
@@ -185,6 +185,7 @@ const AuthStatus = React.memo(({
                 </Link>
             </div>
         );
+    };
 
     return (
         <ContainerComponent.Flex

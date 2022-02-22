@@ -6,24 +6,24 @@ export default function Timespan({
     startTime = Date.now(),
     expireTime,
 }) {
+    const startDate = new Date(startTime);
+    const expireDate = new Date(expireTime);
     const [counterTimer, setCounterTimer] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
+        days: (expireDate.getMonth() - startDate.getMonth()) * 30,
+        hours: 23 - startDate.getHours(),
+        minutes: 59 - startDate.getMinutes(),
+        seconds: 59 - startDate.getSeconds()
     });
 
     useEffect(() => {
-        const startDate = new Date(startTime);
-        const expireDate = new Date(expireTime);
-
         let timeout = setTimeout(() => {
+
             setCounterTimer({
                 days: (expireDate.getMonth() - startDate.getMonth()) * 30,
                 hours: 23 - startDate.getHours(),
                 minutes: 59 - startDate.getMinutes(),
                 seconds: 59 - startDate.getSeconds(),
-            })
+            });
         }, 1000);
 
         return () => {

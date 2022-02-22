@@ -45,13 +45,13 @@ Form.Logo = function ({ image, alt, ...restProp }) {
   );
 };
 
-Form.Input = function ({ children, ...restProp }) {
+Form.Input = React.forwardRef(function ({ children, ...restProp }, ref) {
   return (
     <input className="form__input" {...restProp}>
       {children}
     </input>
   );
-};
+});
 
 Form.Link = function ({ children, ...restProp }) {
   return (
@@ -109,17 +109,17 @@ Form.Option = function ({ children, ...props }) {
 };
 
 Form.Checkbox = function ({ children, ...restProp }) {
-    return (
-        <input type={'checkbox'} className="form__checkbox" {...restProp}>
-            {children}
-        </input>
-    )
+  return (
+    <input type={'checkbox'} className="form__checkbox" {...restProp}>
+      {children}
+    </input>
+  )
 }
 
-Form.FrameAvatar = function({children,...restProp}){
-    return(
-        <div className='form__frameAvatar' {...restProp}>
-            {children}
-        </div>
-    )
+Form.FrameAvatar = function ({ children, ...restProp }) {
+  return (
+    <div className='form__frameAvatar' {...restProp}>
+      {children}
+    </div>
+  )
 }
