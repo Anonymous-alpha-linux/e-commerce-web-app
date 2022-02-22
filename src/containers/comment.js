@@ -142,6 +142,23 @@ Comment.Tab = function ({ children, ...props }) {
           </Text.Paragraph>
         </Text.Line>
       </Text.Group>
+      <Text.Line>
+      <Text.MiddleLine>
+        <Icon.CircleIcon>
+          <FaThumbsUp />
+          </Icon.CircleIcon>
+                  240
+        </Text.MiddleLine>
+        <Text.MiddleLine style={{ margin: "0 10px"}}>
+          <Icon.CircleIcon>
+        <FaThumbsDown  />
+        </Icon.CircleIcon>
+                240
+        </Text.MiddleLine>
+        <Text.MiddleLine>
+            Reply
+        </Text.MiddleLine>
+      </Text.Line>
     </>
   );
 };
