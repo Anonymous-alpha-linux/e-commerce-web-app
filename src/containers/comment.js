@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { ContainerComponent, Text, Icon, Form } from "../components";
 import { FaLock, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
-import { BsFillPersonFill } from "react-icons/bs";
-import { Container } from "react-bootstrap";
+import { BsFillPersonFill } from "react-icons/bs";;
 
 export default function Comment() {
   return (
