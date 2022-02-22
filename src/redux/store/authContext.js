@@ -63,7 +63,8 @@ export default function AuthenticationContext({ children }) {
   //   isLoggedIn: false,
   // });
   // const [workspace, setWorkspace] = useState(null);
-  const { NODE_ENV } = process.env;
+  const { REACT_APP_ENVIRONMENT } = process.env;
+  console.log(REACT_APP_ENVIRONMENT);
   const [user, setUser] = useReducer(authReducer, initialAuth);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -122,7 +123,7 @@ export default function AuthenticationContext({ children }) {
     return socket;
   };
   const onLoadUser = () => {
-    const authApi = NODE_ENV !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
+    const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
     return axios.get(authApi, {
       cancelToken: cancelTokenSource.token,
       headers: {
@@ -143,7 +144,7 @@ export default function AuthenticationContext({ children }) {
     })
   };
   function login(data) {
-    const loginApi = NODE_ENV === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
+    const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
       data,
       {
@@ -180,7 +181,7 @@ export default function AuthenticationContext({ children }) {
   //     }));
   // };
   async function logout() {
-    const logoutApi = NODE_ENV === 'development' ? mainAPI.CLOUD_API_LOGOUT : mainAPI.LOCALHOST_LOGOUT;
+    const logoutApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.CLOUD_API_LOGOUT : mainAPI.LOCALHOST_LOGOUT;
     return axios
       .get(logoutApi, {
         cancelToken: cancelTokenSource.token

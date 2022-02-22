@@ -59,8 +59,8 @@ export default React.memo(function PostContext({ children }) {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
-    const { NODE_ENV } = process.env;
-    const postAPI = NODE_ENV === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
+    const { REACT_APP_ENVIRONMENT } = process.env;
+    const postAPI = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
 
     useEffect(() => {
         getPosts();

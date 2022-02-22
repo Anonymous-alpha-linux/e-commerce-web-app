@@ -2,13 +2,21 @@ import React, { useEffect, useState } from "react";
 import { List } from "../../components";
 import { Filter, PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from '../../config';
-import { usePostContext, useWorkspaceContext } from "../../redux";
+import { useAuthorizationContext, usePostContext, useWorkspaceContext } from "../../redux";
 import { Loading } from "../";
 
 export default function Workspace() {
   const API = mainAPI.CLOUD_API_STAFF;
   const { workspace, loading } = useWorkspaceContext();
-  // const { posts, postLoading } = usePostContext()
+  const { posts, categories } = usePostContext();
+  const { user } = useAuthorizationContext();
+
+  useEffect(() => {
+    console.log('workspace data:', workspace);
+    console.log('post data:', posts);
+    console.log('category data:', categories);
+    console.log('user data', user);
+  }, [workspace, posts, categories, user]);
 
   if (loading) return <Loading></Loading>
 
