@@ -8,7 +8,6 @@ export default function Personal() {
     const { id } = useParams();
     const { user } = useAuthorizationContext();
     useEffect(() => {
-        console.log(id);
         console.log(user);
     }, [id]);
 

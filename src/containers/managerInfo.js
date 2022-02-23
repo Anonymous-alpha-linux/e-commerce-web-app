@@ -1,8 +1,11 @@
 import React from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { BsFillPersonFill } from 'react-icons/bs';
+import { useWorkspaceContext } from '../redux';
 
 export default function ManagerInfo() {
+    const { workspace } = useWorkspaceContext();
+
     return <ContainerComponent.Section className="managerInfo__container" style={{
         padding: '10px',
     }}>
@@ -14,7 +17,7 @@ export default function ManagerInfo() {
                     <Icon.CircleIcon>
                         <BsFillPersonFill />
                     </Icon.CircleIcon>
-                    <Text.Subtitle>Manager Name</Text.Subtitle>
+                    <Text.Subtitle>{workspace.manager.username}</Text.Subtitle>
                     <Text.Subtitle>Digital Marketing</Text.Subtitle>
                     <Text.Paragraph>
                         Manager Name
