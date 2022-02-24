@@ -13,6 +13,7 @@ const initialAuth = {
   authLoading: true,
 };
 export const authReducer = (state, action) => {
+
   switch (action.type) {
     case actions.SET_LOADING:
       return {
@@ -64,7 +65,6 @@ export default function AuthenticationContext({ children }) {
   // });
   // const [workspace, setWorkspace] = useState(null);
   const { REACT_APP_ENVIRONMENT } = process.env;
-  console.log(REACT_APP_ENVIRONMENT);
   const [user, setUser] = useReducer(authReducer, initialAuth);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -102,6 +102,7 @@ export default function AuthenticationContext({ children }) {
       cancelTokenSource.cancel();
     };
   }, []);
+
   useEffect(() => {
     console.log(user)
   }, [user]);
@@ -181,7 +182,7 @@ export default function AuthenticationContext({ children }) {
   //     }));
   // };
   async function logout() {
-    const logoutApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.CLOUD_API_LOGOUT : mainAPI.LOCALHOST_LOGOUT;
+    const logoutApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGOUT : mainAPI.CLOUD_API_LOGOUT;
     return axios
       .get(logoutApi, {
         cancelToken: cancelTokenSource.token
@@ -193,6 +194,8 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   }
+  // if (user.authLoading) return <Loading className="auth__loading"></Loading>
+
   return (
     <AuthenticationContextAPI.Provider value={{
       loading: user.authLoading,

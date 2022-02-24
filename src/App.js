@@ -21,7 +21,7 @@ import Signout from "./pages/signout";
 
 function App() {
   const { loading, user } = useAuthorizationContext();
-  if (loading) return <Loading></Loading>
+  // if (loading) return <Loading className="auth__loading"></Loading>
 
   return (
     <WorkspaceContext>
@@ -66,8 +66,12 @@ function App() {
                       <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
                     </Route>
                     <Route path="q&a" element={<QA></QA>}></Route>
+
                     <Route path="portal/" element={<Portal></Portal>}>
-                      <Route path="idea" element={<PostModal />} />
+                      <Route path="idea" element={<PostModal />} >
+                      </Route>
+                      <Route path="idea/:id" element={<PostModal />} >
+                      </Route>
                       <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
                       <Route path="message" element={<MessageContainer></MessageContainer>}>
                         <Route path=":id" element={<MessageBox></MessageBox>}></Route>

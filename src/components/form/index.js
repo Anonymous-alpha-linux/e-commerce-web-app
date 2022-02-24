@@ -47,7 +47,7 @@ Form.Logo = function ({ image, alt, ...restProp }) {
 
 Form.Input = React.forwardRef(function ({ children, ...restProp }, ref) {
   return (
-    <input className="form__input" {...restProp}>
+    <input className="form__input" ref={ref} {...restProp}>
       {children}
     </input>
   );
