@@ -1,0 +1,45 @@
+.accordion {
+    list-style: none;
+    padding: 0
+}
+
+.accordioncomponents{
+    &__item{
+        border-top: 1px solid #9f9f9f;
+    }
+    &__button{
+        font-size: 16px;
+        background-color: #163d3c;
+        color: #fff;
+        text-align: left;
+        font-weight: 700;
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 8px;
+        cursor: pointer;
+        border: none;
+    }
+    &__item.active &__button{
+        background-color: #105057;
+    }
+
+
+    &__control{
+        font-size: 20px;
+    }
+    &__answerwrapper{
+        height: 0;
+        overflow: hidden;
+    }
+    &__answerwrapper.open {
+        height: auto;
+    }
+    &__answer{
+        background-color: #f7f7f7;
+        padding: 20px;
+        font-size: 14px;
+    }
+}
