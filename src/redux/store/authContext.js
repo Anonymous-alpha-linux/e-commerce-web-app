@@ -13,6 +13,7 @@ const initialAuth = {
   authLoading: true,
 };
 export const authReducer = (state, action) => {
+
   switch (action.type) {
     case actions.SET_LOADING:
       return {
@@ -63,7 +64,7 @@ export default function AuthenticationContext({ children }) {
   //   isLoggedIn: false,
   // });
   // const [workspace, setWorkspace] = useState(null);
-  const { NODE_ENV } = process.env;
+  const { REACT_APP_ENVIRONMENT } = process.env;
   const [user, setUser] = useReducer(authReducer, initialAuth);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -101,6 +102,7 @@ export default function AuthenticationContext({ children }) {
       cancelTokenSource.cancel();
     };
   }, []);
+
   useEffect(() => {
     console.log(user)
   }, [user]);
@@ -122,7 +124,7 @@ export default function AuthenticationContext({ children }) {
     return socket;
   };
   const onLoadUser = () => {
-    const authApi = NODE_ENV !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
+    const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
     return axios.get(authApi, {
       cancelToken: cancelTokenSource.token,
       headers: {
@@ -143,7 +145,7 @@ export default function AuthenticationContext({ children }) {
     })
   };
   function login(data) {
-    const loginApi = NODE_ENV === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
+    const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
       data,
       {
@@ -180,7 +182,7 @@ export default function AuthenticationContext({ children }) {
   //     }));
   // };
   async function logout() {
-    const logoutApi = NODE_ENV === 'development' ? mainAPI.CLOUD_API_LOGOUT : mainAPI.LOCALHOST_LOGOUT;
+    const logoutApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGOUT : mainAPI.CLOUD_API_LOGOUT;
     return axios
       .get(logoutApi, {
         cancelToken: cancelTokenSource.token
@@ -192,6 +194,8 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   }
+  // if (user.authLoading) return <Loading className="auth__loading"></Loading>
+
   return (
     <AuthenticationContextAPI.Provider value={{
       loading: user.authLoading,

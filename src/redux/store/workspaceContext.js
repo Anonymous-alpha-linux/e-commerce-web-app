@@ -3,6 +3,7 @@ import axios from 'axios';
 import { mainAPI } from '../../config';
 import actions from '../reducers/actions';
 import { useAuthorizationContext } from '.';
+import { Loading } from '../../pages';
 
 const WorkspaceContextAPI = createContext();
 const workspaceReducer = (state, action) => {
@@ -40,13 +41,14 @@ const initialWorkspacePage = {
     page: 0
 }
 
-export default function WorkspaceContext({ children }) {
+export default React.memo(function WorkspaceContext({ children }) {
     const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
     const { user } = useAuthorizationContext();
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
-    const { NODE_ENV } = process.env;
+    const { REACT_APP_ENVIRONMENT } = process.env;
+
     useEffect(() => {
         try {
             onLoadWorkspace();
@@ -59,7 +61,7 @@ export default function WorkspaceContext({ children }) {
     }, [user]);
 
     function onLoadWorkspace() {
-        const workspaceAPI = NODE_ENV === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
+        const workspaceAPI = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
         axios.get(workspaceAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -77,12 +79,14 @@ export default function WorkspaceContext({ children }) {
     }
 
     const contextValue = { workspace: workspaceState, loading: workspaceState.workspaceLoading };
+    if (contextValue.loading) return <Loading className="workspace__loading"></Loading>
+
     return (
         <WorkspaceContextAPI.Provider value={contextValue}>
             {children}
         </WorkspaceContextAPI.Provider>
     )
-}
+});
 
 
 export const useWorkspaceContext = () => {

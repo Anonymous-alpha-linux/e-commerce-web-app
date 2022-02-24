@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { List } from "../../components";
 import { Filter, PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from '../../config';
-import { usePostContext, useWorkspaceContext } from "../../redux";
-import { Loading } from "../";
+import { useWorkspaceContext } from "../../redux";
 
 export default function Workspace() {
-  const API = mainAPI.CLOUD_API_STAFF;
-  const { workspace, loading } = useWorkspaceContext();
-  // const { posts, postLoading } = usePostContext()
-
-  if (loading) return <Loading></Loading>
+  const { workspace } = useWorkspaceContext();
 
   return (
     <div className="workspace">
@@ -21,8 +16,9 @@ export default function Workspace() {
       <Filter></Filter>
       <List>
         {workspace.posts.map(post => {
-          const { postAuthor, content, attachment, like, dislike, comment } = post;
+          const { _id, postAuthor, content, attachment, like, dislike, comment } = post;
           const postHeader = {
+            id: _id,
             image: postAuthor.profileImage,
             alt: postAuthor.username,
             username: postAuthor.username,

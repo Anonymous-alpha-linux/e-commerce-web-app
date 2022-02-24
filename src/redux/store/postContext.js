@@ -3,6 +3,7 @@ import axios from 'axios';
 import { mainAPI } from '../../config';
 import actions from '../reducers/actions';
 import { useAuthorizationContext } from '.';
+import { Loading } from '../../pages';
 
 const PostContextAPI = createContext();
 const postReducer = (state, action) => {
@@ -56,12 +57,11 @@ export default React.memo(function PostContext({ children }) {
     const [postState, setPost] = useReducer(postReducer, initialPostPage);
     const [categoryState, setCategory] = useReducer(categoryReducer, initialCategories);
     const { user } = useAuthorizationContext();
-    const [message, setMessage] = useState('');
+    // const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const { REACT_APP_ENVIRONMENT } = process.env;
+    const [postAPI, host] = REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const cancelTokenSource = axios.CancelToken.source();
-    const { NODE_ENV } = process.env;
-    const postAPI = NODE_ENV === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
-
     useEffect(() => {
         getPosts();
         getPostCategories();
@@ -101,18 +101,75 @@ export default React.memo(function PostContext({ children }) {
             })
         }).catch(error => setError(error.message));
     }
-    function postIdea(input) {
+    function postIdea(input, cb, ...options) {
         const formData = new FormData();
+        input.files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
+            formData.append("files", file);
+        });
+        Object.keys(input).forEach(key => {
+            if (Array.isArray(input[key])) {
+                input[key].forEach(item => {
+                    formData.append(key, item);
+                })
+                return;
+            }
+            formData.append(key, JSON.stringify(input[key]));
+        })
+        if (options.isEdit) return axios.put(postAPI, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${user.accessToken}`
+            },
+            params: {
+                view: 'post',
+                postid: options.id
+            }
+        }).then(res => {
+            cb(res);
+        }).catch(error => setError(error.message));
+
+        return axios.post(postAPI, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${user.accessToken}`
+            },
+            params: {
+                view: 'post'
+            }
+        }).then(res => {
+            // getSocket().emit("notify post", {
+            //     postId: res.data.postId,
+            //     postURL: `/post/${res.data.postId}`
+            // })
+            cb(res);
+        }).catch(err => setError(err.message));
     }
+    async function getFile(attachment, cb) {
+        await axios.get(`${host}\\${attachment.filePath}`, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${user.accessToken}`
+            },
+            responseType: 'blob'
+        }).then(res => {
+            return res.data;
+        }).then(blob => new File([blob], attachment.fileName, {
+            type: attachment.fileType
+        })).then(data => cb(data)).catch(error => console.log(error.message));
+    }
+    // async function getGzipFile() {
+    // }
 
     const contextValues = {
         posts: postState.posts,
         categories: categoryState.categories,
         postLoading: postState.postLoading,
-        categoryLoading: categoryState.categoryLoading
+        categoryLoading: categoryState.categoryLoading,
+        getFile,
+        postIdea
     }
-
-    // if (postState.postLoading || categoryState.categoryLoading) return <Loading></Loading>
+    if (postState.postLoading || categoryState.categoryLoading) return <Loading
+        className="post__loading"></Loading>
 
     return (<PostContextAPI.Provider value={contextValues}>
         {children}

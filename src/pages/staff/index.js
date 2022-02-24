@@ -4,3 +4,4 @@ export { default as Portal } from './portal';
 export { default as Workspace } from './workspace';
 export { default as Profile } from './profile';
 export { default as WorkspaceGroup } from './group';
+export { default as SinglePost } from './singlePost';

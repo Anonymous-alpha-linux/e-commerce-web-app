@@ -25,7 +25,6 @@ export default function Navigation() {
 
     const responsiveHandler = () => {
         const { width } = window.screen;
-
         if (width <= 480) {
             setScreenColumn(2);
         } else {
@@ -215,15 +214,16 @@ const AuthStatus = React.memo(({
                     </Icon.CircleIcon>
                 )) || (
                         <Text.MiddleLine style={{ verticalAlign: 'text-bottom' }}>
-                            <ButtonComponent>
-                                <Link to={"/"} style={{
-                                    color: '#fff'
-                                }} onClick={logout}>
+                            <Link to={"/"} style={{
+                                color: '#fff'
+                            }} onClick={logout}>
+                                <ButtonComponent >
                                     Logout
-                                </Link>
-                            </ButtonComponent>
+                                </ButtonComponent>
+                            </Link>
                         </Text.MiddleLine>
-                    )}
+                    )
+                }
             </ContainerComponent.Item>
         </ContainerComponent.Flex>
     );
