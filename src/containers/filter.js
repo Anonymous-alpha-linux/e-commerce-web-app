@@ -9,7 +9,7 @@ export default function Filter() {
           padding: "1px",
         }}
       >
-        <ContainerComponent.Flex style={{
+        {/* <ContainerComponent.Flex style={{
           alignItems: 'center'
         }}>
           <ContainerComponent.Item style={{
@@ -45,7 +45,36 @@ export default function Filter() {
               </Text.MiddleLine>
             </Text.MiddleLine>
           </ContainerComponent.Item>
-        </ContainerComponent.Flex>
+        </ContainerComponent.Flex> */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "5px",
+          }}
+        >
+          <hr
+            style={{
+              flexGrow: "9",
+              height: "1px",
+              margin: "0em",
+            }}
+          ></hr>
+          <h3
+            style={{
+              fontSize: "13px",
+              flexGrow: "0.1",
+            }}
+          >
+            Filter:
+            <select style={{ fontSize: "12px" }}>
+              <option style={{ fontSize: "12px" }}>Top</option>
+              <option style={{ fontSize: "12px" }}>Most Recent</option>
+              <option style={{ fontSize: "12px" }}>Most Like</option>
+            </select>
+          </h3>
+        </div>
       </ContainerComponent.Inner>
     </ContainerComponent>
   );
