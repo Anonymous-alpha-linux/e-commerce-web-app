@@ -14,9 +14,14 @@ let arrTest = [
 ];
 
 export default function Workspace() {
+  const [formField, setFormField] = useState([]);
   return (
     <>
-      <TagsInput filter={arrTest}></TagsInput>
+      <TagsInput
+        filter={arrTest}
+        formField={formField}
+        setFormField={setFormField}
+      ></TagsInput>
       <Timespan></Timespan>
       <PostForm></PostForm>
       <PostContainer></PostContainer>
