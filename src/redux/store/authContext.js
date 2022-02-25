@@ -58,8 +58,6 @@ export const authReducer = (state, action) => {
   }
 }
 export default function AuthenticationContext({ children }) {
-<<<<<<< HEAD
-=======
   // const [user, setUser] = useState({
   //   accessToken: localStorage.getItem('accessToken') || 'a.b.c',
   //   isLoggedIn: false,
@@ -70,7 +68,6 @@ export default function AuthenticationContext({ children }) {
   const [user, setUser] = useReducer(authReducer, initialAuth);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
->>>>>>> 9f63d46303af593b9897776c6ca03d5e4abf6143
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
