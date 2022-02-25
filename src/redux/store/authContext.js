@@ -3,73 +3,22 @@ import React, { createContext, useContext, useState, useEffect, useReducer } fro
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
-import actions from '../reducers/actions';
 import { unstable_batchedUpdates } from 'react-dom'
+import actions from '../reducers/actions';
+import { authReducer, initialAuth } from '../reducers';
 
 const AuthenticationContextAPI = createContext();
-const initialAuth = {
-  accessToken: localStorage.getItem('accessToken') || 'a.b.c',
-  isLoggedIn: false,
-  authLoading: true,
-};
-export const authReducer = (state, action) => {
 
-  switch (action.type) {
-    case actions.SET_LOADING:
-      return {
-        ...state,
-        authLoading: true
-      };
-    case actions.AUTHENTICATE_ACTION:
-      return {
-        ...state,
-        ...action.payload,
-        authLoading: false
-      };
-    case actions.AUTHENTICATE_FAILED:
-      return {
-        ...state,
-        authLoading: false
-      };
-    case actions.LOGIN_ACTION:
-      return {
-        ...state,
-        ...action.payload,
-        isLoggedIn: true,
-        authLoading: false
-      };
-    case actions.LOGIN_FAILED:
-      return {
-        ...state,
-        isLoggedIn: false,
-        authLoading: false
-      };
-    case actions.FORGET_PASS_ACTION:
-      return {
-        ...state,
-        ...action.payload
-      };
-    case actions.LOGOUT_ACTION:
-      return {
-        ...initialAuth,
-        authLoading: false
-      };
-    default:
-      return state;
-  }
-}
 export default function AuthenticationContext({ children }) {
-  // const [user, setUser] = useState({
-  //   accessToken: localStorage.getItem('accessToken') || 'a.b.c',
-  //   isLoggedIn: false,
-  // });
-  // const [workspace, setWorkspace] = useState(null);
   const { REACT_APP_ENVIRONMENT } = process.env;
   const [user, setUser] = useReducer(authReducer, initialAuth);
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
+  console.log(REACT_APP_ENVIRONMENT);
+  const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
 
   useEffect(() => {
     try {
@@ -103,20 +52,7 @@ export default function AuthenticationContext({ children }) {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(user)
-  }, [user]);
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.emit("start", {
-  //       user
-  //     });
 
-  //     socket.on("notify post", data => {
-  //       console.log(data);
-  //     })
-  //   }
-  // }, [socket]);
   const getSocket = () => {
     if (!socket) {
       throw new Error("Socket cannot be accessible!");
@@ -124,7 +60,6 @@ export default function AuthenticationContext({ children }) {
     return socket;
   };
   const onLoadUser = () => {
-    const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
     return axios.get(authApi, {
       cancelToken: cancelTokenSource.token,
       headers: {
@@ -194,7 +129,7 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   }
-  // if (user.authLoading) return <Loading className="auth__loading"></Loading>
+  if (user.authLoading) return <Loading className="auth__loading"></Loading>
 
   return (
     <AuthenticationContextAPI.Provider value={{

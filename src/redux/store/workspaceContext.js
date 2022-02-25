@@ -75,7 +75,13 @@ export default React.memo(function WorkspaceContext({ children }) {
                 type: actions.WORKSPACE_ACTION,
                 payload: res.data.workspace
             });
-        }).catch(error => setError(error.message))
+        }).catch(error => {
+            setWorkspace({
+                type: actions.SET_LOADING,
+                loading: false
+            })
+            setError(error.message)
+        });
     }
 
     const contextValue = { workspace: workspaceState, loading: workspaceState.workspaceLoading };

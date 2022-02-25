@@ -2,27 +2,29 @@ import React from "react";
 import { List } from "../../components";
 import { Filter, PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from '../../config';
-import { useWorkspaceContext } from "../../redux";
+import { usePostContext, useWorkspaceContext } from "../../redux";
 
 export default function Workspace() {
   const { workspace } = useWorkspaceContext();
-
+  const { posts, removeIdea, loadNextPosts,filterPost } = usePostContext();
+  
   return (
-    <div className="workspace">
+    <div className="workspace" id="workspace">
       <Timespan
         expireTime={workspace.expireTime}>
       </Timespan>
       <PostForm></PostForm>
       <Filter></Filter>
-      <List>
-        {workspace.posts.map(post => {
-          const { _id, postAuthor, content, attachment, like, dislike, comment } = post;
+      <List className="workspace__postList">
+        {posts.map(post => {
+          const { _id, postAuthor, content, attachment, like, dislike, comment, hideAuthor } = post;
           const postHeader = {
             id: _id,
             image: postAuthor.profileImage,
             alt: postAuthor.username,
             username: postAuthor.username,
-            date: post.createdAt
+            date: post.createdAt,
+            hideAuthor
           }
           const postBody = {
             content,
@@ -43,7 +45,9 @@ export default function Workspace() {
           return <List.Item key={post._id}>
             <PostContainer postHeader={postHeader}
               postBody={postBody}
-              postFooter={postFooter}></PostContainer>
+              postFooter={postFooter}
+              removeIdea={() => removeIdea(_id)}
+            ></PostContainer>
           </List.Item>
         }
         )}

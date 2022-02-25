@@ -67,7 +67,7 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
       })
       .then(s => setLoading(false))
       .catch(error => setError(error.message));
-  }, []);
+  }, [files]);
 
   if (loading) return <Loading></Loading>
   return (

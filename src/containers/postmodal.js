@@ -7,8 +7,6 @@ import { useAuthorizationContext, usePostContext } from '../redux';
 import { mainAPI } from '../config';
 
 import { Loading } from '../pages';
-
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from './tagsinput';
@@ -27,11 +25,17 @@ export default function PostModal({ setOpenModal }) {
     const [openCondition, setOpenCondition] = useState(false);
 
     const privateChecked = useRef(null);
+    const checkedCondition = useRef();
+
+
 
     const navigate = useNavigate();
     const { id } = useParams();
     const { user, getSocket } = useAuthorizationContext();
-    const { posts, categories, postLoading, categoryLoading, getFile, postIdea } = usePostContext();
+    const { posts, categories, postLoading, categoryLoading,
+        getFile, postIdea } = usePostContext();
+
+    console.log(posts, categories);
 
     const { NODE_ENV } = process.env;
     const [staffURL, host] = NODE_ENV === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
@@ -44,37 +48,54 @@ export default function PostModal({ setOpenModal }) {
         return currentSize + fileSize > 50000;
     };
     const editHandler = (e) => {
+        e.preventDefault();
+        postIdea(input, res => {
+            // console.log(res);
+            navigate('/');
+        }, {
+            isEdit: true,
+            id: id,
+        })
     }
     const submitHandler = (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        input.files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
-            formData.append("files", file);
-        });
-        Object.keys(input).forEach(key => {
-            if (Array.isArray(input[key])) {
-                input[key].forEach(item => {
-                    formData.append(key, item);
-                })
-                return;
-            }
-            formData.append(key, JSON.stringify(input[key]));
-        })
-        return axios.post(staffURL, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${user.accessToken}`
-            },
-            params: {
-                view: 'post'
-            }
-        }).then(res => {
-            getSocket().emit("notify post", {
-                postId: res.data.postId,
-                postURL: `/post/${res.data.postId}`
+        if (checkedCondition.current.checked) {
+            postIdea(input, res => {
+                // console.log(res);
+                navigate('/');
             })
-            navigate('/');
-        }).catch(err => setError(err.message));
+        }
+        else {
+            setError('Please checked our terms and condition');
+        }
+        // const formData = new FormData();
+        // input.files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
+        //     formData.append("files", file);
+        // });
+        // Object.keys(input).forEach(key => {
+        //     if (Array.isArray(input[key])) {
+        //         input[key].forEach(item => {
+        //             formData.append(key, item);
+        //         })
+        //         return;
+        //     }
+        //     formData.append(key, JSON.stringify(input[key]));
+        // })
+        // return axios.post(staffURL, formData, {
+        //     headers: {
+        //         'Content-Type': 'multipart/form-data',
+        //         'Authorization': `Bearer ${user.accessToken}`
+        //     },
+        //     params: {
+        //         view: 'post'
+        //     }
+        // }).then(res => {
+        //     // getSocket().emit("notify post", {
+        //     //     postId: res.data.postId,
+        //     //     postURL: `/post/${res.data.postId}`
+        //     // });
+        //     navigate('/');
+        // }).catch(err => setError(err.message));
     };
     const inputHandler = (e) => {
         setInput(input => ({
@@ -114,33 +135,43 @@ export default function PostModal({ setOpenModal }) {
     }
 
     useEffect(() => {
-        const { attachment, category, content, hideAuthor } = posts.find(post => post._id === id);
-        console.log(attachment);
-        attachment.forEach(attach => {
-            getFile(attach, file => {
-                setInput({
-                    ...input,
-                    content: content,
-                    private: hideAuthor,
-                    categories: category,
-                    files: [...input.files, file]
+        // console.log(posts);
+        if (id) {
+            const { attachment, category, content, hideAuthor } = posts.find(post => post._id === id);
+            console.log(attachment);
+            attachment.forEach(attach => {
+                getFile(attach, file => {
+                    setInput({
+                        ...input,
+                        content: content,
+                        private: hideAuthor,
+                        categories: category.map(single => single._id),
+                        files: [...input.files, file]
+                    });
+                }).then(f => {
+                    setLoading(false);
                 });
-            }).then(f => {
-                setLoading(false);
             });
-        });
+        }
+        else
+            setLoading(false);
     }, []);
 
-    useEffect(() => {
-        console.log(input);
-    }, [input]);
+    // useEffect(() => {
+    //     console.log(input)
+    // }, [input]);
 
     if (postLoading || categoryLoading || loading) return <Loading></Loading>
 
     return <ContainerComponent.Section className="postModal__container">
         <Form encType='multipart/form-data'
             method={'POST'}
-            onSubmit={submitHandler}
+            onSubmit={(e) => {
+                if (id)
+                    editHandler(e);
+                else
+                    submitHandler(e)
+            }}
             className="postModal__form">
             <Text.Line className="postModal__header">
                 <Text.MiddleLine onClick={() => {
@@ -170,7 +201,8 @@ export default function PostModal({ setOpenModal }) {
                 </Text.RightLine>
 
             </Text.Line>
-            <Text.Label className="postModal__label">Author name:
+            <Text.Label className="postModal__label">
+                Author name:
                 <Text.MiddleLine>
                     <Text.Bold>{user.account}</Text.Bold>
                 </Text.MiddleLine>
@@ -212,6 +244,7 @@ export default function PostModal({ setOpenModal }) {
                     <Form.Checkbox id='condition'
                         name='condition'
                         onChange={checkedHandler}
+                        ref={checkedCondition}
                     ></Form.Checkbox>
                 </Text.MiddleLine>
                 <Text.MiddleLine>
@@ -220,8 +253,7 @@ export default function PostModal({ setOpenModal }) {
                         style={{
                             color: 'blue',
                             margin: '0'
-                        }}
-                    >Condition and Term</Text.Paragraph>
+                        }}>Condition and Term</Text.Paragraph>
                 </Text.MiddleLine>
             </Text.Line>
 
@@ -232,10 +264,10 @@ export default function PostModal({ setOpenModal }) {
             {error && <MessageBox.TextMessage>
                 {error}
             </MessageBox.TextMessage>}
-            {id && <Form.Input type='hidden'
+            {/* {id && <Form.Input type='hidden'
                 name="id"
                 id="id"
-                value={id}></Form.Input>}
+                value={id}></Form.Input>} */}
             <Form.Input type='submit' value={id ? 'Edit' : 'Submit'}></Form.Input>
         </Form>
     </ContainerComponent.Section>

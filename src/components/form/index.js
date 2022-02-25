@@ -108,13 +108,13 @@ Form.Option = function ({ children, ...props }) {
   );
 };
 
-Form.Checkbox = function ({ children, ...restProp }) {
+Form.Checkbox = React.forwardRef(function ({ children, ...restProp }, ref) {
   return (
-    <input type={'checkbox'} className="form__checkbox" {...restProp}>
+    <input type={'checkbox'} className="form__checkbox" ref={ref} {...restProp}>
       {children}
     </input>
   )
-}
+})
 
 Form.FrameAvatar = function ({ children, ...restProp }) {
   return (

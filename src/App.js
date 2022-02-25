@@ -21,13 +21,12 @@ import Signout from "./pages/signout";
 
 function App() {
   const { loading, user } = useAuthorizationContext();
-  // if (loading) return <Loading className="auth__loading"></Loading>
 
   return (
     <WorkspaceContext>
-      <PostContext>
-        <BrowserRouter>
-          {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
+      <BrowserRouter>
+        {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
+        <PostContext>
           <Routes>
             <Route path="login" element={<Login></Login>}></Route>
             <Route path="register" element={<Register></Register>}></Route>
@@ -85,8 +84,8 @@ function App() {
             <Route path="/*" element={<h1>404 Error: Page Not Found...</h1>}>
             </Route>
           </Routes>
-        </BrowserRouter>
-      </PostContext>
+        </PostContext>
+      </BrowserRouter>
     </WorkspaceContext>
   );
 }
