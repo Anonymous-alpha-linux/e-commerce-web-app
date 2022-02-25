@@ -9,9 +9,8 @@ function Register() {
     const [error, setError] = useState('');
 
     const location = useLocation();
-
     let from = location.state?.from?.pathname || '/';
-    console.log('login');
+
     const submitHandler = (e) => {
         e.preventDefault();
         try {
@@ -41,6 +40,8 @@ function Register() {
         <ContainerComponent.Hero>
         </ContainerComponent.Hero>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
+        <ContainerComponent.Hero>
+        </ContainerComponent.Hero>
         <Form method={'POST'}
             onSubmit={submitHandler}
             style={{

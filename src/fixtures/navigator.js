@@ -2,11 +2,12 @@ import { IoHomeSharp } from 'react-icons/io5';
 import { RiHistoryLine } from 'react-icons/ri';
 import { FaUserAlt, FaUsers, FaUserTie } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
+
 const navigators = [
     {
         icon: <IoHomeSharp></IoHomeSharp>,
         label: 'home',
-        link: 'home'
+        link: ''
     },
     {
         icon: <RiHistoryLine></RiHistoryLine>,
@@ -16,17 +17,17 @@ const navigators = [
     {
         icon: <FaUserAlt></FaUserAlt>,
         label: 'user',
-        link: 'profile'
+        link: '/profile/personal'
     },
     {
         icon: <FaUsers></FaUsers>,
-        label: 'group',
-        link: 'group'
+        label: 'workspace',
+        link: 'workspace'
     },
     {
         icon: <FaUserTie></FaUserTie>,
         label: 'manager',
-        link: 'manager'
+        link: '/profile/manager'
     },
     {
         icon: <FiLogOut></FiLogOut>,

@@ -9,32 +9,43 @@ export default function Filter() {
           padding: "1px",
         }}
       >
-        <hr
-          style={{
-            margin: "auto 1vw",
-            display: "inline-block",
-            width: "80vw",
-          }}
-        ></hr>
-        <Text.Subtitle
-          style={{
-            display: "inline-block",
-            fontSize: "1.5vw",
-            marginLeft: `2vw`,
-            width: "10vw",
-          }}
-        >
-          Filter...
-          <span
-            style={{
-              display: "inline-block",
-              fontSize: "80%",
-              marginLeft: "2px",
-            }}
-          >
-            Top
-          </span>
-        </Text.Subtitle>
+        <ContainerComponent.Flex style={{
+          alignItems: 'center'
+        }}>
+          <ContainerComponent.Item style={{
+            flexGrow: 1
+          }}>
+            <hr
+              style={{
+                display: "inline-block",
+                width: "100%",
+              }}
+            ></hr>
+          </ContainerComponent.Item>
+          <ContainerComponent.Item>
+            <Text.MiddleLine style={{
+              width: '20%'
+            }}>
+              <Text.Subtitle
+                style={{
+                  display: "inline-block",
+                }}
+              >
+                Filter:
+              </Text.Subtitle>
+              <Text.MiddleLine>
+                <Text.Title
+                  style={{
+                    display: "inline-block",
+                    marginLeft: "2px",
+                  }}
+                >
+                  Top
+                </Text.Title>
+              </Text.MiddleLine>
+            </Text.MiddleLine>
+          </ContainerComponent.Item>
+        </ContainerComponent.Flex>
       </ContainerComponent.Inner>
     </ContainerComponent>
   );

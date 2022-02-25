@@ -1,28 +1,30 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-
-import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
-import NavData from "../fixtures/nav-links.json";
-import navigators from "../fixtures/navigator";
-import { useAuthorizationContext } from "../redux";
-
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineMessage } from "react-icons/ai";
 import {
     IoNotificationsOutline,
     IoLogoApple,
     IoSearchSharp,
 } from "react-icons/io5";
+
+
+import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
+import navigators from "../fixtures/navigator";
+import { useAuthorizationContext } from "../redux";
 import { BsList } from "react-icons/bs";
-import ConditionContainer from "./condition";
+// import NotificationContainer from "./notification";
+// import { MessageBoxContainer, MessageContainer } from ".";
 
 export default function Navigation() {
-    const useAuth = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
+    const navigate = useNavigate();
+    // const [openNotification, setOpenNotification] = React.useState(false);
+    // const [openMessage, setOpenMessage] = useState(false);
+
 
     const responsiveHandler = () => {
         const { width } = window.screen;
-
         if (width <= 480) {
             setScreenColumn(2);
         } else {
@@ -39,6 +41,11 @@ export default function Navigation() {
             window.removeEventListener("resize", responsiveHandler);
         };
     }, [window.screen.width]);
+
+    // const openHome = () => {
+    //     setOpenMessage(false);
+    //     setOpenNotification(false);
+    // }
 
     return (
         <ContainerComponent
@@ -59,12 +66,14 @@ export default function Navigation() {
                         }}
                     >
                         <ContainerComponent.Item>
-                            <Icon.CircleIcon>
+                            <Icon.CircleIcon onClick={() => navigate('/', {
+                                replace: true
+                            })}>
                                 <IoLogoApple></IoLogoApple>
                             </Icon.CircleIcon>
                         </ContainerComponent.Item>
                         <ContainerComponent.Item>
-                            <Text
+                            <Link to="/portal/search"
                                 style={{
                                     paddingLeft: "0",
                                     color: "#fff",
@@ -75,7 +84,7 @@ export default function Navigation() {
                                 }}
                             >
                                 <IoSearchSharp></IoSearchSharp>
-                            </Text>
+                            </Link>
                         </ContainerComponent.Item>
                     </ContainerComponent.Flex>
                 </ContainerComponent.Item>
@@ -98,12 +107,16 @@ export default function Navigation() {
                     <AuthStatus
                         screenColumn={screenColumn}
                         openNavigator={() => setOpenNavigator(true)}
+                    // openNotification={() => setOpenNotification(true)}
+                    // openMessage={() => setOpenMessage(true)}
                     ></AuthStatus>
                 </ContainerComponent.Item>
             </ContainerComponent.Grid>
             {openNavigator && (
                 <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
             )}
+            {/* {openMessage && <MessageContainer></MessageContainer>}
+            {openNotification && (<NotificationContainer></NotificationContainer>)} */}
         </ContainerComponent>
     );
 }
@@ -111,6 +124,7 @@ export default function Navigation() {
 const Navigator = ({ closeNavigator }) => {
     return (
         <ContainerComponent
+            className="navigator__container"
             style={{
                 position: "fixed",
                 bottom: 0,
@@ -120,25 +134,28 @@ const Navigator = ({ closeNavigator }) => {
                 background: "#333",
                 color: "#fff",
                 padding: "10px",
-            }}
-        >
+            }}>
             <ContainerComponent.BackDrop
                 onClick={closeNavigator}
             ></ContainerComponent.BackDrop>
             <ContainerComponent.GridThreeColumns>
                 {navigators.map((navigate, index) => (
-                    <ContainerComponent.Item key={index + 1}>
-                        <ContainerComponent.MiddleInner>
-                            <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
-                            <Icon.Label
-                                style={{
-                                    fontWeight: "bold",
-                                    textTransform: "capitalize",
-                                }}
-                            >
-                                {navigate.label}
-                            </Icon.Label>
-                        </ContainerComponent.MiddleInner>
+                    <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
+                        <Link to={navigate.link} style={{
+                            color: '#fff'
+                        }}>
+                            <ContainerComponent.MiddleInner>
+                                <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
+                                <Icon.Label
+                                    style={{
+                                        fontWeight: "bold",
+                                        textTransform: "capitalize",
+                                    }}
+                                >
+                                    {navigate.label}
+                                </Icon.Label>
+                            </ContainerComponent.MiddleInner>
+                        </Link>
                     </ContainerComponent.Item>
                 ))}
             </ContainerComponent.GridThreeColumns>
@@ -146,10 +163,16 @@ const Navigator = ({ closeNavigator }) => {
     );
 };
 
-const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
+const AuthStatus = React.memo(({
+    screenColumn,
+    openNavigator,
+    openNotification,
+    openMessage
+}) => {
     const { user, logout } = useAuthorizationContext();
 
-    if (!user.isLoggedIn)
+
+    if (!user.isLoggedIn) {
         return (
             <div
                 style={{
@@ -161,6 +184,7 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
                 </Link>
             </div>
         );
+    };
 
     return (
         <ContainerComponent.Flex
@@ -171,12 +195,16 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
         >
             <ContainerComponent.Item>
                 <Icon.CircleIcon>
-                    <AiOutlineMessage></AiOutlineMessage>
+                    <Link to="/portal/message">
+                        <AiOutlineMessage></AiOutlineMessage>
+                    </Link>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
                 <Icon.CircleIcon>
-                    <IoNotificationsOutline></IoNotificationsOutline>
+                    <Link to="/portal/notification">
+                        <IoNotificationsOutline></IoNotificationsOutline>
+                    </Link>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
@@ -185,12 +213,17 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator }) => {
                         <BsList></BsList>
                     </Icon.CircleIcon>
                 )) || (
-                        <ButtonComponent>
-                            <Link to={"/"} onClick={logout}>
-                                Logout
+                        <Text.MiddleLine style={{ verticalAlign: 'text-bottom' }}>
+                            <Link to={"/"} style={{
+                                color: '#fff'
+                            }} onClick={logout}>
+                                <ButtonComponent >
+                                    Logout
+                                </ButtonComponent>
                             </Link>
-                        </ButtonComponent>
-                    )}
+                        </Text.MiddleLine>
+                    )
+                }
             </ContainerComponent.Item>
         </ContainerComponent.Flex>
     );

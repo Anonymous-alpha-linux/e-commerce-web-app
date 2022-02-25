@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ContainerComponent, Icon, Text, Preview } from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import { IoEarth } from "react-icons/io5";
 import { BsFillPersonFill } from "react-icons/bs";
 import { Comment } from ".";
+import { useAuthorizationContext } from "../redux";
 
-export default function Post() {
+export default function Post({ postHeader, postBody, postFooter }) {
     const [openComment, setOpenComment] = useState(false);
+    const { getSocket, user } = useAuthorizationContext();
+    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
+
+    // useEffect(() => {
+    //     console.log(postHeader, postBody, postFooter);
+    // }, [postFooter, postBody, postFooter]);
+
+
+    const thumpupHandler = () => {
+        console.log(user);
+        getSocket().emit('like', {
+
+        });
+    }
+    const thumpdownHandler = () => {
+        getSocket().emit('dislike', {
+
+        })
+    }
     return (
         <ContainerComponent.Section
             className="post__section"
@@ -15,21 +35,23 @@ export default function Post() {
                 padding: "20px",
             }}>
             <ContainerComponent.Pane className="post__header">
-                <Icon.CircleIcon style={{
-                    verticalAlign: 'middle',
-                    background: '#163d3c',
-                    color: '#fff'
-                }}>
-                    <BsFillPersonFill />
-                </Icon.CircleIcon>
+                <ContainerComponent.InlineGroup>
+                    <Icon.Avatar style={{
+                        verticalAlign: 'middle',
+                        background: '#163d3c',
+                        color: '#fff'
+                    }}>
+                        <Preview.Images image={postHeader.image} alt={postHeader.alt}></Preview.Images>
+                    </Icon.Avatar>
+                </ContainerComponent.InlineGroup>
                 <ContainerComponent.InlineGroup style={{
                     margin: '0 10px'
                 }}>
-                    <Text.Title>Staff Name</Text.Title>
+                    <Text.Title>{postHeader.username}</Text.Title>
                     <ContainerComponent.Flex>
                         <Text.Date style={{
                             marginRight: '8px'
-                        }}>20: 20</Text.Date>
+                        }}>{date}</Text.Date>
                         <Text>
                             <IoEarth />
                         </Text>
@@ -38,15 +60,19 @@ export default function Post() {
             </ContainerComponent.Pane>
             <ContainerComponent.Pane className="post__body">
                 <Text.Paragraph>
-                    Một cảm xúc gì đó rất lạ, một cái chất rất khó tả ở Hải Bột, một
-                    người nghệ sĩ rất “nghệ sĩ”! Anh cũng là một gã “gàn dở”, nhưng cũng
-                    là một kẻ vô tư, treo ngược tâm hồn mình cheo leo ở đâu đó tận trên
-                    mây, như một nhà thơ.
+                    {postBody.content}
                 </Text.Paragraph>
-                {/* Preivew */}
-                <Preview.Images image={'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg'} alt={'background'}>
-                    Avatar
-                </Preview.Images>
+                <ContainerComponent.Flex>
+                    {postBody.attachment.map(attach => {
+                        const imageRegex = new RegExp("image/*");
+                        if (imageRegex.test(attach.fileType))
+                            return <ContainerComponent.Item key={attach._id} >
+                                <Preview.Images image={attach.image || 'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg'} alt={'background'}>
+                                </Preview.Images>
+                            </ContainerComponent.Item>
+                        return;
+                    })}
+                </ContainerComponent.Flex>
             </ContainerComponent.Pane>
             {/* {Like, Dislike} */}
             <ContainerComponent.Pane className="post__footer" style={{
@@ -56,12 +82,16 @@ export default function Post() {
                 <ContainerComponent.GridThreeColumns>
                     <ContainerComponent.Item>
                         <Text.MiddleLine>
-                            <Icon.CircleIcon style={{
-                                marginRight: '10px'
-                            }}>
+                            <Icon.CircleIcon
+                                onClick={() => {
+
+                                }}
+                                style={{
+                                    marginRight: '10px'
+                                }}>
                                 <FaThumbsUp />
                             </Icon.CircleIcon>
-                            240
+                            {postFooter.like}
                         </Text.MiddleLine>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
@@ -71,7 +101,7 @@ export default function Post() {
                             }}>
                                 <FaThumbsDown />
                             </Icon.CircleIcon>
-                            240
+                            {postFooter.dislike}
                         </Text.CenterLine>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item onClick={() => setOpenComment(!openComment)}>
@@ -83,7 +113,7 @@ export default function Post() {
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
-            {openComment && <Comment></Comment>}
+            {openComment && <Comment commentLogs={postFooter.comment}></Comment>}
         </ContainerComponent.Section>
     );
 }

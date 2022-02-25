@@ -1,13 +1,12 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 import { ContainerComponent } from "../../components";
-import { Personal } from "../../containers";
-import { ManagerInfo } from "../../containers";
 
 export default function Profile() {
+
   return (
     <ContainerComponent>
-      <Personal></Personal>
-      <ManagerInfo></ManagerInfo>
+      <Outlet></Outlet>
     </ContainerComponent>
   );
 }
