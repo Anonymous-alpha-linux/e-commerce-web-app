@@ -2,17 +2,19 @@ import React from "react";
 import { Button } from "./styles/button";
 
 export default function ButtonComponent({ children, ...restProps }) {
-  return <a className="button" {...restProps}>{children}</a>;
+  return <div className="button" {...restProps}>{children}</div>;
 }
 
 ButtonComponent.Toggle = React.forwardRef(function ({ children, ...props }, ref) {
-  
+
   return <label className="switch">
     <input type="checkbox"
       className="switch__input"
       name={props.name}
       id={props.id}
-      onClick={props.onClick}
+      checked={props.value}
+      onChange={props.onChange}
+
       ref={ref} />
     <span className="switch__slider round">
       <span className="switch__slider--on">{props.onText}</span>

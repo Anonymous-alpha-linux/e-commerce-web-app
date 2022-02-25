@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
+
 import {
   ContainerComponent,
   Form,
@@ -9,12 +10,13 @@ import {
   Icon,
   ButtonComponent,
 } from "../components";
+import { Loading } from "../pages";
 
-const UploadPreview = ({ files, setFiles }) => {
+const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
   const [preview, setPreview] = useState([]);
+  const [loading, setLoading] = useState(true);
   const fileInputRef = useRef(null);
   let image = "https://image.shutterstock.com/image-vector/file-iconvector-illustration-flat-design-260nw-1402633574.jpg";
-
 
   const validateFile = (file) => {
     const imageRegex = new RegExp("image/*");
@@ -23,36 +25,51 @@ const UploadPreview = ({ files, setFiles }) => {
     return "others";
   }
   const removeItem = (id) => {
-    setFiles(files => files.filter((file, index) => index !== id));
+    eliminateFile(id);
+    preview.filter((file, index) => index !== id);
   };
-
-
-  useEffect(() => {
-    files.forEach((file, index) => {
+  const openFiles = () => {
+    fileInputRef.current.click();
+  }
+  const readNewFiles = (e) => {
+    console.log(e.target.files);
+    return Array.from(e.target.files).map(file => {
+      return readFile(file).then(data => setPreview([...preview, data])).catch(error => setError(error.message));
+    });
+  }
+  const readFile = (file) => {
+    return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
-      if (validateFile(file) === 'image') {
-        fileReader.readAsDataURL(file);
-        fileReader.onload = () => {
-          if (index === 0) {
-            setPreview([fileReader.result]);
-            return;
-          }
-          setPreview(preview => [...preview, fileReader.result || image]);
-        }
-        fileReader.onabort = () => {
-          alert("Failed to read file", fileReader.abort);
-        }
-        fileReader.onerror = () => {
-          alert("Failed to read file", fileReader.error);
-        }
+      fileReader.readAsDataURL(file);
+      fileReader.onabort = () => {
+        alert("Failed to read file", fileReader.abort);
+        reject("Failed to read file", fileReader.abort);
       }
-    })
-  }, [files]);
+      fileReader.onerror = () => {
+        alert("Failed to read file", fileReader.error);
+        reject("Failed to read file", fileReader.abort);
+      }
+      fileReader.onload = () => {
+        resolve(validateFile(file) === 'image' ? fileReader.result : image);
+      }
+    });
+  }
+  const readFiles = () => {
+    return files.map(file => {
+      return readFile(file);
+    });
+  }
+
   useEffect(() => {
-    console.log(fileInputRef.current);
-  }, [fileInputRef.current]);
+    Promise.all(readFiles())
+      .then(data => {
+        setPreview(data);
+      })
+      .then(s => setLoading(false))
+      .catch(error => setError(error.message));
+  }, [files]);
 
-
+  if (loading) return <Loading></Loading>
   return (
     <ContainerComponent.Section className="form-upload__container">
       <Text.Label htmlFor="files">Upload Files:</Text.Label>
@@ -71,10 +88,16 @@ const UploadPreview = ({ files, setFiles }) => {
           <Form.Input type="file"
             name="files"
             id="files"
-            onChange={setFiles}
+            onChange={(e) => {
+              readNewFiles(e);
+              setFiles(e);
+            }}
             ref={fileInputRef}
+            style={{
+              display: 'none'
+            }}
             multiple />
-          <ButtonComponent onClick={() => fileInputRef.current.click()}>
+          <ButtonComponent onClick={openFiles}>
             Upload New File
           </ButtonComponent>
           <Text.MiddleLine>

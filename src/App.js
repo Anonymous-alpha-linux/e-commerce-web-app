@@ -21,13 +21,12 @@ import Signout from "./pages/signout";
 
 function App() {
   const { loading, user } = useAuthorizationContext();
-  if (loading) return <Loading></Loading>
 
   return (
     <WorkspaceContext>
-      <PostContext>
-        <BrowserRouter>
-          {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
+      <BrowserRouter>
+        {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
+        <PostContext>
           <Routes>
             <Route path="login" element={<Login></Login>}></Route>
             <Route path="register" element={<Register></Register>}></Route>
@@ -66,8 +65,12 @@ function App() {
                       <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
                     </Route>
                     <Route path="q&a" element={<QA></QA>}></Route>
+
                     <Route path="portal/" element={<Portal></Portal>}>
-                      <Route path="idea" element={<PostModal />} />
+                      <Route path="idea" element={<PostModal />} >
+                      </Route>
+                      <Route path="idea/:id" element={<PostModal />} >
+                      </Route>
                       <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
                       <Route path="message" element={<MessageContainer></MessageContainer>}>
                         <Route path=":id" element={<MessageBox></MessageBox>}></Route>
@@ -81,8 +84,8 @@ function App() {
             <Route path="/*" element={<h1>404 Error: Page Not Found...</h1>}>
             </Route>
           </Routes>
-        </BrowserRouter>
-      </PostContext>
+        </PostContext>
+      </BrowserRouter>
     </WorkspaceContext>
   );
 }

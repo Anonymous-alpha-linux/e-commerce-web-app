@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { ContainerComponent, Icon, Text, Preview } from "../components";
+import { ContainerComponent, Icon, Text, Preview, ButtonComponent } from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import { IoEarth } from "react-icons/io5";
 import { BsFillPersonFill } from "react-icons/bs";
 import { Comment } from ".";
-import { useAuthorizationContext } from "../redux";
+import { useAuthorizationContext, usePostContext } from "../redux";
+import { useParams, Link } from "react-router-dom";
 
-export default function Post({ postHeader, postBody, postFooter }) {
+export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     const [openComment, setOpenComment] = useState(false);
     const { getSocket, user } = useAuthorizationContext();
+    const { posts } = usePostContext();
     const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-
     // useEffect(() => {
     //     console.log(postHeader, postBody, postFooter);
     // }, [postFooter, postBody, postFooter]);
-
+    console.log(posts);
 
     const thumpupHandler = () => {
         console.log(user);
@@ -47,7 +48,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 <ContainerComponent.InlineGroup style={{
                     margin: '0 10px'
                 }}>
-                    <Text.Title>{postHeader.username}</Text.Title>
+                    <Text.Title>{postHeader.hideAuthor && 'Anonymous' || postHeader.username}</Text.Title>
                     <ContainerComponent.Flex>
                         <Text.Date style={{
                             marginRight: '8px'
@@ -57,6 +58,14 @@ export default function Post({ postHeader, postBody, postFooter }) {
                         </Text>
                     </ContainerComponent.Flex>
                 </ContainerComponent.InlineGroup>
+                <Link to={`/portal/idea/${postHeader.id}`}>
+                    <ButtonComponent>
+                        Edit
+                    </ButtonComponent>
+                </Link>
+                <ButtonComponent onClick={removeIdea}>
+                    Delete
+                </ButtonComponent>
             </ContainerComponent.Pane>
             <ContainerComponent.Pane className="post__body">
                 <Text.Paragraph>

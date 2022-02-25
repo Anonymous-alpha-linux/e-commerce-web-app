@@ -16,6 +16,12 @@ const actions = {
     MESSAGE_ACTION: 14,
     ERROR_ACTION: 15,
     GET_POST_CATEGORIES: 16,
+    SHOW_UPDATE: 17,
+    LIKE_POST: 18,
+    DISLIKE_POST: 19,
+    LOAD_MORE_POST: 20,
+    LOAD_MORE_PAGE: 21,
+    
 }
 
 export default actions;

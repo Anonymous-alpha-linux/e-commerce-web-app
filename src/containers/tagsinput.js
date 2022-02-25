@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { ContainerComponent, Form, Icon, List, Text } from '../components';
 import { FaTimes } from 'react-icons/fa';
 
 export default function TagInput({ itemList, formField = [], setFormField }) {
   const [openInput, setOpenInput] = useState(false);
-
   const handleClickSection = (e) => {
     e.stopPropagation();
     setOpenInput(true);
@@ -32,6 +31,7 @@ export default function TagInput({ itemList, formField = [], setFormField }) {
     }));
     setOpenInput(true);
   }
+  console.log(formField, itemList);
 
   return (
     <ContainerComponent.Section className="tags_container"
@@ -61,7 +61,6 @@ export default function TagInput({ itemList, formField = [], setFormField }) {
                 width: 'auto',
               }}>
               <Form.Button
-                key={index}
                 className="tag"
                 style={{
                   display: 'inline-block',
@@ -76,7 +75,7 @@ export default function TagInput({ itemList, formField = [], setFormField }) {
                   whiteSpace: 'nowrap',
                   borderRadius: '20px'
                 }}>
-                {itemList.find((value) => value._id === tag).name}
+                {itemList.find(value => value._id === tag).name}
                 <Text.MiddleLine onClick={(e) => deleteOptionHandler(e, index)}>
                   <Icon>
                     <FaTimes></FaTimes>

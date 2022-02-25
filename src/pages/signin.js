@@ -9,9 +9,7 @@ const Login = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-
     const location = useLocation();
-    let from = location.state?.from?.pathname || '/';
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -31,6 +29,7 @@ const Login = () => {
         })
     }, [input, setInput])
 
+    console.log(user);
     if (user.isLoggedIn) {
         return <Navigate to={'/'} state={{ from: location }} replace />;
     }
