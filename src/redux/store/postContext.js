@@ -73,7 +73,6 @@ const categoryReducer = (state, action) => {
     }
 }
 
-
 const initialPostPage = {
     posts: [],
     postLoading: true,
@@ -240,20 +239,35 @@ export default React.memo(function PostContext({ children }) {
     function interactPost(id, type = 'like') {
         if (type = 'like')
             return axios.put(postAPI, {
-
             });
         else if (type = 'dislike')
             return axios.put(postAPI, {});
 
-        else if (type = '') {
+        else if (type = 'comment') {
             return axios.put(postAPI, {});
         }
-
     }
     function filterPost() {
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: postState.page,
+                count: 2,
+                filter: 1
+            }
+        }).then(res => console.log(res.data))
+            .catch(error => {
+                setCategory({
+                    type: actions.SET_OFF_LOADING
+                });
+                setError(error.message);
+            })
     }
-    // async function getGzipFile() {
-    // }
+    async function getGzipFile() {
+    }
     useEffect(() => {
         getPosts();
         getPostCategories();

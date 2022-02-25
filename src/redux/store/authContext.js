@@ -52,7 +52,6 @@ export default function AuthenticationContext({ children }) {
     };
   }, []);
 
-
   const getSocket = () => {
     if (!socket) {
       throw new Error("Socket cannot be accessible!");
@@ -129,6 +128,7 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   }
+
   if (user.authLoading) return <Loading className="auth__loading"></Loading>
 
   return (
