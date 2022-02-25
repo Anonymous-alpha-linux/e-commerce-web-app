@@ -7,6 +7,7 @@ import { usePostContext, useWorkspaceContext } from "../../redux";
 export default function Workspace() {
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
+  const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
   return (
     <div className="workspace" id="workspace">
@@ -27,6 +28,7 @@ export default function Workspace() {
           } = post;
           const postHeader = {
             id: _id,
+            postAuthor: postAuthor._id,
             image: postAuthor.profileImage,
             alt: postAuthor.username,
             username: postAuthor.username,
@@ -39,7 +41,7 @@ export default function Workspace() {
               const { _id, fileType, filePath } = attach;
               return {
                 _id,
-                image: `${mainAPI.LOCALHOST_HOST}\\${filePath}`,
+                image: `${host}\\${filePath}`,
                 fileType,
               };
             }),

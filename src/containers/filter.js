@@ -1,6 +1,8 @@
 import { ContainerComponent, Text } from "../components";
+import { usePostContext } from "../redux";
 
 export default function Filter() {
+  const { filterPost } = usePostContext();
   return (
     <ContainerComponent>
       <ContainerComponent.Inner
@@ -68,10 +70,10 @@ export default function Filter() {
             }}
           >
             Filter:
-            <select style={{ fontSize: "12px" }}>
-              <option style={{ fontSize: "12px" }}>Top</option>
-              <option style={{ fontSize: "12px" }}>Most Recent</option>
-              <option style={{ fontSize: "12px" }}>Most Like</option>
+            <select style={{ fontSize: "12px" }} onChange={filterPost}>
+              {/* <option style={{ fontSize: "12px" }}>Top</option> */}
+              <option style={{ fontSize: "12px" }} value={0}>Most Recent</option>
+              <option style={{ fontSize: "12px" }} value={1}>Most Like</option>
             </select>
           </h3>
         </div>

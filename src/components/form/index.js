@@ -87,7 +87,6 @@ Form.ErrorMessage = function ({ children, ...restProp }) {
 Form.TextArea = function ({ children, ...restProp }) {
   return (
     <textarea cols={12} {...restProp}>
-      {children}
     </textarea>
   );
 };

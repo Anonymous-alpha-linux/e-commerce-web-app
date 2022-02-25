@@ -10,13 +10,14 @@ import { useParams, Link } from "react-router-dom";
 
 export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     const [openComment, setOpenComment] = useState(false);
+    const [disliked, setDisliked] = useState(false);
+    const [liked, setLiked] = useState(false);
     const { getSocket, user } = useAuthorizationContext();
     const { posts } = usePostContext();
     const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-    // useEffect(() => {
-    //     console.log(postHeader, postBody, postFooter);
-    // }, [postFooter, postBody, postFooter]);
-    console.log(posts);
+    useEffect(() => {
+        console.log(postHeader, postBody, postFooter);
+    }, [postFooter, postBody, postFooter]);
 
     const thumpupHandler = () => {
         console.log(user);
@@ -58,14 +59,17 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                         </Text>
                     </ContainerComponent.Flex>
                 </ContainerComponent.InlineGroup>
-                <Link to={`/portal/idea/${postHeader.id}`}>
-                    <ButtonComponent>
-                        Edit
+                {user.accountId === postHeader.postAuthor && <>
+                    <Link to={`/portal/idea/${postHeader.id}`}>
+                        <ButtonComponent>
+                            Edit
+                        </ButtonComponent>
+                    </Link>
+
+                    <ButtonComponent onClick={removeIdea}>
+                        Delete
                     </ButtonComponent>
-                </Link>
-                <ButtonComponent onClick={removeIdea}>
-                    Delete
-                </ButtonComponent>
+                </>}
             </ContainerComponent.Pane>
             <ContainerComponent.Pane className="post__body">
                 <Text.Paragraph>

@@ -189,7 +189,6 @@ export default function PostModal({ setOpenModal }) {
                         Back
                     </Text.Middle>
                 </Text.MiddleLine>
-
                 <Text.RightLine
                     style={{
                         width: '80%',

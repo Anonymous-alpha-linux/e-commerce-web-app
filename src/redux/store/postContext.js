@@ -41,6 +41,11 @@ const postReducer = (state, action) => {
                 ...state,
                 page: state.page + 1
             };
+        case actions.LOAD_MY_POST:
+            return {
+                ...state,
+                myPosts: action.payload
+            };
         default:
             return initialPostPage;
     }
@@ -75,6 +80,7 @@ const categoryReducer = (state, action) => {
 
 const initialPostPage = {
     posts: [],
+    myPosts: [],
     postLoading: true,
     page: 0
 }
@@ -106,7 +112,7 @@ export default React.memo(function PostContext({ children }) {
             params: {
                 view: 'post',
                 page: postState.page,
-                count: 2
+                count: 3
             }
         }).then(res => {
             if (postState.posts.length)
@@ -144,7 +150,7 @@ export default React.memo(function PostContext({ children }) {
                 view: 'category',
             }
         }).then(res => {
-            console.log(res);
+            // console.log(res);
             setCategory({
                 type: actions.GET_POST_CATEGORIES,
                 payload: res.data.response
@@ -237,6 +243,9 @@ export default React.memo(function PostContext({ children }) {
         })).then(data => cb(data)).catch(error => console.log(error.message));
     }
     function interactPost(id, type = 'like') {
+    setPost({
+            type: actions.SET_LOADING
+        });
         if (type = 'like')
             return axios.put(postAPI, {
             });
@@ -244,10 +253,20 @@ export default React.memo(function PostContext({ children }) {
             return axios.put(postAPI, {});
 
         else if (type = 'comment') {
-            return axios.put(postAPI, {});
+            return axios.put(postAPI, {},{
+         headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: postState.page,
+                count: 3
+            }
+            });
         }
     }
-    function filterPost() {
+    function filterPost(e) {
+        const filterValue = e.target.value;
         return axios.get(postAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -255,19 +274,46 @@ export default React.memo(function PostContext({ children }) {
             params: {
                 view: 'post',
                 page: postState.page,
-                count: 2,
-                filter: 1
+                count: 3,
+                filter: filterValue
             }
-        }).then(res => console.log(res.data))
-            .catch(error => {
-                setCategory({
-                    type: actions.SET_OFF_LOADING
-                });
-                setError(error.message);
-            })
+        }).then(res => setPost({
+            type: actions.GET_POST_LIST,
+            payload: res.data.response
+        })).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        });
     }
     async function getGzipFile() {
     }
+    async function getOwnPosts() {
+        setPost({
+            type: actions.SET_LOADING
+        });
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: postState.page,
+                count: 5,
+                filter: 2
+            }
+        }).then(res => setPost({
+            type: actions.LOAD_MY_POST,
+            payload: res.data.response
+        })).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        });
+    }
+
     useEffect(() => {
         getPosts();
         getPostCategories();
@@ -275,26 +321,13 @@ export default React.memo(function PostContext({ children }) {
             cancelTokenSource.cancel();
         };
     }, [user, showUpdate, postState.page]);
-
     useEffect(() => {
-        console.log(postState)
+        console.log(postState);
     }, [postState]);
-    // useEffect(() => {
-    //     // const loadDatas = async () => {
-    //     //     setLoading(true);
-    //     //     const newDatas = await axios({
-    //     //         baseURL: `https://randomuser.me/api/`,
-    //     //         params: { page: page, results: 50 },
-    //     //     }).then((res) => res.data);
-    //     //     setDatas((prev) => [...prev, ...newDatas.results]);
-    //     //     setLoading(false);
-    //     // };
-    //     getPosts();
-    //     // loadDatas();
-    // }, []);
 
     const contextValues = {
         posts: postState.posts,
+        myPosts: postState.myPosts,
         categories: categoryState.categories,
         postLoading: postState.postLoading,
         categoryLoading: categoryState.categoryLoading,
@@ -306,7 +339,10 @@ export default React.memo(function PostContext({ children }) {
         postIdea,
         removeIdea,
         loadNextPosts,
-        filterPost
+        filterPost,
+        interactPost,
+        getGzipFile,
+        getOwnPosts
     }
 
     if (postState.postLoading && categoryState.categoryLoading) return <Loading className="post__loading"></Loading>

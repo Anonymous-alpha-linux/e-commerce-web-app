@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { createContext, useContext, useState, useEffect, useReducer } from 'react';
+import React, { createContext, useContext, useState, useEffect, useReducer, useCallback } from 'react';
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
@@ -17,7 +17,6 @@ export default function AuthenticationContext({ children }) {
   const [error, setError] = useState('');
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
-  console.log(REACT_APP_ENVIRONMENT);
   const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
 
   useEffect(() => {
@@ -25,7 +24,6 @@ export default function AuthenticationContext({ children }) {
       onLoadUser();
     }
     catch (error) {
-      console.log(error.message);
       setError(error.message);
     }
     // .then(() => {
@@ -78,6 +76,10 @@ export default function AuthenticationContext({ children }) {
       });
     })
   };
+  // const onLoadAccount = useCallback(() => {
+  //   return axios.get()
+  // }, [user])
+  console.log(user);
   function login(data) {
     const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,

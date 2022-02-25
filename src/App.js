@@ -9,7 +9,8 @@ import {
   Workspace, Profile, QA,
   Portal,
   WorkspaceGroup,
-  Loading
+  Loading,
+  MyPost
 } from './pages';
 
 import { AddGroupContainer, ManagerInfo, MessageContainer, NotificationContainer, Personal, PostModal, Searchbar } from "./containers";
@@ -64,8 +65,8 @@ function App() {
                       <Route path="personal" element={<Personal></Personal>} />
                       <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
                     </Route>
+                    <Route path="history" element={<MyPost></MyPost>} />
                     <Route path="q&a" element={<QA></QA>}></Route>
-
                     <Route path="portal/" element={<Portal></Portal>}>
                       <Route path="idea" element={<PostModal />} >
                       </Route>

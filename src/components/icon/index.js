@@ -21,3 +21,5 @@ IconComponent.Avatar = ({ children, ...props }) => {
         {children}
     </div>
 }
+
+IconComponent.Image = ({ ...props }) => <img src={props.src} alt={props.alt} className="image" loading='eager'></img>

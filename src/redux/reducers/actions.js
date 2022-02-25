@@ -21,7 +21,7 @@ const actions = {
     DISLIKE_POST: 19,
     LOAD_MORE_POST: 20,
     LOAD_MORE_PAGE: 21,
-    
+    LOAD_MY_POST: 22
 }
 
 export default actions;

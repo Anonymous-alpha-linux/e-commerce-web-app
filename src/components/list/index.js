@@ -2,9 +2,9 @@ import React from 'react'
 
 export default function List({ children, ...props }) {
     return (
-        <ol {...props} className={`list ${props.className}`}>
+        <ul {...props} className={`list ${props.className}`}>
             {children}
-        </ol>
+        </ul>
     )
 }
 
