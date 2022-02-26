@@ -17,3 +17,4 @@ export { default as Loader } from "./loader";
 export { default as Searchbar } from "./searchbar";
 export { default as ConditionContainer } from "./condition";
 export { default as UploadForm } from "./uploadpreview";
+export { default as LazyLoading } from './lazyLoading';

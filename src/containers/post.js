@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { ContainerComponent, Icon, Text, Preview, ButtonComponent } from "../components";
+import { ContainerComponent, Icon, Text, Preview, ButtonComponent, Dropdown } from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import { IoEarth } from "react-icons/io5";
-import { BsFillPersonFill } from "react-icons/bs";
+import { IoIosArrowDown } from 'react-icons/io';
 import { Comment } from ".";
 import { useAuthorizationContext, usePostContext } from "../redux";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     const [openComment, setOpenComment] = useState(false);
@@ -15,12 +15,9 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     const { getSocket, user } = useAuthorizationContext();
     const { posts } = usePostContext();
     const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-    useEffect(() => {
-        console.log(postHeader, postBody, postFooter);
-    }, [postFooter, postBody, postFooter]);
 
     const thumpupHandler = () => {
-        console.log(user);
+
         getSocket().emit('like', {
 
         });
@@ -59,17 +56,23 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                         </Text>
                     </ContainerComponent.Flex>
                 </ContainerComponent.InlineGroup>
-                {user.accountId === postHeader.postAuthor && <>
-                    <Link to={`/portal/idea/${postHeader.id}`}>
-                        <ButtonComponent>
-                            Edit
-                        </ButtonComponent>
-                    </Link>
+                {user.accountId === postHeader.postAuthor && <Text.RightLine>
+                    <Dropdown component={<IoIosArrowDown></IoIosArrowDown>}>
+                        <Dropdown.Item>
+                            <Link to={`/portal/idea/${postHeader.id}`}>
+                                <ButtonComponent>
+                                    Edit
+                                </ButtonComponent>
+                            </Link>
+                        </Dropdown.Item>
 
-                    <ButtonComponent onClick={removeIdea}>
-                        Delete
-                    </ButtonComponent>
-                </>}
+                        <Dropdown.Item>
+                            <ButtonComponent onClick={removeIdea}>
+                                Delete
+                            </ButtonComponent>
+                        </Dropdown.Item>
+                    </Dropdown>
+                </Text.RightLine>}
             </ContainerComponent.Pane>
             <ContainerComponent.Pane className="post__body">
                 <Text.Paragraph>
@@ -126,7 +129,9 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
-            {openComment && <Comment commentLogs={postFooter.comment}></Comment>}
+            {openComment && <Comment
+                postId={postHeader.id}
+                commentLogs={postFooter.comment}></Comment>}
         </ContainerComponent.Section>
     );
 }

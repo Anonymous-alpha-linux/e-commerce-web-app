@@ -14,8 +14,15 @@ const postReducer = (state, action) => {
                 posts: action.payload,
                 postLoading: false,
             };
-        case actions.GET_SINGLE_POST:
-            return {};
+        case actions.UPDATE_SINGLE_POST:
+            return {
+                ...state,
+                posts: state.posts.map(post => {
+                    if (post._id === action.payload._id) {
+                        return action.payload
+                    }
+                })
+            };
         case actions.SET_LOADING:
             return {
                 ...state,
@@ -115,22 +122,43 @@ export default React.memo(function PostContext({ children }) {
                 count: 3
             }
         }).then(res => {
-            if (postState.posts.length)
-                setPost({
-                    type: actions.LOAD_MORE_POST,
-                    payload: res.data.response
-                });
-            else
-                setPost({
-                    type: actions.GET_POST_LIST,
-                    payload: res.data.response
-                });
+            setPost({
+                type: actions.GET_POST_LIST,
+                payload: res.data.response
+            });
         }).catch(error => {
             setPost({
                 type: actions.SET_OFF_LOADING
             });
             setError(error.message);
         });
+    }
+    async function updateSinglePost(postId) {
+        setPost({
+            type: actions.SET_LOADING
+        });
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'singlepost',
+                postid: postId
+            }
+        }).then(res => {
+            console.log(res.data);
+            // setPost({
+            //     type: actions.UPDATE_SINGLE_POST,
+            //     payload: res.data
+            // });
+        }).then(success => setPost({
+            type: actions.SET_OFF_LOADING
+        })).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        })
     }
     async function loadNextPosts() {
         setPost({
@@ -150,7 +178,6 @@ export default React.memo(function PostContext({ children }) {
                 view: 'category',
             }
         }).then(res => {
-            // console.log(res);
             setCategory({
                 type: actions.GET_POST_CATEGORIES,
                 payload: res.data.response
@@ -240,28 +267,68 @@ export default React.memo(function PostContext({ children }) {
             return res.data;
         }).then(blob => new File([blob], attachment.fileName, {
             type: attachment.fileType
-        })).then(data => cb(data)).catch(error => console.log(error.message));
+        })).then(data => cb(data)).catch(error => setError(error.message));
     }
-    function interactPost(id, type = 'like') {
-    setPost({
+    async function getPostComments(postId) {
+        setPost({
             type: actions.SET_LOADING
         });
-        if (type = 'like')
-            return axios.put(postAPI, {
-            });
-        else if (type = 'dislike')
-            return axios.put(postAPI, {});
 
-        else if (type = 'comment') {
-            return axios.put(postAPI, {},{
-         headers: {
+        return axios.get(postAPI, {
+            headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
             },
             params: {
-                view: 'post',
-                page: postState.page,
-                count: 3
+                view: 'comment',
+                postid: postId
             }
+        }).then(res => {
+            console.log(res.data);
+            return setPost({
+                type: actions.GET_COMMENT
+            })
+        }).then(success => {
+            return setPost({
+                type: actions.SET_OFF_LOADING
+            })
+        }).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        })
+    }
+    function interactPost(postId, type = 'like', input) {
+        // Set Loading for waiting post
+        setPost({
+            type: actions.SET_LOADING
+        });
+
+        if (type === 'like')
+            return axios.put(postAPI, {
+            }, {});
+        else if (type === 'dislike')
+            return axios.put(postAPI, {}, {});
+        else if (type === 'comment') {
+            console.log('im comment');
+            return axios.put(postAPI, {
+                content: input.content
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                params: {
+                    view: 'comment',
+                    postid: postId
+                }
+            }).then(res => {
+                console.log(res.data);
+                return setShowUpdate(!showUpdate);
+            }).catch(error => {
+                setPost({
+                    type: actions.SET_OFF_LOADING
+                });
+                setError(error.message);
             });
         }
     }
@@ -321,9 +388,10 @@ export default React.memo(function PostContext({ children }) {
             cancelTokenSource.cancel();
         };
     }, [user, showUpdate, postState.page]);
-    useEffect(() => {
-        console.log(postState);
-    }, [postState]);
+
+    // useEffect(() => {
+    //     console.log(postState);
+    // }, [postState]);
 
     const contextValues = {
         posts: postState.posts,
@@ -337,12 +405,14 @@ export default React.memo(function PostContext({ children }) {
         setError,
         getFile,
         postIdea,
+        updateSinglePost,
         removeIdea,
         loadNextPosts,
         filterPost,
         interactPost,
         getGzipFile,
-        getOwnPosts
+        getOwnPosts,
+        getPostComments
     }
 
     if (postState.postLoading && categoryState.categoryLoading) return <Loading className="post__loading"></Loading>

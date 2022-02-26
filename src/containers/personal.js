@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
-import { BsFillPersonFill } from 'react-icons/bs';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
 
@@ -9,9 +8,10 @@ export default function Personal({ personalInfo }) {
     const { workspace } = useWorkspaceContext();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);
-    useEffect(() => {
-        console.log(user, workspace);
-    }, []);
+    const [input, setInput] = useState(true);
+    // useEffect(() => {
+    //     console.log(user, workspace);
+    // }, []);
 
     return <ContainerComponent
         style={{
@@ -127,17 +127,16 @@ export default function Personal({ personalInfo }) {
                     textAlign: 'right',
                 }} value={user.email}></Form.Input>
             </ContainerComponent.Pane>
-
-            {isEdit && <ButtonComponent 
-            onClick={() => setIsEdit(false)}
-            style={{width: '30%', maxWidth: '80px'}}>
-                Save
-            </ButtonComponent>
-            ||  <ButtonComponent style={{width: '30%', maxWidth: '80px'}} 
-            onClick={() => setIsEdit(true)}>
-                Edit
-            </ButtonComponent>}
-        
+            <Text.RightLine>
+                {isEdit && <ButtonComponent
+                    onClick={() => setIsEdit(false)}>
+                    Save
+                </ButtonComponent>
+                    || <ButtonComponent
+                        onClick={() => setIsEdit(true)}>
+                        Edit
+                    </ButtonComponent>}
+            </Text.RightLine>
         </ContainerComponent.Inner>
     </ContainerComponent>
 }

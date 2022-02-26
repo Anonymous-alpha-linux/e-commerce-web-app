@@ -12,6 +12,7 @@
       display: inline-block;
       vertical-align: middle;
       line-height: 100%;
+      overflow: hidden;
    }
    &__avatar {
       padding: 0;
@@ -20,5 +21,14 @@
       width: 30px;
       height: 30px;
       overflow: hidden;
+   }
+   &__badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      padding: 5px 10px;
+      border-radius: 50%;
+      background: red;
+      color: white;
    }
 }

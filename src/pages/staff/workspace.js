@@ -1,6 +1,6 @@
 import React from "react";
 import { List } from "../../components";
-import { Filter, PostContainer, PostForm, Timespan } from "../../containers";
+import { Filter, LazyLoading, PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from "../../config";
 import { usePostContext, useWorkspaceContext } from "../../redux";
 
@@ -14,55 +14,57 @@ export default function Workspace() {
       <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
       <Filter></Filter>
-      <List className="workspace__postList">
-        {posts.map((post) => {
-          const {
-            _id,
-            postAuthor,
-            content,
-            attachment,
-            like,
-            dislike,
-            comment,
-            hideAuthor,
-          } = post;
-          const postHeader = {
-            id: _id,
-            postAuthor: postAuthor._id,
-            image: postAuthor.profileImage,
-            alt: postAuthor.username,
-            username: postAuthor.username,
-            date: post.createdAt,
-            hideAuthor,
-          };
-          const postBody = {
-            content,
-            attachment: attachment.map((attach) => {
-              const { _id, fileType, filePath } = attach;
-              return {
-                _id,
-                image: `${host}\\${filePath}`,
-                fileType,
-              };
-            }),
-          };
-          const postFooter = {
-            like,
-            dislike,
-            comment,
-          };
-          return (
-            <List.Item key={post._id}>
-              <PostContainer
-                postHeader={postHeader}
-                postBody={postBody}
-                postFooter={postFooter}
-                removeIdea={() => removeIdea(_id)}
-              ></PostContainer>
-            </List.Item>
-          );
-        })}
-      </List>
+      <LazyLoading>
+        <List className="workspace__postList">
+          {posts.map((post) => {
+            const {
+              _id,
+              postAuthor,
+              content,
+              attachment,
+              like,
+              dislike,
+              comment,
+              hideAuthor,
+            } = post;
+            const postHeader = {
+              id: _id,
+              postAuthor: postAuthor._id,
+              image: postAuthor.profileImage,
+              alt: postAuthor.username,
+              username: postAuthor.username,
+              date: post.createdAt,
+              hideAuthor,
+            };
+            const postBody = {
+              content,
+              attachment: attachment.map((attach) => {
+                const { _id, fileType, filePath } = attach;
+                return {
+                  _id,
+                  image: `${host}\\${filePath}`,
+                  fileType,
+                };
+              }),
+            };
+            const postFooter = {
+              like,
+              dislike,
+              comment,
+            };
+            return (
+              <List.Item key={post._id}>
+                <PostContainer
+                  postHeader={postHeader}
+                  postBody={postBody}
+                  postFooter={postFooter}
+                  removeIdea={() => removeIdea(_id)}
+                ></PostContainer>
+              </List.Item>
+            );
+          })}
+        </List>
+      </LazyLoading>
     </div>
   );
 }

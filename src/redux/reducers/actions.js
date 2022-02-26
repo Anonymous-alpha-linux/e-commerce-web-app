@@ -21,7 +21,9 @@ const actions = {
     DISLIKE_POST: 19,
     LOAD_MORE_POST: 20,
     LOAD_MORE_PAGE: 21,
-    LOAD_MY_POST: 22
+    LOAD_MY_POST: 22,
+    UPDATE_SINGLE_POST: 23,
+    GET_COMMENT: 24,
 }
 
 export default actions;

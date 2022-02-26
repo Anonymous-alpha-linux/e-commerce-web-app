@@ -200,21 +200,26 @@ export default function PostModal({ setOpenModal }) {
                 </Text.RightLine>
 
             </Text.Line>
-            <Text.Label className="postModal__label">
-                Author name:
+            <Text.Line>
                 <Text.MiddleLine>
-                    <Text.Bold>{user.account}</Text.Bold>
+                    <Text.Label className="postModal__label">
+                        Author name:
+                    </Text.Label>
                 </Text.MiddleLine>
-                <Text.MiddleLine style={{ marginLeft: '40px' }}>
-                    <ButtonComponent.Toggle onText="Hide"
+                <Text.MiddleLine>
+                    <Text.Bold>{!input.private ? user.account : 'Anonymous'}</Text.Bold>
+                </Text.MiddleLine>
+                <Text.RightLine style={{ paddingTop: '10px' }}>
+                    <ButtonComponent.Toggle
+                        onText="Hide"
                         offText="Show"
                         id="private"
                         name="private"
                         value={input.private}
                         onChange={checkedHandler}
                         ref={privateChecked}></ButtonComponent.Toggle>
-                </Text.MiddleLine>
-            </Text.Label>
+                </Text.RightLine>
+            </Text.Line>
             <Form.TextArea
                 id='content'
                 name='content'

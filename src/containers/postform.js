@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 export default function PostForm() {
     // const [openModal, setOpenModal] = useState(false);
     const { user } = useAuthorizationContext();
-
+    console.log(user);
     return <ContainerComponent.Section
         className="post-form__container"
         style={{
@@ -17,8 +17,10 @@ export default function PostForm() {
         }}>
         <ContainerComponent.Flex style={{ alignItems: 'center' }}>
             <ContainerComponent.Item>
-                <Icon.CircleIcon style={{ size: '15px', background: '#163d3c', color: '#fff' }}>
-                    <IoLogoApple></IoLogoApple>
+                <Icon.CircleIcon style={{ size: '15px', background: '#163d3c', color: '#fff', padding: 0 }}>
+                    <Icon.Image
+                        src={user.profileImage}
+                        alt='avatar'></Icon.Image>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item style={{

@@ -1,10 +1,27 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { ContainerComponent, Text, Icon, Form } from "../components";
 import { FaLock, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
-import { BsFillPersonFill } from "react-icons/bs";;
+import { BsFillPersonFill } from "react-icons/bs";
+import { useAuthorizationContext, usePostContext } from "../redux";
 
-export default function Comment() {
+
+export default function Comment({ postId, commentLogs }) {
+  const { user } = useAuthorizationContext();
+  const { interactPost } = usePostContext();
+  const [input, setInput] = useState({
+    content: ''
+  });
+  console.log(commentLogs, postId, input);
+  const inputHandler = (e) => {
+    setInput({
+      [e.target.name]: e.target.value
+    })
+  }
+  const submitHandler = (e) => {
+    e.preventDefault();
+    interactPost(postId, 'comment', input);
+  }
   return (
     <ContainerComponent.Section
       className="comment__section"
@@ -38,9 +55,10 @@ export default function Comment() {
               style={{
                 background: "#163d3c",
                 color: "#fff",
+                padding: 0
               }}
             >
-              <BsFillPersonFill />
+              <Icon.Image src={user.profileImage}></Icon.Image>
             </Icon.CircleIcon>
           </ContainerComponent.Item>
           <ContainerComponent.Item
@@ -48,47 +66,39 @@ export default function Comment() {
               flexGrow: 1,
             }}
           >
-            <Text.Subtitle style={{ margin: "8px" }}>
-              User Name
+            <Text.Subtitle>
+              {user.account}
               <FaLock style={{ margin: "0 10px" }} />
             </Text.Subtitle>
             <Text.Line>
-              <Form.Input
-                placeholder="Post your idea"
-                style={{
-                  width: "80%",
-                }}
-              ></Form.Input>
-              <Text.MiddleLine>
-                <Text.CenterLine>
-                  <Icon.CircleIcon>
-                    <FiSend />
-                  </Icon.CircleIcon>
-                </Text.CenterLine>
-              </Text.MiddleLine>
+              <Form
+                method='POST'
+                style={{ paddingLeft: 0 }}
+                onSubmit={submitHandler}
+              >
+                <Form.Input
+                  placeholder="Leave your comment"
+                  name='content'
+                  value={input.body}
+                  onChange={inputHandler}
+                  style={{ width: '90%' }}
+                ></Form.Input>
+                <input type='submit' style={{ display: 'none' }}></input>
+                <Text.RightLine>
+                  <Text.MiddleLine>
+                    <Text.CenterLine>
+                      <Icon.CircleIcon>
+                        <Form.Input component={<FiSend />}></Form.Input>
+                      </Icon.CircleIcon>
+                    </Text.CenterLine>
+                  </Text.MiddleLine>
+                </Text.RightLine>
+              </Form>
             </Text.Line>
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
         <ContainerComponent.Pane className="comment__log__footer">
-          <ContainerComponent.GridThreeColumns>
-            <ContainerComponent.Item>
-              <Text.MiddleLine>
-                <FaThumbsUp style={{ marginRight: "10px" }} />
-                240
-              </Text.MiddleLine>
-            </ContainerComponent.Item>
-            <ContainerComponent.Item>
-              <Text.CenterLine>
-                <FaThumbsDown style={{ marginRight: "10px" }} />
-                240
-              </Text.CenterLine>
-            </ContainerComponent.Item>
-            <ContainerComponent.Item>
-              <Text.CenterLine>
-                <Text.MiddleLine>Reply</Text.MiddleLine>
-              </Text.CenterLine>
-            </ContainerComponent.Item>
-          </ContainerComponent.GridThreeColumns>
+
         </ContainerComponent.Pane>
       </ContainerComponent.Pane>
       <ContainerComponent.Pane
@@ -97,7 +107,7 @@ export default function Comment() {
           paddingTop: "12px",
         }}
       >
-        <Comment.Tab></Comment.Tab>
+        {commentLogs.map(comment => <Comment.Tab key={comment._id} comment={comment}></Comment.Tab>)}
       </ContainerComponent.Pane>
       <ContainerComponent.Pane className="comment__footer">
         <Text.Subtitle
@@ -111,6 +121,7 @@ export default function Comment() {
 }
 
 Comment.Tab = function ({ children, ...props }) {
+  console.log(props);
   return (
     <>
       <Text.Group>
@@ -142,20 +153,20 @@ Comment.Tab = function ({ children, ...props }) {
         </Text.Line>
       </Text.Group>
       <Text.Line>
-      <Text.MiddleLine>
-        <Icon.CircleIcon>
-          <FaThumbsUp />
-          </Icon.CircleIcon>
-                  240
-        </Text.MiddleLine>
-        <Text.MiddleLine style={{ margin: "0 10px"}}>
+        <Text.MiddleLine>
           <Icon.CircleIcon>
-        <FaThumbsDown  />
-        </Icon.CircleIcon>
-                240
+            <FaThumbsUp />
+          </Icon.CircleIcon>
+          240
+        </Text.MiddleLine>
+        <Text.MiddleLine style={{ margin: "0 10px" }}>
+          <Icon.CircleIcon>
+            <FaThumbsDown />
+          </Icon.CircleIcon>
+          240
         </Text.MiddleLine>
         <Text.MiddleLine>
-            Reply
+          Reply
         </Text.MiddleLine>
       </Text.Line>
     </>
