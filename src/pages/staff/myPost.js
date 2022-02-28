@@ -1,24 +1,31 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Loading } from '..';
 import { List } from '../../components';
 import { mainAPI } from '../../config';
-import { PostContainer } from '../../containers';
+import { LazyLoading, PostContainer } from '../../containers';
 import { usePostContext } from '../../redux';
+import axios from 'axios';
 
 export default function MyPost() {
+    // const [loading, setLoading] = useState(true);
     const { myPosts, getOwnPosts, removeIdea } = usePostContext();
-    const [loading, setLoading] = React.useState(true);
+    const listRef = React.useRef();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
-    React.useEffect(() => {
-        setLoading(true);
-        getOwnPosts().then(f => setLoading(false));
-    }, []);
+    // const cancelTokenSource = axios.CancelToken.source();
 
-    if (loading) return <Loading></Loading>
-
+    // React.useEffect(() => {
+    //     getOwnPosts(() => setLoading(false));
+    //     return () => {
+    //         cancelTokenSource.cancel();
+    //     };
+    // }, []);
+    // if (loading) return <Loading></Loading>
     return (
-        <div>
-            <List className="workspace__postList">
+        <LazyLoading loader={getOwnPosts}>
+            <List className="workspace__postList" ref={listRef}>
+                {!myPosts.length && <List.Item>
+                    Loading...
+                </List.Item>}
                 {myPosts.map((post) => {
                     const {
                         _id,
@@ -67,6 +74,6 @@ export default function MyPost() {
                     );
                 })}
             </List>
-        </div>
+        </LazyLoading>
     )
 }

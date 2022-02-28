@@ -4,7 +4,7 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import { IoEarth } from "react-icons/io5";
 import { IoIosArrowDown } from 'react-icons/io';
-import { Comment } from ".";
+import { Comment, DropDownButton } from ".";
 import { useAuthorizationContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
 
@@ -57,21 +57,20 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                     </ContainerComponent.Flex>
                 </ContainerComponent.InlineGroup>
                 {user.accountId === postHeader.postAuthor && <Text.RightLine>
-                    <Dropdown component={<IoIosArrowDown></IoIosArrowDown>}>
+                    <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
                         <Dropdown.Item>
                             <Link to={`/portal/idea/${postHeader.id}`}>
-                                <ButtonComponent>
+                                <Text>
                                     Edit
-                                </ButtonComponent>
+                                </Text>
                             </Link>
                         </Dropdown.Item>
-
                         <Dropdown.Item>
-                            <ButtonComponent onClick={removeIdea}>
+                            <Text onClick={removeIdea}>
                                 Delete
-                            </ButtonComponent>
+                            </Text>
                         </Dropdown.Item>
-                    </Dropdown>
+                    </DropDownButton>
                 </Text.RightLine>}
             </ContainerComponent.Pane>
             <ContainerComponent.Pane className="post__body">

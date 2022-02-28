@@ -79,7 +79,6 @@ export default function AuthenticationContext({ children }) {
   // const onLoadAccount = useCallback(() => {
   //   return axios.get()
   // }, [user])
-  console.log(user);
   function login(data) {
     const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
@@ -96,7 +95,6 @@ export default function AuthenticationContext({ children }) {
           payload: res.data
         });
       }).then(end => {
-        console.log('load again');
         return onLoadUser();
       }).catch(error => setUser({
         type: actions.AUTHENTICATE_FAILED,
@@ -109,7 +107,6 @@ export default function AuthenticationContext({ children }) {
   //     cancelToken: cancelTokenSource.token
   //   })
   //     .then(res => {
-  //       // console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', res.data);
   //       localStorage.setItem('accessToken', res.data.accessToken);
   //       setUser({ ...res.data });
   //     }).catch(error => setUser({

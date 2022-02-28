@@ -1,25 +1,38 @@
 import React from 'react'
 
-export default function DropDown({ children, ...props }) {
-    const [value, setValue] = React.useState();
-    const [openChildren, setOpenChildren] = React.useState(false);
+export default function DropDown({ children, forwardRef, ...props }) {
     return (
         <div className="dropdown"
-            onClick={() => setOpenChildren(!openChildren)}
-            style={props.style}>
-            <span
-                className="dropdown__dropbtn">
-                {props.component}
-            </span>
-
-            <input value={value} type="hidden" className="dropdown__input"></input>
-            {openChildren && <div className="dropdown__content">
-                {children}
-            </div>}
+            ref={forwardRef}
+            value={props.value}
+            style={props.style}
+            {...props}>
+            {children}
         </div>
     )
 }
-
+DropDown.DropBtn = ({ children, ...props }) => {
+    return <span className="dropdown__dropbtn"
+        {...props}>
+        {props.component}
+    </span>
+}
+DropDown.Content = ({ children, ...props }) => {
+    return <div className="dropdown__content">
+        {children}
+    </div>
+}
 DropDown.Item = ({ children, ...props }) => {
-    return <span className='dropdown__item' {...props}>{children}</span>
+    return <span className='dropdown__item'
+        {...props}>
+        {children}
+    </span>
+}
+DropDown.Option = ({ children, ...props }) => {
+    return <span className='dropdown__option'
+        onClick={(e) => props.setValue(e.target.value)}
+        value={props.value}
+        {...props}>
+        {children}
+    </span>
 }

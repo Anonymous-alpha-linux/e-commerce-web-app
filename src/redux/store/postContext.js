@@ -13,14 +13,24 @@ const postReducer = (state, action) => {
                 ...state,
                 posts: action.payload,
                 postLoading: false,
+                filter: action.filter,
+                page: 0
+            };
+        case actions.UPDATE_COMMENT:
+            const foundComment = state.posts.find(post => post._id === action.payload.postid).comment;
+            foundComment = action.payload
+            return {
+                ...state,
+                posts: state.posts
             };
         case actions.UPDATE_SINGLE_POST:
             return {
                 ...state,
                 posts: state.posts.map(post => {
-                    if (post._id === action.payload._id) {
-                        return action.payload
+                    if (post._id === action.payload.postid) {
+                        return action.payload.data;
                     }
+                    return post;
                 })
             };
         case actions.SET_LOADING:
@@ -41,7 +51,9 @@ const postReducer = (state, action) => {
         case actions.LOAD_MORE_POST:
             return {
                 ...state,
-                posts: state.posts.concat(action.payload),
+                more: !!action.payload.length,
+                posts: action.payload.length ? state.posts.concat(action.payload) : state.posts,
+                page: action.payload.length ? state.page + 1 : state.page
             };
         case actions.LOAD_MORE_PAGE:
             return {
@@ -49,9 +61,11 @@ const postReducer = (state, action) => {
                 page: state.page + 1
             };
         case actions.LOAD_MY_POST:
+
             return {
                 ...state,
-                myPosts: action.payload
+                myPosts: action.payload.length ? state.myPosts.concat(action.payload) : state.myPosts,
+                myPage: action.payload.length ? state.myPage + 1 : state.myPage,
             };
         default:
             return initialPostPage;
@@ -89,7 +103,10 @@ const initialPostPage = {
     posts: [],
     myPosts: [],
     postLoading: true,
-    page: 0
+    page: 0,
+    myPage: 0,
+    more: true,
+    filter: 0
 }
 const initialCategories = {
     categories: [],
@@ -118,13 +135,15 @@ export default React.memo(function PostContext({ children }) {
             },
             params: {
                 view: 'post',
-                page: postState.page,
-                count: 3
+                page: 0,
+                count: 3,
+                filter: 0
             }
         }).then(res => {
-            setPost({
+            return setPost({
                 type: actions.GET_POST_LIST,
-                payload: res.data.response
+                payload: res.data.response,
+                filter: postState.filter
             });
         }).catch(error => {
             setPost({
@@ -133,7 +152,40 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         });
     }
-    async function updateSinglePost(postId) {
+    async function loadNextPosts(cb) {
+        if (!postState.more) return
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: postState.page + 1,
+                count: 3,
+                filter: postState.filter
+            }
+        }).then(res => {
+
+            if (res.data.response.length) {
+                return setPost({
+                    type: actions.LOAD_MORE_POST,
+                    payload: res.data.response
+                });
+            }
+            return [];
+        }).then(success => {
+            cb();
+        }).catch(error => {
+            setError(error.message);
+        });
+    }
+    async function loadNextPage(cb) {
+        setPost({
+            type: actions.LOAD_MORE_PAGE
+        });
+        cb();
+    }
+    async function updateSinglePost(postId, cb) {
         setPost({
             type: actions.SET_LOADING
         });
@@ -146,25 +198,19 @@ export default React.memo(function PostContext({ children }) {
                 postid: postId
             }
         }).then(res => {
-            console.log(res.data);
-            // setPost({
-            //     type: actions.UPDATE_SINGLE_POST,
-            //     payload: res.data
-            // });
-        }).then(success => setPost({
-            type: actions.SET_OFF_LOADING
-        })).catch(error => {
-            setPost({
-                type: actions.SET_OFF_LOADING
+
+            return setPost({
+                type: actions.UPDATE_SINGLE_POST,
+                payload: {
+                    postid: postId,
+                    data: res.data.response
+                }
             });
+        }).then(success => {
+            cb();
+        }).catch(error => {
             setError(error.message);
         })
-    }
-    async function loadNextPosts() {
-        setPost({
-            type: actions.LOAD_MORE_PAGE
-        });
-        return getPosts;
     }
     async function getPostCategories() {
         setCategory({
@@ -283,7 +329,7 @@ export default React.memo(function PostContext({ children }) {
                 postid: postId
             }
         }).then(res => {
-            console.log(res.data);
+
             return setPost({
                 type: actions.GET_COMMENT
             })
@@ -298,7 +344,7 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         })
     }
-    function interactPost(postId, type = 'like', input) {
+    function interactPost(postId, type = 'like', input, cb) {
         // Set Loading for waiting post
         setPost({
             type: actions.SET_LOADING
@@ -310,9 +356,10 @@ export default React.memo(function PostContext({ children }) {
         else if (type === 'dislike')
             return axios.put(postAPI, {}, {});
         else if (type === 'comment') {
-            console.log('im comment');
-            return axios.put(postAPI, {
-                content: input.content
+            console.log(input);
+            return axios.post(postAPI, {
+                content: input.content,
+                private: input.private
             }, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -322,8 +369,9 @@ export default React.memo(function PostContext({ children }) {
                     postid: postId
                 }
             }).then(res => {
-                console.log(res.data);
-                return setShowUpdate(!showUpdate);
+                return updateSinglePost(postId, cb);
+            }).then(success => {
+                cb();
             }).catch(error => {
                 setPost({
                     type: actions.SET_OFF_LOADING
@@ -340,14 +388,17 @@ export default React.memo(function PostContext({ children }) {
             },
             params: {
                 view: 'post',
-                page: postState.page,
+                page: 0,
                 count: 3,
                 filter: filterValue
             }
-        }).then(res => setPost({
-            type: actions.GET_POST_LIST,
-            payload: res.data.response
-        })).catch(error => {
+        }).then(res => {
+            return setPost({
+                type: actions.GET_POST_LIST,
+                payload: res.data.response,
+                filter: filterValue
+            });
+        }).catch(error => {
             setPost({
                 type: actions.SET_OFF_LOADING
             });
@@ -356,7 +407,7 @@ export default React.memo(function PostContext({ children }) {
     }
     async function getGzipFile() {
     }
-    async function getOwnPosts() {
+    function getOwnPosts(cb) {
         setPost({
             type: actions.SET_LOADING
         });
@@ -366,14 +417,16 @@ export default React.memo(function PostContext({ children }) {
             },
             params: {
                 view: 'post',
-                page: postState.page,
-                count: 5,
+                page: postState.myPage,
+                count: 3,
                 filter: 2
             }
         }).then(res => setPost({
             type: actions.LOAD_MY_POST,
             payload: res.data.response
-        })).catch(error => {
+        })).then(success => {
+            cb();
+        }).catch(error => {
             setPost({
                 type: actions.SET_OFF_LOADING
             });
@@ -387,11 +440,10 @@ export default React.memo(function PostContext({ children }) {
         return () => {
             cancelTokenSource.cancel();
         };
-    }, [user, showUpdate, postState.page]);
-
-    // useEffect(() => {
-    //     console.log(postState);
-    // }, [postState]);
+    }, [user, showUpdate]);
+    useEffect(() => {
+        console.log(postState)
+    }, [postState]);
 
     const contextValues = {
         posts: postState.posts,
@@ -403,11 +455,13 @@ export default React.memo(function PostContext({ children }) {
         error,
         setMessage,
         setError,
+        setShowUpdate,
         getFile,
         postIdea,
         updateSinglePost,
         removeIdea,
         loadNextPosts,
+        loadNextPage,
         filterPost,
         interactPost,
         getGzipFile,

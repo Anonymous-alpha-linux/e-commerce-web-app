@@ -1,21 +1,22 @@
-import React from "react";
-import { List } from "../../components";
+import React, { useRef } from "react";
+import { ContainerComponent, List } from "../../components";
 import { Filter, LazyLoading, PostContainer, PostForm, Timespan } from "../../containers";
 import { mainAPI } from "../../config";
 import { usePostContext, useWorkspaceContext } from "../../redux";
 
 export default function Workspace() {
   const { workspace } = useWorkspaceContext();
-  const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
+  const { posts, removeIdea, loadNextPosts } = usePostContext();
   const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
-
+  const listRef = useRef();
   return (
-    <div className="workspace" id="workspace">
+    <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
       <Filter></Filter>
-      <LazyLoading>
-        <List className="workspace__postList">
+      <LazyLoading loader={loadNextPosts}>
+        <List className="workspace__postList"
+          ref={listRef}>
           {posts.map((post) => {
             const {
               _id,
@@ -53,7 +54,9 @@ export default function Workspace() {
               comment,
             };
             return (
-              <List.Item key={post._id}>
+              <List.Item
+                key={post._id}
+              >
                 <PostContainer
                   postHeader={postHeader}
                   postBody={postBody}
@@ -65,6 +68,6 @@ export default function Workspace() {
           })}
         </List>
       </LazyLoading>
-    </div>
+    </ContainerComponent>
   );
 }

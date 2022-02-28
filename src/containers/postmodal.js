@@ -33,7 +33,7 @@ export default function PostModal({ setOpenModal }) {
     const { id } = useParams();
     const { user, getSocket } = useAuthorizationContext();
     const { posts, categories, postLoading, categoryLoading,
-        getFile, postIdea } = usePostContext();
+        getFile, postIdea, setShowUpdate } = usePostContext();
 
     console.log(posts, categories);
 
@@ -62,6 +62,7 @@ export default function PostModal({ setOpenModal }) {
         if (checkedCondition.current.checked) {
             postIdea(input, res => {
                 // console.log(res);
+                setShowUpdate(o => !o);
                 navigate('/');
             })
         }

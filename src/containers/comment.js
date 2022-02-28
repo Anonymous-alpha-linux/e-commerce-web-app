@@ -1,27 +1,58 @@
-import React, { Component, useState } from "react";
-import { ContainerComponent, Text, Icon, Form } from "../components";
+import React, { Component, useRef, useState } from "react";
+import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components";
 import { FaLock, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
 import { BsFillPersonFill } from "react-icons/bs";
-import { useAuthorizationContext, usePostContext } from "../redux";
+import { useAuthorizationContext, usePostContext, useWorkspaceContext } from "../redux";
 
 
 export default function Comment({ postId, commentLogs }) {
   const { user } = useAuthorizationContext();
+  const { workspace } = useWorkspaceContext();
   const { interactPost } = usePostContext();
+
   const [input, setInput] = useState({
-    content: ''
+    content: '',
+    private: false
   });
-  console.log(commentLogs, postId, input);
+  const [loading, setLoading] = useState(false);
+  const loader = useRef(interactPost);
+  React.useEffect(() => {
+    loader.current = interactPost;
+  }, [interactPost]);
+
   const inputHandler = (e) => {
     setInput({
+      ...input,
       [e.target.name]: e.target.value
     })
   }
-  const submitHandler = (e) => {
+  const checkedHandler = (e) => {
+    setInput(input => ({
+      ...input,
+      [e.target.name]: e.target.checked,
+    }))
+  };
+  const submitHandler = async (e) => {
     e.preventDefault();
-    interactPost(postId, 'comment', input);
+    await loader.current(postId, 'comment', input, () => {
+    });
+    setInput({
+      content: '',
+      private: false
+    });
   }
+  const calcRemainingEventTime = (time) => {
+    const date = new Date(time);
+    const now = new Date(Date.now());
+    return Math.floor(date.getFullYear() - now.getFullYear()) && + 'years'
+      || Math.floor(date.getMonth() - now.getMonth()) && +'months'
+      || Math.floor(date.getDate() - now.getDate()) && +'days'
+      || Math.floor(date.getHours() - now.getHours()) && +'hours'
+      || Math.floor(date.getMinutes() - now.getMinutes()) && +'minutes'
+      || '0 seconds'
+  }
+  console.log(calcRemainingEventTime(workspace.eventTime));
   return (
     <ContainerComponent.Section
       className="comment__section"
@@ -50,12 +81,12 @@ export default function Comment({ postId, commentLogs }) {
         <ContainerComponent.Flex
           style={{ alignItems: "center", flexWrap: "nowrap" }}
         >
-          <ContainerComponent.Item>
+          <ContainerComponent.Item style={{ width: '50px' }}>
             <Icon.CircleIcon
               style={{
                 background: "#163d3c",
                 color: "#fff",
-                padding: 0
+                padding: 0,
               }}
             >
               <Icon.Image src={user.profileImage}></Icon.Image>
@@ -66,22 +97,31 @@ export default function Comment({ postId, commentLogs }) {
               flexGrow: 1,
             }}
           >
-            <Text.Subtitle>
-              {user.account}
-              <FaLock style={{ margin: "0 10px" }} />
-            </Text.Subtitle>
+            <Text.Line>
+              <Text.MiddleLine style={{ marginRight: '12px' }}>
+                <Text.Bold>{!input.private ? user.account : 'Anonymous'}</Text.Bold>
+              </Text.MiddleLine>
+              <ButtonComponent.Toggle
+                onText="Hide"
+                offText="Show"
+                id="private"
+                name="private"
+                value={input.private}
+                onChange={checkedHandler}>
+              </ButtonComponent.Toggle>
+            </Text.Line>
             <Text.Line>
               <Form
                 method='POST'
-                style={{ paddingLeft: 0 }}
+                style={{ paddingLeft: 0, paddingRight: 0, width: '120px' }}
                 onSubmit={submitHandler}
               >
                 <Form.Input
                   placeholder="Leave your comment"
                   name='content'
-                  value={input.body}
+                  value={input.content}
                   onChange={inputHandler}
-                  style={{ width: '90%' }}
+                  style={{ width: 'calc(100% - 60px)' }}
                 ></Form.Input>
                 <input type='submit' style={{ display: 'none' }}></input>
                 <Text.RightLine>
@@ -98,7 +138,6 @@ export default function Comment({ postId, commentLogs }) {
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
         <ContainerComponent.Pane className="comment__log__footer">
-
         </ContainerComponent.Pane>
       </ContainerComponent.Pane>
       <ContainerComponent.Pane
@@ -109,29 +148,44 @@ export default function Comment({ postId, commentLogs }) {
       >
         {commentLogs.map(comment => <Comment.Tab key={comment._id} comment={comment}></Comment.Tab>)}
       </ContainerComponent.Pane>
-      <ContainerComponent.Pane className="comment__footer">
+      {/* <ContainerComponent.Pane className="comment__footer">
         <Text.Subtitle
           style={{ textAlign: "center", width: "100%", margin: "10px 0" }}
         >
           More...
         </Text.Subtitle>
-      </ContainerComponent.Pane>
+      </ContainerComponent.Pane> */}
     </ContainerComponent.Section>
   );
 }
 
 Comment.Tab = function ({ children, ...props }) {
-  console.log(props);
+  const { body, like, dislike, createdAt, hideAuthor, account: { username, profileImage } } = props.comment;
+
+  const parseTime = (time) => {
+    const timeStr = `${(new Date(time)).getHours()}:${(new Date(time)).getMinutes()}`;
+    return timeStr;
+  }
   return (
     <>
-      <Text.Group>
-        <Icon.CircleIcon>
-          <BsFillPersonFill />
+      <Text.MiddleLine>
+        <Icon.CircleIcon style={{
+          width: '30px',
+          height: '30px',
+          padding: 0
+        }}>
+          <Icon.Image src={profileImage} alt={'avatar'}></Icon.Image>
         </Icon.CircleIcon>
-      </Text.Group>
-      <Text.Group>
+      </Text.MiddleLine>
+      <Text.MiddleLine style={{ padding: '0 10px' }}>
         <Text.MiddleLine>
-          <Text.Bold style={{ margin: 0 }}>Staff Name</Text.Bold>
+        </Text.MiddleLine>
+        <Text.MiddleLine>
+          <Text.Bold style={{ margin: 0 }}>
+            <Text>
+              {!hideAuthor ? username : 'Anonymous'}
+            </Text>
+          </Text.Bold>
         </Text.MiddleLine>
         <Text.MiddleLine>
           <Text.Date
@@ -139,7 +193,7 @@ Comment.Tab = function ({ children, ...props }) {
               marginLeft: "8px",
             }}
           >
-            20:30
+            {parseTime(createdAt)}
           </Text.Date>
         </Text.MiddleLine>
         <Text.Line>
@@ -148,22 +202,23 @@ Comment.Tab = function ({ children, ...props }) {
               margin: "8px 0",
             }}
           >
-            Nice Content. Good job Bro!
+            {body}
           </Text.Paragraph>
         </Text.Line>
-      </Text.Group>
+      </Text.MiddleLine>
+
       <Text.Line>
         <Text.MiddleLine>
           <Icon.CircleIcon>
             <FaThumbsUp />
           </Icon.CircleIcon>
-          240
+          {like}
         </Text.MiddleLine>
         <Text.MiddleLine style={{ margin: "0 10px" }}>
           <Icon.CircleIcon>
             <FaThumbsDown />
           </Icon.CircleIcon>
-          240
+          {dislike}
         </Text.MiddleLine>
         <Text.MiddleLine>
           Reply

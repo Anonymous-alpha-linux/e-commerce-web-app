@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Personal({ personalInfo }) {
     const { user } = useAuthorizationContext();
@@ -12,6 +13,8 @@ export default function Personal({ personalInfo }) {
     // useEffect(() => {
     //     console.log(user, workspace);
     // }, []);
+    const location = useLocation();
+    // const from = location.state?.from?.pathname || '/';
 
     return <ContainerComponent
         style={{
@@ -60,13 +63,27 @@ export default function Personal({ personalInfo }) {
             }}>
                 <ContainerComponent.GridThreeColumns>
                     <ContainerComponent.Item>
-                        <ButtonComponent>Information</ButtonComponent>
+                        <ButtonComponent>
+                            <Text.Center>
+                                Information
+                            </Text.Center>
+                        </ButtonComponent>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <ButtonComponent>My Post</ButtonComponent>
+                        <Link to="/history" state={{ from: location }}>
+                            <ButtonComponent>
+                                <Text.Center>
+                                    My Posts
+                                </Text.Center>
+                            </ButtonComponent>
+                        </Link>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <ButtonComponent>Feedback</ButtonComponent>
+                        <ButtonComponent>
+                            <Text.Center>
+                                Feedback
+                            </Text.Center>
+                        </ButtonComponent>
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
@@ -126,6 +143,20 @@ export default function Personal({ personalInfo }) {
                 <Form.Input placeholder="Post your information" style={{
                     textAlign: 'right',
                 }} value={user.email}></Form.Input>
+
+                <Text.MiddleLine style={{
+                    lineHeight: 0,
+                    textIndent: '5px',
+                    transform: 'translateY(25px)',
+                    fontWeight: 800
+                }}>
+                    <Text.Label>
+                        Department
+                    </Text.Label>
+                </Text.MiddleLine>
+                <Form.Input placeholder="Choose Date" type="date" style={{
+                    textAlign: 'right',
+                }}></Form.Input>
             </ContainerComponent.Pane>
             <Text.RightLine>
                 {isEdit && <ButtonComponent
