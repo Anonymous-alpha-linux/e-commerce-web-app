@@ -1,6 +1,9 @@
-import { ContainerComponent, Text } from "../components";
+import { useEffect, useRef } from "react";
+import { ButtonComponent, ContainerComponent, Dropdown, Form, Text } from "../components";
+import { usePostContext } from "../redux";
 
 export default function Filter() {
+  const { filterPost } = usePostContext();
   return (
     <ContainerComponent>
       <ContainerComponent.Inner
@@ -9,43 +12,46 @@ export default function Filter() {
           padding: "1px",
         }}
       >
-        <ContainerComponent.Flex style={{
-          alignItems: 'center'
-        }}>
-          <ContainerComponent.Item style={{
-            flexGrow: 1
-          }}>
-            <hr
-              style={{
-                display: "inline-block",
-                width: "100%",
-              }}
-            ></hr>
-          </ContainerComponent.Item>
-          <ContainerComponent.Item>
-            <Text.MiddleLine style={{
-              width: '20%'
-            }}>
-              <Text.Subtitle
-                style={{
-                  display: "inline-block",
-                }}
-              >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "5px",
+          }}
+        >
+          <hr
+            style={{
+              flexGrow: 1,
+              height: "1px"
+            }}
+          ></hr>
+          <Text.RightLine>
+            <Text.MiddleLine>
+              <Text style={{ margin: '0 5px' }}>
                 Filter:
-              </Text.Subtitle>
-              <Text.MiddleLine>
-                <Text.Title
-                  style={{
-                    display: "inline-block",
-                    marginLeft: "2px",
-                  }}
-                >
-                  Top
-                </Text.Title>
-              </Text.MiddleLine>
+              </Text>
+              <Form.Select onChange={filterPost}>
+                <Form.Option value={0}>
+                  Most Recent
+                </Form.Option>
+                <Form.Option value={1}>
+                  Most Like
+                </Form.Option>
+              </Form.Select>
+              {/* <Dropdown component={<Text.MiddleLine>
+                Most Recent
+              </Text.MiddleLine>}>
+                <Dropdown.Option value={0}>
+                  Most Recent
+                </Dropdown.Option>
+                <Dropdown.Option value={1}>
+                  Most Like
+                </Dropdown.Option>
+              </Dropdown> */}
             </Text.MiddleLine>
-          </ContainerComponent.Item>
-        </ContainerComponent.Flex>
+          </Text.RightLine>
+        </div>
       </ContainerComponent.Inner>
     </ContainerComponent>
   );

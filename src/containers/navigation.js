@@ -6,6 +6,7 @@ import {
     IoLogoApple,
     IoSearchSharp,
 } from "react-icons/io5";
+import logo from '../assets/Logoidea2.jpg';
 
 
 import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
@@ -69,7 +70,8 @@ export default function Navigation() {
                             <Icon.CircleIcon onClick={() => navigate('/', {
                                 replace: true
                             })}>
-                                <IoLogoApple></IoLogoApple>
+                                {/* <IoLogoApple></IoLogoApple> */}
+                                <Icon.Image src={logo} alt={'logo'}></Icon.Image>
                             </Icon.CircleIcon>
                         </ContainerComponent.Item>
                         <ContainerComponent.Item>

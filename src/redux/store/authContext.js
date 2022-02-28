@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { createContext, useContext, useState, useEffect, useReducer } from 'react';
+import React, { createContext, useContext, useState, useEffect, useReducer, useCallback } from 'react';
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
@@ -17,7 +17,6 @@ export default function AuthenticationContext({ children }) {
   const [error, setError] = useState('');
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
-  console.log(REACT_APP_ENVIRONMENT);
   const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
 
   useEffect(() => {
@@ -25,7 +24,6 @@ export default function AuthenticationContext({ children }) {
       onLoadUser();
     }
     catch (error) {
-      console.log(error.message);
       setError(error.message);
     }
     // .then(() => {
@@ -78,6 +76,9 @@ export default function AuthenticationContext({ children }) {
       });
     })
   };
+  // const onLoadAccount = useCallback(() => {
+  //   return axios.get()
+  // }, [user])
   function login(data) {
     const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
@@ -94,7 +95,6 @@ export default function AuthenticationContext({ children }) {
           payload: res.data
         });
       }).then(end => {
-        console.log('load again');
         return onLoadUser();
       }).catch(error => setUser({
         type: actions.AUTHENTICATE_FAILED,
@@ -107,7 +107,6 @@ export default function AuthenticationContext({ children }) {
   //     cancelToken: cancelTokenSource.token
   //   })
   //     .then(res => {
-  //       // console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', res.data);
   //       localStorage.setItem('accessToken', res.data.accessToken);
   //       setUser({ ...res.data });
   //     }).catch(error => setUser({

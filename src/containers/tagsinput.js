@@ -31,7 +31,6 @@ export default function TagInput({ itemList, formField = [], setFormField }) {
     }));
     setOpenInput(true);
   }
-  console.log(formField, itemList);
 
   return (
     <ContainerComponent.Section className="tags_container"

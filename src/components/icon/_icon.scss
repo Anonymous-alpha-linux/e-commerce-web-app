@@ -1,24 +1,34 @@
 .icon {
-  &__circleIcon {
-    padding: 5px;
-    border-radius: 50%;
-    background-color: #fff;
-    color: #333;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 18px;
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 100%;
-  }
-  &__avatar {
-    padding: 0;
-    box-sizing: content-box;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    overflow: hidden;
-  }
+   &__circleIcon {
+      padding: 5px;
+      border-radius: 100%;
+      background-color: #fff;
+      color: #333;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 18px;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 100%;
+      overflow: hidden;
+   }
+   &__avatar {
+      padding: 0;
+      box-sizing: content-box;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      overflow: hidden;
+   }
+   &__badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      padding: 5px 10px;
+      border-radius: 50%;
+      background: red;
+      color: white;
+   }
 }

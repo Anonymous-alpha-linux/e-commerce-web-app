@@ -17,8 +17,10 @@ export default function PostForm() {
         }}>
         <ContainerComponent.Flex style={{ alignItems: 'center' }}>
             <ContainerComponent.Item>
-                <Icon.CircleIcon style={{ size: '15px', background: '#163d3c', color: '#fff' }}>
-                    <IoLogoApple></IoLogoApple>
+                <Icon.CircleIcon style={{ size: '15px', background: '#163d3c', color: '#fff', padding: 0, width: '55px', height: '55px' }}>
+                    <Icon.Image
+                        src={user.profileImage}
+                        alt='avatar'></Icon.Image>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item style={{

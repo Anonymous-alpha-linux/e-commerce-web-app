@@ -37,7 +37,7 @@ Text.Label = function ({ children, ...props }) {
 Text.Line = ({ children, ...props }) => {
   return <div className='text__line' {...props}>{children}</div>
 }
-Text.MiddleLine = ({ children, ...props }) => <span className='text__middleLine' {...props}>{children}</span>
+Text.MiddleLine = ({ children, ...props }) => <span {...props} className={`text__middleLine ${props.className}`}>{children}</span>
 Text.RightLine = ({ children, ...props }) => <div className='text__rightLine' {...props}>{children}</div>
 Text.CenterLine = ({ children, ...props }) => <span className='text__centerLine' {...props}>{children}</span>
 Text.Group = ({ children, ...props }) => <span className='text__group' {...props}>{children}</span>
@@ -45,6 +45,6 @@ Text.Middle = ({ children, ...props }) => {
   return <p className='text__middle' {...props}>{children}</p>
 }
 Text.Center = ({ children, ...props }) => <p className='text__center' {...props}>{children}</p>;
-Text.Bold = ({ children, ...props }) => <p className='text__bold' {...props}>{children}</p>
+Text.Bold = ({ children, ...props }) => <span className='text__bold' {...props}>{children}</span>
 Text.Camel = ({ children, ...props }) => <p className='text__camel' {...props}>{children}</p>
 Text.Link = ({ children, ...props }) => <a className='text__link' {...props}>{children}</a>
