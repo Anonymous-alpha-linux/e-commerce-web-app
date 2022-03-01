@@ -13,15 +13,23 @@ const postReducer = (state, action) => {
                 ...state,
                 posts: action.payload,
                 postLoading: false,
-                filter: action.filter,
+                filter: 0,
                 page: 0
             };
-        case actions.UPDATE_COMMENT:
-            const foundComment = state.posts.find(post => post._id === action.payload.postid).comment;
-            foundComment = action.payload
+        case actions.LOAD_MORE_POST:
+            console.log(!!action.payload.length);
             return {
                 ...state,
-                posts: state.posts
+                posts: action.payload.length ? state.posts.concat(action.payload) : state.posts,
+                page: action.payload.length ? state.page + 1 : state.page
+            };
+        case actions.FILTER_POST_LIST:
+            return {
+                ...state,
+                filter: action.filter,
+                postLoading: false,
+                posts: action.payload,
+                page: 0
             };
         case actions.UPDATE_SINGLE_POST:
             return {
@@ -32,6 +40,27 @@ const postReducer = (state, action) => {
                     }
                     return post;
                 })
+            };
+
+        case actions.GET_MY_POST:
+            return {
+                ...state,
+                myPosts: action.payload,
+                myPage: 0,
+                filter: 2
+            };
+        case actions.LOAD_MORE_MY_POST:
+            return {
+                ...state,
+                myPosts: action.payload.length ? state.myPosts.concat(action.payload) : state.myPosts,
+                myPage: action.payload.length ? state.myPage + 1 : state.myPage
+            };
+        case actions.FILTER_MY_POST:
+            return {
+                ...state,
+                myPosts: action.payload,
+                myPage: 0,
+                filter: action.filter
             };
         case actions.SET_LOADING:
             return {
@@ -48,24 +77,10 @@ const postReducer = (state, action) => {
                 ...state,
                 isUpdated: true
             };
-        case actions.LOAD_MORE_POST:
-            return {
-                ...state,
-                more: !!action.payload.length,
-                posts: action.payload.length ? state.posts.concat(action.payload) : state.posts,
-                page: action.payload.length ? state.page + 1 : state.page
-            };
         case actions.LOAD_MORE_PAGE:
             return {
                 ...state,
                 page: state.page + 1
-            };
-        case actions.LOAD_MY_POST:
-
-            return {
-                ...state,
-                myPosts: action.payload.length ? state.myPosts.concat(action.payload) : state.myPosts,
-                myPage: action.payload.length ? state.myPage + 1 : state.myPage,
             };
         default:
             return initialPostPage;
@@ -125,8 +140,9 @@ export default React.memo(function PostContext({ children }) {
     const [postAPI, host] = REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const cancelTokenSource = axios.CancelToken.source();
 
+    // 1. Post for workspace
     async function getPosts() {
-        setPost({
+        await setPost({
             type: actions.SET_LOADING
         });
         return axios.get(postAPI, {
@@ -143,7 +159,6 @@ export default React.memo(function PostContext({ children }) {
             return setPost({
                 type: actions.GET_POST_LIST,
                 payload: res.data.response,
-                filter: postState.filter
             });
         }).catch(error => {
             setPost({
@@ -152,8 +167,36 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         });
     }
+    function filterPost(filter) {
+        setPost({
+            type: actions.SET_LOADING
+        });
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: 0,
+                count: 3,
+                filter: filter
+            }
+        }).then(res => {
+            return setPost({
+                type: actions.FILTER_POST_LIST,
+                payload: res.data.response,
+                filter: filter
+            });
+        }).then(success => {
+            // console.log(postState);
+        }).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        });
+    }
     async function loadNextPosts(cb) {
-        if (!postState.more) return
         return axios.get(postAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -165,19 +208,117 @@ export default React.memo(function PostContext({ children }) {
                 filter: postState.filter
             }
         }).then(res => {
-
-            if (res.data.response.length) {
-                return setPost({
-                    type: actions.LOAD_MORE_POST,
-                    payload: res.data.response
-                });
-            }
-            return [];
+            return setPost({
+                type: actions.LOAD_MORE_POST,
+                payload: res.data.response
+            });
         }).then(success => {
             cb();
         }).catch(error => {
             setError(error.message);
         });
+    }
+    // 2. Posts for profile
+    function getOwnPosts(cb) {
+        setPost({
+            type: actions.SET_LOADING
+        });
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: 0,
+                count: 3,
+                filter: 2
+            }
+        }).then(res => setPost({
+            type: actions.GET_MY_POST,
+            payload: res.data.response
+        })).then(success => {
+            cb();
+        }).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        });
+    }
+    function filterMyPost(filter) {
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: 0,
+                count: 3,
+                filter: filter
+            }
+        }).then(res => {
+            return setPost({
+                type: actions.FILTER_MY_POST,
+                payload: res.data.response,
+                filter: filter
+            });
+        }).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        });
+    }
+    function loadMyNextPosts(cb) {
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'post',
+                page: postState.myPage + 1,
+                count: 3,
+                filter: postState.filter
+            }
+        }).then(res => setPost({
+            type: actions.LOAD_MORE_MY_POST,
+            payload: res.data.response
+        })).then(success => {
+            cb();
+        }).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        });
+    }
+
+    async function getPostComments(postId) {
+        setPost({
+            type: actions.SET_LOADING
+        });
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'comment',
+                postid: postId
+            }
+        }).then(res => {
+            return setPost({
+                type: actions.GET_COMMENT
+            })
+        }).then(success => {
+            return setPost({
+                type: actions.SET_OFF_LOADING
+            })
+        }).catch(error => {
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
+            setError(error.message);
+        })
     }
     async function loadNextPage(cb) {
         setPost({
@@ -185,6 +326,7 @@ export default React.memo(function PostContext({ children }) {
         });
         cb();
     }
+    // 3. Update a post 
     async function updateSinglePost(postId, cb) {
         setPost({
             type: actions.SET_LOADING
@@ -198,7 +340,6 @@ export default React.memo(function PostContext({ children }) {
                 postid: postId
             }
         }).then(res => {
-
             return setPost({
                 type: actions.UPDATE_SINGLE_POST,
                 payload: {
@@ -212,6 +353,89 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         })
     }
+
+    // 4. Thump-up, thump-down, comment 
+    function interactPost(postId, type, input, cb) {
+        // Set Loading for waiting post
+        setPost({
+            type: actions.SET_LOADING
+        });
+
+        if (type === 'rate') {
+            console.log(postId, type, input);
+            return axios.put(postAPI, {
+                isLiked: input.liked,
+                isDisliked: input.disliked
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                params: {
+                    view: 'post',
+                    postid: postId,
+                    interact: 'rate'
+                }
+            }).then(res => {
+                console.log(res);
+                return updateSinglePost(postId, cb);
+            }).catch(error => {
+                setPost({
+                    type: actions.SET_OFF_LOADING
+                });
+                setError(error.message);
+            })
+        }
+        else if (type === 'comment') {
+            console.log(postId, type, input);
+            return axios.post(postAPI, {
+                content: input.content,
+                private: input.private
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                params: {
+                    view: 'comment',
+                    postid: postId
+                }
+            }).then(res => {
+                return updateSinglePost(postId, cb);
+            }).then(success => {
+                cb();
+            }).catch(error => {
+                setPost({
+                    type: actions.SET_OFF_LOADING
+                });
+                setError(error.message);
+            });
+        }
+        else if (type === 'rate comment') {
+            console.log(postId, type, input);
+            return axios.put(postAPI, {
+                isLiked: input.liked,
+                isDisliked: input.disliked
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                params: {
+                    view: 'comment',
+                    commentid: input.commentId,
+                    interact: 'rate'
+                }
+            }).then(res => {
+                console.log(res);
+                return updateSinglePost(postId, cb);
+            }).catch(error => {
+                setPost({
+                    type: actions.SET_OFF_LOADING
+                });
+                setError(error.message);
+            })
+        }
+    }
+
+    // 5. Get the list of categories
     async function getPostCategories() {
         setCategory({
             type: actions.SET_LOADING
@@ -235,6 +459,8 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         })
     }
+
+    // 6. Post new Idea
     const postIdea = (input, cb, options = null) => {
         // Create form submission for post and upload files
         const formData = new FormData();
@@ -287,6 +513,7 @@ export default React.memo(function PostContext({ children }) {
             cb(res);
         }).catch(err => setError(err.message));
     }
+    // 7. Delete idea
     const removeIdea = (id) => {
         return axios.delete(postAPI, {
             headers: {
@@ -302,6 +529,8 @@ export default React.memo(function PostContext({ children }) {
             // cb(res);
         }).catch(error => setError(error.message));
     }
+
+    // 8. Plug-ins
     async function getFile(attachment, cb) {
         await axios.get(`${host}\\${attachment.filePath}`, {
             headers: {
@@ -315,135 +544,21 @@ export default React.memo(function PostContext({ children }) {
             type: attachment.fileType
         })).then(data => cb(data)).catch(error => setError(error.message));
     }
-    async function getPostComments(postId) {
-        setPost({
-            type: actions.SET_LOADING
-        });
 
-        return axios.get(postAPI, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-            },
-            params: {
-                view: 'comment',
-                postid: postId
-            }
-        }).then(res => {
-
-            return setPost({
-                type: actions.GET_COMMENT
-            })
-        }).then(success => {
-            return setPost({
-                type: actions.SET_OFF_LOADING
-            })
-        }).catch(error => {
-            setPost({
-                type: actions.SET_OFF_LOADING
-            });
-            setError(error.message);
-        })
-    }
-    function interactPost(postId, type = 'like', input, cb) {
-        // Set Loading for waiting post
-        setPost({
-            type: actions.SET_LOADING
-        });
-
-        if (type === 'like')
-            return axios.put(postAPI, {
-            }, {});
-        else if (type === 'dislike')
-            return axios.put(postAPI, {}, {});
-        else if (type === 'comment') {
-            console.log(input);
-            return axios.post(postAPI, {
-                content: input.content,
-                private: input.private
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                },
-                params: {
-                    view: 'comment',
-                    postid: postId
-                }
-            }).then(res => {
-                return updateSinglePost(postId, cb);
-            }).then(success => {
-                cb();
-            }).catch(error => {
-                setPost({
-                    type: actions.SET_OFF_LOADING
-                });
-                setError(error.message);
-            });
-        }
-    }
-    function filterPost(e) {
-        const filterValue = e.target.value;
-        return axios.get(postAPI, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-            },
-            params: {
-                view: 'post',
-                page: 0,
-                count: 3,
-                filter: filterValue
-            }
-        }).then(res => {
-            return setPost({
-                type: actions.GET_POST_LIST,
-                payload: res.data.response,
-                filter: filterValue
-            });
-        }).catch(error => {
-            setPost({
-                type: actions.SET_OFF_LOADING
-            });
-            setError(error.message);
-        });
-    }
-    async function getGzipFile() {
-    }
-    function getOwnPosts(cb) {
-        setPost({
-            type: actions.SET_LOADING
-        });
-        return axios.get(postAPI, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-            },
-            params: {
-                view: 'post',
-                page: postState.myPage,
-                count: 3,
-                filter: 2
-            }
-        }).then(res => setPost({
-            type: actions.LOAD_MY_POST,
-            payload: res.data.response
-        })).then(success => {
-            cb();
-        }).catch(error => {
-            setPost({
-                type: actions.SET_OFF_LOADING
-            });
-            setError(error.message);
-        });
+    function getGzipFile() {
     }
 
     useEffect(() => {
         getPosts();
         getPostCategories();
+
         return () => {
             cancelTokenSource.cancel();
         };
     }, [user, showUpdate]);
-    useEffect(() => {
-        console.log(postState)
-    }, [postState]);
+    // useEffect(() => {
+    //     console.log(postState)
+    // }, [postState]);
 
     const contextValues = {
         posts: postState.posts,
@@ -461,8 +576,10 @@ export default React.memo(function PostContext({ children }) {
         updateSinglePost,
         removeIdea,
         loadNextPosts,
+        loadMyNextPosts,
         loadNextPage,
         filterPost,
+        filterMyPost,
         interactPost,
         getGzipFile,
         getOwnPosts,

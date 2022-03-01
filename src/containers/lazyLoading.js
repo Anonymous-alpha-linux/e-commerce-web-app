@@ -50,7 +50,10 @@ export default function LazyLoading({ children, ...restProps }) {
         const childrens = children.ref.current?.childNodes;
         const lastChildren = childrens?.item(childrens.length - 1);
         setElement(lastChildren);
-    }, [children.ref.current, posts, myPosts]);
+    }, [children.ref.current,
+        posts,
+        myPosts
+    ]);
 
     useEffect(() => {
         if (element) {

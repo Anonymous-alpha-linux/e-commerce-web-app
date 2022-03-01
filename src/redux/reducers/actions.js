@@ -21,11 +21,14 @@ const actions = {
     DISLIKE_POST: 19,
     LOAD_MORE_POST: 20,
     LOAD_MORE_PAGE: 21,
-    LOAD_MY_POST: 22,
+    GET_MY_POST: 22,
     UPDATE_SINGLE_POST: 23,
     UPDATE_COMMENT: 24,
     ON_LOAD_MORE: 25,
-    OFF_LOAD_MORE: 26
+    OFF_LOAD_MORE: 26,
+    FILTER_MY_POST: 27,
+    FILTER_POST_LIST: 28,
+    LOAD_MORE_MY_POST: 29
 }
 
 export default actions;

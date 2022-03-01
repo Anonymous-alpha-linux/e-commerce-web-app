@@ -1,56 +1,63 @@
-import { useState, useEffect } from "react";
-import { Text } from "../components";
+import React, { useState, useEffect, useRef } from "react";
+import { Text, ContainerComponent, ButtonComponent } from "../components";
 
-export default function GridImage({ images }) {
+
+export default function GridPreview({ files }) {
     const [Rows, setRows] = useState([]);
+    const Images = useRef(files.filter((file) => file.fileType.includes('image')))
+    const otherFiles = useRef(files.some((file) => !file.fileType.includes(`image`)))
+
+    // images = ['linkImage']
+    const getRowColumn = () => {
+        if (Images.current.length <= 2) return [1, Images.current.length];
+        else if (Images.current.length >= 3) return [2, 2];
+    };
 
     useEffect(() => {
-        const getRowColumn = () => {
-            if (images.length <= 2) return [1, images.length];
-            else if (images.length >= 3) return [2, 2];
-        };
 
         let [numRow, numColumn] = getRowColumn();
-        let Rows = [];
-        for (let i = 0; i < numRow; i++) {
-            let columnItems = images.slice(
+        let rows = [];
+        if (Images.current.length > 0) for (let i = 0; i < numRow; i++) {
+            let columnItems = Images.current.slice(
                 i * numColumn,
                 i * numColumn + numColumn
             );
-            Rows.push(
+
+            rows.push(
                 <div className="grid_preview__row"
+                    key={i + 1}
                     style={{
                         display: `flex`,
                         gap: `5px`,
-                        height: `50%`,
+                        height: numRow > 1 ? `50%` : `100%`,
                     }}>
                     {columnItems.map((item, index) => {
                         return (
-                            <div
-                                key={Math.floor(Math.random() * 16777215).toString(16)}
+                            <div key={index + 1}
                                 className={
-                                    i == 1 && index == 1
+                                    i === 1 && index === 1
                                         ? `grid_preview__imgLeft`
                                         : `grid_preview__item`
                                 }
                                 style={{
                                     flex: `${100 / columnItems.length}%`,
-                                    marginTop: `5px`,
                                     verticalAlign: `middle`,
-                                    height: `100%`,
-                                }}
-                            >
-                                {i == 1 && index == 1 ? (
-                                    <Text.CenterLine>
-                                        ` + ${images.length - 3}`
-                                    </Text.CenterLine>
+                                    border: '1px solid #000',
+                                    position: 'relative',
+                                    filter: 'contrast(50%)',
+                                }}>
+                                {i === 1 && index === 1 ? (
+                                    <Text.AbsoluteMiddle>
+                                        <Text.CenterLine>
+                                            {`+ ${Images.current.length - 3}`}
+                                        </Text.CenterLine>
+                                    </Text.AbsoluteMiddle>
                                 ) : (
-                                    <img src={item.picture.medium}
-                                        styles={{
-                                            marginTop: `5px`,
-                                            verticalAlign: `middle`,
+                                    <img src={`${item.image}`}
+                                        alt={'post'}
+                                        style={{
                                             height: `100%`,
-                                        }} ></img>
+                                        }} />
                                 )}
                             </div>
                         );
@@ -58,20 +65,39 @@ export default function GridImage({ images }) {
                 </div>
             );
         }
-        setRows([...Rows]);
+        setRows([...rows]);
     }, []);
 
     return (
-        <div
-            className="grid_preview__container"
-            style={{
-                display: `flex`,
-                flexDirection: `column`,
-                width: `300px`,
-                height: `300px`,
-            }}
-        >
-            {Rows.map((row) => row)}
+        <div className="post_review__container" style={{
+            margin: `0 auto`,
+            display: `flex`,
+            flexDirection: `column`,
+            width: `100%`,
+            alignContent: `center`
+        }}>
+            {Rows.length > 0 && <ContainerComponent.Pane
+                className="grid_preview__container"
+                style={{
+                    display: `flex`,
+                    flexDirection: `column`,
+                    margin: '5px 0',
+                    gap: '5px',
+                    width: `100%`,
+                    height: otherFiles.current ? `250px` : `100%`
+                }}
+            >
+                {Rows.map((row) => row)}
+
+            </ContainerComponent.Pane>}
+            {otherFiles.current && <ButtonComponent.Upload className="upload_file" style={{
+                width: `100%`, height: `50px`, textAlign: `center`,
+                verticalAlign: `middle`, border: '1px dashed #000', position: 'relative'
+            }}>
+                <Text.AbsoluteMiddle>
+                    Uploaded File
+                </Text.AbsoluteMiddle>
+            </ButtonComponent.Upload>}
         </div>
     );
 }

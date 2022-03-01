@@ -16,7 +16,7 @@ ContainerComponent.Absolute = function ({ children, ...restProps }) {
     </div>
 }
 ContainerComponent.Flex = function ({ children, ...restProps }) {
-    return <div className='container__flex' {...restProps}>
+    return <div  {...restProps} className={`container__flex ${restProps.className}`}>
         {children}
     </div>
 }
