@@ -4,11 +4,12 @@ import { FaSearch} from 'react-icons/fa'
 export default function MessageContainer() {
   return (
     <Message style={{width:"100%"}}>
-          <ContainerComponent style={{ background: "#ffff",color:"black" }}>
+          <ContainerComponent style={{ background: "#ffff",color:"black",padding:"10px" }}>
             <ContainerComponent.Item style={{
                 display:"flex",
                 alignItems:"center",
-                justifyContent:"space-between"
+                justifyContent:"space-between",
+                marginBottom:"10px"
                 }}>
                     <Text.Title style={{fontSize:"18px"}}>CHAT</Text.Title>
                     <ButtonComponent style={{display:"flex",backgroundColor:"silver",padding:"7px",borderRadius:"10px"}}>
@@ -17,22 +18,21 @@ export default function MessageContainer() {
                     </ButtonComponent>
             </ContainerComponent.Item>
             {/* Search Form */}
-            <ContainerComponent.Item>
+            <ContainerComponent.Item style={{marginBottom:"5px"}}>
                 <Message.SearchForm 
                 style={{ display: "flex",
                 justifyContent:"center",
                 alignItems:"center",
                 border:"1px solid black",
-                borderRadius:"10px",
-                padding:"5px"
+                borderRadius:"25px",
+                padding:"3px"
                  }}>
-                    <Icon style={{height:"fix-content",padding:"2px",display:"flex",alignItems:"center"}}>
+                    <Icon style={{height:"fix-content",paddingLeft:"10px",display:"flex",alignItems:"center"}}>
                         <FaSearch style={{fontSize:"16px"}}></FaSearch>
                     </Icon>
                     <Form.Input
                     style={{
                         width:"100%",
-                        marginLeft:"5px",
                         border:"none",
                         outline:"none"
                     }}
@@ -68,7 +68,7 @@ export default function MessageContainer() {
                               <Text.Paragraph style={{ margin: 0 }}>This is my chat</Text.Paragraph>
                           </ContainerComponent.Item>
                       </ContainerComponent.Flex>
-                      <ContainerComponent.Flex style={{ height: "50px", alignItems:"DmC6bBayWirRCzLX4dhwOEt5d6w5aJvuQOiLcORN8ZCaxeGAQttCRIEQRAEQRAEQRAEQRAEQRAEQRAEQRAEQRAEQWDnP" }}>
+                      <ContainerComponent.Flex style={{ height: "50px", alignItems: "center" }}>
                           <ContainerComponent.Item style={{ borderRadius: "50%", padding: "0", height: "fit-content" }}>
                               <Preview.Images style={{
                                   borderRadius: "50%",

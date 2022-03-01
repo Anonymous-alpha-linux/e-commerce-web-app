@@ -5,8 +5,7 @@
   max-width: 320px;
   min-width: 310px;
   padding: 10px;
-  text
-  &__container {
+  text &__container {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -57,6 +56,8 @@
     border-radius: 10px;
   }
   &__checkbox {
+    width: 18px;
+    height: 18px;
   }
   &__select {
     color: #444;

@@ -4,15 +4,15 @@ import { FaSearch } from 'react-icons/fa'
 
 export default function AddGroupContainer() {
   return (
-      <ContainerComponent style={{width:"100vw",height:"100vh"}}>
-        <ContainerComponent.Inner>
+      <ContainerComponent style={{ width: "100vw", height: "100vh", background:"#A9C39E"}}>
+        <ContainerComponent.Inner style={{padding:"10px",display:"flex",flexDirection:"column",height:"100%"}}>
             <ContainerComponent.Flex style={{justifyContent:"space-between",padding:"10px"}}>
                 <Form.Button style={{border:"none"}}>Back</Form.Button>
                 <Form.Button style={{ wordWrap:"break-word",border:"none"}}>Add Member</Form.Button>
             </ContainerComponent.Flex>
             {/* group Name */}
             <ContainerComponent.Item style={{position:"relative"}}>
-                <Form.Input placeholder="Group Name" style={{padding:"4px",width:"96%"}} ></Form.Input>
+                <Form.Input placeholder="Group Name" style={{padding:"8px 10px",width:"100%",borderRadius:"5px",border:"none"}} ></Form.Input>
             </ContainerComponent.Item>
             {/* SearchForm */}
             <ContainerComponent.Item>
@@ -21,9 +21,9 @@ export default function AddGroupContainer() {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        border: "1px solid black",
-                        borderRadius: "10px",
-                        padding: "5px"
+                        borderRadius: "25px",
+                        padding: "2px 2px 2px 10px",
+                        background:"white"
                     }}>
                     <Icon style={{ height: "fix-content", padding: "2px", display: "flex", alignItems: "center" }}>
                         <FaSearch style={{ fontSize: "16px" }}></FaSearch>
@@ -32,7 +32,6 @@ export default function AddGroupContainer() {
                         placeholder="Search"
                         style={{
                             width: "100%",
-                            marginLeft: "5px",
                             border: "none",
                             outline: "none"
                         }}
@@ -40,16 +39,17 @@ export default function AddGroupContainer() {
                 </Message.SearchForm>
             </ContainerComponent.Item>
             {/* List Members */}
-            <ContainerComponent.Item>
+            <ContainerComponent.Item style={{marginTop:"10px"}}>
                       <ContainerComponent.Inner 
                       style={{
                       color:"black",
                       padding:"10px",
                       background:'white',
-                      height:"500px"
+                      height:"580px",
+                      borderRadius:"5px"
                     }}>
                     <ContainerComponent.Inner style={{height:"50px",display:"flex",justifyContent:"space-between",flexGrow:"1"}}>
-                          <ContainerComponent.Pane style={{display:"flex",alignItems:"center"}}>
+                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center", gap: "5px"}}>
                             <ContainerComponent.Item 
                                 style={{ padding: "0",
                                 height: "fit-content",
@@ -70,7 +70,7 @@ export default function AddGroupContainer() {
                         </ContainerComponent.Flex>
                     </ContainerComponent.Inner>
                       <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
-                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
+                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center",gap:"5px" }}>
                               <ContainerComponent.Item
                                   style={{
                                       padding: "0",
@@ -92,7 +92,7 @@ export default function AddGroupContainer() {
                           </ContainerComponent.Flex>
                       </ContainerComponent.Inner>
                       <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
-                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
+                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                               <ContainerComponent.Item
                                   style={{
                                       padding: "0",
@@ -114,7 +114,7 @@ export default function AddGroupContainer() {
                           </ContainerComponent.Flex>
                       </ContainerComponent.Inner>
                       <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
-                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
+                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                               <ContainerComponent.Item
                                   style={{
                                       padding: "0",
@@ -136,7 +136,7 @@ export default function AddGroupContainer() {
                           </ContainerComponent.Flex>
                       </ContainerComponent.Inner>
                       <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
-                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
+                          <ContainerComponent.Pane style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                               <ContainerComponent.Item
                                   style={{
                                       padding: "0",
@@ -160,8 +160,8 @@ export default function AddGroupContainer() {
                       </ContainerComponent.Inner>
             </ContainerComponent.Item>
             {/* Button */}
-            <ContainerComponent.Item style={{textAlign:'center'}}>
-                <Form.Button style={{padding:"5px",borderRadius:'15px',background:"white",color:"black"}}>Submit</Form.Button>
+            <ContainerComponent.Item style={{flexGrow:"1",display:"flex",justifyContent:"center",alignItems:"center"}}>
+                <Form.Button style={{padding:"5px 10px",borderRadius:'15px',background:"white",color:"black"}}>Submit</Form.Button>
             </ContainerComponent.Item>
         </ContainerComponent.Inner>
         
