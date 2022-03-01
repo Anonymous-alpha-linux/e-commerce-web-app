@@ -1,199 +1,254 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ButtonComponent, ContainerComponent, Form, Icon, MessageBox, Text } from '../components';
-import ConditionContainer from './condition';
-import { useAuthorizationContext } from '../redux';
+import { ConditionContainer, UploadForm } from '.';
+// import ConditionContainer from './condition';
+// import UploadForm from './uploadpreview';
+import { useAuthorizationContext, usePostContext } from '../redux';
 import { mainAPI } from '../config';
-import UploadForm from './uploadpreview';
 
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Loading } from '../pages';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from './tagsinput';
 
-export default function PostModal({ setOpenModal }) {
+export default function PostModal({
+    // setOpenModal
+}) {
     const [input, setInput] = useState({
         content: '',
         private: false,
         condition: false,
-        categories: []
-    })
-    const [files, setFiles] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [rerender, setRerender] = useState(false);
+        categories: [],
+        files: [],
+    });
+    const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
-    const [openCondition, setOpenCondition] = React.useState(false);
-    const { user } = useAuthorizationContext();
+    const [openCondition, setOpenCondition] = useState(false);
+
+    const privateChecked = useRef(null);
+    const checkedCondition = useRef();
+
+
+
     const navigate = useNavigate();
+    const { id } = useParams();
+    const { user, getSocket } = useAuthorizationContext();
+    const { posts, categories, postLoading, categoryLoading,
+        getFile, postIdea, setShowUpdate } = usePostContext();
 
-    const staffURL = mainAPI.CLOUD_API_STAFF;
+    console.log(posts, categories);
 
-    const validateFile = (file) => {
-        const imageRegex = new RegExp("image/*");
-        if (imageRegex.test(file.type))
-            return "image";
-        return "others";
+    const { REACT_APP_ENVIRONMENT } = process.env;
+    const [staffURL, host] = REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+
+    const isOverflowFile = (currentFileList, fileSize) => {
+        const currentSize = currentFileList.reduce((prev, file) => {
+            return prev + file.size / 1024;
+        }, 0);
+
+        return currentSize + fileSize > 50000;
+    };
+    const editHandler = (e) => {
+        e.preventDefault();
+        postIdea(input, res => {
+            // console.log(res);
+            navigate('/');
+        }, {
+            isEdit: true,
+            id: id,
+        })
     }
     const submitHandler = (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        const headers = {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${user.accessToken}`
-        };
-        files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
-            formData.append("files", file);
-        })
-        Object.keys(input).forEach(key => {
-            if (Array.isArray(input[key])) {
-                input[key].forEach(item => {
-                    formData.append(key, item);
-                })
-                return;
-            }
-            formData.append(key, input[key]);
-        })
-        console.log(formData);
-        axios.post(`${staffURL}?view=post`, formData, {
-            headers: headers
-        })
-            .then(res => {
-                window.location.reload();
+        if (checkedCondition.current.checked) {
+            postIdea(input, res => {
+                // console.log(res);
+                setShowUpdate(o => !o);
+                navigate('/');
             })
-            .catch(err => setError(err.message));
-    }
+        }
+        else {
+            setError('Please checked our terms and condition');
+        }
+        // const formData = new FormData();
+        // input.files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
+        //     formData.append("files", file);
+        // });
+        // Object.keys(input).forEach(key => {
+        //     if (Array.isArray(input[key])) {
+        //         input[key].forEach(item => {
+        //             formData.append(key, item);
+        //         })
+        //         return;
+        //     }
+        //     formData.append(key, JSON.stringify(input[key]));
+        // })
+        // return axios.post(staffURL, formData, {
+        //     headers: {
+        //         'Content-Type': 'multipart/form-data',
+        //         'Authorization': `Bearer ${user.accessToken}`
+        //     },
+        //     params: {
+        //         view: 'post'
+        //     }
+        // }).then(res => {
+        //     // getSocket().emit("notify post", {
+        //     //     postId: res.data.postId,
+        //     //     postURL: `/post/${res.data.postId}`
+        //     // });
+        //     navigate('/');
+        // }).catch(err => setError(err.message));
+    };
     const inputHandler = (e) => {
         setInput(input => ({
             ...input,
             [e.target.name]: e.target.value,
-        }))
-    }
+        }));
+    };
     const checkedHandler = (e) => {
         setInput(input => ({
             ...input,
             [e.target.name]: e.target.checked,
         }))
+    };
+    const pushInputHandler = (e) => {
+        const filter = Array.from(e.target.files).map(file => {
+            let size = file.size / 1024;
+            if (isOverflowFile(input.files, size)) {
+                alert("File size is overflow");
+                setError("File size is overflow");
+                return;
+            }
+            return file;
+        }).filter(file => file);
+
+        setInput(input => {
+            return {
+                ...input,
+                files: [...input.files, ...filter]
+            };
+        });
+    };
+    const eliminateFile = (id) => {
+        setInput(input => ({
+            ...input,
+            files: input.files.filter((file, index) => id !== index)
+        }));
     }
 
     useEffect(() => {
-        const categoryURL = `${staffURL}?view=category`;
-        axios.get(categoryURL, {
-            headers: {
-                'Authorization': `Bearer ${user.accessToken}`
-            }
-        }).then(res => setCategories(res.data.category))
-            .catch(error => setError(error.message));
-    }, [])
+        // console.log(posts);
+        if (id) {
+            const { attachment, category, content, hideAuthor } = posts.find(post => post._id === id);
+            console.log(attachment);
+            attachment.forEach(attach => {
+                getFile(attach, file => {
+                    setInput({
+                        ...input,
+                        content: content,
+                        private: hideAuthor,
+                        categories: category.map(single => single._id),
+                        files: [...input.files, file]
+                    });
+                }).then(f => {
+                    setLoading(false);
+                });
+            });
+        }
+        else
+            setLoading(false);
+    }, []);
 
-    useEffect(() => {
-        setTimeout(() => {
-            setError('');
-        }, 3000)
-        setTimeout(() => {
-            setMessage('');
-        }, 3000)
-        setFiles(files => {
-            files.forEach((file, index) => {
-                const fileReader = new FileReader();
-                if (validateFile(file.file) === 'image') {
+    // console.log(postLoading, categoryLoading, loading, id);
+    if (postLoading || categoryLoading || loading) return <Loading></Loading>
 
-                    fileReader.readAsDataURL(file.file);
-                    fileReader.onload = () => {
-
-                        const updateFileObject = Object.assign({}, {
-                            ...file,
-                            image: fileReader.result
-                        });
-                        files.splice(index, 1, updateFileObject);
-                        setRerender(rerender => !rerender);
-                    }
-                    fileReader.onabort = () => {
-                        alert("Failed to read file", fileReader.abort);
-                    }
-                    fileReader.onerror = () => {
-                        alert("Failed to read file", fileReader.error);
-                    }
-                }
-            })
-            return files;
-        })
-    }, [files]);
-
-    return <ContainerComponent.Section className="postModal__container" style={{
-        position: 'fixed',
-        top: '50px',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        zIndex: 10000,
-        padding: '10px',
-        background: '#fff',
-        overflowY: 'scroll',
-        paddingBottom: '50px'
-    }}>
+    return <ContainerComponent.Section className="postModal__container">
         <Form encType='multipart/form-data'
             method={'POST'}
-            onSubmit={submitHandler}
-            style={{
-                borderRadius: '20px',
-                background: '#fff',
-            }}>
-            <Text.Line onClick={() => setOpenModal(modal => !modal)}>
-                <Text.MiddleLine>
-                    <Icon style={{ display: 'inline' }}>
-                        <FaChevronLeft></FaChevronLeft>
-                    </Icon>
-                </Text.MiddleLine>
-                <Text.Middle style={{
-                    verticalAlign: 'text-top'
+            onSubmit={(e) => {
+                if (id)
+                    editHandler(e);
+                else
+                    submitHandler(e)
+            }}
+            className="postModal__form">
+            <Text.Line className="postModal__header">
+                <Text.MiddleLine onClick={() => {
+                    // setOpenModal(modal => !modal);
+                    navigate('/');
                 }}>
-                    Back
-                </Text.Middle>
+                    <Text.MiddleLine>
+                        <Icon style={{ display: 'inline' }}>
+                            <FaChevronLeft></FaChevronLeft>
+                        </Icon>
+                    </Text.MiddleLine>
+                    <Text.Middle style={{
+                        verticalAlign: 'text-top'
+                    }}>
+                        Back
+                    </Text.Middle>
+                </Text.MiddleLine>
+                <Text.RightLine
+                    style={{
+                        width: '80%',
+                        display: 'inline-block'
+                    }}>
+                    <Text.Title style={{
+                        textAlign: 'right',
+                    }}>Post Modal</Text.Title>
+                </Text.RightLine>
+
             </Text.Line>
-            <Text.Title style={{
-                textAlign: 'right'
-            }}>Post Modal</Text.Title>
-            <Text.Label>Author name: <Text.MiddleLine>
-                <Text.Bold>{user.account}</Text.Bold>
-            </Text.MiddleLine>
-            </Text.Label>
+            <Text.Line style={{ margin: '15px 0' }}>
+                <Text.MiddleLine>
+                    <Text.Label className="postModal__label">
+                        Author name:
+                    </Text.Label>
+                </Text.MiddleLine>
+                <Text.MiddleLine>
+                    <Text.Bold>{!input.private ? user.account : 'Anonymous'}</Text.Bold>
+                </Text.MiddleLine>
+                <Text.RightLine>
+                    <ButtonComponent.Toggle
+                        onText="Hide"
+                        offText="Show"
+                        id="private"
+                        name="private"
+                        value={input.private}
+                        onChange={checkedHandler}
+                        ref={privateChecked}></ButtonComponent.Toggle>
+                </Text.RightLine>
+            </Text.Line>
             <Form.TextArea
                 id='content'
                 name='content'
                 onChange={inputHandler}
+                value={input.content}
                 style={{
                     width: '100%',
                     height: '100px'
                 }}
             ></Form.TextArea>
-            <Text.Line>
+            <Text.Line className="postModal__category">
                 <TagInput itemList={categories}
                     formField={input.categories}
                     setFormField={setInput}></TagInput>
             </Text.Line>
-            <Text.Line>
-                <Text.Middle>
-                    <Form.Checkbox name='private'
-                        id='private'
-                        onChange={checkedHandler}
-                    ></Form.Checkbox>
-                </Text.Middle>
-                <Text.MiddleLine>
-                    <Text.Subtitle>
-                        Private Post
-                    </Text.Subtitle>
-                </Text.MiddleLine>
-            </Text.Line>
-            <ContainerComponent.Pane className="upload__input" style={{
-                padding: '10px 0'
-            }}>
-                <UploadForm files={files} setFiles={setFiles}></UploadForm>
+            <ContainerComponent.Pane className="upload__input"
+                style={{
+                    padding: '10px 0'
+                }}>
+                <UploadForm files={input.files}
+                    eliminateFile={eliminateFile}
+                    setFiles={pushInputHandler}></UploadForm>
             </ContainerComponent.Pane>
-            <Text.Line>
+            <Text.Line className="postModal__conditional">
                 <Text.MiddleLine>
                     <Form.Checkbox id='condition'
                         name='condition'
                         onChange={checkedHandler}
+                        ref={checkedCondition}
                     ></Form.Checkbox>
                 </Text.MiddleLine>
                 <Text.MiddleLine>
@@ -202,10 +257,10 @@ export default function PostModal({ setOpenModal }) {
                         style={{
                             color: 'blue',
                             margin: '0'
-                        }}
-                    >Condition and Term</Text.Paragraph>
+                        }}>Condition and Term</Text.Paragraph>
                 </Text.MiddleLine>
             </Text.Line>
+
             {openCondition && <ConditionContainer closeCondition={() => setOpenCondition(false)}></ConditionContainer>}
             {message && <MessageBox.TextMessage>
                 {message}
@@ -213,7 +268,11 @@ export default function PostModal({ setOpenModal }) {
             {error && <MessageBox.TextMessage>
                 {error}
             </MessageBox.TextMessage>}
-            <Form.Input type='submit' value={'Submit'}></Form.Input>
+            {/* {id && <Form.Input type='hidden'
+                name="id"
+                id="id"
+                value={id}></Form.Input>} */}
+            <Form.Input type='submit' value={id ? 'Edit' : 'Submit'}></Form.Input>
         </Form>
     </ContainerComponent.Section>
 }

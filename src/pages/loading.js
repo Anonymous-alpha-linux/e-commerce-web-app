@@ -5,8 +5,16 @@ import { Loader } from '../containers'
 const Loading = React.memo(() => {
   return (
     <ContainerComponent>
-      <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
-      <Loader></Loader>
+      <ContainerComponent.BackDrop>
+        <ContainerComponent.Inner style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%,-50%)',
+        }}>
+          <Loader></Loader>
+        </ContainerComponent.Inner>
+      </ContainerComponent.BackDrop>
     </ContainerComponent>
   );
 });

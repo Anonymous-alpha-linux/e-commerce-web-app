@@ -22,7 +22,8 @@ const ForgotPassword = () => {
     return (
         <>
             <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
-            <Form method={'POST'}
+            <Form
+                method={'POST'}
                 onSubmit={submitHandler}
                 style={{
                     position: 'absolute',
@@ -44,14 +45,15 @@ const ForgotPassword = () => {
                         onChange={inputHandler}
                         placeholder="Input Your Email"
                     ></Form.Input>
-                    <Form.Button
+                    <Form.Input
+                        type='submit'
                         style={{
                             background: 'black',
                             color: '#fff'
                         }}
+                        value="submit"
                     >
-                        submit
-                    </Form.Button>
+                    </Form.Input>
                 </Form.Container>
             </Form>
         </>

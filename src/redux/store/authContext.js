@@ -1,142 +1,139 @@
 import axios from 'axios';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useReducer, useCallback } from 'react';
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
+import { unstable_batchedUpdates } from 'react-dom'
+import actions from '../reducers/actions';
+import { authReducer, initialAuth } from '../reducers';
 
 const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
-  const [socket, setSocket] = useState(null);
-  const [user, setUser] = useState({
-    accessToken: localStorage.getItem('accessToken') || 'a.b.c',
-  });
-  const [workspace, setWorkspace] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { REACT_APP_ENVIRONMENT } = process.env;
+  const [user, setUser] = useReducer(authReducer, initialAuth);
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
+  const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
 
   useEffect(() => {
-    auth().then(() => {
-      setLoading(true);
-      const socketHost = mainAPI.CLOUD_HOST;
-      // const socketHost = mainAPI.LOCALHOST_HOST;
-      const socket = io(socketHost, {
-        auth: {
-          accessToken: user.accessToken
-        }
-      }).on("join", (msg) => {
-        console.log(msg);
-        setSocket(socket);
-      }).on("connect_error", err => {
-        console.log(err.message);
-        socket.disconnect();
-      });
-    }).finally(() => {
-      setLoading(false);
-    })
+    try {
+      onLoadUser();
+    }
+    catch (error) {
+      setError(error.message);
+    }
+    // .then(() => {
+    //   setLoading(true);
+    //   // const socketHost = mainAPI.CLOUD_HOST;
+    //   const socketHost = mainAPI.LOCALHOST_HOST;
+    //   const socket = io(socketHost, {
+    //     auth: {
+    //       accessToken: user.accessToken
+    //     }
+    //   }).on("join", (msg) => {
+    //     console.log(msg);
+    //     setSocket(socket);
+    //   }).on("connect_error", err => {
+    //     setError(err.message);
+    //     socket.disconnect();
+    //   });
+    // })
+    // .finally(() => {
+    //   setLoading(false);
+    // });
     return () => {
       cancelTokenSource.cancel();
-      socket.disconnect();
     };
   }, []);
 
-  useEffect(() => {
-    console.log(workspace)
-  }, [workspace]);
-
-  const auth = async () => {
-    const authApi = mainAPI.CLOUD_API_AUTH;
-    // const authApi = mainAPI.LOCALHOST_AUTH;
-
+  const getSocket = () => {
+    if (!socket) {
+      throw new Error("Socket cannot be accessible!");
+    }
+    return socket;
+  };
+  const onLoadUser = () => {
     return axios.get(authApi, {
       cancelToken: cancelTokenSource.token,
       headers: {
-        'Authorization': `Bearer ${user.accessToken}`
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       }
     }).then(response => {
       setUser({
-        ...response.data
-      })
+        type: actions.AUTHENTICATE_ACTION,
+        payload: response.data,
+      });
     }).catch(error => {
-      setError(error.message);
+      unstable_batchedUpdates(() => {
+        setUser({
+          type: actions.AUTHENTICATE_FAILED,
+        });
+        setError(error.message);
+      });
     })
   };
   function login(data) {
-    // const loginApi = mainAPI.LOCALHOST_LOGIN;
-    const loginApi = mainAPI.CLOUD_API_LOGIN;
-
+    const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
-      data,
-      {
-        cancelToken: cancelTokenSource.token,
-        headers: {
-          'Authorization': `Bearer ${user.accessToken}`
-        }
-      }).then(res => {
-        localStorage.setItem('accessToken', res.data.accessToken);
-        setUser({
-          ...res.data
-        });
-      }).catch(error => setError(error.message));
-  };
-  const register = async (data) => {
-    const registerApi = mainAPI.CLOUD_API_REGISTER;
-    // const registerApi = mainAPI.LOCALHOST_REGISTER;
-    return axios.post(registerApi, { ...data }, {
+      data, {
       cancelToken: cancelTokenSource.token
-    })
-      .then(res => {
-        // console.log('get response from', mainAPI.LOCALHOST_REGISTER || mainAPI.CLOUD_API_REGISTER, 'response data from register', res.data);
-        localStorage.setItem('accessToken', res.data.accessToken);
-        setUser({ ...res.data });
-      }).catch(error => setError(error.message));
-  }
-  const logout = React.useCallback(async function () {
-    try {
-      const logoutApi = mainAPI.CLOUD_API_LOGOUT;
-      // const lgoutApi = mainAPI.LOCALHOST_LOGOUT;
-
-      return axios.get(logoutApi, {
+    }).then(res => {
+      localStorage.setItem('accessToken', res.data.accessToken);
+      return onLoadUser();
+    }).catch(error => setUser({
+      type: actions.AUTHENTICATE_FAILED,
+    }));
+  };
+  // const register = async (data) => {
+  //   const registerApi = mainAPI.CLOUD_API_REGISTER;
+  //   // const registerApi = mainAPI.LOCALHOST_REGISTER;
+  //   return axios.post(registerApi, { ...data }, {
+  //     cancelToken: cancelTokenSource.token
+  //   })
+  //     .then(res => {
+  //       localStorage.setItem('accessToken', res.data.accessToken);
+  //       setUser({ ...res.data });
+  //     }).catch(error => setUser({
+  //       type: actions.ERROR_ACTION,
+  //       error: error.message
+  //     }));
+  // };
+  async function logout() {
+    const logoutApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGOUT : mainAPI.CLOUD_API_LOGOUT;
+    return axios
+      .get(logoutApi, {
         cancelToken: cancelTokenSource.token
       })
-        .then(res => {
-          localStorage.removeItem('accessToken');
-          setUser(res.data);
-        })
-    } catch (err) {
-      setLoading(false);
-      setError(err.message);
-    }
-    finally {
-      setLoading(false);
-    }
-  }, [user]);
+      .then(res => {
+        localStorage.clear();
+        setUser({
+          type: actions.LOGOUT_ACTION,
+        });
+      }).catch(error => setError(error.message));
+  }
 
-  if (loading) return <Loading></Loading>
+  if (user.authLoading) return <Loading className="auth__loading"></Loading>
 
   return (
     <AuthenticationContextAPI.Provider value={{
-      loading,
+      loading: user.authLoading,
       user,
-      socket,
+      message,
+      error,
       cancelTokenSource,
-      workspace,
-      setWorkspace,
-      setSocket,
+      getSocket,
       login,
       logout,
-      register,
-      setError,
-      setMessage,
-      setLoading,
-      setUser,
     }}>
       {children}
     </AuthenticationContextAPI.Provider>
-  )
+  );
 }
+
 export const useAuthorizationContext = () => {
   return useContext(AuthenticationContextAPI);
 }

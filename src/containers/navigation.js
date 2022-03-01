@@ -1,31 +1,32 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-
-import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
-import NavData from "../fixtures/nav-links.json";
-import navigators from "../fixtures/navigator";
-import { useAuthorizationContext } from "../redux";
-
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineMessage } from "react-icons/ai";
 import {
     IoNotificationsOutline,
-    IoLogoApple,
     IoSearchSharp,
 } from "react-icons/io5";
+import logo from '../assets/Logoidea2.jpg';
+
+
+import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
+import navigators from "../fixtures/navigator";
+import navData from '../fixtures/nav-links';
+import { useAuthorizationContext } from "../redux";
 import { BsList } from "react-icons/bs";
-import ConditionContainer from "./condition";
-import NotificationContainer from "./notification";
+// import NotificationContainer from "./notification";
+// import { MessageBoxContainer, MessageContainer } from ".";
 
 export default function Navigation() {
-    const useAuth = useAuthorizationContext();
     const [screenColumn, setScreenColumn] = React.useState(2);
     const [openNavigator, setOpenNavigator] = React.useState(false);
-    const [openNotification, setOpenNotification] = React.useState(false);
+    const navigate = useNavigate();
+    // const [openNotification, setOpenNotification] = React.useState(false);
+    // const [openMessage, setOpenMessage] = useState(false);
+
 
     const responsiveHandler = () => {
         const { width } = window.screen;
-
-        if (width <= 480) {
+        if (width <= 650) {
             setScreenColumn(2);
         } else {
             setScreenColumn(3);
@@ -42,6 +43,11 @@ export default function Navigation() {
         };
     }, [window.screen.width]);
 
+    // const openHome = () => {
+    //     setOpenMessage(false);
+    //     setOpenNotification(false);
+    // }
+
     return (
         <ContainerComponent
             className="navigation__container"
@@ -53,7 +59,7 @@ export default function Navigation() {
                 zIndex: 100,
             }}
         >
-            <ContainerComponent.Grid columns={screenColumn}>
+            <ContainerComponent.Flex className="navigation__grid" columns={screenColumn}>
                 <ContainerComponent.Item>
                     <ContainerComponent.Flex
                         style={{
@@ -61,12 +67,15 @@ export default function Navigation() {
                         }}
                     >
                         <ContainerComponent.Item>
-                            <Icon.CircleIcon>
-                                <IoLogoApple></IoLogoApple>
+                            <Icon.CircleIcon onClick={() => navigate('/', {
+                                replace: true
+                            })}>
+                                {/* <IoLogoApple></IoLogoApple> */}
+                                <Icon.Image src={logo} alt={'logo'}></Icon.Image>
                             </Icon.CircleIcon>
                         </ContainerComponent.Item>
                         <ContainerComponent.Item>
-                            <Text
+                            <Link to="/portal/search"
                                 style={{
                                     paddingLeft: "0",
                                     color: "#fff",
@@ -77,38 +86,46 @@ export default function Navigation() {
                                 }}
                             >
                                 <IoSearchSharp></IoSearchSharp>
-                            </Text>
+                            </Link>
                         </ContainerComponent.Item>
                     </ContainerComponent.Flex>
                 </ContainerComponent.Item>
                 {screenColumn > 2 && (
-                    <ContainerComponent.Item>
-                        {/* <ContainerComponent.MiddleInner>
-                    <ContainerComponent.Flex>
-                        {NavData.map((link, index) => {
-                            return <ContainerComponent.Link
-                                key={index + 1}
-                                path={link.path}>
-                                {link.name}
-                            </ContainerComponent.Link>
-                        })}
-                    </ContainerComponent.Flex>
-                </ContainerComponent.MiddleInner> */}
+                    <ContainerComponent.Item style={{ color: '#fff' }}>
+                        <ContainerComponent.MiddleInner>
+                            <ContainerComponent.Flex>
+                                {navData.map((link, index) => {
+                                    return <ContainerComponent.Item key={index + 1}>
+                                        <Link
+                                            to={link.path}
+                                            style={{ color: '#fff' }}>
+                                            <Text.MiddleLine style={{ marginRight: '5px' }}>
+                                                <Icon>{link.icon}</Icon>
+                                            </Text.MiddleLine>
+                                            <Text>
+                                                {link.name}
+                                            </Text>
+                                        </Link>
+                                    </ContainerComponent.Item>
+                                })}
+                            </ContainerComponent.Flex>
+                        </ContainerComponent.MiddleInner>
                     </ContainerComponent.Item>
                 )}
                 <ContainerComponent.Item>
                     <AuthStatus
                         screenColumn={screenColumn}
                         openNavigator={() => setOpenNavigator(true)}
-                        setOpenNotification={setOpenNotification}
-                        openNotification={openNotification}
+                    // openNotification={() => setOpenNotification(true)}
+                    // openMessage={() => setOpenMessage(true)}
                     ></AuthStatus>
                 </ContainerComponent.Item>
-            </ContainerComponent.Grid>
+            </ContainerComponent.Flex>
             {openNavigator && (
                 <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
             )}
-            {openNotification && (<NotificationContainer></NotificationContainer>)}
+            {/* {openMessage && <MessageContainer></MessageContainer>}
+            {openNotification && (<NotificationContainer></NotificationContainer>)} */}
         </ContainerComponent>
     );
 }
@@ -116,6 +133,7 @@ export default function Navigation() {
 const Navigator = ({ closeNavigator }) => {
     return (
         <ContainerComponent
+            className="navigator__container"
             style={{
                 position: "fixed",
                 bottom: 0,
@@ -125,25 +143,28 @@ const Navigator = ({ closeNavigator }) => {
                 background: "#333",
                 color: "#fff",
                 padding: "10px",
-            }}
-        >
+            }}>
             <ContainerComponent.BackDrop
                 onClick={closeNavigator}
             ></ContainerComponent.BackDrop>
             <ContainerComponent.GridThreeColumns>
                 {navigators.map((navigate, index) => (
-                    <ContainerComponent.Item key={index + 1}>
-                        <ContainerComponent.MiddleInner>
-                            <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
-                            <Icon.Label
-                                style={{
-                                    fontWeight: "bold",
-                                    textTransform: "capitalize",
-                                }}
-                            >
-                                {navigate.label}
-                            </Icon.Label>
-                        </ContainerComponent.MiddleInner>
+                    <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
+                        <Link to={navigate.link} style={{
+                            color: '#fff'
+                        }}>
+                            <ContainerComponent.MiddleInner>
+                                <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
+                                <Icon.Label
+                                    style={{
+                                        fontWeight: "bold",
+                                        textTransform: "capitalize",
+                                    }}
+                                >
+                                    {navigate.label}
+                                </Icon.Label>
+                            </ContainerComponent.MiddleInner>
+                        </Link>
                     </ContainerComponent.Item>
                 ))}
             </ContainerComponent.GridThreeColumns>
@@ -151,10 +172,16 @@ const Navigator = ({ closeNavigator }) => {
     );
 };
 
-const AuthStatus = React.memo(({ screenColumn, openNavigator, openNotification, setOpenNotification }) => {
+const AuthStatus = React.memo(({
+    screenColumn,
+    openNavigator,
+    openNotification,
+    openMessage
+}) => {
     const { user, logout } = useAuthorizationContext();
 
-    if (!user.isLoggedIn)
+
+    if (!user.isLoggedIn) {
         return (
             <div
                 style={{
@@ -166,6 +193,7 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator, openNotification, 
                 </Link>
             </div>
         );
+    };
 
     return (
         <ContainerComponent.Flex
@@ -176,12 +204,16 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator, openNotification, 
         >
             <ContainerComponent.Item>
                 <Icon.CircleIcon>
-                    <AiOutlineMessage></AiOutlineMessage>
+                    <Link to="/portal/message">
+                        <AiOutlineMessage></AiOutlineMessage>
+                    </Link>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
-                <Icon.CircleIcon onClick={() => setOpenNotification(!openNotification)}>
-                    <IoNotificationsOutline></IoNotificationsOutline>
+                <Icon.CircleIcon>
+                    <Link to="/portal/notification">
+                        <IoNotificationsOutline></IoNotificationsOutline>
+                    </Link>
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
@@ -190,12 +222,17 @@ const AuthStatus = React.memo(({ screenColumn, openNavigator, openNotification, 
                         <BsList></BsList>
                     </Icon.CircleIcon>
                 )) || (
-                        <ButtonComponent>
-                            <Link to={"/"} onClick={logout}>
-                                Logout
+                        <Text.MiddleLine style={{ verticalAlign: 'text-bottom' }}>
+                            <Link to={"/"} style={{
+                                color: '#fff'
+                            }} onClick={logout}>
+                                <ButtonComponent >
+                                    Logout
+                                </ButtonComponent>
                             </Link>
-                        </ButtonComponent>
-                    )}
+                        </Text.MiddleLine>
+                    )
+                }
             </ContainerComponent.Item>
         </ContainerComponent.Flex>
     );

@@ -45,13 +45,19 @@ Form.Logo = function ({ image, alt, ...restProp }) {
   );
 };
 
-Form.Input = function ({ children, ...restProp }) {
-  return (
-    <input className="form__input" {...restProp}>
-      {children}
-    </input>
+Form.Input = React.forwardRef(function ({ children, ...restProp }, ref) {
+  return (<>
+    {restProp.component}
+    <input className="form__input"
+      type={restProp.component ? 'hidden' : restProp.type}
+      ref={ref}
+      {...restProp} />
+  </>
   );
-};
+});
+
+
+
 
 Form.Link = function ({ children, ...restProp }) {
   return (
@@ -87,7 +93,6 @@ Form.ErrorMessage = function ({ children, ...restProp }) {
 Form.TextArea = function ({ children, ...restProp }) {
   return (
     <textarea cols={12} {...restProp}>
-      {children}
     </textarea>
   );
 };
@@ -108,18 +113,18 @@ Form.Option = function ({ children, ...props }) {
   );
 };
 
-Form.Checkbox = function ({ children, ...restProp }) {
-    return (
-        <input type={'checkbox'} className="form__checkbox" {...restProp}>
-            {children}
-        </input>
-    )
-}
+Form.Checkbox = React.forwardRef(function ({ children, ...restProp }, ref) {
+  return (
+    <input type={'checkbox'} className="form__checkbox" ref={ref} {...restProp}>
+      {children}
+    </input>
+  )
+})
 
-Form.FrameAvatar = function({children,...restProp}){
-    return(
-        <div className='form__frameAvatar' {...restProp}>
-            {children}
-        </div>
-    )
+Form.FrameAvatar = function ({ children, ...restProp }) {
+  return (
+    <div className='form__frameAvatar' {...restProp}>
+      {children}
+    </div>
+  )
 }

@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContainerComponent, Form } from '../components';
 import { useAuthorizationContext } from '../redux';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const { login, user } = useAuthorizationContext();
     const [input, setInput] = useState({});
+    const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-
+    const navigate = useNavigate();
     const location = useLocation();
-    let from = location.state?.from?.pathname || '/';
 
-
-    const submitHandler = async (e) => {
+    const submitHandler = (e) => {
         e.preventDefault();
-        await login(input);
+        login(input);
     }
-
     const inputHandler = React.useCallback((e) => {
         setInput(oldInput => {
             return {
@@ -24,17 +22,13 @@ const Login = () => {
                 [e.target.name]: e.target.value
             }
         })
-    }, [input, setInput])
-
-    // if (user.role === 'admin') return <Navigate to={'/admin'} state={{ from: location }} replace />;
+    }, [input])
 
     if (user.isLoggedIn) {
-        return <Navigate to={from} state={{ from: location }} replace />;
+        return <Navigate to={'/'} state={{ from: location }} replace />;
     }
 
     return <>
-        <ContainerComponent.Hero>
-        </ContainerComponent.Hero>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <ContainerComponent.Hero>
         </ContainerComponent.Hero>
@@ -54,13 +48,15 @@ const Login = () => {
             <Form.Logo image="">
             </Form.Logo>
             <Form.Container>
-                <Form.Title children="LOG IN">
+                <Form.Title>
+                    LOG IN
                 </Form.Title>
                 <Form.Input
                     placeholder="Email"
                     type='text'
                     name="email"
                     onChange={inputHandler}
+                    autoComplete={'true'}
                     value={input.name}
                 ></Form.Input>
                 <Form.Input
@@ -69,19 +65,21 @@ const Login = () => {
                     name="password"
                     onChange={inputHandler}
                     autoComplete='current-password'
-                // value={input.password}
                 ></Form.Input>
-                <Form.Link href='/reset_password'>Forgot your Password?</Form.Link>
-                <Form.Button
+                <Link to='/reset_password'>Forgot your Password?</Link>
+                <Form.Input
+                    type="submit"
+                    value='sign in'
                     onClick={submitHandler}
                     style={{
                         background: 'black',
                         color: '#fff'
                     }}>
-                    sign in
-                </Form.Button>
-                {error && <p>{error}</p>}
+                </Form.Input>
             </Form.Container>
+
+            {message && <Form.Message>{message}</Form.Message>}
+            {error && <Form.ErrorMessage>{error}</Form.ErrorMessage>}
         </Form>
     </>
 }
