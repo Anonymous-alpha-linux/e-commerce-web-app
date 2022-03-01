@@ -1,4 +1,4 @@
-import React, { Component, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components";
 import { FaLock, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
@@ -17,6 +17,7 @@ export default function Comment({ postId, commentLogs }) {
   });
   const [loading, setLoading] = useState(false);
   const loader = useRef(interactPost);
+
   React.useEffect(() => {
     loader.current = interactPost;
   }, [interactPost]);
@@ -45,14 +46,24 @@ export default function Comment({ postId, commentLogs }) {
   const calcRemainingEventTime = (time) => {
     const date = new Date(time);
     const now = new Date(Date.now());
-    return Math.floor(date.getFullYear() - now.getFullYear()) && + 'years'
-      || Math.floor(date.getMonth() - now.getMonth()) && +'months'
-      || Math.floor(date.getDate() - now.getDate()) && +'days'
-      || Math.floor(date.getHours() - now.getHours()) && +'hours'
-      || Math.floor(date.getMinutes() - now.getMinutes()) && +'minutes'
-      || '0 seconds'
+    if (Math.floor(date.getFullYear() - now.getFullYear())) {
+      return Math.floor(date.getFullYear() - now.getFullYear()) + ' years';
+    }
+    else if (Math.floor(date.getMonth() - now.getMonth())) {
+      return Math.floor(date.getMonth() - now.getMonth()) + ' months';
+    }
+    else if (Math.floor(date.getDate() - now.getDate())) {
+      return Math.floor(date.getDate() - now.getDate()) + ' days';
+    }
+    else if (Math.floor(date.getHours() - now.getHours())) {
+      return Math.floor(date.getHours() - now.getHours()) + ' hours';
+    }
+    else if (date.getMinutes() - now.getMinutes())
+      return date.getMinutes() - now.getMinutes() + ' minutes';
+    else if (date.getMinutes() - now.getMinutes())
+      return date.getMinutes() - now.getMinutes() + ' seconds';
+    return 'Closed';
   }
-  console.log(calcRemainingEventTime(workspace.eventTime));
   return (
     <ContainerComponent.Section
       className="comment__section"
@@ -67,7 +78,7 @@ export default function Comment({ postId, commentLogs }) {
           }}
         >
           <ContainerComponent.Item>
-            <Text.Date>Block after 3 hours</Text.Date>
+            <Text.Date>Block after {calcRemainingEventTime(workspace.eventTime)}</Text.Date>
           </ContainerComponent.Item>
           <ContainerComponent.Item>
             <Form.Select>
@@ -146,7 +157,9 @@ export default function Comment({ postId, commentLogs }) {
           paddingTop: "12px",
         }}
       >
-        {commentLogs.map(comment => <Comment.Tab key={comment._id} comment={comment}></Comment.Tab>)}
+        {commentLogs.map(comment => <Comment.Tab postId={postId}
+          key={comment._id}
+          comment={comment}></Comment.Tab>)}
       </ContainerComponent.Pane>
       {/* <ContainerComponent.Pane className="comment__footer">
         <Text.Subtitle
@@ -159,13 +172,57 @@ export default function Comment({ postId, commentLogs }) {
   );
 }
 
-Comment.Tab = function ({ children, ...props }) {
-  const { body, like, dislike, createdAt, hideAuthor, account: { username, profileImage } } = props.comment;
+Comment.Tab = function CommentTab({ children, ...props }) {
+  const { user } = useAuthorizationContext();
+  const { interactPost } = usePostContext();
+  const { _id, body, createdAt, hideAuthor, likedAccounts, dislikedAccounts, account: { username, profileImage } } = props.comment;
 
   const parseTime = (time) => {
     const timeStr = `${(new Date(time)).getHours()}:${(new Date(time)).getMinutes()}`;
     return timeStr;
   }
+  const isFirstRender = useRef(true);
+  const interactRef = useRef(interactPost);
+
+  const [interact, setInteract] = useState({
+    liked: likedAccounts.indexOf(user.accountId) > -1,
+    disliked: dislikedAccounts.indexOf(user.accountId) > -1,
+    commentId: _id
+  })
+
+  const checkedHandler = async (e) => {
+    if (e.target.name === 'like') {
+      setInteract({
+        ...interact,
+        liked: !interact.liked,
+        disliked: interact.disliked && false,
+      });
+    }
+    if (e.target.name === 'dislike') {
+      setInteract({
+        ...interact,
+        disliked: !interact.disliked,
+        liked: interact.liked && false
+      });
+    }
+  }
+
+  React.useEffect(() => {
+    if (!isFirstRender.current) {
+      interactRef.current(props.postId, 'rate comment', interact, () => { });
+    }
+  }, [interact]);
+
+  React.useEffect(() => {
+    isFirstRender.current = false;
+  }, []);
+
+  React.useEffect(() => {
+    interactRef.current = interactPost;
+  }, [interactRef]);
+
+
+
   return (
     <>
       <Text.MiddleLine>
@@ -178,8 +235,6 @@ Comment.Tab = function ({ children, ...props }) {
         </Icon.CircleIcon>
       </Text.MiddleLine>
       <Text.MiddleLine style={{ padding: '0 10px' }}>
-        <Text.MiddleLine>
-        </Text.MiddleLine>
         <Text.MiddleLine>
           <Text.Bold style={{ margin: 0 }}>
             <Text>
@@ -209,16 +264,40 @@ Comment.Tab = function ({ children, ...props }) {
 
       <Text.Line>
         <Text.MiddleLine>
-          <Icon.CircleIcon>
-            <FaThumbsUp />
+          <input type='checkbox'
+            name="like"
+            id={`like ${_id}`}
+            value={interact.liked}
+            onChange={checkedHandler}
+            style={{ display: 'none' }}></input>
+          <Icon.CircleIcon onClick={() => { document.getElementById(`like ${_id}`).click() }}>
+            <FaThumbsUp stroke='#000' strokeWidth={20} style={{
+              fill: `${interact.liked ? 'blue' : 'transparent'}`,
+              position: "absolute",
+              top: '50%',
+              transform: 'translate(-50%,-50%)',
+              left: '50%'
+            }} />
           </Icon.CircleIcon>
-          {like}
+          {likedAccounts.length}
         </Text.MiddleLine>
         <Text.MiddleLine style={{ margin: "0 10px" }}>
-          <Icon.CircleIcon>
-            <FaThumbsDown />
+          <input type='checkbox'
+            name="dislike"
+            id={`dislike ${_id}`}
+            value={interact.disliked}
+            onChange={checkedHandler}
+            style={{ display: 'none' }}></input>
+          <Icon.CircleIcon onClick={() => { document.getElementById(`dislike ${_id}`).click() }}>
+            <FaThumbsDown stroke='#000' strokeWidth={20} style={{
+              fill: `${interact.disliked ? 'blue' : 'transparent'}`,
+              position: "absolute",
+              top: '50%',
+              transform: 'translate(-50%,-50%)',
+              left: '50%'
+            }} />
           </Icon.CircleIcon>
-          {dislike}
+          {dislikedAccounts.length}
         </Text.MiddleLine>
         <Text.MiddleLine>
           Reply

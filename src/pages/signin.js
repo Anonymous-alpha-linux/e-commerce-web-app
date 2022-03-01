@@ -11,14 +11,9 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const submitHandler = async (e) => {
+    const submitHandler = (e) => {
         e.preventDefault();
-        await login(input);
-        if (user.isLoggedIn) {
-            navigate('/', {
-                replace: true,
-            });
-        }
+        login(input);
     }
     const inputHandler = React.useCallback((e) => {
         setInput(oldInput => {
@@ -27,9 +22,8 @@ const Login = () => {
                 [e.target.name]: e.target.value
             }
         })
-    }, [input, setInput])
+    }, [input])
 
-    console.log(user);
     if (user.isLoggedIn) {
         return <Navigate to={'/'} state={{ from: location }} replace />;
     }
@@ -62,6 +56,7 @@ const Login = () => {
                     type='text'
                     name="email"
                     onChange={inputHandler}
+                    autoComplete={'true'}
                     value={input.name}
                 ></Form.Input>
                 <Form.Input
@@ -80,7 +75,6 @@ const Login = () => {
                         background: 'black',
                         color: '#fff'
                     }}>
-
                 </Form.Input>
             </Form.Container>
 

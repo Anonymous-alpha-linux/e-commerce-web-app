@@ -60,7 +60,7 @@ export default function AuthenticationContext({ children }) {
     return axios.get(authApi, {
       cancelToken: cancelTokenSource.token,
       headers: {
-        'Authorization': `Bearer ${user.accessToken}`
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       }
     }).then(response => {
       setUser({
@@ -76,29 +76,17 @@ export default function AuthenticationContext({ children }) {
       });
     })
   };
-  // const onLoadAccount = useCallback(() => {
-  //   return axios.get()
-  // }, [user])
   function login(data) {
     const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
-      data,
-      {
-        cancelToken: cancelTokenSource.token,
-        headers: {
-          'Authorization': `Bearer ${user.accessToken}`
-        }
-      }).then(res => {
-        localStorage.setItem('accessToken', res.data.accessToken);
-        return setUser({
-          type: actions.LOGIN_ACTION,
-          payload: res.data
-        });
-      }).then(end => {
-        return onLoadUser();
-      }).catch(error => setUser({
-        type: actions.AUTHENTICATE_FAILED,
-      }));
+      data, {
+      cancelToken: cancelTokenSource.token
+    }).then(res => {
+      localStorage.setItem('accessToken', res.data.accessToken);
+      return onLoadUser();
+    }).catch(error => setUser({
+      type: actions.AUTHENTICATE_FAILED,
+    }));
   };
   // const register = async (data) => {
   //   const registerApi = mainAPI.CLOUD_API_REGISTER;

@@ -5,7 +5,6 @@ import { useWorkspaceContext } from '../redux';
 
 export default function ManagerInfo() {
     const { workspace } = useWorkspaceContext();
-    console.log(workspace);
     const { profileImage, username, email, role: { roleName }, } = workspace.manager;
     // return <ContainerComponent.Section className="managerInfo__container" style={{
     //     padding: '10px',

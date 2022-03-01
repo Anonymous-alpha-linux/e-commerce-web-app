@@ -55,4 +55,11 @@
    &__group {
       display: inline-block;
    }
+   &__absoluteMiddle {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      transform: translateY(-50%);
+   }
 }

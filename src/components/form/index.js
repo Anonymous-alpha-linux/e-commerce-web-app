@@ -48,10 +48,16 @@ Form.Logo = function ({ image, alt, ...restProp }) {
 Form.Input = React.forwardRef(function ({ children, ...restProp }, ref) {
   return (<>
     {restProp.component}
-    <input className="form__input" type={restProp.component ? 'hidden' : restProp.type} ref={ref} {...restProp} />
+    <input className="form__input"
+      type={restProp.component ? 'hidden' : restProp.type}
+      ref={ref}
+      {...restProp} />
   </>
   );
 });
+
+
+
 
 Form.Link = function ({ children, ...restProp }) {
   return (

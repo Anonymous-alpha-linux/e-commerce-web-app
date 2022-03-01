@@ -11,7 +11,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from './tagsinput';
 
-export default function PostModal({ setOpenModal }) {
+export default function PostModal({
+    // setOpenModal
+}) {
     const [input, setInput] = useState({
         content: '',
         private: false,
@@ -37,8 +39,8 @@ export default function PostModal({ setOpenModal }) {
 
     console.log(posts, categories);
 
-    const { NODE_ENV } = process.env;
-    const [staffURL, host] = NODE_ENV === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+    const { REACT_APP_ENVIRONMENT } = process.env;
+    const [staffURL, host] = REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
     const isOverflowFile = (currentFileList, fileSize) => {
         const currentSize = currentFileList.reduce((prev, file) => {
@@ -158,10 +160,7 @@ export default function PostModal({ setOpenModal }) {
             setLoading(false);
     }, []);
 
-    // useEffect(() => {
-    //     console.log(input)
-    // }, [input]);
-
+    // console.log(postLoading, categoryLoading, loading, id);
     if (postLoading || categoryLoading || loading) return <Loading></Loading>
 
     return <ContainerComponent.Section className="postModal__container">
@@ -201,7 +200,7 @@ export default function PostModal({ setOpenModal }) {
                 </Text.RightLine>
 
             </Text.Line>
-            <Text.Line>
+            <Text.Line style={{ margin: '15px 0' }}>
                 <Text.MiddleLine>
                     <Text.Label className="postModal__label">
                         Author name:
@@ -210,7 +209,7 @@ export default function PostModal({ setOpenModal }) {
                 <Text.MiddleLine>
                     <Text.Bold>{!input.private ? user.account : 'Anonymous'}</Text.Bold>
                 </Text.MiddleLine>
-                <Text.RightLine style={{ paddingTop: '10px' }}>
+                <Text.RightLine>
                     <ButtonComponent.Toggle
                         onText="Hide"
                         offText="Show"
