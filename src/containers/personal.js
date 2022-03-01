@@ -9,12 +9,23 @@ export default function Personal({ personalInfo }) {
     const { workspace } = useWorkspaceContext();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);
-    const [input, setInput] = useState(true);
-    // useEffect(() => {
-    //     console.log(user, workspace);
-    // }, []);
+    const [input, setInput] = useState({
+        introduction: '',
+        gender: 'male',
+        birth: '',
+        email: '',
+        department: ''
+    });
     const location = useLocation();
-    // const from = location.state?.from?.pathname || '/';
+
+    const inputHandler = (e) => {
+        setInput({
+            [e.target.name]: e.target.value
+        })
+    }
+    const submitHandler = (e) => {
+        e.preventDefault();
+    }
 
     return <ContainerComponent
         style={{
@@ -73,101 +84,132 @@ export default function Personal({ personalInfo }) {
                         <Link to="/history" state={{ from: location }}>
                             <ButtonComponent>
                                 <Text.Center>
-                                    My Posts
+                                    My Post
                                 </Text.Center>
                             </ButtonComponent>
                         </Link>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <ButtonComponent>
-                            <Text.Center>
-                                Feedback
-                            </Text.Center>
-                        </ButtonComponent>
+                        <Link to="/workspace" state={{ from: location }}>
+                            <ButtonComponent>
+                                <Text.Center>
+                                    Workspace
+                                </Text.Center>
+                            </ButtonComponent>
+                        </Link>
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
-            <ContainerComponent.Pane style={{
-                padding: '20px 0'
-            }}>
-                <Text.Title style={{
-                    lineHeight: '2px',
-                    textIndent: '10px',
-                    transform: 'translateY(20px)',
-                }}>Profile</Text.Title>
-                <Form.TextArea placeholder="Your introduction"
-                    rows={15}
-                    style={{
-                        width: '100%',
-                        borderRadius: '20px',
-                        padding: '30px 0 0 10px'
+            <Form onSubmit={submitHandler}
+                style={{ maxWidth: 'unset' }}>
+                <ContainerComponent.Pane style={{
+                    padding: '20px 0'
+                }}>
+                    <Text.Title style={{
+                        lineHeight: '2px',
+                        textIndent: '10px',
+                        transform: 'translateY(20px)',
+                    }}>Profile</Text.Title>
+                    <Form.TextArea placeholder="Some your introduction"
+                        rows={15}
+                        name={'introduction'}
+                        onChange={inputHandler}
+                        style={{
+                            width: '100%',
+                            borderRadius: '20px',
+                            padding: '30px 0 0 10px'
+                        }}
+                        value={input.introduction}></Form.TextArea>
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            Gender
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Select placeholder="Post your information"
+                        style={{
+                            textAlign: 'right',
+                            width: '100%',
+                            height: '35px'
+                        }}
+                        onChange={inputHandler}
+                        name={'gender'}
+                        value={input.gender}>
+                        <Form.Option value={'male'}>Male</Form.Option>
+                        <Form.Option value={'female'}>Female</Form.Option>
+                    </Form.Select>
+
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            Day of Birth
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Input
+                        type="date"
+                        onChange={inputHandler}
+                        name='birth'
+                        value={input.birth}
+                        style={{
+                            textAlign: 'right',
+                        }}></Form.Input>
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            Email
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Input style={{
+                        textAlign: 'right',
                     }}
-                    value={"NAME"}></Form.TextArea>
-                <Text.MiddleLine style={{
-                    lineHeight: 0,
-                    textIndent: '5px',
-                    transform: 'translateY(25px)',
-                    fontWeight: 800
-                }}>
-                    <Text.Label>
-                        Gender
-                    </Text.Label>
-                </Text.MiddleLine>
-                <Form.Input placeholder="Post your information" style={{
-                    textAlign: 'right',
-                }} value={"NAME"}></Form.Input>
-
-                <Text.MiddleLine style={{
-                    lineHeight: 0,
-                    textIndent: '5px',
-                    transform: 'translateY(25px)',
-                    fontWeight: 800
-                }}>
-                    <Text.Label>
-                        Day of Birth
-                    </Text.Label>
-                </Text.MiddleLine>
-                <Form.Input placeholder="Choose Date" type="date" style={{
-                    textAlign: 'right',
-                }}></Form.Input>
-                <Text.MiddleLine style={{
-                    lineHeight: 0,
-                    textIndent: '5px',
-                    transform: 'translateY(25px)',
-                    fontWeight: 800
-                }}>
-                    <Text.Label>
-                        Email
-                    </Text.Label>
-                </Text.MiddleLine>
-                <Form.Input placeholder="Post your information" style={{
-                    textAlign: 'right',
-                }} value={user.email}></Form.Input>
-
-                <Text.MiddleLine style={{
-                    lineHeight: 0,
-                    textIndent: '5px',
-                    transform: 'translateY(25px)',
-                    fontWeight: 800
-                }}>
-                    <Text.Label>
-                        Department
-                    </Text.Label>
-                </Text.MiddleLine>
-                <Form.Input placeholder="Choose Date" type="date" style={{
-                    textAlign: 'right',
-                }}></Form.Input>
-            </ContainerComponent.Pane>
-            <Text.RightLine>
-                {isEdit && <ButtonComponent
-                    onClick={() => setIsEdit(false)}>
-                    Save
-                </ButtonComponent>
-                    || <ButtonComponent
-                        onClick={() => setIsEdit(true)}>
-                        Edit
-                    </ButtonComponent>}
-            </Text.RightLine>
+                        name="email"
+                        onChange={inputHandler}
+                        value={user.email}
+                        disabled={'true'}></Form.Input>
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            Department
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Input placeholder="your position"
+                        value={input.department}
+                        name='department'
+                        style={{
+                            textAlign: 'right',
+                        }}></Form.Input>
+                </ContainerComponent.Pane>
+                <Text.RightLine>
+                    {isEdit && <Form.Input
+                        type='submit'
+                        onClick={(e) => {
+                            submitHandler(e);
+                            setIsEdit(false)
+                        }}>
+                        Save
+                    </Form.Input>
+                        || <ButtonComponent
+                            onClick={() => setIsEdit(true)}>
+                            Edit
+                        </ButtonComponent>}
+                </Text.RightLine>
+            </Form>
         </ContainerComponent.Inner>
     </ContainerComponent>
 }

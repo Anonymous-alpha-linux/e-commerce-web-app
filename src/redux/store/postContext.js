@@ -139,7 +139,7 @@ export default React.memo(function PostContext({ children }) {
     const { REACT_APP_ENVIRONMENT } = process.env;
     const [postAPI, host] = REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const cancelTokenSource = axios.CancelToken.source();
-
+    console.log(postState);
     // 1. Post for workspace
     async function getPosts() {
         await setPost({
