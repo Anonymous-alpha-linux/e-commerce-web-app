@@ -28,7 +28,8 @@ const actions = {
     OFF_LOAD_MORE: 26,
     FILTER_MY_POST: 27,
     FILTER_POST_LIST: 28,
-    LOAD_MORE_MY_POST: 29
+    LOAD_MORE_MY_POST: 29,
+    GET_PROFILE: 30
 }
 
 export default actions;

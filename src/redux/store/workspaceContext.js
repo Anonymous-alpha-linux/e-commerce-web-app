@@ -60,6 +60,9 @@ export default React.memo(function WorkspaceContext({ children }) {
             cancelTokenSource.cancel();
         }
     }, [user]);
+    // useEffect(() => {
+    //     console.log(workspaceState);
+    // }, [workspaceState]);
 
     function onLoadWorkspace() {
         axios.get(workspaceAPI, {

@@ -53,7 +53,7 @@ export default function Workspace() {
               comment,
               hideAuthor,
             } = post;
-
+console.log(post);
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,
