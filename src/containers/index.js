@@ -21,6 +21,12 @@ export { default as LazyLoading } from './lazyLoading';
 export { default as DropDownButton } from './dropDownButton';
 export { default as DropDownOption } from './dropdownOption';
 export { default as GridPreview } from './gridPreview';
+export { default as MenuContainer } from './sidebar';
+export { default as PopUp } from './popUp';
 export { default as DashboardOverview } from './overview';
 export { default as Chart } from './chart';
+<<<<<<< HEAD
 export { default as TriggerLoading } from './triggerLoading';
+=======
+
+>>>>>>> 4acb91ec4bca4f87b0afd85670aa28dff1f952bb
