@@ -1,65 +1,89 @@
-import React, { useEffect, useState } from "react";
-import { List } from "../../components";
-import { Filter, PostContainer, PostForm, Timespan } from "../../containers";
-import { mainAPI } from '../../config';
+import React, { useRef } from "react";
+import { ContainerComponent, List } from "../../components";
+import { Filter, LazyLoading, PostContainer, PostForm, Timespan } from "../../containers";
+import { mainAPI } from "../../config";
 import { useAuthorizationContext, usePostContext, useWorkspaceContext } from "../../redux";
-import { Loading } from "../";
 
 export default function Workspace() {
-  const API = mainAPI.CLOUD_API_STAFF;
-  const { workspace, loading } = useWorkspaceContext();
-  const { posts, categories } = usePostContext();
   const { user } = useAuthorizationContext();
-
-  useEffect(() => {
-    console.log('workspace data:', workspace);
-    console.log('post data:', posts);
-    console.log('category data:', categories);
-    console.log('user data', user);
-  }, [workspace, posts, categories, user]);
-
-  if (loading) return <Loading></Loading>
-
+  const { workspace } = useWorkspaceContext();
+  const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
+  const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+  const listRef = useRef();
   return (
-    <div className="workspace">
-      <Timespan
-        expireTime={workspace.expireTime}>
-      </Timespan>
+    <ContainerComponent className="workspace" id="workspace">
+      <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
-      <Filter></Filter>
-      <List>
-        {workspace.posts.map(post => {
-          const { postAuthor, content, attachment, like, dislike, comment } = post;
-          const postHeader = {
-            image: postAuthor.profileImage,
-            alt: postAuthor.username,
-            username: postAuthor.username,
-            date: post.createdAt
-          }
-          const postBody = {
-            content,
-            attachment: attachment.map(attach => {
-              const { _id, fileType, filePath } = attach;
-              return {
-                _id,
-                image: `${mainAPI.LOCALHOST_HOST}\\${filePath}`,
-                fileType
-              }
-            })
-          }
-          const postFooter = {
-            like,
-            dislike,
-            comment
-          }
-          return <List.Item key={post._id}>
-            <PostContainer postHeader={postHeader}
-              postBody={postBody}
-              postFooter={postFooter}></PostContainer>
-          </List.Item>
+      <Filter loader={filterPost} selectOptions={[
+        {
+          label: 'Most Recent',
+          value: 0
+        },
+        {
+          label: 'Most Liked',
+          value: 1
         }
-        )}
-      </List>
-    </div>
+      ]}></Filter>
+      <LazyLoading loader={loadNextPosts}>
+        <List className="workspace__postList"
+          ref={listRef}>
+          {posts.map((post) => {
+            const {
+              _id,
+              postAuthor,
+              content,
+              attachment,
+              likedAccounts,
+              dislikedAccounts,
+              comment,
+              hideAuthor,
+            } = post;
+
+            let postHeader = {
+              id: _id,
+              postAuthor: postAuthor._id,
+              image: postAuthor.profileImage,
+              alt: postAuthor.username,
+              username: postAuthor.username,
+              date: post.createdAt,
+              hideAuthor,
+            };
+            let postBody = {
+              content,
+              attachment: attachment.map((attach) => {
+                const { _id, fileType, filePath } = attach;
+                return {
+                  _id,
+                  image: `${host}\\${filePath}`,
+                  fileType,
+                };
+              }),
+            };
+            let postFooter = {
+              like: likedAccounts.length,
+              dislike: dislikedAccounts.length,
+              isLiked: likedAccounts.indexOf(user.accountId) > -1,
+              isDisliked: dislikedAccounts.indexOf(user.accountId) > -1,
+              likedAccounts,
+              dislikedAccounts,
+              comment,
+            };
+            return (
+              <List.Item
+                key={post._id}
+              >
+                <PostContainer
+                  postId={_id}
+                  postHeader={postHeader}
+                  postBody={postBody}
+                  postFooter={postFooter}
+                  removeIdea={() => removeIdea(_id)}
+                ></PostContainer>
+              </List.Item>
+            );
+          })}
+        </List>
+      </LazyLoading>
+    </ContainerComponent>
   );
 }
