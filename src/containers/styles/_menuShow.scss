@@ -1,0 +1,7 @@
+.hide {
+  transform: scaleY(0);
+}
+.show {
+  transform: scaleY(1);
+  transition: all 0.4s;
+}
