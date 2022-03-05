@@ -16,7 +16,8 @@ const workspaceReducer = (state, action) => {
         case actions.WORKSPACE_ACTION:
             return {
                 ...state,
-                ...action.payload,
+                workspaces: action.payload.workspaces,
+                workspace: action.payload.workspace,
                 workspaceLoading: false
             };
         case actions.SET_POST_ACTION:
@@ -65,7 +66,7 @@ export default React.memo(function WorkspaceContext({ children }) {
     // }, [workspaceState]);
 
     function onLoadWorkspace() {
-        axios.get(workspaceAPI, {
+        return axios.get(workspaceAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
             },
@@ -76,7 +77,10 @@ export default React.memo(function WorkspaceContext({ children }) {
         }).then(res => {
             setWorkspace({
                 type: actions.WORKSPACE_ACTION,
-                payload: res.data.workspace
+                payload: {
+                    workspace: res.data.response.find(workspace => workspace._id === user.workspace),
+                    workspaces: res.data.response
+                }
             });
         }).catch(error => {
             setWorkspace({
@@ -87,7 +91,7 @@ export default React.memo(function WorkspaceContext({ children }) {
         });
     }
 
-    const contextValue = { workspace: workspaceState, loading: workspaceState.workspaceLoading };
+    const contextValue = { workspace: workspaceState.workspace, workspaces: workspaceState.workspaces, loading: workspaceState.workspaceLoading };
     if (contextValue.loading) return <Loading className="workspace__loading"></Loading>
 
     return (

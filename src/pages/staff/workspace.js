@@ -33,12 +33,14 @@ export default function Workspace() {
               postAuthor,
               content,
               attachment,
+              like,
+              dislike,
               likedAccounts,
               dislikedAccounts,
               comment,
               hideAuthor,
+              comments
             } = post;
-
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,
@@ -60,17 +62,19 @@ export default function Workspace() {
               }),
             };
             let postFooter = {
-              like: likedAccounts.length,
-              dislike: dislikedAccounts.length,
+              like,
+              dislike,
               isLiked: likedAccounts.indexOf(user.accountId) > -1,
               isDisliked: dislikedAccounts.indexOf(user.accountId) > -1,
               likedAccounts,
               dislikedAccounts,
               comment,
+              comments
             };
             return (
               <List.Item
                 key={post._id}
+                id={post._id}
               >
                 <PostContainer
                   postId={_id}

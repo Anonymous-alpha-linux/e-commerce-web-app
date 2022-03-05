@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
@@ -179,7 +179,7 @@ export default function Personal({ personalInfo }) {
                     <Form.Input style={{
                         textAlign: 'right',
                     }}
-                        name="lastName"
+                        name="phone"
                         onChange={inputHandler}
                         value={input.phone}
                         disabled={!isEdit}></Form.Input>

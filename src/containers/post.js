@@ -2,21 +2,22 @@ import React, { useState, useRef } from "react";
 import { ContainerComponent, Icon, Text, Preview, Dropdown } from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
-// import { IoEarth } from "react-icons/io5";
 import { IoIosArrowDown } from 'react-icons/io';
 import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
 
 export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
-    const [openComment, setOpenComment] = useState(false);
+    // const openComment = useRef(false);
     const { user } = useAuthorizationContext();
-    const { interactPost } = usePostContext();
+    const { interactPost, getPostComments } = usePostContext();
     const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
 
     const isFirstRender = useRef(true);
     const interactRef = useRef(interactPost);
+    const getComment = useRef(getPostComments);
 
+    const [openComment, setOpenComment] = useState(false);
     const [interact, setInteract] = useState({
         liked: postFooter.isLiked,
         disliked: postFooter.isDisliked
@@ -45,11 +46,9 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
             interactRef.current(postHeader.id, 'rate', interact, () => { });
         }
     }, [interact]);
-
     React.useEffect(() => {
         isFirstRender.current = false;
     }, []);
-
     React.useEffect(() => {
         interactRef.current = interactPost;
     }, [interactRef]);
@@ -180,10 +179,19 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                             </Text.CenterLine>
                         </Text.MiddleLine>
                     </ContainerComponent.Item>
-                    <ContainerComponent.Item onClick={() => setOpenComment(!openComment)}>
+                    <ContainerComponent.Item onClick={() => {
+                        if (!openComment) {
+                            getComment.current(postHeader.id, () => {
+                                setOpenComment(true);
+                            });
+                        }
+                        else {
+                            setOpenComment(false);
+                        }
+                    }}>
                         <Text.AbsoluteMiddle>
                             <Text.CenterLine>
-                                Comment
+                                Comment ({postFooter.comment})
                             </Text.CenterLine>
                         </Text.AbsoluteMiddle>
                     </ContainerComponent.Item>
@@ -192,7 +200,8 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
             {
                 openComment && <Comment
                     postId={postHeader.id}
-                    commentLogs={postFooter.comment}></Comment>
+                    commentLogs={postFooter.comments}
+                ></Comment>
             }
         </ContainerComponent.Section>
     );

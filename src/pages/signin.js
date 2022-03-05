@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ContainerComponent, Form } from '../components';
+import { ContainerComponent, Form, Text } from '../components';
 import { useAuthorizationContext } from '../redux';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ const Login = () => {
         return <Navigate to={'/'} state={{ from: location }} replace />;
     }
 
-    return <>
+    return <ContainerComponent>
         <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
         <ContainerComponent.Hero>
         </ContainerComponent.Hero>
@@ -45,20 +45,24 @@ const Login = () => {
                 transform: 'translate(-50%,-50%)',
                 zIndex: '1',
             }}>
-            <Form.Logo image="">
-            </Form.Logo>
+            {/* <Form.Logo image="">
+            </Form.Logo> */}
             <Form.Container>
-                <Form.Title>
+                <Form.Title style={{
+                    border: 'unset'
+                }}>
                     LOG IN
                 </Form.Title>
-                <Form.Input
-                    placeholder="Email"
-                    type='text'
-                    name="email"
-                    onChange={inputHandler}
-                    autoComplete={'true'}
-                    value={input.name}
-                ></Form.Input>
+                <Text.Line>
+                    <Form.Input
+                        placeholder="Email"
+                        type='text'
+                        name="email"
+                        onChange={inputHandler}
+                        autoComplete={'true'}
+                        value={input.name}
+                    ></Form.Input>
+                </Text.Line>
                 <Form.Input
                     placeholder="Password"
                     type='password'
@@ -66,7 +70,11 @@ const Login = () => {
                     onChange={inputHandler}
                     autoComplete='current-password'
                 ></Form.Input>
-                <Link to='/reset_password'>Forgot your Password?</Link>
+                <Link to='/reset_password'>
+                    <Text.Bold>
+                        Have a problem ?
+                    </Text.Bold>
+                </Link>
                 <Form.Input
                     type="submit"
                     value='sign in'
@@ -81,7 +89,7 @@ const Login = () => {
             {message && <Form.Message>{message}</Form.Message>}
             {error && <Form.ErrorMessage>{error}</Form.ErrorMessage>}
         </Form>
-    </>
+    </ContainerComponent>
 }
 
 export default React.memo(Login);

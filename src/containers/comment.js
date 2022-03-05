@@ -1,14 +1,20 @@
 import React, { useRef, useState } from "react";
 import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components";
-import { FaLock, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
-import { BsFillPersonFill } from "react-icons/bs";
 import { useAuthorizationContext, usePostContext, useWorkspaceContext } from "../redux";
+import { TriggerLoading } from ".";
+import Filter from "./filter";
 
 
 export default function Comment({ postId, commentLogs }) {
   const { workspace } = useWorkspaceContext();
+  const { posts, loadNextComments, filterPostComment } = usePostContext();
 
+  const filterRef = useRef(filterPostComment);
+  const isMounted = useRef(false);
+
+  const [filterInput, setFilterInput] = useState(0);
   const calcRemainingEventTime = (time) => {
     const date = new Date(time);
     const now = new Date(Date.now());
@@ -32,14 +38,15 @@ export default function Comment({ postId, commentLogs }) {
     }
     return 'Closed';
   }
-
+  const filterComment = (e) => {
+    filterRef.current(postId, e.target.value);
+  }
   return (
     <ContainerComponent.Section
       className="comment__section"
       style={{
         padding: "10px",
-      }}
-    >
+      }}>
       <ContainerComponent.Pane className="comment__header">
         <ContainerComponent.Flex
           style={{
@@ -49,36 +56,46 @@ export default function Comment({ postId, commentLogs }) {
             <Text.Date>Block after {calcRemainingEventTime(workspace.eventTime)}</Text.Date>
           </ContainerComponent.Item>
           <ContainerComponent.Item>
-            <Form.Select>
-              <Form.Option>Most Popular</Form.Option>
-              <Form.Option>Most Favorite</Form.Option>
+            <Form.Select
+              // value={filterInput}
+              onChange={filterComment}>
+              <Form.Option value={0}>Most Popular</Form.Option>
+              <Form.Option value={1}>Most Favorite</Form.Option>
             </Form.Select>
+            {/* <Filter></Filter> */}
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
       </ContainerComponent.Pane>
+
       <ContainerComponent.Pane className="comment__body">
         <Comment.TabInput
           postId={postId}
         ></Comment.TabInput>
       </ContainerComponent.Pane>
-      <ContainerComponent.Pane
-        className="comment__log"
-        style={{
-          paddingTop: "12px",
-        }}>
-        {commentLogs.map(comment => <Comment.Tab
-          postId={postId}
-          key={comment._id}
-          comment={comment}
-        ></Comment.Tab>)}
-      </ContainerComponent.Pane>
-      {/* <ContainerComponent.Pane className="comment__footer">
+
+      <TriggerLoading
+        loader={() => loadNextComments(postId)}
+        loadMore={posts.find(post => post._id === postId).loadMore}
+      >
+        <ContainerComponent.Pane className="comment__log"
+          style={{
+            paddingTop: "12px",
+          }}>
+          {commentLogs.map(comment => <Comment.Tab
+            postId={postId}
+            key={comment._id}
+            comment={comment}
+          ></Comment.Tab>)}
+        </ContainerComponent.Pane>
+      </TriggerLoading>
+      {/* 
+      <ContainerComponent.Pane className="comment__footer">
         <Text.Subtitle
-          style={{ textAlign: "center", width: "100%", margin: "10px 0" }}
-        >
+          style={{ textAlign: "center", width: "100%", margin: "10px 0" }}>
           More...
         </Text.Subtitle>
       </ContainerComponent.Pane> */}
+
     </ContainerComponent.Section>
   );
 }
@@ -86,18 +103,28 @@ export default function Comment({ postId, commentLogs }) {
 Comment.Tab = function CommentTab({ ...props }) {
   const { user } = useAuthorizationContext();
   const { interactPost } = usePostContext();
-  const { _id, body, createdAt, hideAuthor, likedAccounts, dislikedAccounts, replies, account: { username, profileImage } } = props.comment;
+  const { _id, body, createdAt, hideAuthor, likedAccounts, dislikedAccounts, like, dislike, isLiked, isDisliked, replies, account: { username, profileImage } } = props.comment;
   const parseTime = (time) => {
-    const timeStr = `${(new Date(time)).getHours()}:${(new Date(time)).getMinutes()}`;
-    return timeStr;
+    const minuteAgo = (new Date(Date.now())).getMinutes() - (new Date(time)).getMinutes();
+    const hourAgo = (new Date(Date.now())).getHours() - (new Date(time)).getHours();
+    const DateAgo = (new Date(Date.now())).getDate() - (new Date(time)).getDate();
+    const ago = (new Date(time)).getDate();
+
+    if (ago < 1) {
+      if (minuteAgo > 60) return minuteAgo + ' minutes ago';
+      if (hourAgo > 1) return hourAgo + ' hours ago';
+    }
+    if (ago < 2) return DateAgo + ' days ago';
+    return `${(new Date(time).toLocaleString("en-us", { dateStyle: 'full' }))}`;
   }
+
   const isFirstRender = useRef(true);
   const interactRef = useRef(interactPost);
   const inputRef = useRef();
 
   const [interact, setInteract] = useState({
-    liked: likedAccounts.indexOf(user.accountId) > -1,
-    disliked: dislikedAccounts.indexOf(user.accountId) > -1,
+    liked: !!likedAccounts.find(acc => acc._id === user.accountId),
+    disliked: !!dislikedAccounts.find(acc => acc._id === user.accountId),
     commentId: _id
   });
   const [openReply, setOpenReply] = useState(false);
@@ -137,8 +164,12 @@ Comment.Tab = function CommentTab({ ...props }) {
   }, [openReply])
 
   return (
-    <ContainerComponent.Pane className="comment__tab">
-      <Text.MiddleLine>
+    <ContainerComponent.Pane
+      className="comment__tab"
+      id={`comment__tab-${_id}`}
+      onMouseLeave={() => setOpenReply(false)}
+    >
+      <Text.MiddleLine className="comment__header">
         <Icon.CircleIcon style={{
           width: '30px',
           height: '30px',
@@ -147,7 +178,8 @@ Comment.Tab = function CommentTab({ ...props }) {
           <Icon.Image src={profileImage} alt={'avatar'}></Icon.Image>
         </Icon.CircleIcon>
       </Text.MiddleLine>
-      <Text.MiddleLine style={{ padding: '0 10px' }}>
+      <Text.MiddleLine className="comment__body"
+        style={{ padding: '0 10px' }}>
         <Text.MiddleLine>
           <Text.Bold style={{ margin: 0 }}>
             <Text>
@@ -155,15 +187,14 @@ Comment.Tab = function CommentTab({ ...props }) {
             </Text>
           </Text.Bold>
         </Text.MiddleLine>
-        <Text.MiddleLine>
-          <Text.Date
-            style={{
-              marginLeft: "8px",
-            }}
-          >
-            {parseTime(createdAt)}
-          </Text.Date>
-        </Text.MiddleLine>
+        <Text.Line>
+          <Text.MiddleLine>
+            <Text.Date
+            >
+              Commented at {parseTime(createdAt)}
+            </Text.Date>
+          </Text.MiddleLine>
+        </Text.Line>
         <Text.Line>
           <Text.Paragraph
             style={{
@@ -174,17 +205,18 @@ Comment.Tab = function CommentTab({ ...props }) {
           </Text.Paragraph>
         </Text.Line>
       </Text.MiddleLine>
-      <Text.Line>
-        <Text.MiddleLine>
+      <Text.Line className="comment__interacts">
+        <Text.MiddleLine className="comment__like">
           <input type='checkbox'
             name="like"
-            id={`like ${_id}`}
+            id={`like - ${_id} `}
             value={interact.liked}
             onChange={checkedHandler}
             style={{ display: 'none' }}></input>
-          <Icon.CircleIcon onClick={() => { document.getElementById(`like ${_id}`).click() }}>
+          <Icon.CircleIcon className="comment__likeIcon"
+            onClick={() => { document.getElementById(`like - ${_id} `).click() }}>
             <FaThumbsUp stroke='#000' strokeWidth={20} style={{
-              fill: `${interact.liked ? 'blue' : 'transparent'}`,
+              fill: `${interact.liked ? 'blue' : 'transparent'} `,
               position: "absolute",
               top: '50%',
               transform: 'translate(-50%,-50%)',
@@ -193,16 +225,19 @@ Comment.Tab = function CommentTab({ ...props }) {
           </Icon.CircleIcon>
           {likedAccounts.length}
         </Text.MiddleLine>
-        <Text.MiddleLine style={{ margin: "0 10px" }}>
+
+        <Text.MiddleLine className="comment__dislike"
+          style={{ margin: "0 10px" }}>
           <input type='checkbox'
             name="dislike"
-            id={`dislike ${_id}`}
+            id={`dislike ${_id} `}
             value={interact.disliked}
             onChange={checkedHandler}
             style={{ display: 'none' }}></input>
-          <Icon.CircleIcon onClick={() => { document.getElementById(`dislike ${_id}`).click() }}>
+          <Icon.CircleIcon className="comment__dislikeIcon"
+            onClick={() => { document.getElementById(`dislike ${_id} `).click() }}>
             <FaThumbsDown stroke='#000' strokeWidth={20} style={{
-              fill: `${interact.disliked ? 'blue' : 'transparent'}`,
+              fill: `${interact.disliked ? 'blue' : 'transparent'} `,
               position: "absolute",
               top: '50%',
               transform: 'translate(-50%,-50%)',
@@ -212,14 +247,23 @@ Comment.Tab = function CommentTab({ ...props }) {
           {dislikedAccounts.length}
         </Text.MiddleLine>
 
-        <Text.MiddleLine onClick={() => setOpenReply(!openReply)}>
+        <Text.MiddleLine className="comment__replyBtn"
+          onClick={() => {
+            setOpenReply(!openReply);
+            if (openReply) {
+              document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter');
+            }
+            else {
+              document.getElementById(`comment__tab-${_id}`).removeEventListener('mouseenter');
+            }
+          }}>
           Reply
         </Text.MiddleLine>
         {openReply && <Text.Line className="comment__reply">
           <Comment.TabReply
             forwardedRef={inputRef}
             preReply={username}
-            setOpenReply={() => setOpenReply(false)}
+            closeReply={() => setOpenReply(false)}
             postId={props.postId}
             commentId={_id}
           ></Comment.TabReply>
@@ -227,13 +271,13 @@ Comment.Tab = function CommentTab({ ...props }) {
       </Text.Line>
 
       <ContainerComponent.Pane className="comment__reply">
-        {replies.map(comment => {
+        {/* {replies.map(comment => {
           return <Comment.Tab
             comment={comment}
             key={comment._id}
             postId={props.postId}>
           </Comment.Tab>
-        })}
+        })} */}
       </ContainerComponent.Pane>
     </ContainerComponent.Pane>
   );
@@ -249,7 +293,7 @@ Comment.TabInput = function TabInput({
 
   const [input, setInput] = useState({
     pre: preReply,
-    content: `${preReply && `@${preReply}`}`,
+    content: preReply ? `@${preReply}` : '',
     private: false,
     commentid: commentId
   });
@@ -343,7 +387,7 @@ Comment.TabInput = function TabInput({
 Comment.TabReply = function TabReply({
   forwardedRef,
   postId,
-  setOpenReply,
+  closeReply,
   preReply = '',
   commentId }) {
   const { user } = useAuthorizationContext();
@@ -351,7 +395,7 @@ Comment.TabReply = function TabReply({
 
   const [input, setInput] = useState({
     pre: preReply,
-    content: `${preReply && `@${preReply}`}`,
+    content: `${preReply && `@${preReply}`} `,
     private: false,
     commentid: commentId
   });
@@ -383,7 +427,7 @@ Comment.TabReply = function TabReply({
       loader.current(postId, 'reply comment', input, () => {
       })
     }
-    setOpenReply();
+    closeReply();
     setInput({
       pre: '',
       content: '',
@@ -391,11 +435,14 @@ Comment.TabReply = function TabReply({
     });
   }
   const onBlurHandler = (e) => {
-    setOpenReply();
+    closeReply();
   }
 
   return (
-    <ContainerComponent.Pane>
+    <ContainerComponent.Pane
+      className="comment-reply__container"
+      id="comment__reply"
+      onMouseLeave={onBlurHandler}>
       <Text.Line>
         <Text.MiddleLine style={{ marginRight: '20px' }}>
           <Icon.CircleIcon
@@ -424,14 +471,14 @@ Comment.TabReply = function TabReply({
         <Form
           method='POST'
           style={{ padding: '0 20px', width: '100%' }}
-          onSubmit={submitHandler}>
+          onSubmit={submitHandler}
+        >
           <Form.Input
             ref={forwardedRef}
             placeholder="Leave your comment"
             name='content'
             value={input.content}
             onChange={inputHandler}
-            onBlur={onBlurHandler}
             style={{ width: 'calc(100% - 60px)' }}
           ></Form.Input>
           <input type='submit' style={{ display: 'none' }}></input>

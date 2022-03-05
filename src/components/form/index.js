@@ -92,7 +92,11 @@ Form.ErrorMessage = function ({ children, ...restProp }) {
 
 Form.TextArea = function ({ children, ...restProp }) {
   return (
-    <textarea cols={12} {...restProp}>
+    <textarea cols={12} {...restProp} style={{
+      resize: 'none',
+      width: '100%',
+      padding: '30px 0 0 20px'
+    }}>
     </textarea>
   );
 };

@@ -1,0 +1,1 @@
+export { default as useMedia, deviceStr } from './useResponsive';
