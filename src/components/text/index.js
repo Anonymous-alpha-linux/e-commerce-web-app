@@ -7,9 +7,9 @@ export default function Text({ children, ...props }) {
     </p>
   );
 }
-Text.Title = function ({ children, ...props }) {
+Text.Title = function ({ children, forwardedRef, ...props }) {
   return (
-    <h2 className="text__title" {...props}>
+    <h2 className="text__title" ref={forwardedRef} {...props}>
       {children}
     </h2>
   );

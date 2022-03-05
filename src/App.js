@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
   Home, Login, ProtectedPage, Register, ForgetPassword, Nav,
@@ -10,7 +9,8 @@ import {
   Portal,
   WorkspaceGroup,
   Loading,
-  MyPost
+  MyPost,
+  DashboardManager
 } from './pages';
 
 import { AddGroupContainer, ManagerInfo, MessageContainer, NotificationContainer, Personal, PostModal, Searchbar } from "./containers";
@@ -44,12 +44,15 @@ function App() {
               element={<ProtectedPage authorized={[roles.QA_MANAGER]}>
                 <QAManager></QAManager>
               </ProtectedPage>}>
+              {/* <Route index element={<Workspace></Workspace>} /> */}
+              <Route index element={<DashboardManager></DashboardManager>} />
             </Route>) ||
             // 3. QA coordinator
             (user.role === roles.QA_COORDINATOR && <Route path=""
               element={<ProtectedPage authorized={[roles.QA_COORDINATOR]}>
                 <QACoordinator></QACoordinator>
               </ProtectedPage>}>
+              <Route index element={<Workspace></Workspace>} />
             </Route>) ||
             // 4. Staff
             (user.role === roles.STAFF &&

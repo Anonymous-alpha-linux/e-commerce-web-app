@@ -1,8 +1,8 @@
 import React from 'react';
-import { MenuContainer } from '../../containers';
+import { Outlet } from 'react-router-dom';
 
-export default function Merchant() {
-    return <div>
-        <MenuContainer></MenuContainer>
-    </div>;
+export default function QAManager() {
+    return <>
+        <Outlet></Outlet>
+    </>;
 }

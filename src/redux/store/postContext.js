@@ -17,7 +17,6 @@ const postReducer = (state, action) => {
                 page: 0
             };
         case actions.LOAD_MORE_POST:
-            console.log(!!action.payload.length);
             return {
                 ...state,
                 posts: action.payload.length ? state.posts.concat(action.payload) : state.posts,
@@ -156,6 +155,7 @@ export default React.memo(function PostContext({ children }) {
                 filter: 0
             }
         }).then(res => {
+            console.log(res);
             return setPost({
                 type: actions.GET_POST_LIST,
                 payload: res.data.response,
@@ -188,7 +188,7 @@ export default React.memo(function PostContext({ children }) {
                 filter: filter
             });
         }).then(success => {
-            // console.log(postState);
+
         }).catch(error => {
             setPost({
                 type: actions.SET_OFF_LOADING
@@ -292,7 +292,6 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         });
     }
-
     async function getPostComments(postId) {
         setPost({
             type: actions.SET_LOADING
@@ -353,7 +352,6 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         })
     }
-
     // 4. Thump-up, thump-down, comment 
     function interactPost(postId, type, input, cb) {
         // Set Loading for waiting post
@@ -362,7 +360,6 @@ export default React.memo(function PostContext({ children }) {
         });
 
         if (type === 'rate') {
-            console.log(postId, type, input);
             return axios.put(postAPI, {
                 isLiked: input.liked,
                 isDisliked: input.disliked
@@ -376,7 +373,7 @@ export default React.memo(function PostContext({ children }) {
                     interact: 'rate'
                 }
             }).then(res => {
-                console.log(res);
+
                 return updateSinglePost(postId, cb);
             }).catch(error => {
                 setPost({
@@ -386,7 +383,6 @@ export default React.memo(function PostContext({ children }) {
             })
         }
         else if (type === 'comment') {
-            console.log(postId, type, input);
             return axios.post(postAPI, {
                 content: input.content,
                 private: input.private
@@ -410,7 +406,7 @@ export default React.memo(function PostContext({ children }) {
             });
         }
         else if (type === 'rate comment') {
-            console.log(postId, type, input);
+
             return axios.put(postAPI, {
                 isLiked: input.liked,
                 isDisliked: input.disliked
@@ -424,7 +420,7 @@ export default React.memo(function PostContext({ children }) {
                     interact: 'rate'
                 }
             }).then(res => {
-                console.log(res);
+
                 return updateSinglePost(postId, cb);
             }).catch(error => {
                 setPost({
@@ -433,8 +429,31 @@ export default React.memo(function PostContext({ children }) {
                 setError(error.message);
             })
         }
+        else if (type === 'reply comment') {
+            return axios.put(postAPI, {
+                content: input.content,
+                private: input.private
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                params: {
+                    view: 'comment',
+                    commentid: input.commentid,
+                    interact: 'reply'
+                }
+            }).then(res => {
+                return updateSinglePost(postId, cb);
+            }).then(success => {
+                cb();
+            }).catch(error => {
+                setPost({
+                    type: actions.SET_OFF_LOADING
+                });
+                setError(error.message);
+            });
+        }
     }
-
     // 5. Get the list of categories
     async function getPostCategories() {
         setCategory({
@@ -459,7 +478,6 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         })
     }
-
     // 6. Post new Idea
     const postIdea = (input, cb, options = null) => {
         // Create form submission for post and upload files
@@ -529,7 +547,6 @@ export default React.memo(function PostContext({ children }) {
             // cb(res);
         }).catch(error => setError(error.message));
     }
-
     // 8. Plug-ins
     async function getFile(attachment, cb) {
         await axios.get(`${host}\\${attachment.filePath}`, {
@@ -544,20 +561,29 @@ export default React.memo(function PostContext({ children }) {
             type: attachment.fileType
         })).then(data => cb(data)).catch(error => setError(error.message));
     }
-
     function getGzipFile() {
+    }
+
+    function getPostQuery() {
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${user.accessToken}`
+            },
+            params: {
+                view: 'query'
+            }
+        }).then(res => console.log(res.data)).catch(error => console.log(error.message));
     }
 
     useEffect(() => {
         getPosts();
         getPostCategories();
-
         return () => {
             cancelTokenSource.cancel();
         };
     }, [user, showUpdate]);
     // useEffect(() => {
-    //     console.log(postState)
+    //     console.log(postState);
     // }, [postState]);
 
     const contextValues = {

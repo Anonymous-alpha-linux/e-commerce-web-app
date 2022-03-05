@@ -23,3 +23,5 @@ export { default as DropDownOption } from './dropdownOption';
 export { default as GridPreview } from './gridPreview';
 export { default as MenuContainer } from './sidebar';
 export { default as PopUp } from './popUp';
+export { default as DashboardOverview } from './overview';
+export { default as Chart } from './chart';
