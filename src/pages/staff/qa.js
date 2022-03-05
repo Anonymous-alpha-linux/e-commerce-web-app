@@ -1,5 +1,5 @@
 import React from 'react'
-import { Accordion, ContainerComponent, Text } from '../../components'
+import { Accordion, BarChart, ContainerComponent, Text } from '../../components'
 
 export default function QA() {
     return (
@@ -9,6 +9,7 @@ export default function QA() {
                 textAlign: 'center'
             }}>Q&a</Text.Title>
             <Accordion></Accordion>
+            <BarChart></BarChart>
         </ContainerComponent>
 
     )
