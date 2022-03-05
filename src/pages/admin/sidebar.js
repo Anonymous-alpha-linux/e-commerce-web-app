@@ -6,7 +6,7 @@ import { useAuthorizationContext } from '../../redux';
 export default function Sidebar() {
     const { logout } = useAuthorizationContext();
     return <aside>
-        This is admin Aside
+        {/* Sidebar */}
         <Link to={'/'} onClick={logout}>Logout</Link>
     </aside>;
 }

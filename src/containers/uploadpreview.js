@@ -77,69 +77,74 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
         style={{
           marginBottom: "10px",
         }}>
-        <Text.MiddleLine>
-          <Icon style={{
-            fontSize: "30px",
-          }}>
-            <AiOutlineCloudUpload></AiOutlineCloudUpload>
-          </Icon>
-        </Text.MiddleLine>
-        <Text.MiddleLine className="form-upload__input">
-          <Form.Input type="file"
-            name="files"
-            id="files"
-            onChange={(e) => {
-              readNewFiles(e);
-              setFiles(e);
-            }}
-            ref={fileInputRef}
-            style={{
-              display: 'none'
-            }}
-            multiple />
-          <ButtonComponent onClick={openFiles}>
-            Upload New File
-          </ButtonComponent>
-          <Text.MiddleLine>
-            {preview.length} choose
-          </Text.MiddleLine>
-        </Text.MiddleLine>
-        <Preview>
-          {!preview.length &&
-            (<Text.Title className="upload-preview__placeholder"
+        <ContainerComponent.Pane onClick={openFiles} style={{ padding: '10px 0' }}>
+
+          <Text.CenterLine>
+            <Icon style={{
+              fontSize: "30px",
+            }}>
+              <AiOutlineCloudUpload></AiOutlineCloudUpload>
+            </Icon>
+          </Text.CenterLine>
+          <Text.CenterLine className="form-upload__input">
+            <Form.Input type="file"
+              name="files"
+              id="files"
+              onChange={(e) => {
+                readNewFiles(e);
+                setFiles(e);
+              }}
+              ref={fileInputRef}
               style={{
-                color: "#444",
-                fontSize: "15px",
-                textAlign: "center",
-                textTransform: "uppercase",
-                fontStyle: "italic",
-              }}>
-              Document Preview
-            </Text.Title>) ||
-            (<ContainerComponent.Flex>
-              {preview.map((file, index) => {
-                return <ContainerComponent.Item className="upload-preview-item"
-                  key={index}
-                  style={{
-                    position: "relative",
-                    flexGrow: 1,
-                  }}>
-                  <Icon className="upload-review-item__icon" onClick={() => removeItem(index)}
+                display: 'none'
+              }}
+              multiple />
+            <ButtonComponent>
+              <Text.CenterLine>
+                Upload New File
+              </Text.CenterLine>
+            </ButtonComponent>
+            <Text.CenterLine style={{ padding: '10px' }}>
+              {preview.length} choose
+            </Text.CenterLine>
+          </Text.CenterLine>
+          <Preview>
+            {!preview.length &&
+              (<Text.Title className="upload-preview__placeholder"
+                style={{
+                  color: "#444",
+                  fontSize: "15px",
+                  textAlign: "center",
+                  textTransform: "uppercase",
+                  fontStyle: "italic",
+                }}>
+                Document Preview
+              </Text.Title>) ||
+              (<ContainerComponent.Flex>
+                {preview.map((file, index) => {
+                  return <ContainerComponent.Item className="upload-preview-item"
+                    key={index}
                     style={{
-                      position: "position",
-                      right: 0,
-                      top: 0,
-                      transform: 'translate(10px, 10px)',
+                      position: "relative",
+                      flexGrow: 1,
                     }}>
-                    <FaTimes></FaTimes>
-                  </Icon>
-                  <Preview.Images image={file}
-                    alt={"preview file"}
-                  ></Preview.Images>
-                </ContainerComponent.Item>
-              })}
-            </ContainerComponent.Flex>)}
-        </Preview>
+                    <Icon className="upload-review-item__icon" onClick={() => removeItem(index)}
+                      style={{
+                        position: "position",
+                        right: 0,
+                        top: 0,
+                        transform: 'translate(10px, 10px)',
+                      }}>
+                      <FaTimes></FaTimes>
+                    </Icon>
+                    <Preview.Images image={file}
+                      alt={"preview file"}
+                    ></Preview.Images>
+                  </ContainerComponent.Item>
+                })}
+              </ContainerComponent.Flex>)}
+          </Preview>
+        </ContainerComponent.Pane>
       </Text.Line>
     </ContainerComponent.Section>
   );

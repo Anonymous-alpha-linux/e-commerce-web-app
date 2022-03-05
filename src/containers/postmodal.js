@@ -11,7 +11,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from './tagsinput';
 
-export default function PostModal({ setOpenModal }) {
+export default function PostModal({
+    // setOpenModal
+}) {
     const [input, setInput] = useState({
         content: '',
         private: false,
@@ -33,12 +35,12 @@ export default function PostModal({ setOpenModal }) {
     const { id } = useParams();
     const { user, getSocket } = useAuthorizationContext();
     const { posts, categories, postLoading, categoryLoading,
-        getFile, postIdea } = usePostContext();
+        getFile, postIdea, setShowUpdate } = usePostContext();
 
     console.log(posts, categories);
 
-    const { NODE_ENV } = process.env;
-    const [staffURL, host] = NODE_ENV === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+    const { REACT_APP_ENVIRONMENT } = process.env;
+    const [staffURL, host] = REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
     const isOverflowFile = (currentFileList, fileSize) => {
         const currentSize = currentFileList.reduce((prev, file) => {
@@ -62,6 +64,7 @@ export default function PostModal({ setOpenModal }) {
         if (checkedCondition.current.checked) {
             postIdea(input, res => {
                 // console.log(res);
+                setShowUpdate(o => !o);
                 navigate('/');
             })
         }
@@ -157,10 +160,7 @@ export default function PostModal({ setOpenModal }) {
             setLoading(false);
     }, []);
 
-    // useEffect(() => {
-    //     console.log(input)
-    // }, [input]);
-
+    // console.log(postLoading, categoryLoading, loading, id);
     if (postLoading || categoryLoading || loading) return <Loading></Loading>
 
     return <ContainerComponent.Section className="postModal__container">
@@ -189,7 +189,6 @@ export default function PostModal({ setOpenModal }) {
                         Back
                     </Text.Middle>
                 </Text.MiddleLine>
-
                 <Text.RightLine
                     style={{
                         width: '80%',
@@ -201,21 +200,26 @@ export default function PostModal({ setOpenModal }) {
                 </Text.RightLine>
 
             </Text.Line>
-            <Text.Label className="postModal__label">
-                Author name:
+            <Text.Line style={{ margin: '15px 0' }}>
                 <Text.MiddleLine>
-                    <Text.Bold>{user.account}</Text.Bold>
+                    <Text.Label className="postModal__label">
+                        Author name:
+                    </Text.Label>
                 </Text.MiddleLine>
-                <Text.MiddleLine style={{ marginLeft: '40px' }}>
-                    <ButtonComponent.Toggle onText="Hide"
+                <Text.MiddleLine>
+                    <Text.Bold>{!input.private ? user.account : 'Anonymous'}</Text.Bold>
+                </Text.MiddleLine>
+                <Text.RightLine>
+                    <ButtonComponent.Toggle
+                        onText="Hide"
                         offText="Show"
                         id="private"
                         name="private"
                         value={input.private}
                         onChange={checkedHandler}
                         ref={privateChecked}></ButtonComponent.Toggle>
-                </Text.MiddleLine>
-            </Text.Label>
+                </Text.RightLine>
+            </Text.Line>
             <Form.TextArea
                 id='content'
                 name='content'

@@ -3,13 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineMessage } from "react-icons/ai";
 import {
     IoNotificationsOutline,
-    IoLogoApple,
     IoSearchSharp,
 } from "react-icons/io5";
+import logo from '../assets/Logoidea2.jpg';
 
 
 import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
 import navigators from "../fixtures/navigator";
+import navData from '../fixtures/nav-links';
 import { useAuthorizationContext } from "../redux";
 import { BsList } from "react-icons/bs";
 // import NotificationContainer from "./notification";
@@ -25,7 +26,7 @@ export default function Navigation() {
 
     const responsiveHandler = () => {
         const { width } = window.screen;
-        if (width <= 480) {
+        if (width <= 650) {
             setScreenColumn(2);
         } else {
             setScreenColumn(3);
@@ -58,7 +59,7 @@ export default function Navigation() {
                 zIndex: 100,
             }}
         >
-            <ContainerComponent.Grid columns={screenColumn}>
+            <ContainerComponent.Flex className="navigation__grid" columns={screenColumn}>
                 <ContainerComponent.Item>
                     <ContainerComponent.Flex
                         style={{
@@ -69,7 +70,8 @@ export default function Navigation() {
                             <Icon.CircleIcon onClick={() => navigate('/', {
                                 replace: true
                             })}>
-                                <IoLogoApple></IoLogoApple>
+                                {/* <IoLogoApple></IoLogoApple> */}
+                                <Icon.Image src={logo} alt={'logo'}></Icon.Image>
                             </Icon.CircleIcon>
                         </ContainerComponent.Item>
                         <ContainerComponent.Item>
@@ -89,18 +91,25 @@ export default function Navigation() {
                     </ContainerComponent.Flex>
                 </ContainerComponent.Item>
                 {screenColumn > 2 && (
-                    <ContainerComponent.Item>
-                        {/* <ContainerComponent.MiddleInner>
-                    <ContainerComponent.Flex>
-                        {NavData.map((link, index) => {
-                            return <ContainerComponent.Link
-                                key={index + 1}
-                                path={link.path}>
-                                {link.name}
-                            </ContainerComponent.Link>
-                        })}
-                    </ContainerComponent.Flex>
-                </ContainerComponent.MiddleInner> */}
+                    <ContainerComponent.Item style={{ color: '#fff' }}>
+                        <ContainerComponent.MiddleInner>
+                            <ContainerComponent.Flex>
+                                {navData.map((link, index) => {
+                                    return <ContainerComponent.Item key={index + 1}>
+                                        <Link
+                                            to={link.path}
+                                            style={{ color: '#fff' }}>
+                                            <Text.MiddleLine style={{ marginRight: '5px' }}>
+                                                <Icon>{link.icon}</Icon>
+                                            </Text.MiddleLine>
+                                            <Text>
+                                                {link.name}
+                                            </Text>
+                                        </Link>
+                                    </ContainerComponent.Item>
+                                })}
+                            </ContainerComponent.Flex>
+                        </ContainerComponent.MiddleInner>
                     </ContainerComponent.Item>
                 )}
                 <ContainerComponent.Item>
@@ -111,7 +120,7 @@ export default function Navigation() {
                     // openMessage={() => setOpenMessage(true)}
                     ></AuthStatus>
                 </ContainerComponent.Item>
-            </ContainerComponent.Grid>
+            </ContainerComponent.Flex>
             {openNavigator && (
                 <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
             )}

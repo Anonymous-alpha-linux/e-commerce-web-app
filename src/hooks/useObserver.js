@@ -18,6 +18,7 @@ export default function useObserver(
         },
         { root: isMany ? nodes : nodes.parentElement, ...options }
       );
+      
       isMany
         ? [...nodes.children].forEach((node) => observer.current.observe(node))
         : observer.current.observe(nodes);
