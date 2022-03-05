@@ -50,7 +50,11 @@ ContainerComponent.Pane = function ({ children, ...restProps }) {
         {children}
     </div>
 }
-
+ContainerComponent.Toggle = function({children,...restProps}){
+    return <div {...restProps}>
+        {children}
+    </div>
+}
 ContainerComponent.Inner = function ({ children, ...restProps }) {
     return <div className="container__inner" {...restProps}>
         {children}

@@ -1,7 +1,8 @@
 import React from 'react';
+import { MenuContainer } from '../../containers';
 
 export default function Merchant() {
     return <div>
-        <h1>This is QA manager page</h1>
+        <MenuContainer></MenuContainer>
     </div>;
 }

@@ -21,3 +21,5 @@ export { default as LazyLoading } from './lazyLoading';
 export { default as DropDownButton } from './dropDownButton';
 export { default as DropDownOption } from './dropdownOption';
 export { default as GridPreview } from './gridPreview';
+export { default as MenuContainer } from './menu';
+export { default as PopUp } from './popUp';
