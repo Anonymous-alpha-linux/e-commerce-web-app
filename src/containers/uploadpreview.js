@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
+
 import {
   ContainerComponent,
   Form,
@@ -9,12 +10,13 @@ import {
   Icon,
   ButtonComponent,
 } from "../components";
+import { Loading } from "../pages";
 
-const UploadPreview = ({ files, setFiles }) => {
+const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
   const [preview, setPreview] = useState([]);
+  const [loading, setLoading] = useState(true);
   const fileInputRef = useRef(null);
   let image = "https://image.shutterstock.com/image-vector/file-iconvector-illustration-flat-design-260nw-1402633574.jpg";
-
 
   const validateFile = (file) => {
     const imageRegex = new RegExp("image/*");
@@ -23,36 +25,51 @@ const UploadPreview = ({ files, setFiles }) => {
     return "others";
   }
   const removeItem = (id) => {
-    setFiles(files => files.filter((file, index) => index !== id));
+    eliminateFile(id);
+    preview.filter((file, index) => index !== id);
   };
-
-
-  useEffect(() => {
-    files.forEach((file, index) => {
+  const openFiles = () => {
+    fileInputRef.current.click();
+  }
+  const readNewFiles = (e) => {
+    console.log(e.target.files);
+    return Array.from(e.target.files).map(file => {
+      return readFile(file).then(data => setPreview([...preview, data])).catch(error => setError(error.message));
+    });
+  }
+  const readFile = (file) => {
+    return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
-      if (validateFile(file) === 'image') {
-        fileReader.readAsDataURL(file);
-        fileReader.onload = () => {
-          if (index === 0) {
-            setPreview([fileReader.result]);
-            return;
-          }
-          setPreview(preview => [...preview, fileReader.result || image]);
-        }
-        fileReader.onabort = () => {
-          alert("Failed to read file", fileReader.abort);
-        }
-        fileReader.onerror = () => {
-          alert("Failed to read file", fileReader.error);
-        }
+      fileReader.readAsDataURL(file);
+      fileReader.onabort = () => {
+        alert("Failed to read file", fileReader.abort);
+        reject("Failed to read file", fileReader.abort);
       }
-    })
-  }, [files]);
+      fileReader.onerror = () => {
+        alert("Failed to read file", fileReader.error);
+        reject("Failed to read file", fileReader.abort);
+      }
+      fileReader.onload = () => {
+        resolve(validateFile(file) === 'image' ? fileReader.result : image);
+      }
+    });
+  }
+  const readFiles = () => {
+    return files.map(file => {
+      return readFile(file);
+    });
+  }
+
   useEffect(() => {
-    console.log(fileInputRef.current);
-  }, [fileInputRef.current]);
+    Promise.all(readFiles())
+      .then(data => {
+        setPreview(data);
+      })
+      .then(s => setLoading(false))
+      .catch(error => setError(error.message));
+  }, [files]);
 
-
+  if (loading) return <Loading></Loading>
   return (
     <ContainerComponent.Section className="form-upload__container">
       <Text.Label htmlFor="files">Upload Files:</Text.Label>
@@ -60,63 +77,74 @@ const UploadPreview = ({ files, setFiles }) => {
         style={{
           marginBottom: "10px",
         }}>
-        <Text.MiddleLine>
-          <Icon style={{
-            fontSize: "30px",
-          }}>
-            <AiOutlineCloudUpload></AiOutlineCloudUpload>
-          </Icon>
-        </Text.MiddleLine>
-        <Text.MiddleLine className="form-upload__input">
-          <Form.Input type="file"
-            name="files"
-            id="files"
-            onChange={setFiles}
-            ref={fileInputRef}
-            multiple />
-          <ButtonComponent onClick={() => fileInputRef.current.click()}>
-            Upload New File
-          </ButtonComponent>
-          <Text.MiddleLine>
-            {preview.length} choose
-          </Text.MiddleLine>
-        </Text.MiddleLine>
-        <Preview>
-          {!preview.length &&
-            (<Text.Title className="upload-preview__placeholder"
+        <ContainerComponent.Pane onClick={openFiles} style={{ padding: '10px 0' }}>
+
+          <Text.CenterLine>
+            <Icon style={{
+              fontSize: "30px",
+            }}>
+              <AiOutlineCloudUpload></AiOutlineCloudUpload>
+            </Icon>
+          </Text.CenterLine>
+          <Text.CenterLine className="form-upload__input">
+            <Form.Input type="file"
+              name="files"
+              id="files"
+              onChange={(e) => {
+                readNewFiles(e);
+                setFiles(e);
+              }}
+              ref={fileInputRef}
               style={{
-                color: "#444",
-                fontSize: "15px",
-                textAlign: "center",
-                textTransform: "uppercase",
-                fontStyle: "italic",
-              }}>
-              Document Preview
-            </Text.Title>) ||
-            (<ContainerComponent.Flex>
-              {preview.map((file, index) => {
-                return <ContainerComponent.Item className="upload-preview-item"
-                  key={index}
-                  style={{
-                    position: "relative",
-                    flexGrow: 1,
-                  }}>
-                  <Icon className="upload-review-item__icon" onClick={() => removeItem(index)}
+                display: 'none'
+              }}
+              multiple />
+            <ButtonComponent>
+              <Text.CenterLine>
+                Upload New File
+              </Text.CenterLine>
+            </ButtonComponent>
+            <Text.CenterLine style={{ padding: '10px' }}>
+              {preview.length} choose
+            </Text.CenterLine>
+          </Text.CenterLine>
+          <Preview>
+            {!preview.length &&
+              (<Text.Title className="upload-preview__placeholder"
+                style={{
+                  color: "#444",
+                  fontSize: "15px",
+                  textAlign: "center",
+                  textTransform: "uppercase",
+                  fontStyle: "italic",
+                }}>
+                Document Preview
+              </Text.Title>) ||
+              (<ContainerComponent.Flex>
+                {preview.map((file, index) => {
+                  return <ContainerComponent.Item className="upload-preview-item"
+                    key={index}
                     style={{
-                      position: "position",
-                      right: 0,
-                      top: 0,
-                      transform: 'translate(10px, 10px)',
+                      position: "relative",
+                      flexGrow: 1,
                     }}>
-                    <FaTimes></FaTimes>
-                  </Icon>
-                  <Preview.Images image={file}
-                    alt={"preview file"}
-                  ></Preview.Images>
-                </ContainerComponent.Item>
-              })}
-            </ContainerComponent.Flex>)}
-        </Preview>
+                    <Icon className="upload-review-item__icon" onClick={() => removeItem(index)}
+                      style={{
+                        position: "position",
+                        right: 0,
+                        top: 0,
+                        transform: 'translate(10px, 10px)',
+                      }}>
+                      <FaTimes></FaTimes>
+                    </Icon>
+                    <Preview.Images image={file}
+                      alt={"preview file"}
+                    ></Preview.Images>
+                  </ContainerComponent.Item>
+                })}
+              </ContainerComponent.Flex>)}
+          </Preview>
+        </ContainerComponent.Pane>
       </Text.Line>
     </ContainerComponent.Section>
   );

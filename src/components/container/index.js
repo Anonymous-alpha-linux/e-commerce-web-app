@@ -4,7 +4,7 @@ import React from 'react';
 // 1. define the default component
 export default function ContainerComponent({ children, ...restProps }) {
     return (
-        <div {...restProps} className={`container__root ${restProps.className}`}>
+        <div {...restProps} className={`${restProps.className} container__root`}>
             {children}
         </div>
     )
@@ -16,7 +16,7 @@ ContainerComponent.Absolute = function ({ children, ...restProps }) {
     </div>
 }
 ContainerComponent.Flex = function ({ children, ...restProps }) {
-    return <div className='container__flex' {...restProps}>
+    return <div  {...restProps} className={`container__flex ${restProps.className}`}>
         {children}
     </div>
 }
