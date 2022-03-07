@@ -4,6 +4,7 @@ export const initialAuth = {
     accessToken: localStorage.getItem('accessToken') || 'a.b.c',
     isLoggedIn: false,
     authLoading: true,
+    profile: null
 };
 const authReducer = (state, action) => {
     switch (action.type) {
@@ -22,6 +23,11 @@ const authReducer = (state, action) => {
             return {
                 ...state,
                 authLoading: false
+            };
+        case actions.GET_PROFILE:
+            return {
+                ...state,
+                profile: action.payload
             };
         case actions.LOGIN_ACTION:
             return {

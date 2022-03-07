@@ -17,34 +17,17 @@ export default function AuthenticationContext({ children }) {
   const [error, setError] = useState('');
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
+
   const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
 
   useEffect(() => {
     try {
       onLoadUser();
+      getProfile();
     }
     catch (error) {
       setError(error.message);
     }
-    // .then(() => {
-    //   setLoading(true);
-    //   // const socketHost = mainAPI.CLOUD_HOST;
-    //   const socketHost = mainAPI.LOCALHOST_HOST;
-    //   const socket = io(socketHost, {
-    //     auth: {
-    //       accessToken: user.accessToken
-    //     }
-    //   }).on("join", (msg) => {
-    //     console.log(msg);
-    //     setSocket(socket);
-    //   }).on("connect_error", err => {
-    //     setError(err.message);
-    //     socket.disconnect();
-    //   });
-    // })
-    // .finally(() => {
-    //   setLoading(false);
-    // });
     return () => {
       cancelTokenSource.cancel();
     };
@@ -115,6 +98,39 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   }
+  function getProfile() {
+    return axios.get(authApi, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'profile'
+      }
+    }).then(res => {
+
+      return setUser({
+        type: actions.GET_PROFILE,
+        payload: res.data.response
+      });
+    }).catch(error => setError(error.message));
+  }
+  function editProfile(input) {
+
+    return axios.put(authApi, {
+      ...input
+    }, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'profile'
+      }
+    }).then(res => getProfile()).catch(error => {
+      setError(error.message);
+    })
+  }
 
   if (user.authLoading) return <Loading className="auth__loading"></Loading>
 
@@ -122,12 +138,14 @@ export default function AuthenticationContext({ children }) {
     <AuthenticationContextAPI.Provider value={{
       loading: user.authLoading,
       user,
+      profile: user.profile,
       message,
       error,
       cancelTokenSource,
       getSocket,
       login,
       logout,
+      editProfile
     }}>
       {children}
     </AuthenticationContextAPI.Provider>

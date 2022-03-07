@@ -6,7 +6,7 @@ export default function IconComponent({ children, ...restProps }) {
 }
 
 IconComponent.CircleIcon = ({ children, ...props }) => {
-    return <div className="icon__circleIcon" {...props}>
+    return <div {...props} className={`icon__circleIcon ${props.className}`}>
         {children}
     </div>
 }
