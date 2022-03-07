@@ -52,6 +52,15 @@ const postReducer = (state, action) => {
                         };
                     }
                     return post;
+                }),
+                myPosts: state.myPosts.map(post => {
+                    if (post._id === action.payload.postid) {
+                        return {
+                            ...post,
+                            ...action.payload.data
+                        };
+                    }
+                    return post;
                 })
             };
 
@@ -229,7 +238,7 @@ const postReducer = (state, action) => {
                     if (post._id === action.postid) {
                         return {
                             ...post,
-                            comments: state.comments.map(comment => {
+                            comments: post.comments.map(comment => {
                                 if (comment._id === action.commentid)
                                     return {
                                         ...comment,
@@ -241,7 +250,6 @@ const postReducer = (state, action) => {
                                     }
                                 return comment;
                             })
-
                         }
                     }
                     return post;
@@ -250,7 +258,7 @@ const postReducer = (state, action) => {
                     if (post._id === action.postid) {
                         return {
                             ...post,
-                            comments: state.comments.map(comment => {
+                            comments: post.comments.map(comment => {
                                 if (comment._id === action.commentid)
                                     return {
                                         ...comment,
@@ -274,13 +282,13 @@ const postReducer = (state, action) => {
                     if (post._id === action.postid) {
                         return {
                             ...post,
-                            comments: state.comments.map(comment => {
+                            comments: post.comments.map(comment => {
                                 if (comment._id === action.commentid) {
                                     return {
                                         ...comment,
-                                        replies: action.payload.length ? [...post.comments, ...action.payload] : comment.replies,
-                                        page: action.payload.length ? post.page + 1 : post.page,
-                                        loadMore: action.payload.length >= post.count
+                                        replies: action.payload.length ? [...comment.replies, ...action.payload] : comment.replies,
+                                        page: action.payload.length ? comment.page + 1 : comment.page,
+                                        loadMore: action.payload.length >= comment.count
                                     }
                                 }
                                 return comment;
@@ -293,13 +301,13 @@ const postReducer = (state, action) => {
                     if (post._id === action.postid) {
                         return {
                             ...post,
-                            comments: state.comments.map(comment => {
+                            comments: post.comments.map(comment => {
                                 if (comment._id === action.commentid) {
                                     return {
                                         ...comment,
-                                        replies: action.payload.length ? [...post.comments, ...action.payload] : comment.replies,
-                                        page: action.payload.length ? post.page + 1 : post.page,
-                                        loadMore: action.payload.length >= post.count
+                                        replies: action.payload.length ? [...comment.replies, ...action.payload] : comment.replies,
+                                        page: action.payload.length ? comment.page + 1 : comment.page,
+                                        loadMore: action.payload.length >= comment.count
                                     }
                                 }
                                 return comment;
@@ -310,17 +318,39 @@ const postReducer = (state, action) => {
                 }),
             };
         case actions.ADD_COMMENT_REPLY:
+            /*
+                action.postid: [String]
+                action.commentid: [String]
+                action.payload: [Object]
+            */
             return {
                 ...state,
                 posts: state.posts.map(post => {
                     if (post._id === action.postid) {
                         return {
-                            ...post,
-                            comments: state.comments.map(comment => {
+                            ...post,    
+                            comments: post.comments.map(comment => {
                                 if (comment._id === action.commentid) {
                                     return {
                                         ...comment,
-                                        replies: [action.payload, ...post.replies]
+                                        replies: [action.payload, ...comment.replies]
+                                    }
+                                }
+                                return comment;
+                            })
+                        }
+                    }
+                    return post;
+                }),
+                myPosts: state.myPosts.map(post => {
+                    if (post._id === action.postid) {
+                        return {
+                            ...post,
+                            comments: post.comments.map(comment => {
+                                if (comment._id === action.commentid) {
+                                    return {
+                                        ...comment,
+                                        replies: [action.payload, ...comment.replies]
                                     }
                                 }
                                 return comment;
@@ -337,7 +367,7 @@ const postReducer = (state, action) => {
                     if (post._id === action.postid) {
                         return {
                             ...post,
-                            comments: state.comments.map(comment => {
+                            comments: post.comments.map(comment => {
                                 if (comment._id === action.commentid) {
                                     return {
                                         ...comment,

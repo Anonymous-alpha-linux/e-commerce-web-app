@@ -5,8 +5,6 @@ import { ConditionContainer, UploadForm } from '.';
 // import UploadForm from './uploadpreview';
 import { useAuthorizationContext, usePostContext } from '../redux';
 import { mainAPI } from '../config';
-
-import { Loading } from '../pages';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from './tagsinput';
@@ -30,7 +28,7 @@ export default function PostModal({
     const checkedCondition = useRef();
     const navigate = useNavigate();
     const { id } = useParams();
-    const { user, getSocket } = useAuthorizationContext();
+    const { user } = useAuthorizationContext();
     const { posts, categories, postLoading, categoryLoading,
         getFile, postIdea, setShowUpdate } = usePostContext();
 
@@ -58,10 +56,9 @@ export default function PostModal({
         e.preventDefault();
         if (checkedCondition.current.checked) {
             postIdea(input, res => {
-                // console.log(res);
                 setShowUpdate(o => !o);
                 navigate('/');
-            })
+            });
         }
         else {
             setError('Please checked our terms and condition');
@@ -135,7 +132,6 @@ export default function PostModal({
     useEffect(() => {
         if (id && posts.length) {
             const { attachment, category, content, hideAuthor } = posts.find(post => post._id === id);
-
             attachment.forEach(attach => {
                 getFile(attach, file => {
                     setInput({
@@ -153,9 +149,13 @@ export default function PostModal({
         else
             setLoading(false);
     }, [posts]);
+    useEffect(() => {
+        console.log(input);
+
+    }, [input]);
 
     // console.log(postLoading, categoryLoading, loading, id);
-    if (postLoading || categoryLoading || loading) return <Loading></Loading>
+    // if (postLoading || categoryLoading || loading) return <Loading></Loading>
 
     return <>
         <ContainerComponent.Section className="postModal__container">

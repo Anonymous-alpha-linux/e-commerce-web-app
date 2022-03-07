@@ -6,17 +6,19 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function Personal({ personalInfo }) {
     const { user, profile, editProfile } = useAuthorizationContext();
+    console.log(profile);
     const { workspace } = useWorkspaceContext();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);
+
     const [input, setInput] = useState({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        address: profile.address,
-        phone: profile.phone,
-        introduction: profile?.introduction,
-        gender: profile.gender || 'male',
-        age: profile.age || 0,
+        firstName: profile?.firstName || '',
+        lastName: profile?.lastName || '',
+        address: profile?.address || '',
+        phone: profile?.phone || '',
+        introduction: profile?.introduction || '',
+        gender: profile?.gender || 'male',
+        age: profile?.age || 0,
         birth: ''
     });
     const location = useLocation();
@@ -32,10 +34,6 @@ export default function Personal({ personalInfo }) {
         e.preventDefault();
         return editProfile(input);
     }
-
-    // useEffect(() => {
-    //     console.log(input);
-    // }, [input]);
 
     return <ContainerComponent
         className="personal"
@@ -284,15 +282,23 @@ export default function Personal({ personalInfo }) {
                         }}></Form.Input>
                 </ContainerComponent.Pane>
                 <Text.RightLine>
-                    {isEdit && <Form.Input
-                        type='submit'
-                        onClick={(e) => {
-                            submitHandler(e);
-                            setIsEdit(false);
-                        }}>
-                        Save
-                    </Form.Input>
+                    {isEdit && <>
+                        <Form.Input
+                            type='submit'
+                            style={{ display: 'none' }}
+                            onClick={(e) => {
+                                submitHandler(e);
+                                setIsEdit(false);
+                            }}>
+                        </Form.Input>
+                        <ButtonComponent style={{ cursor: 'pointer' }}
+                            onClick={() => { document.querySelector('input[type=submit]').click(); }}
+                        >
+                            Save
+                        </ButtonComponent>
+                    </>
                         || <ButtonComponent
+                            style={{ cursor: 'pointer' }}
                             onClick={() => setIsEdit(true)}>
                             Edit
                         </ButtonComponent>}

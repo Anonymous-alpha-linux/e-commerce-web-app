@@ -5,6 +5,7 @@ import actions from '../reducers/actions';
 import { useAuthorizationContext } from '.';
 import { Loading } from '../../pages';
 import { postReducer } from '../reducers';
+import { notifyData, socketTargets } from '../../fixtures';
 const PostContextAPI = createContext();
 
 
@@ -44,7 +45,8 @@ const initialPostPage = {
     page: 0,
     myPage: 0,
     more: true,
-    filter: 0
+    filter: 0,
+
 }
 const initialCategories = {
     categories: [],
@@ -56,7 +58,7 @@ export default React.memo(function PostContext({ children }) {
     const [categoryState, setCategory] = useReducer(categoryReducer, initialCategories);
 
     const [showUpdate, setShowUpdate] = useState(false);
-    const { user } = useAuthorizationContext();
+    const { user, socket } = useAuthorizationContext();
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const { REACT_APP_ENVIRONMENT } = process.env;
@@ -272,7 +274,6 @@ export default React.memo(function PostContext({ children }) {
     }
     function filterPostComment(postId, filter) {
         const { count } = postState.posts.find(post => post._id === postId);
-        console.log(postId, filter);
         return axios.get(postAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -285,7 +286,6 @@ export default React.memo(function PostContext({ children }) {
                 filter: filter
             }
         }).then(res => {
-            console.log(res.data.response);
             return setPost({
                 type: actions.FILTER_POST_COMMENT,
                 payload: res.data.response,
@@ -333,7 +333,6 @@ export default React.memo(function PostContext({ children }) {
                 commentid: commentId
             }
         }).then(res => {
-            console.log(res.data);
             return setPost({
                 type: actions.UPDATE_POST_COMMENT,
                 payload: res.data.response,
@@ -380,12 +379,13 @@ export default React.memo(function PostContext({ children }) {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
             },
             params: {
-                view: 'comment',
+                view: 'reply',
                 commentid: commentId,
                 page: 0,
                 count: 10
             }
         }).then(res => {
+            console.log(res.data.response);
             return setPost({
                 type: actions.GET_COMMENT_REPLIES,
                 payload: res.data.response,
@@ -405,8 +405,30 @@ export default React.memo(function PostContext({ children }) {
     function updateCommentReplies(postId, commentId, cb) {
         return;
     }
-    function addCommentReply(postId, commentId) {
-        return;
+    function addCommentReply(postId, commentId, cb) {
+        return axios.get(postAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'singlecomment',
+                commentid: commentId,
+                page: 0,
+                count: 10
+            }
+        }).then(res => {
+            console.log(res.data.response);
+            return setPost({
+                type: actions.ADD_COMMENT_REPLY,
+                payload: res.data.response.replies,
+                postid: postId,
+                commentid: commentId,
+            });
+        }).then(success => {
+            cb();
+        }).catch(error => {
+            setError(error.message);
+        });;
     }
 
     // Load the next page of post or comment or my post
@@ -460,7 +482,6 @@ export default React.memo(function PostContext({ children }) {
             });
         }
         else if (type === 'rate comment') {
-            console.log(input);
             return axios.put(postAPI, {
                 isLiked: input.liked,
                 isDisliked: input.disliked
@@ -493,8 +514,9 @@ export default React.memo(function PostContext({ children }) {
                     interact: 'reply'
                 }
             }).then(res => {
-                console.log(res.data.response);
-                // return updateSinglePost(postId, cb);
+                return addCommentReply(postId, res.data.response._id, () => {
+                    cb();
+                });
             }).then(success => {
                 cb();
             }).catch(error => {
@@ -558,7 +580,15 @@ export default React.memo(function PostContext({ children }) {
                     postid: options.id
                 }
             }).then(res => {
+                console.log(res.data);
+                socket.emit("notify", {
+                    postId: res.data.response._id,
+                    postURL: `/post/${res.data.response._id}`,
+                    type: notifyData.EDIT_POST,
+                    to: socketTargets.WITHOUT_BROADCAST
+                });
                 setShowUpdate(!showUpdate);
+
                 cb(res);
             }).catch(error => setError(error.message));
 
@@ -571,10 +601,13 @@ export default React.memo(function PostContext({ children }) {
                 view: 'post'
             }
         }).then(res => {
-            // getSocket().emit("notify post", {
-            //     postId: res.data.postId,
-            //     postURL: `/post/${res.data.postId}`
-            // })
+            console.log(res.data);
+            socket.emit("notify", {
+                postId: res.data.response._id,
+                postURL: `/post/${res.data.response._id}`,
+                type: notifyData.CREATE_POST,
+                to: 'all'
+            });
             setShowUpdate(!showUpdate);
             cb(res);
         }).catch(err => setError(err.message));
@@ -597,7 +630,7 @@ export default React.memo(function PostContext({ children }) {
     }
     // 8. Plug-ins
     async function getFile(attachment, cb) {
-        await axios.get(`${host}\\${attachment.filePath}`, {
+        await axios.get(`${attachment.online_url || attachment.filePath}`, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${user.accessToken}`
@@ -620,9 +653,9 @@ export default React.memo(function PostContext({ children }) {
         };
     }, [user, showUpdate]);
 
-    useEffect(() => {
-        console.log(postState);
-    }, [postState]);
+    // useEffect(() => {
+    //     console.log(postState);
+    // }, [postState]);
 
     const contextValues = {
         posts: postState.posts,
@@ -649,7 +682,8 @@ export default React.memo(function PostContext({ children }) {
         getOwnPosts,
         getPostComments,
         loadNextComments,
-        filterPostComment
+        filterPostComment,
+        getCommentReplies
     }
 
     if (postState.postLoading && categoryState.categoryLoading) return <Loading className="post__loading"></Loading>

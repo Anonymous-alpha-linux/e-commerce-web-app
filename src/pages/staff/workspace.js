@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { ContainerComponent, List } from "../../components";
+import { ButtonComponent, ContainerComponent, List } from "../../components";
 import {
   Filter,
   LazyLoading,
@@ -15,7 +15,7 @@ import {
 } from "../../redux";
 
 export default function Workspace() {
-  const { user } = useAuthorizationContext();
+  const { user, socket } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
   const [postAPI, host] =
@@ -68,10 +68,10 @@ export default function Workspace() {
             let postBody = {
               content,
               attachment: attachment.map((attach) => {
-                const { _id, fileType, filePath } = attach;
+                const { _id, fileType, online_url, filePath } = attach;
                 return {
                   _id,
-                  image: `${host}\\${filePath}`,
+                  image: `${online_url || filePath}`,
                   fileType,
                 };
               }),

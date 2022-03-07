@@ -11,7 +11,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     // const openComment = useRef(false);
     const { user } = useAuthorizationContext();
     const { interactPost, getPostComments } = usePostContext();
-    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
+    // const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
 
     const isFirstRender = useRef(true);
     const interactRef = useRef(interactPost);
@@ -39,6 +39,19 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                 liked: interact.liked && false
             });
         }
+    }
+    const parseTime = (time) => {
+        const secondAgo = (new Date(Date.now())).getSeconds() - (new Date(time)).getSeconds();
+        const minuteAgo = (new Date(Date.now())).getMinutes() - (new Date(time)).getMinutes();
+        const hourAgo = (new Date(Date.now())).getHours() - (new Date(time)).getHours();
+        const dateAgo = (new Date(Date.now())).getDate() - (new Date(time)).getDate();
+        if (dateAgo < 1) {
+            if (hourAgo < 24) return hourAgo + ' hours ago';
+            if (minuteAgo < 60) return minuteAgo + ' minutes ago';
+            if (secondAgo < 60) return secondAgo + ' seconds ago';
+        }
+        if (dateAgo < 2) return dateAgo + ' days ago';
+        return `${(new Date(time).toLocaleString("en-us", { dateStyle: 'full' }))}`;
     }
 
     React.useEffect(() => {
@@ -76,7 +89,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                     <ContainerComponent.Flex>
                         <Text.Date style={{
                             marginRight: '8px'
-                        }}>{date}</Text.Date>
+                        }}>{parseTime(postHeader.date)}</Text.Date>
                         {/* <Text>
                             <IoEarth />
                         </Text> */}
