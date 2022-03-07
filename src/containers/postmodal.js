@@ -14,6 +14,7 @@ import { useAuthorizationContext, usePostContext } from "../redux";
 import { mainAPI } from "../config";
 
 import { Loading } from "../pages";
+import useValidate from "../hooks/useValidate";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from "./tagsinput";
@@ -81,16 +82,17 @@ export default function PostModal(
   const submitHandler = (e) => {
     e.preventDefault();
     try {
-      if (input.categories.length) throw new Error("Please select a category");
-      if (checkedCondition.current.checked) {
-        postIdea(input, (res) => {
-          // console.log(res);
-          setShowUpdate((o) => !o);
-          navigate("/");
-        });
-      } else {
+      const valContent = new useValidate(input.content);
+      const check = valContent.isEmpty();
+      if (!input.categories.length) throw new Error("Please select a category");
+      if (!checkedCondition.current.checked) {
         throw new Error("Please checked our terms and condition");
       }
+      postIdea(input, (res) => {
+        // console.log(res);
+        setShowUpdate((o) => !o);
+        navigate("/");
+      });
     } catch (error) {
       setError(error.message);
     }
@@ -120,7 +122,6 @@ export default function PostModal(
         }
       })
       .filter((file) => file);
-    console.log(filter);
 
     setInput((input) => {
       return {

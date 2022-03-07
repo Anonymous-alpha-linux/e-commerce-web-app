@@ -140,3 +140,197 @@
   //   }
   // }
 }
+
+//Gobal Style for button
+//default variables
+$fec-button-border-default: none !default;
+$fec-button-padding-default: 0.5em 1.5em 0.5em !default;
+$fec-button-border-radius-default: 2px !default;
+//functions
+// button base mixins
+@mixin pure-button(
+  $color,
+  $background,
+  $color-opacity: 1,
+  $background-opacity: 0,
+  $border: $fec-button-border-default,
+  $border-radius: $fec-button-border-radius-default,
+  $padding: $fec-button-padding-default
+) {
+  //convert color
+  $color-rgba: rgba($color, $color-opacity);
+  $background-rgba: rgba($background, $background-opacity);
+
+  // for hover, and active state
+  $background-dark: rgba(darken($background, 10%), $background-opacity / 2);
+  $background-darker: rgba(darken($background, 15%), $background-opacity / 2);
+  // Structure
+  display: inline-block;
+  *display: inline; //IE 6/7
+  zoom: 1;
+  line-height: normal;
+  white-space: nowrap;
+  vertical-align: baseline;
+  text-align: center;
+  cursor: pointer;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  *font-size: 90%;
+  *overflow: visible;
+  padding: $padding;
+  color: $color;
+  color: $color-rgba;
+  *color: $color;
+  border: $border;
+
+  @if $background-opacity != 1 {
+    background-color: $background-rgba;
+  } @else {
+    background-color: $background;
+  }
+
+  text-decoration: none;
+  border-radius: $border-radius;
+  -webkit-font-smoothing: antialiased;
+  //Transitions
+  -webkit-transition: 0.1s linear -webkit-box-shadow;
+  -moz-transition: 0.1s linear -moz-box-shadow;
+  -ms-transition: 0.1s linear box-shadow;
+  -o-transition: 0.1s linear box-shadow;
+  transition: 0.1s linear box-shadow;
+
+  // Firefox: Get rid of the inner focus border
+  &::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+  }
+
+  &:hover,
+  &:focus {
+    @if lightness($background) >=
+      lightness($color) and
+      $background-opacity ==
+      0 and
+      $background !=
+      #ffffff
+    {
+      color: lighten($background, 50%);
+    } @else if $background == #ffffff and $background-opacity == 0 {
+      color: darken($background, 50%);
+    } @else {
+      color: lighten($background, 50%);
+    }
+    @if $background-opacity == 0 {
+      background-color: $background;
+      -webkit-transition: all 0.25s linear;
+      -moz-transition: all 0.25s linear;
+      -ms-transition: all 0.25s linear;
+      -o-transition: all 0.25s linear;
+      transition: all 0.25s linear;
+    } @else {
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#{ie-hex-str($background-dark)}, endColorstr=#{ie-hex-str($background-darker)}, GradientType=0);
+      background-image: -webkit-gradient(
+        linear,
+        0 0,
+        0 100%,
+        from(transparent),
+        color-stop(40%, $background-dark),
+        to($background-darker)
+      );
+      background-image: -webkit-linear-gradient(
+        transparent,
+        $background-dark 40%,
+        $background-darker
+      );
+      background-image: -moz-linear-gradient(
+        top,
+        $background-dark 0%,
+        $background-darker
+      );
+      background-image: -ms-linear-gradient(
+        transparent,
+        $background-dark 40%,
+        $background-darker
+      );
+      background-image: -o-linear-gradient(
+        transparent,
+        $background-dark 40%,
+        $background-darker
+      );
+      background-image: linear-gradient(
+        transparent,
+        $background-dark 40%,
+        $background-darker
+      );
+    }
+  }
+  &:focus {
+    outline: 0;
+  }
+  &:active {
+    box-shadow: 0 0 0 1px
+        rgba(darken($background, 20%), $background-opacity / 4) inset,
+      0 0 6px rgba(darken($background, 20%), $background-opacity / 2) inset;
+  }
+}
+//sizing
+@mixin pure-button-size($size) {
+  @if $size == xs {
+    font-size: 70%;
+  } @else if $size == sm {
+    font-size: 85%;
+  } @else if $size == lg {
+    font-size: 110%;
+  } @else if $size == xl {
+    font-size: 125%;
+  } @else {
+    font-size: 100%;
+  }
+}
+
+.btn-blue {
+  @include pure-button(#fff, #0e90d2);
+}
+.btn-green {
+  @include pure-button(#fff, #368868);
+}
+.btn-red {
+  @include pure-button(#ffffff, #dd514c, 1, 1);
+  border-radius: 20px;
+}
+.btn-warning {
+  @include pure-button(#ffffff, #df7514);
+}
+.btn-blue-xs {
+  @include pure-button-size(xs);
+  @include pure-button(#ffffff, #0e90d2);
+}
+.btn-blue-sm {
+  @include pure-button-size(sm);
+  @include pure-button(#ffffff, #0e90d2);
+}
+.btn-blue-lg {
+  @include pure-button-size(lg);
+  @include pure-button(#ffffff, #0e90d2);
+}
+.btn-blue-xl {
+  @include pure-button-size(xl);
+  @include pure-button(#ffffff, #0e90d2);
+}
+.btn-bordered {
+  @include pure-button(#dd514c, #dd514c, 1, 0, 1px solid #dd514c);
+}
+
+.btn-trans-Cancel {
+  @include pure-button-size(lg);
+  @include pure-button(black, #fff, 1, 0);
+}
+
+.btn-rounded-green {
+  @include pure-button(#368868, #368868, 1, 0, 1px solid #368868, 10px);
+  border-radius: 20px;
+}

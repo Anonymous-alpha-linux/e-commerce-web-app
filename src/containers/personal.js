@@ -1,33 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function Personal({ personalInfo }) {
-    const { user } = useAuthorizationContext();
+    const { user, profile, editProfile } = useAuthorizationContext();
+    console.log(profile);
     const { workspace } = useWorkspaceContext();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);
+
     const [input, setInput] = useState({
-        introduction: '',
-        gender: 'male',
-        birth: '',
-        email: '',
-        department: ''
+        firstName: profile?.firstName || '',
+        lastName: profile?.lastName || '',
+        address: profile?.address || '',
+        phone: profile?.phone || '',
+        introduction: profile?.introduction || '',
+        gender: profile?.gender || 'male',
+        age: profile?.age || 0,
+        birth: ''
     });
     const location = useLocation();
+    const titleRef = useRef();
 
     const inputHandler = (e) => {
         setInput({
+            ...input,
             [e.target.name]: e.target.value
-        })
+        });
     }
     const submitHandler = (e) => {
         e.preventDefault();
+        return editProfile(input);
     }
 
     return <ContainerComponent
+        className="personal"
         style={{
             padding: '10px'
         }}>
@@ -36,13 +45,7 @@ export default function Personal({ personalInfo }) {
                 position: 'relative',
             }}>
                 <Text.CenterLine style={{ position: 'relative', zIndex: 1, height: '27.5px' }}>
-                    <Icon.CircleIcon style={{
-                        display: 'inline-block',
-                        overflow: 'hidden',
-                        width: '57px',
-                        height: '57px',
-                        zIndex: 1
-                    }}>
+                    <Icon.CircleIcon className="personal__avatar">
                         <Icon.Image src={`${user.profileImage}`} alt={`Avatar`} style={{
                             objectFit: 'fill',
                         }}></Icon.Image>
@@ -105,21 +108,98 @@ export default function Personal({ personalInfo }) {
                 <ContainerComponent.Pane style={{
                     padding: '20px 0'
                 }}>
-                    <Text.Title style={{
-                        lineHeight: '2px',
-                        textIndent: '10px',
-                        transform: 'translateY(20px)',
-                    }}>Profile</Text.Title>
+                    <Text.Title
+                        className={"personal__title"}
+                        forwardedRef={titleRef}
+                    >Profile</Text.Title>
                     <Form.TextArea placeholder="Some your introduction"
                         rows={15}
                         name={'introduction'}
                         onChange={inputHandler}
+                        onScroll={(e) => {
+                            if (e.target.scrollTop > 10) titleRef.current.style.opacity = '0';
+                            else titleRef.current.style.opacity = '1';
+                        }}
                         style={{
                             width: '100%',
                             borderRadius: '20px',
                             padding: '30px 0 0 10px'
                         }}
+                        disabled={!isEdit}
                         value={input.introduction}></Form.TextArea>
+
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            First name
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Input style={{
+                        textAlign: 'right',
+                    }}
+                        name="firstName"
+                        onChange={inputHandler}
+                        value={input.firstName}
+                        disabled={!isEdit}></Form.Input>
+
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            Last name
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Input style={{
+                        textAlign: 'right',
+                    }}
+                        name="lastName"
+                        onChange={inputHandler}
+                        value={input.lastName}
+                        disabled={!isEdit}></Form.Input>
+
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            Phone
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Input style={{
+                        textAlign: 'right',
+                    }}
+                        name="phone"
+                        onChange={inputHandler}
+                        value={input.phone}
+                        disabled={!isEdit}></Form.Input>
+
+                    <Text.MiddleLine style={{
+                        lineHeight: 0,
+                        textIndent: '5px',
+                        transform: 'translateY(25px)',
+                        fontWeight: 800
+                    }}>
+                        <Text.Label>
+                            Address
+                        </Text.Label>
+                    </Text.MiddleLine>
+                    <Form.Input style={{
+                        textAlign: 'right',
+                    }}
+                        name="address"
+                        onChange={inputHandler}
+                        value={input.address}
+                        disabled={!isEdit}></Form.Input>
+
                     <Text.MiddleLine style={{
                         lineHeight: 0,
                         textIndent: '5px',
@@ -131,6 +211,8 @@ export default function Personal({ personalInfo }) {
                         </Text.Label>
                     </Text.MiddleLine>
                     <Form.Select placeholder="Post your information"
+                        disabled={!isEdit}
+                        value={input.gender}
                         style={{
                             textAlign: 'right',
                             width: '100%',
@@ -142,7 +224,7 @@ export default function Personal({ personalInfo }) {
                         <Form.Option value={'male'}>Male</Form.Option>
                         <Form.Option value={'female'}>Female</Form.Option>
                     </Form.Select>
-
+                    {/* Date of birth */}
                     <Text.MiddleLine style={{
                         lineHeight: 0,
                         textIndent: '5px',
@@ -150,17 +232,19 @@ export default function Personal({ personalInfo }) {
                         fontWeight: 800
                     }}>
                         <Text.Label>
-                            Day of Birth
+                            {isEdit ? 'Day of Birth' : 'Age'}
                         </Text.Label>
                     </Text.MiddleLine>
                     <Form.Input
-                        type="date"
+                        type={isEdit ? "date" : "text"}
                         onChange={inputHandler}
-                        name='birth'
-                        value={input.birth}
+                        name={'birth'}
+                        disabled={!isEdit}
+                        value={!isEdit ? input.age : input.birth}
                         style={{
                             textAlign: 'right',
                         }}></Form.Input>
+
                     <Text.MiddleLine style={{
                         lineHeight: 0,
                         textIndent: '5px',
@@ -177,7 +261,8 @@ export default function Personal({ personalInfo }) {
                         name="email"
                         onChange={inputHandler}
                         value={user.email}
-                        disabled={'true'}></Form.Input>
+                        disabled={true}></Form.Input>
+
                     <Text.MiddleLine style={{
                         lineHeight: 0,
                         textIndent: '5px',
@@ -189,22 +274,31 @@ export default function Personal({ personalInfo }) {
                         </Text.Label>
                     </Text.MiddleLine>
                     <Form.Input placeholder="your position"
-                        value={input.department}
+                        value={workspace.workTitle}
                         name='department'
+                        disabled={true}
                         style={{
                             textAlign: 'right',
                         }}></Form.Input>
                 </ContainerComponent.Pane>
                 <Text.RightLine>
-                    {isEdit && <Form.Input
-                        type='submit'
-                        onClick={(e) => {
-                            submitHandler(e);
-                            setIsEdit(false)
-                        }}>
-                        Save
-                    </Form.Input>
+                    {isEdit && <>
+                        <Form.Input
+                            type='submit'
+                            style={{ display: 'none' }}
+                            onClick={(e) => {
+                                submitHandler(e);
+                                setIsEdit(false);
+                            }}>
+                        </Form.Input>
+                        <ButtonComponent style={{ cursor: 'pointer' }}
+                            onClick={() => { document.querySelector('input[type=submit]').click(); }}
+                        >
+                            Save
+                        </ButtonComponent>
+                    </>
                         || <ButtonComponent
+                            style={{ cursor: 'pointer' }}
                             onClick={() => setIsEdit(true)}>
                             Edit
                         </ButtonComponent>}
