@@ -9,7 +9,7 @@ export default function Timespan({
     const startDate = new Date(startTime);
     const expireDate = new Date(expireTime);
     const [counterTimer, setCounterTimer] = useState({
-        days: (expireDate.getMonth() - startDate.getMonth()) * 30,
+        days: expireDate.getDate() - startDate.getDate(),
         hours: 23 - startDate.getHours(),
         minutes: 59 - startDate.getMinutes(),
         seconds: 59 - startDate.getSeconds()
@@ -19,7 +19,7 @@ export default function Timespan({
         let timeout = setTimeout(() => {
 
             setCounterTimer({
-                days: (expireDate.getMonth() - startDate.getMonth()) * 30,
+                days: expireDate.getDate() - startDate.getDate(),
                 hours: 23 - startDate.getHours(),
                 minutes: 59 - startDate.getMinutes(),
                 seconds: 59 - startDate.getSeconds(),

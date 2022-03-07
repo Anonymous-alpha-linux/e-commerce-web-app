@@ -1,34 +1,59 @@
-import React, { useState, useEffect } from "react";
-import { ContainerComponent, Icon, Text, Preview, ButtonComponent } from "../components";
+import React, { useState, useRef } from "react";
+import { ContainerComponent, Icon, Text, Preview, Dropdown } from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
-import { IoEarth } from "react-icons/io5";
-import { BsFillPersonFill } from "react-icons/bs";
-import { Comment } from ".";
+// import { IoEarth } from "react-icons/io5";
+import { IoIosArrowDown } from 'react-icons/io';
+import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, usePostContext } from "../redux";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     const [openComment, setOpenComment] = useState(false);
-    const { getSocket, user } = useAuthorizationContext();
-    const { posts } = usePostContext();
+    const { user } = useAuthorizationContext();
+    const { interactPost } = usePostContext();
     const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-    // useEffect(() => {
-    //     console.log(postHeader, postBody, postFooter);
-    // }, [postFooter, postBody, postFooter]);
-    console.log(posts);
 
-    const thumpupHandler = () => {
-        console.log(user);
-        getSocket().emit('like', {
+    const isFirstRender = useRef(true);
+    const interactRef = useRef(interactPost);
 
-        });
+    const [interact, setInteract] = useState({
+        liked: postFooter.isLiked,
+        disliked: postFooter.isDisliked
+    })
+
+    const checkedHandler = async (e) => {
+        const isChecked = e.target.checked;
+        if (e.target.name === 'like') {
+            setInteract({
+                ...interact,
+                liked: !interact.liked,
+                disliked: interact.disliked && false,
+            });
+        }
+        if (e.target.name === 'dislike') {
+            setInteract({
+                ...interact,
+                disliked: !interact.disliked,
+                liked: interact.liked && false
+            });
+        }
     }
-    const thumpdownHandler = () => {
-        getSocket().emit('dislike', {
 
-        })
-    }
+    React.useEffect(() => {
+        if (!isFirstRender.current) {
+            interactRef.current(postHeader.id, 'rate', interact, () => { });
+        }
+    }, [interact]);
+
+    React.useEffect(() => {
+        isFirstRender.current = false;
+    }, []);
+
+    React.useEffect(() => {
+        interactRef.current = interactPost;
+    }, [interactRef]);
+
     return (
         <ContainerComponent.Section
             className="post__section"
@@ -53,25 +78,33 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                         <Text.Date style={{
                             marginRight: '8px'
                         }}>{date}</Text.Date>
-                        <Text>
+                        {/* <Text>
                             <IoEarth />
-                        </Text>
+                        </Text> */}
                     </ContainerComponent.Flex>
                 </ContainerComponent.InlineGroup>
-                <Link to={`/portal/idea/${postHeader.id}`}>
-                    <ButtonComponent>
-                        Edit
-                    </ButtonComponent>
-                </Link>
-                <ButtonComponent onClick={removeIdea}>
-                    Delete
-                </ButtonComponent>
+                {user.accountId === postHeader.postAuthor && <Text.RightLine>
+                    <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
+                        <Dropdown.Item>
+                            <Link to={`/portal/idea/${postHeader.id}`}>
+                                <Text>
+                                    Edit
+                                </Text>
+                            </Link>
+                        </Dropdown.Item>
+                        <Dropdown.Item>
+                            <Text onClick={removeIdea}>
+                                Delete
+                            </Text>
+                        </Dropdown.Item>
+                    </DropDownButton>
+                </Text.RightLine>}
             </ContainerComponent.Pane>
             <ContainerComponent.Pane className="post__body">
                 <Text.Paragraph>
                     {postBody.content}
                 </Text.Paragraph>
-                <ContainerComponent.Flex>
+                {/* <ContainerComponent.Flex>
                     {postBody.attachment.map(attach => {
                         const imageRegex = new RegExp("image/*");
                         if (imageRegex.test(attach.fileType))
@@ -81,7 +114,9 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                             </ContainerComponent.Item>
                         return;
                     })}
-                </ContainerComponent.Flex>
+                </ContainerComponent.Flex> */}
+                {postBody.attachment.length && <GridPreview files={postBody.attachment}></GridPreview>}
+
             </ContainerComponent.Pane>
             {/* {Like, Dislike} */}
             <ContainerComponent.Pane className="post__footer" style={{
@@ -91,38 +126,74 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                 <ContainerComponent.GridThreeColumns>
                     <ContainerComponent.Item>
                         <Text.MiddleLine>
+                            <input type='checkbox'
+                                name="like"
+                                id={`like ${postHeader.id}`}
+                                value={interact.liked}
+                                onChange={checkedHandler}
+                                style={{ display: 'none' }}></input>
                             <Icon.CircleIcon
-                                onClick={() => {
-
-                                }}
+                                onClick={() => { document.getElementById(`like ${postHeader.id}`).click() }}
                                 style={{
-                                    marginRight: '10px'
+                                    marginRight: '10px',
+                                    color: '#fff',
+                                    position: 'relative',
                                 }}>
-                                <FaThumbsUp />
+                                <FaThumbsUp stroke='#000'
+                                    strokeWidth={20}
+                                    style={{
+                                        fill: `${interact.liked ? 'blue' : 'transparent'}`,
+                                        position: "absolute",
+                                        top: '50%',
+                                        transform: 'translate(-50%,-50%)',
+                                        left: '50%'
+                                    }} />
                             </Icon.CircleIcon>
                             {postFooter.like}
                         </Text.MiddleLine>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <Text.CenterLine>
-                            <Icon.CircleIcon style={{
-                                marginRight: '10px'
-                            }}>
-                                <FaThumbsDown />
-                            </Icon.CircleIcon>
-                            {postFooter.dislike}
-                        </Text.CenterLine>
+                        <Text.MiddleLine>
+                            <input type='checkbox'
+                                name="dislike"
+                                id={`dislike ${postHeader.id}`}
+                                value={interact.disliked}
+                                onChange={checkedHandler}
+                                style={{ display: 'none' }}></input>
+                            <Text.CenterLine>
+                                <Icon.CircleIcon
+                                    onClick={() => { document.getElementById(`dislike ${postHeader.id}`).click() }}
+                                    style={{
+                                        marginRight: '10px',
+                                        color: '#fff',
+                                        position: 'relative',
+                                    }}>
+                                    <FaThumbsDown stroke='#000' strokeWidth={20} style={{
+                                        fill: `${interact.disliked ? 'blue' : 'transparent'}`,
+                                        position: "absolute",
+                                        top: '50%',
+                                        transform: 'translate(-50%,-50%)',
+                                        left: '50%'
+                                    }} />
+                                </Icon.CircleIcon>
+                                {postFooter.dislike}
+                            </Text.CenterLine>
+                        </Text.MiddleLine>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item onClick={() => setOpenComment(!openComment)}>
-                        <Text.CenterLine>
-                            <Text.MiddleLine>
+                        <Text.AbsoluteMiddle>
+                            <Text.CenterLine>
                                 Comment
-                            </Text.MiddleLine>
-                        </Text.CenterLine>
+                            </Text.CenterLine>
+                        </Text.AbsoluteMiddle>
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
-            {openComment && <Comment commentLogs={postFooter.comment}></Comment>}
+            {
+                openComment && <Comment
+                    postId={postHeader.id}
+                    commentLogs={postFooter.comment}></Comment>
+            }
         </ContainerComponent.Section>
     );
 }

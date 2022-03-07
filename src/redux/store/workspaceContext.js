@@ -48,6 +48,7 @@ export default React.memo(function WorkspaceContext({ children }) {
     const [error, setError] = useState('');
     const cancelTokenSource = axios.CancelToken.source();
     const { REACT_APP_ENVIRONMENT } = process.env;
+    const workspaceAPI = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
 
     useEffect(() => {
         try {
@@ -61,7 +62,6 @@ export default React.memo(function WorkspaceContext({ children }) {
     }, [user]);
 
     function onLoadWorkspace() {
-        const workspaceAPI = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
         axios.get(workspaceAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`

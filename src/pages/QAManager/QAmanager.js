@@ -1,7 +1,8 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 
-export default function Merchant() {
-    return <div>
-        <h1>This is QA manager page</h1>
-    </div>;
+export default function QAManager() {
+    return <>
+        <Outlet></Outlet>
+    </>;
 }

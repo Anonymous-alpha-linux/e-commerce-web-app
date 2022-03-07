@@ -10,4 +10,6 @@ export { default as MessageBox } from './messagebox'
 export { default as Message } from './message';
 export { default as List } from "./list";
 export { default as Loader } from "./loading";
-export { default as Accordion } from "./accordion"
+export { default as Accordion } from "./accordion";
+export { default as Dropdown } from './dropdown';
+export { default as BarChart} from './barchart'
