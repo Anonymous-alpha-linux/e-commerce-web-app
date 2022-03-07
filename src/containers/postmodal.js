@@ -45,7 +45,6 @@ export default function PostModal({
     const editHandler = (e) => {
         e.preventDefault();
         postIdea(input, res => {
-            // console.log(res);
             navigate('/');
         }, {
             isEdit: true,
@@ -63,34 +62,6 @@ export default function PostModal({
         else {
             setError('Please checked our terms and condition');
         }
-        // const formData = new FormData();
-        // input.files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
-        //     formData.append("files", file);
-        // });
-        // Object.keys(input).forEach(key => {
-        //     if (Array.isArray(input[key])) {
-        //         input[key].forEach(item => {
-        //             formData.append(key, item);
-        //         })
-        //         return;
-        //     }
-        //     formData.append(key, JSON.stringify(input[key]));
-        // })
-        // return axios.post(staffURL, formData, {
-        //     headers: {
-        //         'Content-Type': 'multipart/form-data',
-        //         'Authorization': `Bearer ${user.accessToken}`
-        //     },
-        //     params: {
-        //         view: 'post'
-        //     }
-        // }).then(res => {
-        //     // getSocket().emit("notify post", {
-        //     //     postId: res.data.postId,
-        //     //     postURL: `/post/${res.data.postId}`
-        //     // });
-        //     navigate('/');
-        // }).catch(err => setError(err.message));
     };
     const inputHandler = (e) => {
         setInput(input => ({
