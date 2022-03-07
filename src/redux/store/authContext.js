@@ -42,10 +42,6 @@ export default function AuthenticationContext({ children }) {
         console.log(data);
       });
 
-      // socket.on("notify", data => {
-      //   console.log(data);
-      // });
-
       pushNotification();
     }
     return () => {

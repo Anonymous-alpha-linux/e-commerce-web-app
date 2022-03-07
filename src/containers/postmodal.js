@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ButtonComponent, ContainerComponent, Form, Icon, MessageBox, Text } from '../components';
 import { ConditionContainer, UploadForm } from '.';
-// import ConditionContainer from './condition';
-// import UploadForm from './uploadpreview';
 import { useAuthorizationContext, usePostContext } from '../redux';
 import { mainAPI } from '../config';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from './tagsinput';
+import { Loading } from '../pages';
 
 export default function PostModal({
     // setOpenModal
@@ -19,7 +18,7 @@ export default function PostModal({
         categories: [],
         files: [],
     });
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [openCondition, setOpenCondition] = useState(false);
@@ -53,8 +52,10 @@ export default function PostModal({
     }
     const submitHandler = (e) => {
         e.preventDefault();
+        setLoading(true);
         if (checkedCondition.current.checked) {
             postIdea(input, res => {
+                setLoading(false);
                 setShowUpdate(o => !o);
                 navigate('/');
             });
@@ -103,8 +104,8 @@ export default function PostModal({
     useEffect(() => {
         if (id && posts.length) {
             const { attachment, category, content, hideAuthor } = posts.find(post => post._id === id);
-            attachment.forEach(attach => {
-                getFile(attach, file => {
+            Promise.all(attachment.map(attach => {
+                return getFile(attach, file => {
                     setInput({
                         ...input,
                         content: content,
@@ -112,21 +113,20 @@ export default function PostModal({
                         categories: category.map(single => single._id),
                         files: [...input.files, file]
                     });
-                }).then(f => {
-                    setLoading(false);
                 });
+            })).then(f => {
+                setLoading(false);
+            }).catch(error => {
+                console.log(error.message);
+                setError(error.message);
+                setLoading(false);
             });
         }
         else
             setLoading(false);
     }, [posts]);
-    useEffect(() => {
-        console.log(input);
 
-    }, [input]);
-
-    // console.log(postLoading, categoryLoading, loading, id);
-    // if (postLoading || categoryLoading || loading) return <Loading></Loading>
+    if (loading) return <Loading></Loading>
 
     return <>
         <ContainerComponent.Section className="postModal__container">
