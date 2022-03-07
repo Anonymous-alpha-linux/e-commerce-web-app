@@ -1,2 +1,2 @@
 export { default as AnimateComponent } from "./AnimateComponent";
-export { default as useMedia, deviceStr } from './useResponsive';
+export { default as useMedia } from "./useResponsive";

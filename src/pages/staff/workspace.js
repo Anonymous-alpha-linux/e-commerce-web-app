@@ -1,5 +1,10 @@
 import React, { useRef } from "react";
-import { ButtonComponent, ContainerComponent, List } from "../../components";
+import {
+  BarChart,
+  ButtonComponent,
+  ContainerComponent,
+  List,
+} from "../../components";
 import {
   Filter,
   LazyLoading,
@@ -27,6 +32,7 @@ export default function Workspace() {
     <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
+      <BarChart></BarChart>
       <Filter
         loader={filterPost}
         selectOptions={[
@@ -54,7 +60,7 @@ export default function Workspace() {
               dislikedAccounts,
               comment,
               hideAuthor,
-              comments
+              comments,
             } = post;
             let postHeader = {
               id: _id,
@@ -84,13 +90,10 @@ export default function Workspace() {
               likedAccounts,
               dislikedAccounts,
               comment,
-              comments
+              comments,
             };
             return (
-              <List.Item
-                key={post._id}
-                id={post._id}
-              >
+              <List.Item key={post._id} id={post._id}>
                 <PostContainer
                   postId={_id}
                   postHeader={postHeader}
