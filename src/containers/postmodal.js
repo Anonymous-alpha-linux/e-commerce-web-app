@@ -80,14 +80,19 @@ export default function PostModal(
   };
   const submitHandler = (e) => {
     e.preventDefault();
-    if (checkedCondition.current.checked) {
-      postIdea(input, (res) => {
-        // console.log(res);
-        setShowUpdate((o) => !o);
-        navigate("/");
-      });
-    } else {
-      setError("Please checked our terms and condition");
+    try {
+      if (input.categories.length) throw new Error("Please select a category");
+      if (checkedCondition.current.checked) {
+        postIdea(input, (res) => {
+          // console.log(res);
+          setShowUpdate((o) => !o);
+          navigate("/");
+        });
+      } else {
+        throw new Error("Please checked our terms and condition");
+      }
+    } catch (error) {
+      setError(error.message);
     }
   };
   const inputHandler = (e) => {
@@ -109,16 +114,18 @@ export default function PostModal(
         if (isOverflowFile(input.files, size)) {
           alert("File size is overflow");
           setError("File size is overflow");
-          return;
+          return null;
+        } else {
+          return file;
         }
-        return file;
       })
       .filter((file) => file);
+    console.log(filter);
 
     setInput((input) => {
       return {
         ...input,
-        files: [...input.files, ...filter],
+        files: filter.length ? [...input.files, ...filter] : input.files,
       };
     });
   };
