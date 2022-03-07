@@ -12,43 +12,48 @@ const AuthenticationContextAPI = createContext();
 export default function AuthenticationContext({ children }) {
   const { REACT_APP_ENVIRONMENT } = process.env;
   const [user, setUser] = useReducer(authReducer, initialAuth);
+  const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
+
   const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
 
   useEffect(() => {
     try {
-      onLoadUser();
+      onLoadUser(() => {
+        getProfile();
+        getNotifications();
+      });
     }
     catch (error) {
       setError(error.message);
     }
-    // .then(() => {
-    //   setLoading(true);
-    //   // const socketHost = mainAPI.CLOUD_HOST;
-    //   const socketHost = mainAPI.LOCALHOST_HOST;
-    //   const socket = io(socketHost, {
-    //     auth: {
-    //       accessToken: user.accessToken
-    //     }
-    //   }).on("join", (msg) => {
-    //     console.log(msg);
-    //     setSocket(socket);
-    //   }).on("connect_error", err => {
-    //     setError(err.message);
-    //     socket.disconnect();
-    //   });
-    // })
-    // .finally(() => {
-    //   setLoading(false);
-    // });
     return () => {
       cancelTokenSource.cancel();
     };
   }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('session', data => {
+        console.log(data);
+      });
+
+      // socket.on("notify", data => {
+      //   console.log(data);
+      // });
+
+      pushNotification();
+    }
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [socket]);
 
   const getSocket = () => {
     if (!socket) {
@@ -56,7 +61,7 @@ export default function AuthenticationContext({ children }) {
     }
     return socket;
   };
-  const onLoadUser = () => {
+  const onLoadUser = (cb) => {
     return axios.get(authApi, {
       cancelToken: cancelTokenSource.token,
       headers: {
@@ -67,14 +72,20 @@ export default function AuthenticationContext({ children }) {
         type: actions.AUTHENTICATE_ACTION,
         payload: response.data,
       });
-    }).catch(error => {
-      unstable_batchedUpdates(() => {
-        setUser({
-          type: actions.AUTHENTICATE_FAILED,
-        });
-        setError(error.message);
-      });
+      let socket = io(host);
+      socket.auth = { accessToken: response.data.accessToken };
+      return setSocket(socket);
+    }).then(success => {
+      cb();
     })
+      .catch(error => {
+        unstable_batchedUpdates(() => {
+          setUser({
+            type: actions.AUTHENTICATE_FAILED,
+          });
+          setError(error.message);
+        });
+      })
   };
   function login(data) {
     const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
@@ -115,6 +126,82 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   }
+  function getProfile() {
+    return axios.get(authApi, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'profile',
+        accountid: user.accountId
+      }
+    }).then(res => {
+      return setUser({
+        type: actions.GET_PROFILE,
+        payload: res.data.response
+      });
+    }).catch(error => setError(error.message));
+  }
+  function editProfile(input) {
+    return axios.put(authApi, {
+      ...input
+    }, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'profile'
+      }
+    }).then(res => getProfile()).catch(error => {
+      setError(error.message);
+    })
+  }
+  function pushNotification() {
+    return socket.on("notify", data => {
+      setUser({
+        type: actions.PUSH_NOTIFICATION,
+        payload: data
+      })
+    });
+  }
+  function getNotifications() {
+    return axios.get(authApi, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'notification',
+        page: 0,
+        count: 10,
+      }
+    }).then(res => setUser({
+      type: actions.GET_NOTIFICATIONS,
+      payload: res.data.response
+    })).catch(error => {
+      setError(error.message);
+    });
+  }
+  function loadMoreNotification() {
+    return axios.get(authApi, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'notification',
+        page: user.page + 1,
+        count: 10,
+      }
+    }).then(res => setUser({
+      type: actions.GET_NOTIFICATIONS,
+      payload: res.data.response
+    })).catch(error => {
+      setError(error.message);
+    });
+  }
 
   if (user.authLoading) return <Loading className="auth__loading"></Loading>
 
@@ -122,12 +209,16 @@ export default function AuthenticationContext({ children }) {
     <AuthenticationContextAPI.Provider value={{
       loading: user.authLoading,
       user,
+      profile: user.profile,
       message,
       error,
+      socket,
       cancelTokenSource,
       getSocket,
       login,
       logout,
+      editProfile,
+      loadMoreNotification
     }}>
       {children}
     </AuthenticationContextAPI.Provider>

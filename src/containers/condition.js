@@ -10,7 +10,7 @@ export default function ConditionContainer({ closeCondition }) {
         top: '50px',
         left: 0,
         height: '100%',
-        paddingBottom: '50px'
+        // paddingBottom: '50px'
     }}>
         <ContainerComponent.Inner style={{
             height: '100%'
@@ -33,11 +33,14 @@ export default function ConditionContainer({ closeCondition }) {
                     </Icon.CircleIcon>
                 </ContainerComponent.Item>
                 <ContainerComponent.Item>
-                    <Text.Title style={{
-                        color: '#fff'
-                    }}>
-                        Term and Condition
-                    </Text.Title>
+                    <Text.CenterLine>
+                        <Text.Title style={{
+                            color: '#fff',
+                            lineHeight: 2.2
+                        }}>
+                            Term and Condition
+                        </Text.Title>
+                    </Text.CenterLine>
                     <ContainerComponent.Pane
                         style={{
                             background: 'white',
@@ -45,7 +48,12 @@ export default function ConditionContainer({ closeCondition }) {
                             padding: '10px'
                         }}
                     >
-                        <Text.Paragraph>Việc bạn sử dụng website, bạn đồng ý với các Điều khoản sử dụng này. Chúng tôi có thể sửa đổi Điều khoản Sử dụng này bất kỳ lúc nào theo quyết định của chúng tôi bằng cách đăng các Điều khoản Sử dụng đã sửa đổi tại liên kết Điều khoản Sử dụng (tức là trang web bạn đang xem) hoặc ở nơi khác trên trang web này. Các bản sửa đổi đó sẽ có hiệu lực tại thời điểm bạn đang tải trang, trừ khi được chúng tôi tuyên bố rõ ràng.</Text.Paragraph>
+                        <Text.Paragraph>
+                            You use the website, you agree to these Terms of Use. We may amend the Terms of Use
+                            This use is any at any time as well as OUR DECISION, I by subscribing to the Terms. Use has been modified in Affiliate Terms
+                            Use (i.e. the web page you are viewing) or elsewhere on this site.
+                            Such revision will be in effect at the time you are loading the page, unless expressly stated by us.
+                        </Text.Paragraph>
                     </ContainerComponent.Pane>
                     <ContainerComponent.Pane
                         style={{
@@ -54,7 +62,12 @@ export default function ConditionContainer({ closeCondition }) {
                             padding: '10px'
                         }}
                     >
-                        <Text.Paragraph>Việc bạn sử dụng website, bạn đồng ý với các Điều khoản sử dụng này. Chúng tôi có thể sửa đổi Điều khoản Sử dụng này bất kỳ lúc nào theo quyết định của chúng tôi bằng cách đăng các Điều khoản Sử dụng đã sửa đổi tại liên kết Điều khoản Sử dụng (tức là trang web bạn đang xem) hoặc ở nơi khác trên trang web này. Các bản sửa đổi đó sẽ có hiệu lực tại thời điểm bạn đang tải trang, trừ khi được chúng tôi tuyên bố rõ ràng.</Text.Paragraph>
+                        <Text.Paragraph>
+                            You use the website, you agree to these Terms of Use. We may amend the Terms of Use
+                            This use is any at any time as well as OUR DECISION, I by subscribing to the Terms. Use has been modified in Affiliate Terms
+                            Use (i.e. the web page you are viewing) or elsewhere on this site.
+                            Such revision will be in effect at the time you are loading the page, unless expressly stated by us.
+                        </Text.Paragraph>
                     </ContainerComponent.Pane>
                 </ContainerComponent.Item>
             </ContainerComponent.Flex>

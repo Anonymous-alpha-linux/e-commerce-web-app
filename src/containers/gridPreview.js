@@ -4,8 +4,10 @@ import { Text, ContainerComponent, ButtonComponent } from "../components";
 
 export default function GridPreview({ files }) {
     const [Rows, setRows] = useState([]);
+    console.log(files)
+
     const Images = useRef(files.filter((file) => file.fileType.includes('image')))
-    const otherFiles = useRef(files.some((file) => !file.fileType.includes(`image`)))
+    const otherFiles = useRef(files.some((file) => !file.fileFormat.includes(`image`)))
 
     // images = ['linkImage']
     const getRowColumn = () => {
