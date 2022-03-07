@@ -82,7 +82,7 @@ function Crud() {
         </AnimateComponent> */}
         <div
           style={{
-            marginTop: "25%",
+            marginTop: "200px",
           }}
         >
           <table className="table table-style">
@@ -102,7 +102,13 @@ function Crud() {
                     <td style={{ textAlign: "center", width: "40%" }}>
                       {category.Title}
                     </td>
-                    <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                    <td
+                      style={{
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
+                        width: "120px",
+                      }}
+                    >
                       <button
                         onClick={() => deleteUser()}
                         className="btn-red"
