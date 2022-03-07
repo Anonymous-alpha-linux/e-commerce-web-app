@@ -1,10 +1,5 @@
 import React, { useRef } from "react";
-import {
-  BarChart,
-  ButtonComponent,
-  ContainerComponent,
-  List,
-} from "../../components";
+import { ContainerComponent, List } from "../../components";
 import {
   Filter,
   LazyLoading,
@@ -32,7 +27,6 @@ export default function Workspace() {
     <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
-      <BarChart></BarChart>
       <Filter
         loader={filterPost}
         selectOptions={[
@@ -74,11 +68,12 @@ export default function Workspace() {
             let postBody = {
               content,
               attachment: attachment.map((attach) => {
-                const { _id, fileType, online_url, filePath } = attach;
+                const { _id, fileType, online_url, filePath, fileFormat } = attach;
                 return {
                   _id,
                   image: `${online_url || filePath}`,
                   fileType,
+                  fileFormat
                 };
               }),
             };

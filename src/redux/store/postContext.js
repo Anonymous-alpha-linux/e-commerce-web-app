@@ -588,7 +588,6 @@ export default React.memo(function PostContext({ children }) {
                     to: socketTargets.WITHOUT_BROADCAST
                 });
                 setShowUpdate(!showUpdate);
-
                 cb(res);
             }).catch(error => setError(error.message));
 
@@ -602,15 +601,13 @@ export default React.memo(function PostContext({ children }) {
             }
         }).then(res => {
             console.log(res.data);
-            socket.emit("notify", {
-                postId: res.data.response._id,
-                postURL: `/post/${res.data.response._id}`,
-                type: notifyData.CREATE_POST,
-                to: 'all'
-            });
+            sendNotification(res);
             setShowUpdate(!showUpdate);
             cb(res);
-        }).catch(err => setError(err.message));
+        }).catch(err => {
+            cb(error);
+            setError(err.message);
+        });
     }
     // 7. Delete idea
     const removeIdea = (id) => {
@@ -643,6 +640,14 @@ export default React.memo(function PostContext({ children }) {
         })).then(data => cb(data)).catch(error => setError(error.message));
     }
     function getGzipFile() {
+    }
+    function sendNotification(res) {
+        return socket.emit("notify", {
+            postId: res.data.response._id,
+            postURL: `/post/${res.data.response._id}`,
+            type: notifyData.CREATE_POST,
+            to: 'all'
+        });
     }
 
     useEffect(() => {

@@ -31,7 +31,7 @@ export default function PostModal(
         categories: [],
         files: [],
     });
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [openCondition, setOpenCondition] = useState(false);
@@ -138,14 +138,10 @@ export default function PostModal(
     };
 
     useEffect(() => {
-        // console.log(posts);
-        if (id) {
-            const { attachment, category, content, hideAuthor } = posts.find(
-                (post) => post._id === id
-            );
-            console.log(attachment);
-            attachment.forEach((attach) => {
-                getFile(attach, (file) => {
+        if (id && posts.length) {
+            const { attachment, category, content, hideAuthor } = posts.find(post => post._id === id);
+            Promise.all(attachment.map(attach => {
+                return getFile(attach, file => {
                     setInput({
                         ...input,
                         content: content,
@@ -153,15 +149,20 @@ export default function PostModal(
                         categories: category.map((single) => single._id),
                         files: [...input.files, file],
                     });
-                }).then((f) => {
-                    setLoading(false);
                 });
+            })).then(f => {
+                setLoading(false);
+            }).catch(error => {
+                console.log(error.message);
+                setError(error.message);
+                setLoading(false);
             });
-        } else setLoading(false);
-    }, []);
+        }
+        else
+            setLoading(false);
+    }, [posts]);
 
-    // console.log(postLoading, categoryLoading, loading, id);
-    if (postLoading || categoryLoading || loading) return <Loading></Loading>;
+    if (loading) return <Loading></Loading>
 
     return (
         <ContainerComponent.Section className="postModal__container">
