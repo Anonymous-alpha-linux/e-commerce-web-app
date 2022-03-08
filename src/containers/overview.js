@@ -1,4 +1,5 @@
 import React from 'react'
+
 import {ContainerComponent, Text} from '../components'
 
 export default function DashboardOverview() {
@@ -55,6 +56,5 @@ export default function DashboardOverview() {
             </ContainerComponent.Item>
             </ContainerComponent.GridThreeColumns>
         </ContainerComponent>
-        
     )
 }
