@@ -25,7 +25,7 @@ function Crud() {
   const [categories, setCategories] = useState(Category);
   const [modal, setModal] = useState(false);
 
-  function deleteUser() {}
+  function deleteUser() { }
   function onSubmit(data) {
     return createCetegory(data);
   }
@@ -82,7 +82,7 @@ function Crud() {
         </AnimateComponent> */}
         <div
           style={{
-            marginTop: "200px",
+            marginTop: "100px",
           }}
         >
           <table className="table table-style">
@@ -126,7 +126,7 @@ function Crud() {
               {categories && !categories.length && (
                 <tr>
                   <td>
-                    <div>No Coategry to Display</div>
+                    <div>No Category to Display</div>
                   </td>
                 </tr>
               )}

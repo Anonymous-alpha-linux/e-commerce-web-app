@@ -1,38 +1,3 @@
-<<<<<<< HEAD
-class useValidate {
-
-    constructor(string) {
-        this.input = string;
-    }
-
-    isEmpty() {
-        if (!this.input) throw new Error("Please fulfill your input !");
-        return this;
-    }
-    isNumber() {
-        if (!Number.isInteger(this.input)) throw new Error("This input must be number");
-        return this;
-    }
-    isEmail() {
-
-    }
-    isLengthEnough() {
-
-    }
-    isPhone() {
-
-    }
-}
-
-
-const validate = new useValidate('email@fpt.vn');
-// chaining
-try {
-    // validate.isEmail().isNumber().isLengthEnough().input;
-} catch (error) {
-    console.log(error);
-}
-=======
 export default class useValidate {
   constructor(
     string,
@@ -79,4 +44,3 @@ export default class useValidate {
     return this;
   }
 }
->>>>>>> 4acb91ec4bca4f87b0afd85670aa28dff1f952bb

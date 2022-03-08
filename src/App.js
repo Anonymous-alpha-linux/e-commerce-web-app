@@ -10,7 +10,8 @@ import {
   WorkspaceGroup,
   Loading,
   MyPost,
-  DashboardManager
+  DashboardManager,
+  CategoryManagement
 } from './pages';
 
 import { AddGroupContainer, ManagerInfo, MessageContainer, NotificationContainer, Personal, PostModal, Searchbar } from "./containers";
@@ -46,6 +47,7 @@ function App() {
               </ProtectedPage>}>
               {/* <Route index element={<Workspace></Workspace>} /> */}
               <Route index element={<DashboardManager></DashboardManager>} />
+              <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
             </Route>) ||
             // 3. QA coordinator
             (user.role === roles.QA_COORDINATOR && <Route path=""
@@ -53,6 +55,7 @@ function App() {
                 <QACoordinator></QACoordinator>
               </ProtectedPage>}>
               <Route index element={<Workspace></Workspace>} />
+              <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
             </Route>) ||
             // 4. Staff
             (user.role === roles.STAFF &&

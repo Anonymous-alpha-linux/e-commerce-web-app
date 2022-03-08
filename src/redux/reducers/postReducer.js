@@ -1,4 +1,5 @@
 import actions from './actions';
+import ActionHandler from './handleActions';
 
 export const initialPostPage = {
     posts: [],
@@ -10,6 +11,7 @@ export const initialPostPage = {
     filter: 0
 }
 const postReducer = (state, action) => {
+    const actionHandler = new ActionHandler(state, action);
     switch (action.type) {
         /*
                1. action.payload: [Array],
@@ -19,55 +21,22 @@ const postReducer = (state, action) => {
                5. action.commentid: [String]
            */
         case actions.GET_POST_LIST:
-            return {
-                ...state,
-                posts: action.payload,
+            return actionHandler.getListItem('posts', action.payload, {
                 postLoading: false,
                 filter: 0,
                 page: 0
-            };
+            });
         case actions.LOAD_MORE_POST:
-            return {
-                ...state,
-                posts: action.payload.length ? state.posts.concat(action.payload) : state.posts,
-                page: action.payload.length ? state.page + 1 : state.page
-            };
+            return actionHandler.loadMoreItems('posts', action.payload);
         case actions.FILTER_POST_LIST:
-            return {
-                ...state,
-                filter: action.filter,
-                postLoading: false,
-                posts: action.payload,
-                page: 0
-            };
-        case actions.UPDATE_SINGLE_POST:
-            console.log(action.payload)
-            return {
-                ...state,
-                posts: state.posts.map(post => {
-                    if (post._id === action.payload.postid) {
-                        return {
-                            ...post,
-                            ...action.payload.data
-                        };
-                    }
-                    return post;
-                }),
-                myPosts: state.myPosts.map(post => {
-                    if (post._id === action.payload.postid) {
-                        return {
-                            ...post,
-                            ...action.payload.data
-                        };
-                    }
-                    return post;
-                })
-            };
+            return actionHandler.filterListItem('posts', action.payload, { postLoading: false });
         case actions.PUSH_IDEA:
-            return {
-                ...state,
-                posts: [action.payload, ...state.posts]
-            }
+            return actionHandler.unshiftItem('posts', action.payload);
+        case actions.UPDATE_SINGLE_POST:
+            return actionHandler.updateItem('posts', action.payload, post => post._id === action.payload.postid,
+                actionHandler.updateItem('myPosts', action.payload, post => post._id === action.payload.postid)
+            );
+
 
         case actions.GET_MY_POST:
             return {
@@ -419,5 +388,7 @@ const postReducer = (state, action) => {
         default:
             return initialPostPage;
     }
+
+
 }
 export default postReducer;
