@@ -19,11 +19,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from "./tagsinput";
 
-export default function PostModal(
-    {
-        // setOpenModal
-    }
-) {
+export default function PostModal() {
     const [input, setInput] = useState({
         content: "",
         private: false,
@@ -294,6 +290,6 @@ export default function PostModal(
                 value={id}></Form.Input>} */}
                 <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
             </Form>
-        </ContainerComponent.Section >
+        </ContainerComponent.Section>
     );
 }
