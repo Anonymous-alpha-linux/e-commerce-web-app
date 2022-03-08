@@ -1,23 +1,25 @@
 import { useRef, useEffect } from "react";
 import { toastTypes } from "../fixtures";
 import styles from "./styles/ToastMessage.module.css";
-
+import { useAuthorizationContext } from "../redux";
 export default function ToastMessage({
   message,
   timeout,
-  type = toastTypes.SUCCESS,
+  type = toastTypes.WARNING,
 }) {
   const ToastRef = useRef();
+  const { setError, setMessage } = useAuthorizationContext();
   useEffect(() => {
     ToastRef.current.style.opacity = 1;
     const LoaderBar = ToastRef.current.lastElementChild.children[0];
-    LoaderBar.style.transition = `all ${
+    LoaderBar.style = `width: 0%; transition: all ${
       timeout / 1000
-    }s cubic-bezier(0,0,1,1) `;
-    LoaderBar.style.width = "0%";
+    }s cubic-bezier(0,0,1,1);
+    `;
     const timeoutVal = setTimeout(() => {
       clearTimeout(timeoutVal);
-      ToastRef.current.parentElement.removeChild(ToastRef.current);
+      setError("");
+      setMessage("");
     }, timeout + 100);
   }, []);
   return (

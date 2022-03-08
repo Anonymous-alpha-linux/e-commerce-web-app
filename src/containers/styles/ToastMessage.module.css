@@ -1,53 +1,52 @@
 .ToastMessage {
-  height: 50px;
   width: 280px;
-  border-radius: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-left: 8px;
-  padding-right: 8px;
-  transition: opacity 0.5s ease-in;
+  border-radius: 5px;
+  background-color: #fff;
+  border: 1px solid #000;
+  padding: 10px 12px;
   opacity: 0;
-  margin: 0 auto;
+  transition: opacity 0.5s ease-in;
+  position: fixed;
+  left: 50%;
+  top: 60px;
+  transform: translateX(-50%);
 }
 
-.ToastMessage.warning {
+.ToastMessage.warning .Bar {
   background-color: yellow;
 }
-.ToastMessage.success {
+.ToastMessage.success .Bar {
   background-color: rgb(3, 160, 3);
+}
+.ToastMessage.error .Bar {
+  background-color: rgb(233, 62, 62);
 }
 
 .ToastMessage > span {
-  flex: 2;
+  margin: 12px 0;
+  display: block;
   font-size: 12px;
+  text-indent: 10px;
   font-weight: bold;
   font-style: italic;
-  margin: 2px auto;
 }
 
 .ToastMessage > .Loader {
-  flex: 8;
-  height: 25px;
+  width: 100%;
+  height: 10px;
   border-radius: 20px;
-  background-color: var(--grey-two);
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
+  background-color: #333;
+  padding: 2px;
 }
 
 .Loader > .Bar {
-  width: 90%;
-  height: 50%;
+  width: 100%;
+  height: 100%;
   border-radius: 20px;
-  background-color: var(--blue-shade-one);
 }
 
 @media (min-width: 480px) {
   .ToastMessage {
-    margin: unset;
-    position: fixed;
     bottom: 20px;
     right: 20px;
   }

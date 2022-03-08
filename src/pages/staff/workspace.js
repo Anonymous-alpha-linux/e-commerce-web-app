@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   BarChart,
   ButtonComponent,
@@ -11,7 +11,9 @@ import {
   PostContainer,
   PostForm,
   Timespan,
+  Toast,
 } from "../../containers";
+import { toastTypes } from "../../fixtures";
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
@@ -20,7 +22,7 @@ import {
 } from "../../redux";
 
 export default function Workspace() {
-  const { user, socket } = useAuthorizationContext();
+  const { user, socket, error, setError } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
   const [postAPI, host] =
@@ -28,7 +30,11 @@ export default function Workspace() {
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const listRef = useRef();
-  console.log(user);
+
+  useEffect(() => {
+    setError("Error!");
+  }, []);
+
   return (
     <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
@@ -108,6 +114,9 @@ export default function Workspace() {
           })}
         </List>
       </LazyLoading>
+      {error && (
+        <Toast message={error} timeout={3000} type={toastTypes.ERROR} />
+      )}
     </ContainerComponent>
   );
 }
