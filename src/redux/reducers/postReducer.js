@@ -63,6 +63,11 @@ const postReducer = (state, action) => {
                     return post;
                 })
             };
+        case actions.PUSH_IDEA:
+            return {
+                ...state,
+                posts: [action.payload, ...state.posts]
+            }
 
         case actions.GET_MY_POST:
             return {
@@ -328,7 +333,7 @@ const postReducer = (state, action) => {
                 posts: state.posts.map(post => {
                     if (post._id === action.postid) {
                         return {
-                            ...post,    
+                            ...post,
                             comments: post.comments.map(comment => {
                                 if (comment._id === action.commentid) {
                                     return {
