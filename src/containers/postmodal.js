@@ -189,7 +189,8 @@ export default function PostModal(
                         </Text.MiddleLine>
                         <Text.Middle
                             style={{
-                                verticalAlign: "text-top",
+                                verticalAlign: 'middle',
+                                textIndent: '12px'
                             }}
                         >
                             Back
@@ -293,6 +294,6 @@ export default function PostModal(
                 value={id}></Form.Input>} */}
                 <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
             </Form>
-        </ContainerComponent.Section>
+        </ContainerComponent.Section >
     );
 }
