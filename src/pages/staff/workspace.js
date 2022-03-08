@@ -6,7 +6,9 @@ import {
   PostContainer,
   PostForm,
   Timespan,
+  Toast,
 } from "../../containers";
+import { toastTypes } from "../../fixtures";
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
@@ -15,7 +17,7 @@ import {
 } from "../../redux";
 
 export default function Workspace() {
-  const { user, socket } = useAuthorizationContext();
+  const { user, socket, error, setError } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
   const [postAPI, host] =
@@ -23,6 +25,11 @@ export default function Workspace() {
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const listRef = useRef();
+
+  useEffect(() => {
+    setError("Error!");
+  }, []);
+
   return (
     <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
@@ -56,6 +63,7 @@ export default function Workspace() {
               hideAuthor,
               comments,
             } = post;
+
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,
@@ -65,15 +73,17 @@ export default function Workspace() {
               date: post.createdAt,
               hideAuthor,
             };
+
             let postBody = {
               content,
               attachment: attachment.map((attach) => {
-                const { _id, fileType, online_url, filePath, fileFormat } = attach;
+                const { _id, fileType, online_url, filePath, fileFormat } =
+                  attach;
                 return {
                   _id,
                   image: `${online_url || filePath}`,
                   fileType,
-                  fileFormat
+                  fileFormat,
                 };
               }),
             };
@@ -101,6 +111,9 @@ export default function Workspace() {
           })}
         </List>
       </LazyLoading>
+      {error && (
+        <Toast message={error} timeout={3000} type={toastTypes.ERROR} />
+      )}
     </ContainerComponent>
   );
 }

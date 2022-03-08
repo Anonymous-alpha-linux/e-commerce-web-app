@@ -1,14 +1,19 @@
-import React, { createContext, useContext, useState, useEffect, useReducer, useCallback } from 'react'
-import axios from 'axios';
-import { mainAPI } from '../../config';
-import actions from '../reducers/actions';
-import { useAuthorizationContext } from '.';
-import { Loading } from '../../pages';
-import { postReducer } from '../reducers';
-import { notifyData, socketTargets } from '../../fixtures';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useReducer,
+  useCallback,
+} from "react";
+import axios from "axios";
+import { mainAPI } from "../../config";
+import actions from "../reducers/actions";
+import { useAuthorizationContext } from ".";
+import { Loading } from "../../pages";
+import { postReducer, initialPostPage } from "../reducers";
+import { notifyData, socketTargets } from "../../fixtures";
 const PostContextAPI = createContext();
-
-
 
 const categoryReducer = (state, action) => {
   switch (action.type) {
@@ -651,7 +656,7 @@ export default React.memo(function PostContext({ children }) {
       cancelTokenSource.cancel();
     };
   }, [user, showUpdate]);
-
+  
   const contextValues = {
     posts: postState.posts,
     myPosts: postState.myPosts,
@@ -687,8 +692,6 @@ export default React.memo(function PostContext({ children }) {
     {children}
   </PostContextAPI.Provider>);
 });
-
-
 
 export const usePostContext = () => {
   return useContext(PostContextAPI);

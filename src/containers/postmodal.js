@@ -54,11 +54,10 @@ export default function PostModal() {
             ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
             : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
-    const isOverflowFile = (currentFileList, fileSize) => {
-        const currentSize = currentFileList.reduce((prev, file) => {
-            return prev + file.size / 1024;
-        }, 0);
-
+  const isOverflowFile = (currentFileList, fileSize) => {
+    const currentSize = currentFileList.reduce((prev, file) => {
+      return prev + file.size / 1024;
+    }, 0);
         return currentSize + fileSize > 50000;
     };
     const editHandler = (e) => {
@@ -66,7 +65,6 @@ export default function PostModal() {
         postIdea(
             input,
             (res) => {
-                // console.log(res);
                 navigate("/");
             },
             {
@@ -153,12 +151,21 @@ export default function PostModal() {
                 setError(error.message);
                 setLoading(false);
             });
-        }
-        else
-            setLoading(false);
-    }, [posts]);
+          });
+        })
+      )
+        .then((f) => {
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(error.message);
+          setError(error.message);
+          setLoading(false);
+        });
+    } else setLoading(false);
+  }, [posts]);
 
-    if (loading) return <Loading></Loading>
+  if (loading) return <Loading></Loading>;
 
     return (
         <ContainerComponent.Section className="postModal__container">
