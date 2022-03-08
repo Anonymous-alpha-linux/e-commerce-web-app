@@ -143,10 +143,67 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         });
     }
-    async function updateSinglePost(postId, cb) {
-        setPost({
-            type: actions.SET_LOADING
+    const postIdea = (input, cb, options = null) => {
+        // Create form submission for post and upload files
+        const formData = new FormData();
+        // Deflat input file to single file array for appending to formdata for uploading
+        input.files
+            .reduce((p, c) => ([...p, c.file]), [])
+            .forEach(file => {
+                formData.append("files", file);
+            });
+        // Append post body to form data
+        Object.keys(input).forEach(key => {
+            if (Array.isArray(input[key])) {
+                input[key].forEach(item => {
+                    formData.append(key, item);
+                })
+                return;
+            }
+            formData.append(key, input[key]);
+        })
+        // Check if the postIdea options are pass with edit copyright
+        if (options?.isEdit)
+            return axios.put(postAPI, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${user.accessToken}`
+                },
+                params: {
+                    view: 'post',
+                    postid: options.id
+                }
+            }).then(res => {
+                console.log(res.data);
+                socket.emit("notify", {
+                    postId: res.data.response._id,
+                    postURL: `/post/${res.data.response._id}`,
+                    type: notifyData.EDIT_POST,
+                    to: socketTargets.WITHOUT_BROADCAST
+                });
+                setShowUpdate(!showUpdate);
+                cb(res);
+            }).catch(error => setError(error.message));
+
+        return axios.post(postAPI, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${user.accessToken}`
+            },
+            params: {
+                view: 'post'
+            }
+        }).then(res => {
+            console.log(res.data);
+            sendNotification(res);
+            setShowUpdate(!showUpdate);
+            cb(res);
+        }).catch(err => {
+            cb(error);
+            setError(err.message);
         });
+    };
+    async function updateSinglePost(postId, cb) {
         return axios.get(postAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -432,12 +489,12 @@ export default React.memo(function PostContext({ children }) {
     }
 
     // Load the next page of post or comment or my post
-    async function loadNextPage(cb) {
-        setPost({
-            type: actions.LOAD_MORE_PAGE
-        });
-        cb();
-    }
+    // async function loadNextPage(cb) {
+    //     setPost({
+    //         type: actions.LOAD_MORE_PAGE
+    //     });
+    //     cb();
+    // }
 
     // 4. Thump-up, thump-down, comment 
     function interactPost(postId, type, input, cb) {
@@ -524,6 +581,7 @@ export default React.memo(function PostContext({ children }) {
             });
         }
     }
+
     // 5. Get the list of categories
     async function getPostCategories() {
         setCategory({
@@ -548,75 +606,7 @@ export default React.memo(function PostContext({ children }) {
             setError(error.message);
         })
     }
-    // 6. Post new Idea
-    const postIdea = (input, cb, options = null) => {
-        setPost({
-            type: actions.SET_LOADING
-        });
-        // Create form submission for post and upload files
-        const formData = new FormData();
-        // Deflat input file to single file array for appending to formdata for uploading
-        input.files
-            .reduce((p, c) => ([...p, c.file]), [])
-            .forEach(file => {
-                formData.append("files", file);
-            });
-        // Append post body to form data
-        Object.keys(input).forEach(key => {
-            if (Array.isArray(input[key])) {
-                input[key].forEach(item => {
-                    formData.append(key, item);
-                })
-                return;
-            }
-            formData.append(key, input[key]);
-        })
-        // Check if the postIdea options are pass with edit copyright
-        if (options?.isEdit)
-            return axios.put(postAPI, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${user.accessToken}`
-                },
-                params: {
-                    view: 'post',
-                    postid: options.id
-                }
-            }).then(res => {
-                console.log(res.data);
-                socket.emit("notify", {
-                    postId: res.data.response._id,
-                    postURL: `/post/${res.data.response._id}`,
-                    type: notifyData.EDIT_POST,
-                    to: socketTargets.WITHOUT_BROADCAST
-                });
-                setShowUpdate(!showUpdate);
-                cb(res);
-            }).catch(error => setError(error.message));
 
-        return axios.post(postAPI, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${user.accessToken}`
-            },
-            params: {
-                view: 'post'
-            }
-        }).then(res => {
-            console.log(res.data);
-            setPost({
-                type: actions.SET_OFF_LOADING
-            });
-            socket.emit("notify", {
-                postId: res.data.response._id,
-                postURL: `/post/${res.data.response._id}`,
-                type: notifyData.CREATE_POST,
-                to: 'all'
-            });
-            setShowUpdate(!showUpdate);
-            cb(res);
-        }).catch(err => setError(err.message));
-    }
     // 7. Delete idea
     const removeIdea = (id) => {
         return axios.delete(postAPI, {
@@ -633,8 +623,10 @@ export default React.memo(function PostContext({ children }) {
             // cb(res);
         }).catch(error => setError(error.message));
     }
+
     // 8. Plug-ins
     async function getFile(attachment, cb) {
+        console.log(attachment);
         await axios.get(`${attachment.online_url || attachment.filePath}`, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -650,6 +642,16 @@ export default React.memo(function PostContext({ children }) {
     function getGzipFile() {
     }
 
+    // 9. Notificaiton
+    function sendNotification(notify) {
+        return socket.emit("notify", {
+            postId: notify._id,
+            postURL: `/post/${notify._id}`,
+            type: notifyData.CREATE_POST,
+            to: socketTargets.WITHOUT_BROADCAST
+        });
+    }
+
     useEffect(() => {
         getPosts();
         getPostCategories();
@@ -657,10 +659,6 @@ export default React.memo(function PostContext({ children }) {
             cancelTokenSource.cancel();
         };
     }, [user, showUpdate]);
-
-    // useEffect(() => {
-    //     console.log(postState);
-    // }, [postState]);
 
     const contextValues = {
         posts: postState.posts,
@@ -679,7 +677,7 @@ export default React.memo(function PostContext({ children }) {
         removeIdea,
         loadNextPosts,
         loadMyNextPosts,
-        loadNextPage,
+        // loadNextPage,
         filterPost,
         filterMyPost,
         interactPost,
