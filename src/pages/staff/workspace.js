@@ -68,6 +68,7 @@ export default function Workspace() {
               hideAuthor,
               comments,
             } = post;
+
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,
@@ -77,6 +78,7 @@ export default function Workspace() {
               date: post.createdAt,
               hideAuthor,
             };
+
             let postBody = {
               content,
               attachment: attachment.map((attach) => {
