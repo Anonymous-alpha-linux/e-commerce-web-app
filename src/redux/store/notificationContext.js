@@ -18,6 +18,7 @@ export default function NotificationContext({ children }) {
         if (socket) {
             createSession();
             // pushNotification();
+            receiveNotification();
         }
         return () => {
             if (socket) {
@@ -29,9 +30,6 @@ export default function NotificationContext({ children }) {
     useEffect(() => {
         loadNotifications();
     }, []);
-    useEffect(() => {
-        console.log(notify);
-    }, [notify]);
     function loadNotifications() {
         return axios.get(notifyAPI, {
             headers: {
@@ -75,15 +73,15 @@ export default function NotificationContext({ children }) {
     }
     function receiveNotification() {
         return socket.on('notify', data => {
-
+            console.log(data);
         });
     }
-    function sendNotification(type) {
+    function sendNotification(type, url, target) {
         return socket.emit("notify", {
-            postId: notify._id,
-            postURL: `/post/${notify._id}`,
+            id: user.accountId,
+            url: url,
             type: type,
-            to: socketTargets.WITHOUT_BROADCAST
+            to: target
         });
     }
     // function pushNotification() {
@@ -134,7 +132,9 @@ export default function NotificationContext({ children }) {
 
     const contextValues = {
         notify,
-        loadMoreNotifications
+        loadMoreNotifications,
+        sendNotification,
+        receiveNotification
     }
     return (
         <NotificationContextAPI.Provider value={contextValues}>

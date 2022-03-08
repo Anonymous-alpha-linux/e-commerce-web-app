@@ -19,11 +19,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from "./tagsinput";
 
-export default function PostModal(
-    {
-        // setOpenModal
-    }
-) {
+export default function PostModal() {
+    const navigate = useNavigate();
+
     const [input, setInput] = useState({
         content: "",
         private: false,
@@ -39,22 +37,18 @@ export default function PostModal(
     const privateChecked = useRef(null);
     const checkedCondition = useRef();
 
-    const navigate = useNavigate();
     const { id } = useParams();
-    const { user, getSocket } = useAuthorizationContext();
+    const { user } = useAuthorizationContext();
     const {
         posts,
         categories,
-        postLoading,
-        categoryLoading,
         getFile,
         postIdea,
         setShowUpdate,
     } = usePostContext();
 
-    const { REACT_APP_ENVIRONMENT } = process.env;
     const [staffURL, host] =
-        REACT_APP_ENVIRONMENT === "development"
+        process.env.REACT_APP_ENVIRONMENT === "development"
             ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
             : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
@@ -83,13 +77,13 @@ export default function PostModal(
         e.preventDefault();
         try {
             const valContent = new useValidate(input.content);
-            const check = valContent.isEmpty();
+            const check = valContent.isEmpty().input;
             if (!input.categories.length) throw new Error("Please select a category");
             if (!checkedCondition.current.checked) {
                 throw new Error("Please checked our terms and condition");
             }
             postIdea(input, (res) => {
-                // console.log(res);
+                console.log(res);
                 setShowUpdate((o) => !o);
                 navigate("/");
             });
@@ -294,6 +288,6 @@ export default function PostModal(
                 value={id}></Form.Input>} */}
                 <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
             </Form>
-        </ContainerComponent.Section >
+        </ContainerComponent.Section>
     );
 }
