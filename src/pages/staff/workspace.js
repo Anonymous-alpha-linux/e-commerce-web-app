@@ -33,7 +33,6 @@ export default function Workspace() {
     <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
       <PostForm></PostForm>
-      <BarChart></BarChart>
       <Filter
         loader={filterPost}
         selectOptions={[
