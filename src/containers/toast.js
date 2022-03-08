@@ -18,7 +18,6 @@ export default function ToastMessage({
       setError("");
       setMessage("");
     }, timeout + 100);
-    git;
     return () => {
       clearTimeout(timeoutVal);
     };
