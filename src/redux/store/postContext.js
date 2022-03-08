@@ -550,6 +550,9 @@ export default React.memo(function PostContext({ children }) {
     }
     // 6. Post new Idea
     const postIdea = (input, cb, options = null) => {
+        setPost({
+            type: actions.SET_LOADING
+        });
         // Create form submission for post and upload files
         const formData = new FormData();
         // Deflat input file to single file array for appending to formdata for uploading
@@ -588,7 +591,6 @@ export default React.memo(function PostContext({ children }) {
                     to: socketTargets.WITHOUT_BROADCAST
                 });
                 setShowUpdate(!showUpdate);
-
                 cb(res);
             }).catch(error => setError(error.message));
 
@@ -602,6 +604,9 @@ export default React.memo(function PostContext({ children }) {
             }
         }).then(res => {
             console.log(res.data);
+            setPost({
+                type: actions.SET_OFF_LOADING
+            });
             socket.emit("notify", {
                 postId: res.data.response._id,
                 postURL: `/post/${res.data.response._id}`,

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Bar} from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import {
   Chart,
   ArcElement,
@@ -53,10 +53,10 @@ Chart.register(
   Tooltip
 );
 
-export default function BarChart(){
+export default function BarChart() {
   const barData = {
-    labels:["October", "November", "December"],
-    datasets:[
+    labels: ["October", "November", "December"],
+    datasets: [
       {
         data: [10, 20, 50],
         label: "Data1",
@@ -87,23 +87,22 @@ export default function BarChart(){
       },
     ]
   }
-  return(
+  return (
     <Bar
       type="bar"
       width={'100%'}
       height={100}
       options={{
-        title:{
+        title: {
           display: true,
           text: "Test Data",
           fontSize: 30
         },
-        legend:{
+        legend: {
           display: true,
           position: "bottom"
         }
       }}
       data={barData}
-    />
-  )
+    ></Bar>)
 }

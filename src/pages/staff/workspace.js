@@ -74,11 +74,13 @@ export default function Workspace() {
             let postBody = {
               content,
               attachment: attachment.map((attach) => {
-                const { _id, fileType, online_url, filePath } = attach;
+                const { _id, fileType, online_url, filePath, fileFormat } =
+                  attach;
                 return {
                   _id,
                   image: `${online_url || filePath}`,
                   fileType,
+                  fileFormat,
                 };
               }),
             };
