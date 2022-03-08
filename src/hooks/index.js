@@ -1,1 +1,1 @@
-export { default as useMedia } from './useResponsive';
+export { default as useMedia } from "./useResponsive";

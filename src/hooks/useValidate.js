@@ -3,6 +3,7 @@ export default class useValidate {
     string,
     config = {
       length: 8,
+      passwordLength: 8,
     }
   ) {
     this.input = string;
@@ -10,8 +11,12 @@ export default class useValidate {
   }
 
   isEmail() {
-    const regex = new RegExp("[a-z0-9]+@[a-z]+.[a-z]{2,3}cc");
-    if (!regex.test(this.input)) throw new Error("not an Email");
+    if (
+      !/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        this.input
+      )
+    )
+      throw new Error("not an Email");
     return this;
   }
   isEmpty() {
@@ -20,7 +25,7 @@ export default class useValidate {
   }
   isNumber() {
     const regex = new RegExp(
-      "^[+-]?(?=.d|d)(?:0|[1-9]d*)?(?:.d+)?(?:(?<=d)(?:[eE][+-]?d+))?$"
+      "^(-?[1-9]+\\d*([.]\\d+)?)$|^(-?0[.]\\d*[1-9]+)$|^0$"
     );
     if (!regex.test(this.input)) throw new Error("this is not a number");
     return this;
@@ -33,7 +38,7 @@ export default class useValidate {
     return this;
   }
   isEnoughLength() {
-    if (this.input.length > this.config.length)
+    if (this.input.length < this.config.length)
       throw new Error("this is too long");
     return this;
   }
@@ -41,6 +46,19 @@ export default class useValidate {
     const regex = new RegExp("[-’/`~!#*$@_%+=.,^&(){}[]|;:”<>?\\]");
     if (regex.test(this.input))
       throw new Error("this input contains special character");
+    return this;
+  }
+  isNotCode() {
+    if (/<[a-z][\s\S]*>/.test(this.input))
+      throw new Error("this input contains code");
+    return this;
+  }
+  isPassWord() {
+    const regex = new RegExp(
+      `^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{${this.config.passwordLength},}$`
+    );
+    if (!regex.test(this.input))
+      throw new Error("this input is not like password");
     return this;
   }
 }
