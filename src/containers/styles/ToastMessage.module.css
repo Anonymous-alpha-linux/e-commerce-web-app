@@ -1,0 +1,54 @@
+.ToastMessage {
+  height: 50px;
+  width: 280px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 8px;
+  padding-right: 8px;
+  transition: opacity 0.5s ease-in;
+  opacity: 0;
+  margin: 0 auto;
+}
+
+.ToastMessage.warning {
+  background-color: yellow;
+}
+.ToastMessage.success {
+  background-color: rgb(3, 160, 3);
+}
+
+.ToastMessage > span {
+  flex: 2;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: italic;
+  margin: 2px auto;
+}
+
+.ToastMessage > .Loader {
+  flex: 8;
+  height: 25px;
+  border-radius: 20px;
+  background-color: var(--grey-two);
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+
+.Loader > .Bar {
+  width: 90%;
+  height: 50%;
+  border-radius: 20px;
+  background-color: var(--blue-shade-one);
+}
+
+@media (min-width: 480px) {
+  .ToastMessage {
+    margin: unset;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+  }
+}

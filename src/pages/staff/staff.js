@@ -1,11 +1,16 @@
-import React from 'react';
-import { AddGroupContainer, MessageBoxContainer } from '../../containers';
-import MessageContainer from '../../containers/message';
-import Profile from './profile';
-import Workspace from './workspace';
-import { Outlet } from 'react-router-dom';
+import React from "react";
+import {
+  AddGroupContainer,
+  MessageBoxContainer,
+  Toast,
+} from "../../containers";
+import { toastTypes } from "../../fixtures";
+import { Outlet } from "react-router-dom";
 export default function Staff() {
-    return <>
-        <Outlet></Outlet>
-    </>;
+  return (
+    <>
+      <Outlet></Outlet>
+      <Toast message="Success" timeout={3000} />
+    </>
+  );
 }

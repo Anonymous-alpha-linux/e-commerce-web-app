@@ -26,3 +26,4 @@ export { default as PopUp } from "./popUp";
 export { default as DashboardOverview } from "./overview";
 export { default as Chart } from "./chart";
 export { default as TriggerLoading } from "./triggerLoading";
+export { default as Toast } from "./toast";
