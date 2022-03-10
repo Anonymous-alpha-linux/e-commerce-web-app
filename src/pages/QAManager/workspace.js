@@ -31,6 +31,10 @@ export default function Workspace() {
       : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const listRef = useRef();
 
+  useEffect(() => {
+    setError("Error!");
+  }, []);
+
   return (
     <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
@@ -112,6 +116,9 @@ export default function Workspace() {
           })}
         </List>
       </LazyLoading>
+      {error && (
+        <Toast message={error} timeout={3000} type={toastTypes.ERROR} />
+      )}
     </ContainerComponent>
   );
 }

@@ -12,6 +12,8 @@ import { Loading } from "../../pages";
 import { io } from "socket.io-client";
 import actions from "../reducers/actions";
 import { authReducer, initialAuth } from "../reducers";
+import { Toast } from "../../containers";
+import { toastTypes } from "../../fixtures";
 
 const AuthenticationContextAPI = createContext();
 
@@ -52,10 +54,8 @@ export default function AuthenticationContext({ children }) {
           type: actions.AUTHENTICATE_ACTION,
           payload: response.data,
         });
-
         let socket = io(host);
         socket.auth = { accessToken: response.data.accessToken };
-
         return setSocket(socket);
       })
       .then((success) => {
@@ -65,7 +65,6 @@ export default function AuthenticationContext({ children }) {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
         });
-        setError(error.message);
       });
   };
   function login(data) {
@@ -79,13 +78,15 @@ export default function AuthenticationContext({ children }) {
       })
       .then((res) => {
         localStorage.setItem("accessToken", res.data.accessToken);
+        setMessage("Login successfully!");
         return onLoadUser();
       })
-      .catch((error) =>
+      .catch((error) => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
-        })
-      );
+        });
+        setError("Login Failed");
+      });
   }
   // const register = async (data) => {
   //   const registerApi = mainAPI.CLOUD_API_REGISTER;
@@ -178,9 +179,19 @@ export default function AuthenticationContext({ children }) {
         editProfile,
         setError,
         setMessage,
+        setUser,
       }}
     >
       {children}
+      {(error || message) && (
+        <Toast
+          message={message || error}
+          timeout={2000}
+          type={message ? toastTypes.SUCCESS : toastTypes.ERROR}
+          onError={setError}
+          onSuccess={setMessage}
+        ></Toast>
+      )}
     </AuthenticationContextAPI.Provider>
   );
 }

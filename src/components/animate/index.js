@@ -1,21 +1,27 @@
 import React, { useState } from "react";
 import { CSSTransition } from "react-transition-group";
-export default function AnimateComponent({ children,
+export default function AnimateComponent({
+  children,
   timeout,
   component,
   unmountOnExit,
-  classNames }) {
+  classNames,
+}) {
   const [isMounted, setMounted] = useState(true);
   return (
     <>
-      <div className="transition__container" onClick={() => setMounted(!isMounted)}>
+      <div
+        className="transition__container"
+        onClick={() => setMounted(!isMounted)}
+      >
         {component}
       </div>
       <CSSTransition
         in={isMounted}
         timeout={timeout}
         unmountOnExit={true}
-        classNames={classNames}>
+        classNames={classNames}
+      >
         {children}
       </CSSTransition>
     </>

@@ -7,16 +7,17 @@ export default function ToastMessage({
   message,
   timeout,
   type = toastTypes.WARNING,
+  onError,
+  onSuccess,
 }) {
-  const { setError, setMessage } = useAuthorizationContext();
   const toastRef = useRef();
   useEffect(() => {
     // ToastRef.current.style.opacity = 1;
     // const LoaderBar = ToastRef.current.lastElementChild.children[0];
     toastRef.current.style.width = "0%";
     const timeoutVal = setTimeout(() => {
-      setError("");
-      setMessage("");
+      onSuccess("");
+      onError("");
     }, timeout + 100);
     return () => {
       clearTimeout(timeoutVal);

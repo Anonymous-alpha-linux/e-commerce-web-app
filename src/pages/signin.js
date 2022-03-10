@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import { ContainerComponent, Form } from "../components";
 import { useAuthorizationContext } from "../redux";
 import useValidate from "../hooks/useValidate";
+import actions from "../redux/reducers/actions";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { login, user } = useAuthorizationContext();
+  const { login, user, setUser } = useAuthorizationContext();
   const [input, setInput] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   //toast
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
     try {
       Object.entries(input).forEach((entry) => {
@@ -22,9 +23,19 @@ const Login = () => {
         if (key === "email") validate.isEmpty().isEmail();
         else if (key === "password") validate.isEmpty().isEnoughLength();
       });
-      login(input);
+      await login(input);
     } catch (error) {
-      setError(error.message);
+      console.log(error);
+      if (error.toString().includes("401")) {
+        setMessage("Email or password is not valid");
+        setError("");
+        setUser({
+          type: actions.AUTHENTICATE_FAILED,
+        });
+      } else {
+        setError(error.message);
+        setMessage("");
+      }
     }
   };
   const inputHandler = React.useCallback(
@@ -67,6 +78,7 @@ const Login = () => {
         <Form.Container>
           <Form.Title>LOG IN</Form.Title>
           <Form.Input
+            style={{ marginBottom: "10px" }}
             placeholder="Email"
             type="text"
             name="email"
@@ -75,6 +87,7 @@ const Login = () => {
             value={input.name}
           ></Form.Input>
           <Form.Input
+            style={{ marginBottom: "10px" }}
             placeholder="Password"
             type="password"
             name="password"
@@ -89,12 +102,32 @@ const Login = () => {
             style={{
               background: "black",
               color: "#fff",
+              marginTop: "10px",
             }}
           ></Form.Input>
         </Form.Container>
 
-        {message && <Form.Message>{message}</Form.Message>}
-        {error && <Form.ErrorMessage>{error}</Form.ErrorMessage>}
+        {message && (
+          <Form.Message
+            style={{
+              fontSize: "15px",
+              textTransform: "uppercase",
+            }}
+          >
+            {`* ${message}`}
+          </Form.Message>
+        )}
+        {error && (
+          <Form.ErrorMessage
+            style={{
+              color: "red",
+              fontSize: "15px",
+              textTransform: "uppercase",
+            }}
+          >
+            {`* ${error}`}
+          </Form.ErrorMessage>
+        )}
       </Form>
     </>
   );
