@@ -9,8 +9,6 @@ import { notifyData, socketTargets } from '../../fixtures';
 import { useNotifyContext } from '..';
 const PostContextAPI = createContext();
 
-
-
 const categoryReducer = (state, action) => {
   switch (action.type) {
     case actions.GET_POST_CATEGORIES:
@@ -678,8 +676,6 @@ export default React.memo(function PostContext({ children }) {
     {children}
   </PostContextAPI.Provider>);
 });
-
-
 
 export const usePostContext = () => {
   return useContext(PostContextAPI);

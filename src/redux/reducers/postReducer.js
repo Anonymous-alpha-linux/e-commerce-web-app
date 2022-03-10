@@ -1,5 +1,5 @@
-import actions from './actions';
-import ActionHandler from './handleActions';
+import actions from "./actions";
+import ActionHandler from "./handleActions";
 
 export const initialPostPage = {
   posts: [],
@@ -83,35 +83,35 @@ const postReducer = (state, action) => {
         loadMore: action.payload.length >= 10
       }), post => post._id === action.postid, {
       })
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: action.payload,
-              page: 0,
-              filter: 0,
-              count: 10,
-              loadMore: action.payload.length >= 10
-            }
-          }
-          return post;
-        }),
-        myPosts: state.myPosts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: action.payload,
-              page: 0,
-              filter: 0,
-              count: 10,
-              loadMore: action.payload.length >= 10
-            }
-          }
-          return post;
-        })
-      };
+    // return {
+    //   ...state,
+    //   posts: state.posts.map(post => {
+    //     if (post._id === action.postid) {
+    //       return {
+    //         ...post,
+    //         comments: action.payload,
+    //         page: 0,
+    //         filter: 0,
+    //         count: 10,
+    //         loadMore: action.payload.length >= 10
+    //       }
+    //     }
+    //     return post;
+    //   }),
+    //   myPosts: state.myPosts.map(post => {
+    //     if (post._id === action.postid) {
+    //       return {
+    //         ...post,
+    //         comments: action.payload,
+    //         page: 0,
+    //         filter: 0,
+    //         count: 10,
+    //         loadMore: action.payload.length >= 10
+    //       }
+    //     }
+    //     return post;
+    //   })
+    // };
     case actions.LOAD_MORE_POST_COMMENT:
       return {
         ...state,
@@ -405,7 +405,5 @@ const postReducer = (state, action) => {
     default:
       return initialPostPage;
   }
-
-
-}
+};
 export default postReducer;
