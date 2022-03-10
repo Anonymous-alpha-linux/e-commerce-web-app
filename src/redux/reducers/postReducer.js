@@ -33,10 +33,17 @@ const postReducer = (state, action) => {
         case actions.PUSH_IDEA:
             return actionHandler.unshiftItem('posts', action.payload);
         case actions.UPDATE_SINGLE_POST:
-            return actionHandler.updateItem('posts', action.payload, post => post._id === action.payload.postid,
-                actionHandler.updateItem('myPosts', action.payload, post => post._id === action.payload.postid)
-            );
-
+            return {
+                ...actionHandler.updateItem('posts', post => {
+                    if (post._id === action.postId) return action.payload;
+                    return post;
+                }, {
+                    ...actionHandler.updateItem('myPosts', post => {
+                        if (post._id === action.postId) return action.payload;
+                        return post;
+                    }, state)
+                }),
+            }
 
         case actions.GET_MY_POST:
             return {
@@ -51,6 +58,8 @@ const postReducer = (state, action) => {
                 myPosts: action.payload.length ? state.myPosts.concat(action.payload) : state.myPosts,
                 myPage: action.payload.length ? state.myPage + 1 : state.myPage
             };
+        case actions.PUSH_MY_IDEA:
+            return actionHandler.unshiftItem("myPosts", action.payload);
         case actions.FILTER_MY_POST:
             return {
                 ...state,
@@ -65,7 +74,15 @@ const postReducer = (state, action) => {
                 myPage: 0
             };
 
+
         case actions.GET_POST_COMMENT:
+            return actionHandler.updateItem("posts", actionHandler.updateItem("comments", action.payload, comment => comment._id === action.commentid, {
+                page: 0,
+                filter: 0,
+                count: 10,
+                loadMore: action.payload.length >= 10
+            }), post => post._id === action.postid, {
+            })
             return {
                 ...state,
                 posts: state.posts.map(post => {

@@ -291,17 +291,30 @@ export default function Personal({ personalInfo }) {
                                 setIsEdit(false);
                             }}>
                         </Form.Input>
-                        <ButtonComponent style={{ cursor: 'pointer' }}
-                            onClick={() => { document.querySelector('input[type=submit]').click(); }}
-                        >
-                            Save
-                        </ButtonComponent>
+                        <Text.Line>
+                            <Text.MiddleLine>
+                                <ButtonComponent
+                                    style={{ cursor: 'pointer', marginBottom: '20px' }}
+                                    onClick={() => setIsEdit(false)}>
+                                    Cancel
+                                </ButtonComponent>
+                            </Text.MiddleLine>
+                            <Text.MiddleLine>
+                                <ButtonComponent style={{ cursor: 'pointer', marginBottom: '20px' }}
+                                    onClick={() => { document.querySelector('input[type=submit]').click(); }}
+                                >
+                                    Save
+                                </ButtonComponent>
+                            </Text.MiddleLine>
+                        </Text.Line>
                     </>
-                        || <ButtonComponent
-                            style={{ cursor: 'pointer' }}
+                        ||
+                        <ButtonComponent
+                            style={{ cursor: 'pointer', marginBottom: '20px' }}
                             onClick={() => setIsEdit(true)}>
                             Edit
-                        </ButtonComponent>}
+                        </ButtonComponent>
+                    }
                 </Text.RightLine>
             </Form>
         </ContainerComponent.Inner>

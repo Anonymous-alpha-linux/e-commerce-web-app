@@ -3,6 +3,8 @@ import ActionHandler from './handleActions';
 
 export const initialNotify = {
     notifications: [],
+    newNodes: [],
+    user: {},
     loading: true,
     page: 0,
     count: 10,
@@ -30,6 +32,8 @@ const notificationReducer = (state, action) => {
                 count: 10,
                 more: action.payload.length >= 10
             });
+        case actions.ADD_NEW_NOTIFICATION:
+            return actionHandler.unshiftItem("newNodes", action.payload);
         default:
             return state
 

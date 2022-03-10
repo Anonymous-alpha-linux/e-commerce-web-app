@@ -1,3 +1,5 @@
+import { calculateNewValue } from "@testing-library/user-event/dist/utils";
+
 export default class ActionHandler {
     constructor(state, action) {
         this.state = state;
@@ -35,19 +37,13 @@ export default class ActionHandler {
             ...otherEntries
         };
     };
-    updateItem(field, data, prediction, otherEntries) {
+    updateItem(updateField, callback, otherEntries = {}) {
+        // Inside otherEntries including in the initial state
         return {
-            ...this.state,
-            [field]: this.state[field].map(item => {
-                if (prediction(item)) {
-                    return {
-                        ...item,
-                        ...data.data
-                    };
-                }
-                return item;
-            }),
-            ...otherEntries
+            ...otherEntries,
+            [updateField]: otherEntries[updateField].map(item => {
+                return callback(item);
+            })
         };
-    }
+    };
 }

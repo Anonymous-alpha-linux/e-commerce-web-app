@@ -10,7 +10,7 @@ export default function DropdownOption({ children, ...props }) {
             <DropDown.DropBtn component={props.component}></DropDown.DropBtn>
             <DropDown.Content>
                 {children.map((item, index) => {
-                    console.log(item);
+            
                     return <DropDown.Option key={index + 1} value={item.value}>
                         {item}
                     </DropDown.Option>

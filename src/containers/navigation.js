@@ -2,18 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { AiOutlineMessage } from "react-icons/ai";
-import {
-    IoNotificationsOutline,
-    IoSearchSharp,
-} from "react-icons/io5";
+import { IoNotificationsOutline, IoSearchSharp } from "react-icons/io5";
 import { BsList } from "react-icons/bs";
 
 import logo from '../assets/Logoidea2.jpg';
 
 import { AnimateComponent, ButtonComponent, ContainerComponent, Icon, Text } from "../components";
-import { NotificationContainer } from '../containers';
 import { navigator as navigators, navData } from '../fixtures';
-import { useAuthorizationContext } from "../redux";
+import { useAuthorizationContext, useNotifyContext } from "../redux";
 
 export default function Navigation() {
     const [screenColumn, setScreenColumn] = useState(2);
@@ -161,16 +157,23 @@ const Navigator = ({ closeNavigator }) => {
     );
 };
 
-const AuthStatus = React.memo(({
+const AuthStatus = React.memo(function AuthStatus({
     screenColumn,
-    openNotify,
     openNavigator,
-    setOpenNotify,
-    openMessage
-}) => {
-
+}) {
     const { user, logout } = useAuthorizationContext();
+    const { notify } = useNotifyContext();
+    const [isNew, setIsNew] = useState(false);
 
+    useEffect(() => {
+        if (notify.newNodes.length > 0) {
+            setIsNew(true);
+        }
+    }, [notify.newNodes.length]);
+
+    function turnOffBadge(e) {
+        setIsNew(false);
+    }
 
     if (!user.isLoggedIn) {
         return (
@@ -201,11 +204,12 @@ const AuthStatus = React.memo(({
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
-                <Icon.CircleIcon>
+                <Icon.CircleIcon onClick={turnOffBadge}>
                     <Link to="/portal/notification">
                         <IoNotificationsOutline></IoNotificationsOutline>
                     </Link>
                 </Icon.CircleIcon>
+                {isNew && <Icon.Badge></Icon.Badge>}
                 {/* {screenColumn < 3 &&
                     ||
                     <AnimateComponent

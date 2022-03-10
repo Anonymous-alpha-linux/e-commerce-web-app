@@ -43,18 +43,17 @@ export default function AuthenticationContext({ children }) {
       });
 
       let socket = io(host);
-      socket.auth = { accessToken: response.data.accessToken };
+      socket.auth = { accessToken: localStorage.getItem('accessToken') };
 
       return setSocket(socket);
     }).then(success => {
       cb();
+    }).catch(error => {
+      setUser({
+        type: actions.AUTHENTICATE_FAILED,
+      });
+      setError(error.message);
     })
-      .catch(error => {
-        setUser({
-          type: actions.AUTHENTICATE_FAILED,
-        });
-        setError(error.message);
-      })
   };
   function login(data) {
     const loginApi = process.env.REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
@@ -146,6 +145,11 @@ export default function AuthenticationContext({ children }) {
       setMessage
     }}>
       {children}
+      {(message || error) && <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px'
+      }}>{message || error}</div>}
     </AuthenticationContextAPI.Provider>
   );
 }

@@ -1,26 +1,15 @@
 import React, { useRef, useState } from "react";
-import {
-  ContainerComponent,
-  Text,
-  Icon,
-  Form,
-  ButtonComponent,
-} from "../components";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
-import {
-  useAuthorizationContext,
-  usePostContext,
-  useWorkspaceContext,
-} from "../redux";
+import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components";
+import { useAuthorizationContext, useNotifyContext, usePostContext, useWorkspaceContext, } from "../redux";
+import { notifyData, socketTargets } from '../fixtures'
 import { TriggerLoading } from ".";
 
-export default function Comment({ postId, commentLogs }) {
+export default function Comment({ postAuthor, postId, commentLogs }) {
   const { workspace } = useWorkspaceContext();
   const { posts, loadNextComments, filterPostComment } = usePostContext();
-
   const filterRef = useRef(filterPostComment);
-
   const calcRemainingEventTime = (time) => {
     const date = new Date(time);
     const now = new Date(Date.now());
@@ -47,8 +36,7 @@ export default function Comment({ postId, commentLogs }) {
       className="comment__section"
       style={{
         padding: "10px",
-      }}
-    >
+      }}>
       <ContainerComponent.Pane className="comment__header">
         <ContainerComponent.Flex
           style={{
@@ -73,8 +61,8 @@ export default function Comment({ postId, commentLogs }) {
         </ContainerComponent.Flex>
       </ContainerComponent.Pane>
 
-      <ContainerComponent.Pane className="comment__body">
-        <Comment.TabInput postId={postId}></Comment.TabInput>
+      <ContainerComponent.Pane className="comment__input">
+        <Comment.TabInput postAuthor={postAuthor} postId={postId}></Comment.TabInput>
       </ContainerComponent.Pane>
 
       <TriggerLoading
@@ -85,8 +73,7 @@ export default function Comment({ postId, commentLogs }) {
           className="comment__log"
           style={{
             paddingTop: "12px",
-          }}
-        >
+          }}>
           {commentLogs.map((comment) => (
             <Comment.Tab
               postId={postId}
@@ -96,13 +83,6 @@ export default function Comment({ postId, commentLogs }) {
           ))}
         </ContainerComponent.Pane>
       </TriggerLoading>
-      {/* 
-      <ContainerComponent.Pane className="comment__footer">
-        <Text.Subtitle
-          style={{ textAlign: "center", width: "100%", margin: "10px 0" }}>
-          More...
-        </Text.Subtitle>
-      </ContainerComponent.Pane> */}
     </ContainerComponent.Section>
   );
 }
@@ -173,7 +153,7 @@ Comment.Tab = function CommentTab({ ...props }) {
 
   React.useEffect(() => {
     if (!isFirstRender.current) {
-      interactRef.current(props.postId, "rate comment", interact, () => {});
+      interactRef.current(props.postId, "rate comment", interact, () => { });
     }
   }, [interact]);
   React.useEffect(() => {
@@ -345,9 +325,10 @@ Comment.Tab = function CommentTab({ ...props }) {
   );
 };
 
-Comment.TabInput = function TabInput({ postId, preReply = "", commentId }) {
+Comment.TabInput = function TabInput({ postAuthor, postId, preReply = "", commentId }) {
   const { user } = useAuthorizationContext();
   const { interactPost } = usePostContext();
+  const { sendNotification } = useNotifyContext();
 
   const [input, setInput] = useState({
     pre: preReply,
@@ -376,9 +357,13 @@ Comment.TabInput = function TabInput({ postId, preReply = "", commentId }) {
   const submitHandler = (e) => {
     e.preventDefault();
     if (!commentId) {
-      loader.current(postId, "comment", input, () => {});
+      loader.current(postId, "comment", input, commentId => {
+        sendNotification(notifyData.COMMENT_POST, `/#${commentId}`, postAuthor);
+      });
     } else {
-      loader.current(postId, "reply comment", input, () => {});
+      loader.current(postId, "reply comment", input, replyId => {
+        sendNotification(notifyData.COMMENT_POST, `/#${replyId}`, commentId);
+      });
     }
     setInput({
       pre: "",
@@ -478,7 +463,7 @@ Comment.TabReply = function TabReply({
   };
   const submitHandler = (e) => {
     e.preventDefault();
-    loader.current(postId, "reply comment", input, () => {});
+    loader.current(postId, "reply comment", input, () => { });
     closeReply();
     setInput({
       pre: "",

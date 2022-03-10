@@ -1,18 +1,14 @@
 import React, { useState, useRef } from "react";
 import { ContainerComponent, Icon, Text, Preview, Dropdown } from "../components";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-
+import { FaThumbsUp, FaThumbsDown, FaRegEdit, FaEraser } from "react-icons/fa";
 import { IoIosArrowDown } from 'react-icons/io';
 import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
 
 export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
-    // const openComment = useRef(false);
     const { user } = useAuthorizationContext();
     const { interactPost, getPostComments } = usePostContext();
-    // const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-
     const isFirstRender = useRef(true);
     const interactRef = useRef(interactPost);
     const getComment = useRef(getPostComments);
@@ -56,7 +52,8 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
 
     React.useEffect(() => {
         if (!isFirstRender.current) {
-            interactRef.current(postHeader.id, 'rate', interact, () => { });
+            interactRef.current(postHeader.id, 'rate', interact, () => {
+            });
         }
     }, [interact]);
     React.useEffect(() => {
@@ -90,24 +87,35 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                         <Text.Date style={{
                             marginRight: '8px'
                         }}>{parseTime(postHeader.date)}</Text.Date>
-                        {/* <Text>
-                            <IoEarth />
-                        </Text> */}
                     </ContainerComponent.Flex>
                 </ContainerComponent.InlineGroup>
                 {user.accountId === postHeader.postAuthor && <Text.RightLine>
                     <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
                         <Dropdown.Item>
                             <Link to={`/portal/idea/${postHeader.id}`}>
-                                <Text>
-                                    Edit
-                                </Text>
+                                <Text.Line>
+                                    <Text.MiddleLine>
+                                        <Icon>
+                                            <FaRegEdit></FaRegEdit>
+                                        </Icon>
+                                    </Text.MiddleLine>
+                                    <Text.MiddleLine>
+                                        Edit
+                                    </Text.MiddleLine>
+                                </Text.Line>
                             </Link>
                         </Dropdown.Item>
                         <Dropdown.Item>
-                            <Text onClick={removeIdea}>
-                                Delete
-                            </Text>
+                            <Text.Line onClick={removeIdea}>
+                                <Text.MiddleLine>
+                                    <Icon>
+                                        <FaEraser></FaEraser>
+                                    </Icon>
+                                </Text.MiddleLine>
+                                <Text.MiddleLine>
+                                    Delete
+                                </Text.MiddleLine>
+                            </Text.Line>
                         </Dropdown.Item>
                     </DropDownButton>
                 </Text.RightLine>}
@@ -212,6 +220,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
             </ContainerComponent.Pane>
             {
                 openComment && <Comment
+                    postAuthor={postHeader.postAuthor}
                     postId={postHeader.id}
                     commentLogs={postFooter.comments}
                 ></Comment>

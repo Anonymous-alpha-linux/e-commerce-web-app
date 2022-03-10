@@ -3,12 +3,21 @@
    padding-bottom: 20px;
    font-size: 14px;
    &__avatar {
+      --height: 5rem;
       display: inline-block;
       overflow: hidden;
-      width: 57px;
-      height: 57px;
+      min-width: 70px;
+      min-height: 70px;
+      width: var(--height);
+      height: var(--height);
       z-index: 1;
       border-radius: 100%;
+      @include tablet {
+         --height: 6rem;
+      }
+      @include desktop {
+         --height: 6rem;
+      }
    }
    &__title {
       font-size: 14px;
