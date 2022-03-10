@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { ContainerComponent, List } from "../../components";
+import { ButtonComponent, ContainerComponent, List } from "../../components";
 import {
   Filter,
   LazyLoading,
@@ -10,6 +10,7 @@ import {
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
+  useNotifyContext,
   usePostContext,
   useWorkspaceContext,
 } from "../../redux";
@@ -18,6 +19,8 @@ export default function Workspace() {
   const { user, socket } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
+  const { sendMessageToSpecificPerson } = useNotifyContext();
+
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
@@ -42,7 +45,7 @@ export default function Workspace() {
       ></Filter>
       <LazyLoading loader={loadNextPosts}>
         <List className="workspace__postList" ref={listRef}>
-          {posts.map((post) => {
+          {posts.map((post, index) => {
             const {
               _id,
               postAuthor,
@@ -88,7 +91,7 @@ export default function Workspace() {
               comments,
             };
             return (
-              <List.Item key={post._id} id={post._id}>
+              <List.Item key={`${post._id}-${index}`} id={post._id}>
                 <PostContainer
                   postId={_id}
                   postHeader={postHeader}
@@ -96,6 +99,9 @@ export default function Workspace() {
                   postFooter={postFooter}
                   removeIdea={() => removeIdea(_id)}
                 ></PostContainer>
+                {/* <ButtonComponent onClick={() => {
+                  sendMessageToSpecificPerson(postAuthor._id, 'This is a private message!');
+                }}>Send Message to {postAuthor.username}</ButtonComponent> */}
               </List.Item>
             );
           })}

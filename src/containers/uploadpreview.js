@@ -16,8 +16,17 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
   const [preview, setPreview] = useState([]);
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef(null);
+  // Keep track of the mounted state
+  const mountedRef = useRef(false);
+  const pushFile = useRef(setFiles);
+  const deleteFile = useRef(eliminateFile);
+
   let image =
     "https://image.shutterstock.com/image-vector/file-iconvector-illustration-flat-design-260nw-1402633574.jpg";
+  useEffect(() => {
+    pushFile.current = setFiles;
+    deleteFile.current = eliminateFile;
+  }, [setFiles, eliminateFile]);
 
   const validateFile = (file) => {
     const imageRegex = new RegExp("image/*");
@@ -25,7 +34,7 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
     return "others";
   };
   const removeItem = (id) => {
-    eliminateFile(id);
+    deleteFile.current(id);
     preview.filter((file, index) => index !== id);
   };
   const openFiles = () => {
@@ -62,12 +71,18 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
   };
 
   useEffect(() => {
+    mountedRef.current = true;
     Promise.all(readFiles())
       .then((data) => {
-        setPreview(data);
+        if (mountedRef.current) {
+          setPreview(data);
+        }
       })
       .then((s) => setLoading(false))
       .catch((error) => setError(error.message));
+    return () => {
+      mountedRef.current = false;
+    }
   }, [files]);
 
   if (loading) return <Loading></Loading>;
@@ -99,7 +114,7 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
               id="files"
               onChange={(e) => {
                 readNewFiles(e);
-                setFiles(e);
+                pushFile.current(e);
               }}
               ref={fileInputRef}
               style={{
@@ -129,38 +144,38 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
                 Document Preview
               </Text.Title>
             )) || (
-              <ContainerComponent.Flex>
-                {preview.map((file, index) => {
-                  return (
-                    <ContainerComponent.Item
-                      className="upload-preview-item"
-                      key={index}
-                      style={{
-                        position: "relative",
-                        flexGrow: 1,
-                      }}
-                    >
-                      <Icon
-                        className="upload-review-item__icon"
-                        onClick={() => removeItem(index)}
+                <ContainerComponent.Flex>
+                  {preview.map((file, index) => {
+                    return (
+                      <ContainerComponent.Item
+                        className="upload-preview-item"
+                        key={index}
                         style={{
-                          position: "position",
-                          right: 0,
-                          top: 0,
-                          transform: "translate(10px, 10px)",
+                          position: "relative",
+                          flexGrow: 1,
                         }}
                       >
-                        <FaTimes></FaTimes>
-                      </Icon>
-                      <Preview.Images
-                        image={file}
-                        alt={"preview file"}
-                      ></Preview.Images>
-                    </ContainerComponent.Item>
-                  );
-                })}
-              </ContainerComponent.Flex>
-            )}
+                        <Icon
+                          className="upload-review-item__icon"
+                          onClick={() => removeItem(index)}
+                          style={{
+                            position: "position",
+                            right: 0,
+                            top: 0,
+                            transform: "translate(10px, 10px)",
+                          }}
+                        >
+                          <FaTimes></FaTimes>
+                        </Icon>
+                        <Preview.Images
+                          image={file}
+                          alt={"preview file"}
+                        ></Preview.Images>
+                      </ContainerComponent.Item>
+                    );
+                  })}
+                </ContainerComponent.Flex>
+              )}
           </Preview>
         </ContainerComponent.Pane>
       </Text.Line>

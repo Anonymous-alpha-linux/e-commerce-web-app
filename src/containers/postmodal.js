@@ -5,21 +5,23 @@ import {
     Form,
     Icon,
     MessageBox,
-    Text,
+    Text
 } from "../components";
 import { ConditionContainer, UploadForm } from ".";
-// import ConditionContainer from './condition';
-// import UploadForm from './uploadpreview';
-import { useAuthorizationContext, usePostContext } from "../redux";
+import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
 import { mainAPI } from "../config";
+import { notifyData, socketTargets } from '../fixtures';
 
 import { Loading } from "../pages";
 import useValidate from "../hooks/useValidate";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from "./tagsinput";
+import axios from "axios";
 
 export default function PostModal() {
+    const navigate = useNavigate();
+
     const [input, setInput] = useState({
         content: "",
         private: false,
@@ -32,25 +34,24 @@ export default function PostModal() {
     const [error, setError] = useState("");
     const [openCondition, setOpenCondition] = useState(false);
 
-    const privateChecked = useRef(null);
-    const checkedCondition = useRef();
-
-    const navigate = useNavigate();
     const { id } = useParams();
-    const { user, getSocket } = useAuthorizationContext();
+    const { user } = useAuthorizationContext();
+    const { sendNotification } = useNotifyContext();
     const {
         posts,
         categories,
-        postLoading,
-        categoryLoading,
         getFile,
         postIdea,
-        setShowUpdate,
+        getSinglePost
     } = usePostContext();
+    const privateChecked = useRef(null);
+    const mountedRef = useRef(false);
+    const checkedCondition = useRef();
+    const getFileRef = useRef(getFile);
+    const cancelTokenSource = axios.CancelToken.source();
 
-    const { REACT_APP_ENVIRONMENT } = process.env;
     const [staffURL, host] =
-        REACT_APP_ENVIRONMENT === "development"
+        process.env.REACT_APP_ENVIRONMENT === "development"
             ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
             : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
@@ -58,38 +59,39 @@ export default function PostModal() {
         const currentSize = currentFileList.reduce((prev, file) => {
             return prev + file.size / 1024;
         }, 0);
-
-        return currentSize + fileSize > 50000;
+        return currentSize + fileSize > 5120;
     };
     const editHandler = (e) => {
         e.preventDefault();
-        postIdea(
-            input,
-            (res) => {
-                // console.log(res);
-                navigate("/");
-            },
-            {
-                isEdit: true,
-                id: id,
-            }
-        );
+        setLoading(true);
+        postIdea(input, res => {
+            setLoading(false);
+            navigate("/");
+        }, {
+            isEdit: true,
+            postId: id,
+        });
     };
     const submitHandler = (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
+            // 1. Validate the input
             const valContent = new useValidate(input.content);
-            const check = valContent.isEmpty();
+            const check = valContent.isEmpty().input;
             if (!input.categories.length) throw new Error("Please select a category");
             if (!checkedCondition.current.checked) {
                 throw new Error("Please checked our terms and condition");
             }
-            postIdea(input, (res) => {
-                // console.log(res);
-                setShowUpdate((o) => !o);
+
+            // 2. Post a new idea
+            postIdea(input, postId => {
+                setLoading(false);
+                sendNotification(notifyData.CREATE_POST, `/#${postId}`, socketTargets.WITHOUT_BROADCAST);
                 navigate("/");
             });
         } catch (error) {
+            setLoading(false);
             setError(error.message);
         }
     };
@@ -112,17 +114,16 @@ export default function PostModal() {
                 if (isOverflowFile(input.files, size)) {
                     alert("File size is overflow");
                     setError("File size is overflow");
-                    return null;
-                } else {
-                    return file;
+                    return;
                 }
+                return file;
             })
             .filter((file) => file);
 
         setInput((input) => {
             return {
                 ...input,
-                files: filter.length ? [...input.files, ...filter] : input.files,
+                files: [...input.files, ...filter],
             };
         });
     };
@@ -134,31 +135,53 @@ export default function PostModal() {
     };
 
     useEffect(() => {
+        mountedRef.current = true;
+        setLoading(true);
         if (id && posts.length) {
-            const { attachment, category, content, hideAuthor } = posts.find(post => post._id === id);
-            Promise.all(attachment.map(attach => {
-                return getFile(attach, file => {
-                    setInput({
-                        ...input,
-                        content: content,
-                        private: hideAuthor,
-                        categories: category.map((single) => single._id),
-                        files: [...input.files, file],
-                    });
-                });
-            })).then(f => {
-                setLoading(false);
+            // Stage 1
+            console.log('edit post');
+            getSinglePost(id, post => {
+                return Promise.all([
+                    post,
+                    ...post.attachment.map(attach => {
+                        return new Promise((resolve, reject) => {
+                            getFileRef.current(attach, file => {
+                                resolve(file);
+                            }).catch(error => reject(error));
+                        });
+                    })])
+                    .then(data => {
+                        const [post, ...files] = data;
+                        const { content, hideAuthor, category } = post;
+                        if (mountedRef.current) {
+                            setInput({
+                                ...input,
+                                content: content,
+                                private: hideAuthor,
+                                categories: category.map((single) => single._id),
+                                files: files,
+                            });
+                            setLoading(false);
+                        }
+                    })
             }).catch(error => {
-                console.log(error.message);
-                setError(error.message);
-                setLoading(false);
+                if (mountedRef.current) {
+                    setLoading(false);
+                    setError(error.message);
+                }
             });
         }
-        else
+        else {
             setLoading(false);
+        }
+        return () => {
+            mountedRef.current = false;
+            cancelTokenSource.cancel();
+        }
     }, [posts]);
-
-    if (loading) return <Loading></Loading>
+    useEffect(() => {
+        getFileRef.current = getFile;
+    }, [getFile]);
 
     return (
         <ContainerComponent.Section className="postModal__container">
@@ -166,18 +189,16 @@ export default function PostModal() {
                 encType="multipart/form-data"
                 method={"POST"}
                 onSubmit={(e) => {
-                    if (id) editHandler(e);
-                    else submitHandler(e);
+                    if (id) { editHandler(e); }
+                    else { submitHandler(e); }
                 }}
-                className="postModal__form"
-            >
+                className="postModal__form">
                 <Text.Line className="postModal__header">
                     <Text.MiddleLine
                         onClick={() => {
                             // setOpenModal(modal => !modal);
                             navigate("/");
-                        }}
-                    >
+                        }}>
                         <Text.MiddleLine>
                             <Icon style={{ display: "inline" }}>
                                 <FaChevronLeft></FaChevronLeft>
@@ -247,8 +268,7 @@ export default function PostModal() {
                     className="upload__input"
                     style={{
                         padding: "10px 0",
-                    }}
-                >
+                    }}>
                     <UploadForm
                         files={input.files}
                         eliminateFile={eliminateFile}
@@ -290,6 +310,7 @@ export default function PostModal() {
                 value={id}></Form.Input>} */}
                 <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
             </Form>
+            {loading && <Loading></Loading>}
         </ContainerComponent.Section>
     );
 }

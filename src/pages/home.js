@@ -2,7 +2,7 @@ import React from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import {
     useAuthorizationContext,
-    PostContext, WorkspaceContext, NotifyContext,
+    PostContext, WorkspaceContext,
 } from '../redux';
 
 export default function Home() {
@@ -12,12 +12,10 @@ export default function Home() {
         return <Navigate to="/login" state={{ from: location }} replace></Navigate>
     }
     return (
-        <NotifyContext>
-            <WorkspaceContext>
-                <PostContext>
-                    <Outlet></Outlet>
-                </PostContext>
-            </WorkspaceContext>
-        </NotifyContext>
+        <WorkspaceContext>
+            <PostContext>
+                <Outlet></Outlet>
+            </PostContext>
+        </WorkspaceContext>
     )
 }

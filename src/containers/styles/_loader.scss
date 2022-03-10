@@ -8,7 +8,7 @@
       right: 0;
       height: 300px;
       width: 300px;
-      z-index: 100000;
+      z-index: 1000000;
    }
    &__dot {
       position: absolute;
@@ -20,6 +20,7 @@
       background-color: #909090;
       border-radius: 5rem;
       transition: all 0.15s ease-in-out;
+      z-index: 100000000;
    }
 
    &__dot:nth-child(1) {
