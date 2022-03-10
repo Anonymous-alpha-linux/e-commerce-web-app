@@ -38,7 +38,7 @@ export default class useValidate {
     return this;
   }
   isEnoughLength() {
-    if (this.input.length > this.config.length)
+    if (this.input.length < this.config.length)
       throw new Error("this is too long");
     return this;
   }

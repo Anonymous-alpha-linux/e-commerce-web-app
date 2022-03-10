@@ -1,10 +1,5 @@
-import React, { useRef, useEffect } from "react";
-import {
-  BarChart,
-  ButtonComponent,
-  ContainerComponent,
-  List,
-} from "../../components";
+import React, { useRef } from "react";
+import { ContainerComponent, List } from "../../components";
 import {
   Filter,
   LazyLoading,

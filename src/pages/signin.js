@@ -21,7 +21,7 @@ const Login = () => {
         const value = entry[1];
         const validate = new useValidate(value);
         if (key === "email") validate.isEmpty().isEmail();
-        else if (key === "password") validate.isEmpty().isEnoughLength();
+        else if (key === "password") validate.isEmpty();
       });
       await login(input);
     } catch (error) {
@@ -49,7 +49,6 @@ const Login = () => {
     },
     [input]
   );
-  useEffect(() => {}, []);
 
   if (user.isLoggedIn) {
     return <Navigate to={"/"} state={{ from: location }} replace />;
