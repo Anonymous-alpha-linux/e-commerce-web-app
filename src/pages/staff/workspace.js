@@ -1,14 +1,16 @@
 import React, { useRef, useEffect } from "react";
-import { ButtonComponent, ContainerComponent, List } from "../../components";
+import {
+  ButtonComponent,
+  ContainerComponent,
+  List
+} from "../../components";
 import {
   Filter,
   LazyLoading,
   PostContainer,
   PostForm,
   Timespan,
-  Toast,
 } from "../../containers";
-import { toastTypes } from "../../fixtures";
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
@@ -18,7 +20,7 @@ import {
 } from "../../redux";
 
 export default function Workspace() {
-  const { user, socket, error, setError } = useAuthorizationContext();
+  const { user } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
   const { sendMessageToSpecificPerson } = useNotifyContext();
@@ -28,10 +30,6 @@ export default function Workspace() {
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const listRef = useRef();
-
-  useEffect(() => {
-    setError("Error!");
-  }, []);
 
   return (
     <ContainerComponent className="workspace" id="workspace">
@@ -57,7 +55,7 @@ export default function Workspace() {
               _id,
               postAuthor,
               content,
-              attachment,
+              attachments,
               like,
               dislike,
               likedAccounts,
@@ -66,6 +64,7 @@ export default function Workspace() {
               hideAuthor,
               comments,
             } = post;
+            console.log(post);
 
             let postHeader = {
               id: _id,
@@ -79,7 +78,7 @@ export default function Workspace() {
 
             let postBody = {
               content,
-              attachment: attachment.map((attach) => {
+              attachment: attachments.map((attach) => {
                 const { _id, fileType, online_url, filePath, fileFormat } =
                   attach;
                 return {
@@ -109,9 +108,6 @@ export default function Workspace() {
                   postFooter={postFooter}
                   removeIdea={() => removeIdea(_id)}
                 ></PostContainer>
-                {/* <ButtonComponent onClick={() => {
-                  sendMessageToSpecificPerson(postAuthor._id, 'This is a private message!');
-                }}>Send Message to {postAuthor.username}</ButtonComponent> */}
               </List.Item>
             );
           })}

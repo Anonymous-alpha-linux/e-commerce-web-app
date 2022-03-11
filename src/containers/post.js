@@ -87,7 +87,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     <ContainerComponent.Section
       className="post__section"
       style={{
-        padding: "20px",
+        padding: "10px 20px",
       }}
     >
       <ContainerComponent.Pane className="post__header">
@@ -141,25 +141,16 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
           </DropDownButton>
         </Text.RightLine>}
       </ContainerComponent.Pane>
+
+
       <ContainerComponent.Pane className="post__body">
         <Text.Paragraph>
           {postBody.content}
         </Text.Paragraph>
-        {/* <ContainerComponent.Flex>
-                    {postBody.attachment.map(attach => {
-                        const imageRegex = new RegExp("image/*");
-                        if (imageRegex.test(attach.fileType))
-                            return <ContainerComponent.Item key={attach._id} >
-                                <Preview.Images image={attach.image || 'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg'} alt={'background'}>
-                                </Preview.Images>
-                            </ContainerComponent.Item>
-                        return;
-                    })}
-                </ContainerComponent.Flex> */}
-        {postBody.attachment.length && <GridPreview files={postBody.attachment}></GridPreview>}
-
+        {!!postBody.attachment.length && <GridPreview files={postBody.attachment}></GridPreview>}
       </ContainerComponent.Pane>
-      {/* {Like, Dislike} */}
+
+
       <ContainerComponent.Pane className="post__footer" style={{
         background: '#EEF5EB',
         boxShadow: '1px 1px .5px solid #000'
@@ -239,6 +230,8 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
           </ContainerComponent.Item>
         </ContainerComponent.GridThreeColumns>
       </ContainerComponent.Pane>
+
+
       {
         openComment && <Comment
           postAuthor={postHeader.postAuthor}

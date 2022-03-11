@@ -65,6 +65,7 @@ export default function PostModal() {
         e.preventDefault();
         setLoading(true);
         postIdea(input, res => {
+            console.log(res);
             setLoading(false);
             navigate("/");
         }, {
@@ -83,7 +84,6 @@ export default function PostModal() {
             if (!checkedCondition.current.checked) {
                 throw new Error("Please checked our terms and condition");
             }
-
             // 2. Post a new idea
             postIdea(input, postId => {
                 setLoading(false);

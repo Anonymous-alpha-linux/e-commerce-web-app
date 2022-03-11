@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useReducer, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useReducer, useRef } from 'react'
 import axios from 'axios';
 import { mainAPI } from '../../config';
 import actions from '../reducers/actions';
@@ -40,7 +40,6 @@ const initialCategories = {
   categories: [],
   categoryLoading: true,
 }
-
 export default React.memo(function PostContext({ children }) {
   // Component states
   const [postState, setPost] = useReducer(postReducer, initialPostPage);
@@ -48,16 +47,22 @@ export default React.memo(function PostContext({ children }) {
   const [showUpdate, setShowUpdate] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-
+  const mountedRef = useRef(false);
   // Global states getter
   const { user } = useAuthorizationContext();
-
   const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const cancelTokenSource = axios.CancelToken.source();
 
+  useEffect(() => {
+    getPosts();
+    getPostCategories();
+    return () => {
+      cancelTokenSource.cancel();
+    }
+  }, [user]);
   // 1. Post for workspace
-  async function getPosts() {
-    await setPost({
+  function getPosts() {
+    setPost({
       type: actions.SET_LOADING
     });
     return axios.get(postAPI, {
@@ -67,10 +72,13 @@ export default React.memo(function PostContext({ children }) {
       params: {
         view: 'post',
         page: 0,
-        count: 3,
+        count: postState.count,
         filter: 0
       }
     }).then(res => {
+      setPost({
+        type: actions.SET_OFF_LOADING
+      });
       return setPost({
         type: actions.GET_POST_LIST,
         payload: res.data.response,
@@ -149,13 +157,48 @@ export default React.memo(function PostContext({ children }) {
       setError(error.message);
     });
   }
+  function createSinglePost(postId, cb) {
+    return axios.get(postAPI, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'singlepost',
+        postid: postId
+      }
+    }).then(res => {
+      setPost({
+        type: actions.PUSH_IDEA,
+        payload: [res.data.response]
+      });
+    }).catch(error => {
+      setError(error.message);
+    });
+  }
+  function updateSinglePost(postId, cb) {
+    return axios.get(postAPI, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'singlepost',
+        postid: postId
+      }
+    }).then(res => {
+      return setPost({
+        type: actions.UPDATE_SINGLE_POST,
+        payload: res.data.response
+      })
+    }).catch(error => {
+      setError(error.message);
+    })
+  }
   function postIdea(input, cb, options = null) {
     // Create form submission for post and upload files
     const formData = new FormData();
     // Deflat input file to single file array for appending to formdata for uploading
     input.files
-      .reduce((p, c) => ([...p, c.file]), [])
-      .forEach(file => {
+      .reduce((p, c) => ([...p, c.file]), []).forEach(file => {
         formData.append("files", file);
       });
     // Append post body to form data
@@ -167,47 +210,63 @@ export default React.memo(function PostContext({ children }) {
         return;
       }
       formData.append(key, input[key]);
-    })
+    });
     // Check if the postIdea options are pass with edit copyright
     if (options?.isEdit) {
-      return axios.put(postAPI, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        params: {
-          view: 'post',
-          postid: options.postId
-        }
-      }).then(res => {
-        setPost({
-          type: actions.UPDATE_SINGLE_POST,
-          postId: options.postId,
-          payload: res.data.response[0]
-        })
-        // cb(res);
-      }).catch(error => setError(error.message));
+      editIdea(input, cb, options);
     }
-
     return axios.post(postAPI, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')
-          }`
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       params: {
         view: 'post',
         postid: input.postid
       }
     }).then(res => {
-      const postId = res.data.response[0].postId
-      // setShowUpdate(!showUpdate);
-      cb(postId);
+      cb(res.data.response[0]._id);
+      return createSinglePost(res.data.response[0]._id, cb)
     }).catch(err => {
       cb(error);
       setError(err.message);
     });
   };
+  function editIdea(input, cb, options) {
+    // Create form submission for post and upload files
+    const formData = new FormData();
+    // Deflat input file to single file array for appending to formdata for uploading
+    input.files.reduce((p, c) => ([...p, c.file]), []).forEach(file => {
+      formData.append("files", file);
+    });
+    // Append post body to form data
+    Object.keys(input).forEach(key => {
+      if (Array.isArray(input[key])) {
+        input[key].forEach(item => {
+          formData.append(key, item);
+        })
+        return;
+      }
+      formData.append(key, input[key]);
+    });
+    return axios.put(postAPI, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'post',
+        postid: options.postId
+      }
+    }).then(res => {
+      setPost({
+        type: actions.UPDATE_SINGLE_POST,
+        postId: options.postId,
+        payload: res.data.response[0]
+      })
+      cb(res);
+    }).catch(error => setError(error.message));
+  }
   // async function updateSinglePost(postId, cb) {
   //   return axios.get(postAPI, {
   //     headers: {
@@ -631,15 +690,6 @@ export default React.memo(function PostContext({ children }) {
   function getGzipFile() {
   }
 
-  useEffect(() => {
-    getPosts();
-    getPostCategories();
-    return () => {
-      cancelTokenSource.cancel();
-    }
-  }, [user]);
-
-
   const contextValues = {
     posts: postState.posts,
     myPosts: postState.myPosts,
@@ -676,7 +726,6 @@ export default React.memo(function PostContext({ children }) {
     {children}
   </PostContextAPI.Provider>);
 });
-
 export const usePostContext = () => {
   return useContext(PostContextAPI);
 }
