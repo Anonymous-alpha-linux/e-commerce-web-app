@@ -20,7 +20,6 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
   });
 
   const checkedHandler = async (e) => {
-    const isChecked = e.target.checked;
     if (e.target.name === "like") {
       setInteract({
         ...interact,
@@ -72,8 +71,9 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
 
   React.useEffect(() => {
     if (!isFirstRender.current) {
-      interactRef.current(postHeader.id, 'rate', interact, () => {
-      });
+      // interactRef.current(postHeader.id, 'rate', interact, () => {
+      // });
+      interactPost(postHeader.id, 'rate', interact);
     }
   }, [interact]);
   React.useEffect(() => {

@@ -31,28 +31,18 @@ export default class ActionHandler {
         }
     }
     unshiftItem(field, data, otherEntries) {
-        console.log(data);
         return {
             ...otherEntries,
             [field]: data.length ? [...data, ...this.state[field]] : this.state[field],
         };
     };
-    updateItem(updateField, callback, initialState, otherEntries = {},) {
+    updateItem(updateField, callback, otherEntries = {},) {
         // Inside otherEntries including in the initial state
-        if (Object.entries(otherEntries).length) {
-            return {
-                ...initialState,
-                [updateField]: initialState[updateField].map(item => {
-                    return callback(item);
-                }),
-                ...otherEntries
-            };
-        }
         return {
-            ...initialState,
-            [updateField]: initialState[updateField].map(item => {
+            ...otherEntries,
+            [updateField]: otherEntries[updateField].map(item => {
                 return callback(item);
-            })
+            }),
         };
     };
 }

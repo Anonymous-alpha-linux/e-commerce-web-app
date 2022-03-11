@@ -64,7 +64,6 @@ export default function Workspace() {
               hideAuthor,
               comments,
             } = post;
-            console.log(post);
 
             let postHeader = {
               id: _id,

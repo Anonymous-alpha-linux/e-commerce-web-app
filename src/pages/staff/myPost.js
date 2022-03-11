@@ -7,21 +7,24 @@ import { usePostContext, useAuthorizationContext } from '../../redux';
 import axios from 'axios';
 
 export default function MyPost() {
-    const [loading, setLoading] = useState(true);
     const { user } = useAuthorizationContext();
     const { myPosts, getOwnPosts, loadMyNextPosts, filterMyPost, removeIdea } = usePostContext();
+    const [loading, setLoading] = useState(true);
+    const mountedRef = React.useRef(false);
     const listRef = React.useRef();
-    const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+    // const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const cancelTokenSource = axios.CancelToken.source();
 
     React.useEffect(() => {
-        console.log(myPosts);
-        getOwnPosts(() => {
-            console.log('get own posts');
-            setLoading(false
-            );
-        });
+        mountedRef.current = true;
+        if (mountedRef.current) {
+            getOwnPosts(() => {
+                console.log('get own posts');
+                setLoading(false);
+            });
+        }
         return () => {
+            mountedRef.current = false;
             cancelTokenSource.cancel();
         };
     }, []);
@@ -49,7 +52,7 @@ export default function MyPost() {
                         _id,
                         postAuthor,
                         content,
-                        attachment,
+                        attachments,
                         like,
                         dislike,
                         likedAccounts,
@@ -70,12 +73,14 @@ export default function MyPost() {
                     };
                     let postBody = {
                         content,
-                        attachment: attachment.map((attach) => {
-                            const { _id, fileType, filePath } = attach;
+                        attachment: attachments.map((attach) => {
+                            const { _id, fileType, online_url, filePath, fileFormat } =
+                                attach;
                             return {
                                 _id,
-                                image: `${host}\\${filePath}`,
+                                image: `${online_url || filePath}`,
                                 fileType,
+                                fileFormat,
                             };
                         }),
                     };

@@ -47,7 +47,6 @@ export default React.memo(function PostContext({ children }) {
   const [showUpdate, setShowUpdate] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const mountedRef = useRef(false);
   // Global states getter
   const { user } = useAuthorizationContext();
   const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
@@ -60,6 +59,10 @@ export default React.memo(function PostContext({ children }) {
       cancelTokenSource.cancel();
     }
   }, [user]);
+  useEffect(() => {
+    console.log(postState.posts);
+    console.log(postState.myPosts);
+  }, [postState]);
   // 1. Post for workspace
   function getPosts() {
     setPost({
@@ -144,7 +147,6 @@ export default React.memo(function PostContext({ children }) {
   function getSinglePost(postId, cb) {
     return axios.get(postAPI, {
       headers: {
-        'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       params: {
@@ -152,7 +154,7 @@ export default React.memo(function PostContext({ children }) {
         postid: postId
       }
     }).then(post => {
-      cb(post.data.response);
+      return cb(post.data.response);
     }).catch(error => {
       setError(error.message);
     });
@@ -185,12 +187,28 @@ export default React.memo(function PostContext({ children }) {
         postid: postId
       }
     }).then(res => {
-      return setPost({
+      setPost({
         type: actions.UPDATE_SINGLE_POST,
-        payload: res.data.response
+        payload: res.data.response,
+        postId: postId
       })
     }).catch(error => {
       setError(error.message);
+    })
+  }
+  function deleteSinglePost(postId, cb) {
+    return axios.delete(postAPI, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'singlepost',
+        postid: postId
+      }
+    }).then(res => {
+
+    }).catch(error => {
+
     })
   }
   function postIdea(input, cb, options = null) {
@@ -213,7 +231,8 @@ export default React.memo(function PostContext({ children }) {
     });
     // Check if the postIdea options are pass with edit copyright
     if (options?.isEdit) {
-      editIdea(input, cb, options);
+      console.log('edit post');
+      return editIdea(input, cb, options);
     }
     return axios.post(postAPI, formData, {
       headers: {
@@ -259,12 +278,8 @@ export default React.memo(function PostContext({ children }) {
         postid: options.postId
       }
     }).then(res => {
-      setPost({
-        type: actions.UPDATE_SINGLE_POST,
-        postId: options.postId,
-        payload: res.data.response[0]
-      })
-      cb(res);
+      cb(res.data.response[0]._id);
+      return updateSinglePost(res.data.response[0]._id);
     }).catch(error => setError(error.message));
   }
   // async function updateSinglePost(postId, cb) {
@@ -566,7 +581,7 @@ export default React.memo(function PostContext({ children }) {
           interact: 'rate'
         }
       }).then(res => {
-        // updateSinglePost(postId, cb);
+        updateSinglePost(postId);
       }).catch(error => {
         setError(error.message);
       })
