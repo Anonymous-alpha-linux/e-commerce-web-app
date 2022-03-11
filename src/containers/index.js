@@ -24,3 +24,5 @@ export { default as GridPreview } from "./gridPreview";
 export { default as DashboardOverview } from "./overview";
 export { default as Chart } from "./chart";
 export { default as Crud } from "./Crud";
+export { default as Pagination } from "./Pagination";
+export { default as AddFromWS } from "./AddFromWS";
