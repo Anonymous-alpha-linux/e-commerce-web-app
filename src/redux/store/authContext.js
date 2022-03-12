@@ -3,61 +3,35 @@ import React, { createContext, useContext, useState, useEffect, useReducer, useC
 import { mainAPI } from '../../config';
 import { Loading } from '../../pages';
 import { io } from 'socket.io-client';
-import { unstable_batchedUpdates } from 'react-dom'
 import actions from '../reducers/actions';
 import { authReducer, initialAuth } from '../reducers';
 
 const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
-  const { REACT_APP_ENVIRONMENT } = process.env;
   const [user, setUser] = useReducer(authReducer, initialAuth);
+  const [authAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
-  const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
 
   useEffect(() => {
     try {
-      onLoadUser();
+      onLoadUser(() => {
+        getProfile();
+      });
     }
     catch (error) {
       setError(error.message);
     }
-    // .then(() => {
-    //   setLoading(true);
-    //   // const socketHost = mainAPI.CLOUD_HOST;
-    //   const socketHost = mainAPI.LOCALHOST_HOST;
-    //   const socket = io(socketHost, {
-    //     auth: {
-    //       accessToken: user.accessToken
-    //     }
-    //   }).on("join", (msg) => {
-    //     console.log(msg);
-    //     setSocket(socket);
-    //   }).on("connect_error", err => {
-    //     setError(err.message);
-    //     socket.disconnect();
-    //   });
-    // })
-    // .finally(() => {
-    //   setLoading(false);
-    // });
     return () => {
       cancelTokenSource.cancel();
     };
   }, []);
-
-  const getSocket = () => {
-    if (!socket) {
-      throw new Error("Socket cannot be accessible!");
-    }
-    return socket;
-  };
-  const onLoadUser = () => {
-    return axios.get(authApi, {
+  const onLoadUser = (cb) => {
+    return axios.get(authAPI, {
       cancelToken: cancelTokenSource.token,
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -67,17 +41,22 @@ export default function AuthenticationContext({ children }) {
         type: actions.AUTHENTICATE_ACTION,
         payload: response.data,
       });
+
+      let socket = io(host);
+      socket.auth = { accessToken: localStorage.getItem('accessToken') };
+
+      return setSocket(socket);
+    }).then(success => {
+      cb();
     }).catch(error => {
-      unstable_batchedUpdates(() => {
-        setUser({
-          type: actions.AUTHENTICATE_FAILED,
-        });
-        setError(error.message);
+      setUser({
+        type: actions.AUTHENTICATE_FAILED,
       });
+      setError(error.message);
     })
   };
   function login(data) {
-    const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
+    const loginApi = process.env.REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
     return axios.post(loginApi,
       data, {
       cancelToken: cancelTokenSource.token
@@ -103,7 +82,7 @@ export default function AuthenticationContext({ children }) {
   //     }));
   // };
   async function logout() {
-    const logoutApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGOUT : mainAPI.CLOUD_API_LOGOUT;
+    const logoutApi = process.env.REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGOUT : mainAPI.CLOUD_API_LOGOUT;
     return axios
       .get(logoutApi, {
         cancelToken: cancelTokenSource.token
@@ -115,6 +94,38 @@ export default function AuthenticationContext({ children }) {
         });
       }).catch(error => setError(error.message));
   }
+  function getProfile() {
+    return axios.get(authAPI, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'profile',
+        accountid: user.accountId
+      }
+    }).then(res => {
+      return setUser({
+        type: actions.GET_PROFILE,
+        payload: res.data.response
+      });
+    }).catch(error => setError(error.message));
+  }
+  function editProfile(input) {
+    return axios.put(authAPI, {
+      ...input
+    }, {
+      cancelToken: cancelTokenSource.token,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'profile'
+      }
+    }).then(res => getProfile()).catch(error => {
+      setError(error.message);
+    })
+  }
 
   if (user.authLoading) return <Loading className="auth__loading"></Loading>
 
@@ -122,14 +133,23 @@ export default function AuthenticationContext({ children }) {
     <AuthenticationContextAPI.Provider value={{
       loading: user.authLoading,
       user,
+      profile: user.profile,
       message,
       error,
+      socket,
       cancelTokenSource,
-      getSocket,
       login,
       logout,
+      editProfile,
+      setError,
+      setMessage
     }}>
       {children}
+      {(message || error) && <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px'
+      }}>{message || error}</div>}
     </AuthenticationContextAPI.Provider>
   );
 }

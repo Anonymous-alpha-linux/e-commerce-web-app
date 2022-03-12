@@ -5,8 +5,8 @@ import { ContainerComponent } from "../../components";
 export default function Profile() {
 
   return (
-    <ContainerComponent>
+    <>
       <Outlet></Outlet>
-    </ContainerComponent>
+    </>
   );
 }

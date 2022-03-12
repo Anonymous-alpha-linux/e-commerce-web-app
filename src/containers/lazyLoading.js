@@ -3,6 +3,9 @@ import { Loader } from '.';
 import { usePostContext } from '../redux';
 
 export default function LazyLoading({ children, ...restProps }) {
+    /* restProps:
+        1. loader: [Function]
+     */
     const [loading, setLoading] = useState(false);
     const [element, setElement] = useState(null);
     const {
