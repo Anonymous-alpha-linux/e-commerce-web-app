@@ -18,7 +18,6 @@ export default function Home() {
       <PostContext>
         <Outlet></Outlet>
       </PostContext>
-      <Crud />
     </WorkspaceContext>
   );
 }
