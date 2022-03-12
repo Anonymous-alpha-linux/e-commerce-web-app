@@ -48,7 +48,7 @@ export default React.memo(function PostContext({ children }) {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   // Global states getter
-  const { user } = useAuthorizationContext();
+  const { user, socket } = useAuthorizationContext();
   const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const cancelTokenSource = axios.CancelToken.source();
 
@@ -60,9 +60,8 @@ export default React.memo(function PostContext({ children }) {
     }
   }, [user]);
   useEffect(() => {
-    console.log(postState.posts);
-    console.log(postState.myPosts);
-  }, [postState]);
+    receiveRealtimeComment();
+  }, [socket]);
   // 1. Post for workspace
   function getPosts() {
     setPost({
@@ -197,18 +196,24 @@ export default React.memo(function PostContext({ children }) {
     })
   }
   function deleteSinglePost(postId, cb) {
+    console.log(postId);
     return axios.delete(postAPI, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       params: {
-        view: 'singlepost',
+        view: 'post',
         postid: postId
       }
     }).then(res => {
-
+      console.log(res);
+      setPost({
+        type: actions.REMOVE_SINGLE_POST,
+        postId: postId
+      });
+      cb(postId);
     }).catch(error => {
-
+      setError(error.message);
     })
   }
   function postIdea(input, cb, options = null) {
@@ -244,8 +249,9 @@ export default React.memo(function PostContext({ children }) {
         postid: input.postid
       }
     }).then(res => {
+      console.log(res);
+      createSinglePost(res.data.response[0]._id, cb)
       cb(res.data.response[0]._id);
-      return createSinglePost(res.data.response[0]._id, cb)
     }).catch(err => {
       cb(error);
       setError(err.message);
@@ -385,7 +391,7 @@ export default React.memo(function PostContext({ children }) {
   }
 
   // 3. Comment for posts
-  async function getPostComments(postId, cb) {
+  function getPostComments(postId, cb) {
     return axios.get(postAPI, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -397,12 +403,13 @@ export default React.memo(function PostContext({ children }) {
         count: 10
       }
     }).then(res => {
-      return setPost({
+      setPost({
         type: actions.GET_POST_COMMENT,
         payload: res.data.response,
-        postid: postId,
+        postId: postId,
         count: 10
       });
+      cb(res.data.response);
     }).then(success => {
       cb();
     }).catch(error => {
@@ -459,6 +466,18 @@ export default React.memo(function PostContext({ children }) {
       setError(error.message);
     });
   }
+  function sendRealtimeComment(postId, commentId) {
+    socket.emit('comment', {
+      postId,
+      commentId
+    });
+  }
+  function receiveRealtimeComment() {
+    socket.on('comment', (res) => {
+      const { postId, commentId } = res;
+      addSingleComment(postId, commentId);
+    })
+  }
   function updateSingleComment(postId, commentId, cb) {
     return axios.get(postAPI, {
       headers: {
@@ -496,11 +515,12 @@ export default React.memo(function PostContext({ children }) {
         commentid: commentId
       }
     }).then(res => {
+      console.log(res.data);
       const { _id } = res.data.response;
       setPost({
         type: actions.CREATE_POST_COMMENT,
-        payload: res.data.response,
-        postid: postId
+        payload: [res.data.response],
+        postId: postId
       });
     }).catch(error => {
       setError(error.message);
@@ -599,8 +619,9 @@ export default React.memo(function PostContext({ children }) {
           postid: postId
         }
       }).then(res => {
-        cb(res.data.response._id);
         addSingleComment(postId, res.data.response._id);
+        sendRealtimeComment(postId, res.data.response._id);
+        cb(res.data.response._id);
       }).catch(error => {
         setError(error.message);
       });
@@ -719,6 +740,7 @@ export default React.memo(function PostContext({ children }) {
     getFile,
     postIdea,
     getSinglePost,
+    deleteSinglePost,
     // updateSinglePost,
     removeIdea,
     loadNextPosts,

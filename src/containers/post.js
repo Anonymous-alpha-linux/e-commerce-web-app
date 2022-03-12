@@ -1,23 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { ContainerComponent, Icon, Text, Preview, Dropdown } from "../components";
 import { FaThumbsUp, FaThumbsDown, FaRegEdit, FaEraser } from "react-icons/fa";
 import { IoIosArrowDown } from 'react-icons/io';
 import { Comment, DropDownButton, GridPreview } from ".";
-import { useAuthorizationContext, usePostContext } from "../redux";
+import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
+import { notifyData, socketTargets } from "../fixtures";
 
-export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
+export default function Post({ postHeader, postBody, postFooter }) {
   const { user } = useAuthorizationContext();
-  const { interactPost, getPostComments } = usePostContext();
+  const { interactPost, getPostComments, deleteSinglePost } = usePostContext();
+  const { sendNotification } = useNotifyContext();
   const isFirstRender = useRef(true);
   const interactRef = useRef(interactPost);
   const getComment = useRef(getPostComments);
 
   const [openComment, setOpenComment] = useState(false);
-  const [interact, setInteract] = useState({
-    liked: postFooter.isLiked,
-    disliked: postFooter.isDisliked,
-  });
+  const [interact, setInteract] = useState({ liked: postFooter.isLiked, disliked: postFooter.isDisliked });
 
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
@@ -54,26 +53,33 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
   //   });
   // };
   const parseTime = (time) => {
-    const secondAgo =
-      new Date(Date.now()).getSeconds() - new Date(time).getSeconds();
-    const minuteAgo =
-      new Date(Date.now()).getMinutes() - new Date(time).getMinutes();
-    const hourAgo = new Date(Date.now()).getHours() - new Date(time).getHours();
-    const dateAgo = new Date(Date.now()).getDate() - new Date(time).getDate();
-    if (dateAgo < 1) {
-      if (hourAgo < 24) return hourAgo + " hours ago";
-      if (minuteAgo < 60) return minuteAgo + " minutes ago";
-      if (secondAgo < 60) return secondAgo + " seconds ago";
+    // const secondAgo = new Date(Date.now()).getSeconds() - new Date(time).getSeconds();
+    // const minuteAgo = new Date(Date.now()).getMinutes() - new Date(time).getMinutes();
+    // const hourAgo = new Date(Date.now()).getHours() - new Date(time).getHours();
+    // const dateAgo = new Date(Date.now()).getDate() - new Date(time).getDate();
+    const now = new Date(Date.now());
+    const end = new Date(time);
+    const diff = new Date(now.getTime() - end.getTime());
+
+    if (diff.getUTCDate() - 1 === 0) {
+      if (diff.getUTCHours() > 1) return diff.getUTCHours() + " hours ago";
+      if (diff.getUTCMinutes() > 1) return diff.getUTCMinutes() + " minutes ago";
+      return diff.getUTCSeconds() + " seconds ago";
     }
-    if (dateAgo < 2) return dateAgo + " days ago";
+    if (diff.getUTCDate() < 30) return diff.getUTCDate() + " days ago";
     return `${new Date(time).toLocaleString("en-us", { dateStyle: "full" })}`;
   };
 
   React.useEffect(() => {
+    getComment.current = getPostComments;
+  }, [getPostComments])
+  React.useEffect(() => {
     if (!isFirstRender.current) {
       // interactRef.current(postHeader.id, 'rate', interact, () => {
       // });
-      interactPost(postHeader.id, 'rate', interact);
+      interactPost(postHeader.id, 'rate', interact, commentId => {
+        console.log(commentId);
+      });
     }
   }, [interact]);
   React.useEffect(() => {
@@ -127,7 +133,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
               </Link>
             </Dropdown.Item>
             <Dropdown.Item>
-              <Text.Line onClick={removeIdea}>
+              <Text.Line onClick={() => deleteSinglePost(postHeader.id)}>
                 <Text.MiddleLine>
                   <Icon>
                     <FaEraser></FaEraser>
@@ -214,7 +220,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
           </ContainerComponent.Item>
           <ContainerComponent.Item onClick={() => {
             if (!openComment) {
-              getComment.current(postHeader.id, () => {
+              getComment.current(postHeader.id, (res) => {
                 setOpenComment(true);
               });
             }
@@ -230,8 +236,6 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
           </ContainerComponent.Item>
         </ContainerComponent.GridThreeColumns>
       </ContainerComponent.Pane>
-
-
       {
         openComment && <Comment
           postAuthor={postHeader.postAuthor}

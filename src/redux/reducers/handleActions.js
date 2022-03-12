@@ -5,12 +5,10 @@ export default class ActionHandler {
         this.state = state;
         this.action = action;
     }
-
     getListItem(field, data, otherEntries) {
         return {
-            ...this.state,
+            ...otherEntries,
             [field]: data,
-            ...otherEntries
         };
     }
     filterListItem(field, data, otherEntries) {
@@ -33,10 +31,18 @@ export default class ActionHandler {
     unshiftItem(field, data, otherEntries) {
         return {
             ...otherEntries,
-            [field]: data.length ? [...data, ...this.state[field]] : this.state[field],
+            [field]: data.length ? [...data, ...otherEntries[field]] : otherEntries[field],
         };
     };
-    updateItem(updateField, callback, otherEntries = {},) {
+    removeItem(updateField, callback, otherEntries) {
+        return {
+            ...otherEntries,
+            [updateField]: otherEntries[updateField].map(item => {
+                return callback(item);
+            }).filter(item => item)
+        }
+    }
+    updateItem(updateField, callback, otherEntries = {}) {
         // Inside otherEntries including in the initial state
         return {
             ...otherEntries,

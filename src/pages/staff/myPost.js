@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Loading } from '..';
 import { ContainerComponent, List } from '../../components';
-import { mainAPI } from '../../config';
 import { Filter, LazyLoading, PostContainer, PostForm } from '../../containers';
 import { usePostContext, useAuthorizationContext } from '../../redux';
 import axios from 'axios';
@@ -19,7 +18,6 @@ export default function MyPost() {
         mountedRef.current = true;
         if (mountedRef.current) {
             getOwnPosts(() => {
-                console.log('get own posts');
                 setLoading(false);
             });
         }
@@ -44,9 +42,9 @@ export default function MyPost() {
         ]}></Filter>
         <LazyLoading loader={loadMyNextPosts}>
             <List className="workspace__postList" ref={listRef}>
-                {!myPosts.length && <List.Item>
-                    Loading...
-                </List.Item>}
+                {/* {!myPosts.length && <List.Item>
+                    <Text.Center>Loading...</Text.Center>
+                </List.Item>} */}
                 {myPosts.map((post) => {
                     const {
                         _id,
@@ -101,7 +99,6 @@ export default function MyPost() {
                                 postHeader={postHeader}
                                 postBody={postBody}
                                 postFooter={postFooter}
-                                removeIdea={() => removeIdea(_id)}
                             ></PostContainer>
                         </List.Item>
                     );

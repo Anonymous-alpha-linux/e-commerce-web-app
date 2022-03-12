@@ -105,7 +105,6 @@ export default function Workspace() {
                   postHeader={postHeader}
                   postBody={postBody}
                   postFooter={postFooter}
-                  removeIdea={() => removeIdea(_id)}
                 ></PostContainer>
               </List.Item>
             );

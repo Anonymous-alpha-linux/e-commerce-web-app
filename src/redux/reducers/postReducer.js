@@ -23,6 +23,7 @@ const postReducer = (state, action) => {
        */
     case actions.GET_POST_LIST:
       return actionHandler.getListItem('posts', action.payload, {
+        ...state,
         postLoading: false,
         filter: 0,
         page: 0
@@ -35,7 +36,6 @@ const postReducer = (state, action) => {
       console.log(action.payload);
       return actionHandler.unshiftItem('posts', action.payload, actionHandler.unshiftItem('myPosts', action.payload, state));
     case actions.UPDATE_SINGLE_POST:
-      console.log(action.payload);
       return actionHandler.updateItem('myPosts', post => {
         if (post._id === action.postId) return action.payload;
         return post;
@@ -43,6 +43,15 @@ const postReducer = (state, action) => {
         if (post._id === action.postId) return action.payload;
         return post;
       }, state));
+    case actions.REMOVE_SINGLE_POST:
+      const singlePost = actionHandler.removeItem('posts', post => {
+        if (post._id === action.postId) return null;
+        return post;
+      }, actionHandler.removeItem('myPosts', post => {
+        if (post._id === action.postId) return null;
+        return post;
+      }, state));
+      return singlePost;
 
     case actions.GET_MY_POST:
       return {
@@ -75,35 +84,48 @@ const postReducer = (state, action) => {
 
 
     case actions.GET_POST_COMMENT:
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: action.payload,
-              page: 0,
-              filter: 0,
-              count: 10,
-              loadMore: action.payload.length >= 10
-            }
-          }
-          return post;
-        }),
-        myPosts: state.myPosts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: action.payload,
-              page: 0,
-              filter: 0,
-              count: 10,
-              loadMore: action.payload.length >= 10
-            }
-          }
-          return post;
-        })
-      };
+      console.log(action.payload);
+      return actionHandler.updateItem('posts', post => {
+        if (post._id === action.postId) return actionHandler.getListItem("comments", action.payload, {
+          ...post,
+          loadMore: action.payload.length >= 10,
+          count: 10,
+          page: 0
+        });
+        return post;
+      }, actionHandler.updateItem('myPosts', post => {
+        if (post._id === action.postId) return actionHandler.getListItem("comments", action.payload, post);
+        return post;
+      }, state));
+    // return {
+    //   ...state,
+    //   posts: state.posts.map(post => {
+    //     if (post._id === action.postid) {
+    //       return {
+    //         ...post,
+    //         comments: action.payload,
+    //         page: 0,
+    //         filter: 0,
+    //         count: 10,
+    //         loadMore: action.payload.length >= 10
+    //       }
+    //     }
+    //     return post;
+    //   }),
+    //   myPosts: state.myPosts.map(post => {
+    //     if (post._id === action.postid) {
+    //       return {
+    //         ...post,
+    //         comments: action.payload,
+    //         page: 0,
+    //         filter: 0,
+    //         count: 10,
+    //         loadMore: action.payload.length >= 10
+    //       }
+    //     }
+    //     return post;
+    //   })
+    // };
     case actions.LOAD_MORE_POST_COMMENT:
       return {
         ...state,
@@ -200,18 +222,25 @@ const postReducer = (state, action) => {
         }),
       };
     case actions.CREATE_POST_COMMENT:
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: [action.payload, ...post.comments],
-            }
-          }
-          return post;
-        })
-      };
+      return actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, post);
+        return post
+      }, actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, post);
+        return post;
+      }, state));
+    // return {
+    //   ...state,
+    //   posts: state.posts.map(post => {
+    //     if (post._id === action.postid) {
+    //       return {
+    //         ...post,
+    //         comments: [action.payload, ...post.comments],
+    //       }
+    //     }
+    //     return post;
+    //   })
+    // };
 
     case actions.GET_COMMENT_REPLIES:
       return {
