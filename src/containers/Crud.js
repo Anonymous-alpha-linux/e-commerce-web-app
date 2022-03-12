@@ -15,7 +15,7 @@ let Category = [
     name: "Art",
   },
   {
-    id: 3,
+    id: "9beb-4e7-90c-405",
     name: "IT",
   },
   {
@@ -43,7 +43,7 @@ let Category = [
     name: "Reading",
   },
   {
-    id: 10,
+    id: "d8a4-43c-b7e-65b",
     name: "Photo",
   },
 ];
@@ -195,6 +195,7 @@ function SearchCategory({
 }
 
 function Crud() {
+  let Url = "";
   const [categories, setCategories] = useState(Category);
   // const state = usePostContext();
   // console.log(state);
@@ -212,7 +213,7 @@ function Crud() {
 
   useEffect(() => {
     const fetchCategory = async () => {
-      const { data } = await axios.get(``);
+      const { data } = await axios.get(`${Url}`);
 
       setCategories(data);
     };
@@ -220,16 +221,24 @@ function Crud() {
     fetchCategory();
   }, []);
 
-  function deleteCate() {
-    axios({
-      method: "delete",
-      url: "",
-      data: categories.id,
-    })
+  function deleteCate(e) {
+    e.preventDefault();
+
+    axios
+      .delete(Url + `${categories.id}`)
       .then((res) => {
         console.log(res.data);
       })
       .catch((error) => console.log(error, "Get Error"));
+
+    // axios({
+    //   method: "delete",
+    //   url: `${categories.id}`,
+    // })
+    //   .then((res) => {
+    //     console.log(res.data);
+    //   })
+    //   .catch((error) => console.log(error, "Get Error"));
   }
 
   return (
