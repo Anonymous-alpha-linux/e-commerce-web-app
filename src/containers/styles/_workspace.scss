@@ -1,4 +1,9 @@
 .workspace {
    max-width: 680px !important;
    width: 100%;
+   border: 1px solid grey;
+   box-shadow: 0 -20px grey inset;
+   &__postList {
+      background: #fff;
+   }
 }

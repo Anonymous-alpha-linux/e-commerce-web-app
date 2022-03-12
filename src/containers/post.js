@@ -1,22 +1,19 @@
 import React, { useState, useRef } from "react";
 import { ContainerComponent, Icon, Text, Preview, Dropdown } from "../components";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-
-// import { IoEarth } from "react-icons/io5";
+import { FaThumbsUp, FaThumbsDown, FaRegEdit, FaEraser } from "react-icons/fa";
 import { IoIosArrowDown } from 'react-icons/io';
 import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
 
 export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
-    const [openComment, setOpenComment] = useState(false);
     const { user } = useAuthorizationContext();
-    const { interactPost } = usePostContext();
-    const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-
+    const { interactPost, getPostComments } = usePostContext();
     const isFirstRender = useRef(true);
     const interactRef = useRef(interactPost);
+    const getComment = useRef(getPostComments);
 
+    const [openComment, setOpenComment] = useState(false);
     const [interact, setInteract] = useState({
         liked: postFooter.isLiked,
         disliked: postFooter.isDisliked
@@ -39,17 +36,29 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
             });
         }
     }
+    const parseTime = (time) => {
+        const secondAgo = (new Date(Date.now())).getSeconds() - (new Date(time)).getSeconds();
+        const minuteAgo = (new Date(Date.now())).getMinutes() - (new Date(time)).getMinutes();
+        const hourAgo = (new Date(Date.now())).getHours() - (new Date(time)).getHours();
+        const dateAgo = (new Date(Date.now())).getDate() - (new Date(time)).getDate();
+        if (dateAgo < 1) {
+            if (hourAgo < 24) return hourAgo + ' hours ago';
+            if (minuteAgo < 60) return minuteAgo + ' minutes ago';
+            if (secondAgo < 60) return secondAgo + ' seconds ago';
+        }
+        if (dateAgo < 2) return dateAgo + ' days ago';
+        return `${(new Date(time).toLocaleString("en-us", { dateStyle: 'full' }))}`;
+    }
 
     React.useEffect(() => {
         if (!isFirstRender.current) {
-            interactRef.current(postHeader.id, 'rate', interact, () => { });
+            interactRef.current(postHeader.id, 'rate', interact, () => {
+            });
         }
     }, [interact]);
-
     React.useEffect(() => {
         isFirstRender.current = false;
     }, []);
-
     React.useEffect(() => {
         interactRef.current = interactPost;
     }, [interactRef]);
@@ -77,25 +86,36 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                     <ContainerComponent.Flex>
                         <Text.Date style={{
                             marginRight: '8px'
-                        }}>{date}</Text.Date>
-                        {/* <Text>
-                            <IoEarth />
-                        </Text> */}
+                        }}>{parseTime(postHeader.date)}</Text.Date>
                     </ContainerComponent.Flex>
                 </ContainerComponent.InlineGroup>
                 {user.accountId === postHeader.postAuthor && <Text.RightLine>
                     <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
                         <Dropdown.Item>
                             <Link to={`/portal/idea/${postHeader.id}`}>
-                                <Text>
-                                    Edit
-                                </Text>
+                                <Text.Line>
+                                    <Text.MiddleLine>
+                                        <Icon>
+                                            <FaRegEdit></FaRegEdit>
+                                        </Icon>
+                                    </Text.MiddleLine>
+                                    <Text.MiddleLine>
+                                        Edit
+                                    </Text.MiddleLine>
+                                </Text.Line>
                             </Link>
                         </Dropdown.Item>
                         <Dropdown.Item>
-                            <Text onClick={removeIdea}>
-                                Delete
-                            </Text>
+                            <Text.Line onClick={removeIdea}>
+                                <Text.MiddleLine>
+                                    <Icon>
+                                        <FaEraser></FaEraser>
+                                    </Icon>
+                                </Text.MiddleLine>
+                                <Text.MiddleLine>
+                                    Delete
+                                </Text.MiddleLine>
+                            </Text.Line>
                         </Dropdown.Item>
                     </DropDownButton>
                 </Text.RightLine>}
@@ -180,10 +200,19 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
                             </Text.CenterLine>
                         </Text.MiddleLine>
                     </ContainerComponent.Item>
-                    <ContainerComponent.Item onClick={() => setOpenComment(!openComment)}>
+                    <ContainerComponent.Item onClick={() => {
+                        if (!openComment) {
+                            getComment.current(postHeader.id, () => {
+                                setOpenComment(true);
+                            });
+                        }
+                        else {
+                            setOpenComment(false);
+                        }
+                    }}>
                         <Text.AbsoluteMiddle>
                             <Text.CenterLine>
-                                Comment
+                                Comment ({postFooter.comment})
                             </Text.CenterLine>
                         </Text.AbsoluteMiddle>
                     </ContainerComponent.Item>
@@ -191,8 +220,10 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
             </ContainerComponent.Pane>
             {
                 openComment && <Comment
+                    postAuthor={postHeader.postAuthor}
                     postId={postHeader.id}
-                    commentLogs={postFooter.comment}></Comment>
+                    commentLogs={postFooter.comments}
+                ></Comment>
             }
         </ContainerComponent.Section>
     );

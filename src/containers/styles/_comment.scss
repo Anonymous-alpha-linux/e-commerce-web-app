@@ -1,4 +1,22 @@
 .comment {
-  &__header {
-  }
+   &__header {
+   }
+   &__reply {
+      margin-left: 30px;
+      .comment__tab {
+         // border-color: red;
+         // border-left: 1px solid red;
+         &::before {
+            content: "Replies";
+            font-size: 12px;
+            margin: 15px 0;
+            text-transform: uppercase;
+            display: block;
+            height: 10px;
+         }
+      }
+   }
+   &__tab {
+      border-top: 1px solid black;
+   }
 }

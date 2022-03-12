@@ -1,5 +1,5 @@
 import React from 'react'
-import { ContainerComponent } from '../../components'
+import { ContainerComponent, BarChart } from '../../components'
 import { Chart, DashboardOverview } from '../../containers'
 
 export default function Dashboard() {
@@ -19,7 +19,7 @@ export default function Dashboard() {
 
             <ContainerComponent.Pane>
                 {/* Chart.Column Container */}
-                <Chart.Column></Chart.Column>
+                <BarChart></BarChart>
             </ContainerComponent.Pane>
         </ContainerComponent>
 

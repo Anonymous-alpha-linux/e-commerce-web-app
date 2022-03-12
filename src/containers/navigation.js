@@ -1,28 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { AiOutlineMessage } from "react-icons/ai";
-import {
-    IoNotificationsOutline,
-    IoSearchSharp,
-} from "react-icons/io5";
+import { IoNotificationsOutline, IoSearchSharp } from "react-icons/io5";
+import { BsList } from "react-icons/bs";
+
 import logo from '../assets/Logoidea2.jpg';
 
-
-import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
-import navigators from "../fixtures/navigator";
-import navData from '../fixtures/nav-links';
-import { useAuthorizationContext } from "../redux";
-import { BsList } from "react-icons/bs";
-// import NotificationContainer from "./notification";
-// import { MessageBoxContainer, MessageContainer } from ".";
+import { AnimateComponent, ButtonComponent, ContainerComponent, Icon, Text } from "../components";
+import { navigator as navigators, navData } from '../fixtures';
+import { useAuthorizationContext, useNotifyContext } from "../redux";
 
 export default function Navigation() {
-    const [screenColumn, setScreenColumn] = React.useState(2);
-    const [openNavigator, setOpenNavigator] = React.useState(false);
+    const [screenColumn, setScreenColumn] = useState(2);
+    const [openNavigator, setOpenNavigator] = useState(false);
     const navigate = useNavigate();
-    // const [openNotification, setOpenNotification] = React.useState(false);
-    // const [openMessage, setOpenMessage] = useState(false);
-
 
     const responsiveHandler = () => {
         const { width } = window.screen;
@@ -42,11 +34,6 @@ export default function Navigation() {
             window.removeEventListener("resize", responsiveHandler);
         };
     }, [window.screen.width]);
-
-    // const openHome = () => {
-    //     setOpenMessage(false);
-    //     setOpenNotification(false);
-    // }
 
     return (
         <ContainerComponent
@@ -116,16 +103,14 @@ export default function Navigation() {
                     <AuthStatus
                         screenColumn={screenColumn}
                         openNavigator={() => setOpenNavigator(true)}
-                    // openNotification={() => setOpenNotification(true)}
-                    // openMessage={() => setOpenMessage(true)}
                     ></AuthStatus>
                 </ContainerComponent.Item>
             </ContainerComponent.Flex>
             {openNavigator && (
                 <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
             )}
-            {/* {openMessage && <MessageContainer></MessageContainer>}
-            {openNotification && (<NotificationContainer></NotificationContainer>)} */}
+            {/* {openMessage && <MessageContainer></MessageContainer>} */}
+
         </ContainerComponent>
     );
 }
@@ -172,14 +157,23 @@ const Navigator = ({ closeNavigator }) => {
     );
 };
 
-const AuthStatus = React.memo(({
+const AuthStatus = React.memo(function AuthStatus({
     screenColumn,
     openNavigator,
-    openNotification,
-    openMessage
-}) => {
+}) {
     const { user, logout } = useAuthorizationContext();
+    const { notify } = useNotifyContext();
+    const [isNew, setIsNew] = useState(false);
 
+    useEffect(() => {
+        if (notify.newNodes.length > 0) {
+            setIsNew(true);
+        }
+    }, [notify.newNodes.length]);
+
+    function turnOffBadge(e) {
+        setIsNew(false);
+    }
 
     if (!user.isLoggedIn) {
         return (
@@ -210,28 +204,43 @@ const AuthStatus = React.memo(({
                 </Icon.CircleIcon>
             </ContainerComponent.Item>
             <ContainerComponent.Item>
-                <Icon.CircleIcon>
+                <Icon.CircleIcon onClick={turnOffBadge}>
                     <Link to="/portal/notification">
                         <IoNotificationsOutline></IoNotificationsOutline>
                     </Link>
                 </Icon.CircleIcon>
+                {isNew && <Icon.Badge></Icon.Badge>}
+                {/* {screenColumn < 3 &&
+                    ||
+                    <AnimateComponent
+                        className="fixed__container"
+                        run={openNotify}
+                        component={
+                            <Icon.CircleIcon>
+                                <IoNotificationsOutline></IoNotificationsOutline>
+                            </Icon.CircleIcon>}
+                        classNames={"dropdown"}
+                        unmountOnExit={true}
+                        timeout={300}>
+                        <NotificationContainer></NotificationContainer>
+                    </AnimateComponent>
+                } */}
             </ContainerComponent.Item>
             <ContainerComponent.Item>
-                {(screenColumn < 3 && (
+                {screenColumn < 3 &&
                     <Icon.CircleIcon onClick={openNavigator}>
                         <BsList></BsList>
                     </Icon.CircleIcon>
-                )) || (
-                        <Text.MiddleLine style={{ verticalAlign: 'text-bottom' }}>
-                            <Link to={"/"} style={{
-                                color: '#fff'
-                            }} onClick={logout}>
-                                <ButtonComponent >
-                                    Logout
-                                </ButtonComponent>
-                            </Link>
-                        </Text.MiddleLine>
-                    )
+                    ||
+                    <Text.MiddleLine style={{ verticalAlign: 'text-bottom' }}>
+                        <Link to={"/"} style={{
+                            color: '#fff'
+                        }} onClick={logout}>
+                            <ButtonComponent >
+                                Logout
+                            </ButtonComponent>
+                        </Link>
+                    </Text.MiddleLine>
                 }
             </ContainerComponent.Item>
         </ContainerComponent.Flex>

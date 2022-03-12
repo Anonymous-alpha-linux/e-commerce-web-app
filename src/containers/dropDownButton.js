@@ -15,7 +15,6 @@ export default function DropdownButton({ children, ...props }) {
             <DropDown.DropBtn component={props.component}></DropDown.DropBtn>
             {openContent && <DropDown.Content>
                 {children.map((item, index) => {
-                    console.log(item);
                     return <DropDown.Item key={index + 1} value={item.value} style={{ cursor: 'pointer' }}>
                         {item}
                     </DropDown.Item>
