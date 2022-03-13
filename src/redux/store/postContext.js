@@ -207,7 +207,6 @@ export default React.memo(function PostContext({ children }) {
         postid: postId
       }
     }).then(res => {
-      console.log(res);
       setPost({
         type: actions.REMOVE_SINGLE_POST,
         postId: postId
@@ -237,7 +236,6 @@ export default React.memo(function PostContext({ children }) {
     });
     // Check if the postIdea options are pass with edit copyright
     if (options?.isEdit) {
-      console.log('edit post');
       return editIdea(input, cb, options);
     }
     return axios.post(postAPI, formData, {
@@ -250,7 +248,7 @@ export default React.memo(function PostContext({ children }) {
         postid: input.postid
       }
     }).then(res => {
-      console.log(res);
+
       createSinglePost(res.data.response[0]._id, cb)
       cb(res.data.response[0]._id);
     }).catch(err => {
@@ -292,7 +290,6 @@ export default React.memo(function PostContext({ children }) {
   function likePost(isLiked, postId, userId) {
     let isDisliked = postState
     // .dislikedAccounts.includes(user.accountId);
-    console.log('disliked', isDisliked);
     if (!isDisliked) {
       setPost({
         type: actions.LIKE_POST,
@@ -570,7 +567,6 @@ export default React.memo(function PostContext({ children }) {
         commentid: commentId
       }
     }).then(res => {
-      console.log(res.data);
       const { _id } = res.data.response;
       setPost({
         type: actions.CREATE_POST_COMMENT,
@@ -589,18 +585,17 @@ export default React.memo(function PostContext({ children }) {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       params: {
-        view: 'reply',
+        view: 'comment reply',
         commentid: commentId,
         page: 0,
         count: 10
       }
     }).then(res => {
-
-      return setPost({
+      setPost({
         type: actions.GET_COMMENT_REPLIES,
         payload: res.data.response,
-        postid: postId,
-        commentid: commentId,
+        postId: postId,
+        commentId: commentId,
         count: 10
       });
     }).then(success => {
@@ -610,28 +605,50 @@ export default React.memo(function PostContext({ children }) {
     });
   }
   function loadNextReplies(postId, commentId, cb) {
-    return;
+    const replyPage = postState.posts.find(post => post._id === postId).comments.find(comment => comment._id === commentId).page;
+    console.log(replyPage);
+    return axios.get(postAPI, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      params: {
+        view: 'comment reply',
+        commentid: commentId,
+        page: replyPage + 1,
+        count: 10
+      }
+    }).then(res => {
+      console.log(res.data);
+      setPost({
+        type: actions.LOAD_MORE_COMMENT_REPLIES,
+        payload: res.data.response,
+        postId: postId,
+        commentId: commentId,
+        count: 10
+      });
+    }).catch(error => {
+      setError(error.message);
+    });
   }
   function updateCommentReplies(postId, commentId, cb) {
     return;
   }
-  function addCommentReply(postId, commentId, cb) {
+  function addCommentReply(postId, commentId, replyId, cb) {
     return axios.get(postAPI, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       },
       params: {
         view: 'singlecomment',
-        commentid: commentId,
-        page: 0,
-        count: 10
+        commentid: replyId,
       }
     }).then(res => {
-      return setPost({
+      console.log(res.data.response);
+      setPost({
         type: actions.ADD_COMMENT_REPLY,
-        payload: res.data.response.replies,
-        postid: postId,
-        commentid: commentId,
+        payload: [res.data.response],
+        postId: postId,
+        commentId: commentId,
       });
     }).then(success => {
       cb();
@@ -641,7 +658,6 @@ export default React.memo(function PostContext({ children }) {
   }
   // 4. Thump-up, thump-down, comment 
   function interactPost(postId, type, input, cb) {
-    console.log(input);
     // Set Loading for waiting post
     if (type === 'rate') {
       return axios.put(postAPI, {
@@ -759,10 +775,13 @@ export default React.memo(function PostContext({ children }) {
         params: {
           view: 'comment',
           commentid: input.commentid,
+          postid: postId,
           interact: 'reply'
         }
       }).then(res => {
-        return addCommentReply(postId, res.data.response._id, () => {
+        console.log(res.data.response);
+        const replyId = res.data.response._id;
+        addCommentReply(postId, input.commentid, replyId, () => {
           cb();
         });
       }).then(success => {
@@ -858,6 +877,7 @@ export default React.memo(function PostContext({ children }) {
     loadNextComments,
     filterPostComment,
     getCommentReplies,
+    loadNextReplies,
   }
 
   if (postState.postLoading && categoryState.categoryLoading) return <Loading className="post__loading"></Loading>

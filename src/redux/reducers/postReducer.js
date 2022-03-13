@@ -162,7 +162,6 @@ const postReducer = (state, action) => {
 
 
     case actions.GET_POST_COMMENT:
-      console.log(action.payload);
       return actionHandler.updateItem('posts', post => {
         if (post._id === action.postId) return actionHandler.getListItem("comments", action.payload, {
           ...post,
@@ -280,6 +279,20 @@ const postReducer = (state, action) => {
       }, state));
 
     case actions.GET_COMMENT_REPLIES:
+      return actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+          if (comment._id === action.commentId) return actionHandler.getListItem("replies", action.payload, { ...comment, page: 0, count: 10, loadMore: action.payload.length >= 10 });
+          return comment;
+        }, post)
+        return post;
+      }, actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+          if (comment._id === action.commentId) return actionHandler.getListItem("replies", action.payload, { ...comment, page: 0, count: 10, loadMore: action.payload.length >= 10 });
+          return comment;
+        }, post)
+        return post;
+      }, state));
+    case actions.UPDATE_COMMENT_REPLY:
       return {
         ...state,
         posts: state.posts.map(post => {
@@ -287,35 +300,20 @@ const postReducer = (state, action) => {
             return {
               ...post,
               comments: post.comments.map(comment => {
-                if (comment._id === action.commentid)
+                if (comment._id === action.commentid) {
                   return {
                     ...comment,
-                    replies: action.payload,
-                    page: 0,
-                    filter: 0,
-                    count: 10,
-                    loadMore: action.payload.length >= 10
+                    replies: comment.replies.map(reply => {
+                      if (reply._id === action.payload._id) {
+                        return {
+                          ...reply,
+                          ...action.payload
+                        }
+                      }
+                      return reply;
+                    })
                   }
-                return comment;
-              })
-            }
-          }
-          return post;
-        }),
-        myPosts: state.myPosts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid)
-                  return {
-                    ...comment,
-                    replies: action.payload,
-                    page: 0,
-                    filter: 0,
-                    count: 10,
-                    loadMore: action.payload.length >= 10
-                  }
+                }
                 return comment;
               })
             }
@@ -324,90 +322,38 @@ const postReducer = (state, action) => {
         })
       };
     case actions.LOAD_MORE_COMMENT_REPLIES:
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    replies: action.payload.length ? [...comment.replies, ...action.payload] : comment.replies,
-                    page: action.payload.length ? comment.page + 1 : comment.page,
-                    loadMore: action.payload.length >= comment.count
-                  }
-                }
-                return comment;
-              })
-            }
-          }
-          return post;
-        }),
-        myPosts: state.myPosts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    replies: action.payload.length ? [...comment.replies, ...action.payload] : comment.replies,
-                    page: action.payload.length ? comment.page + 1 : comment.page,
-                    loadMore: action.payload.length >= comment.count
-                  }
-                }
-                return comment;
-              })
-            }
-          }
-          return post;
-        }),
-      };
+      return actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+          if (comment._id === action.commentId) return actionHandler.pushItem("replies", action.payload, { ...comment, page: comment.page + 1, loadMore: action.payload.length >= 10 });
+          return comment;
+        }, post)
+        return post;
+      }, actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+          if (comment._id === action.commentId) return actionHandler.pushItem("replies", action.payload, { ...comment, page: comment.page + 1, loadMore: action.payload.length >= 10 });
+          return comment;
+        }, post)
+        return post;
+      }, state));
     case actions.ADD_COMMENT_REPLY:
       /*
-          action.postid: [String]
-          action.commentid: [String]
+          action.postId: [String]
+          action.commentId: [String]
           action.payload: [Object]
       */
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    replies: [action.payload, ...comment.replies]
-                  }
-                }
-                return comment;
-              })
-            }
-          }
-          return post;
-        }),
-        myPosts: state.myPosts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    replies: [action.payload, ...comment.replies]
-                  }
-                }
-                return comment;
-              })
-            }
-          }
-          return post;
-        })
-      };
+      return actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+          if (comment._id === action.commentId) { console.log(comment.replies, action.payload); return actionHandler.unshiftItem("replies", action.payload, { ...comment, reply: comment.reply + 1 }); }
+          return comment;
+        }, post)
+        return post;
+      }, actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+          if (comment._id === action.commentId) return actionHandler.unshiftItem("replies", action.payload, { ...comment, reply: comment.reply + 1 });
+          return comment;
+        }, post)
+        return post;
+      }, state));
     case actions.UPDATE_COMMENT_REPLY:
       return {
         ...state,

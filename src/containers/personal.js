@@ -6,7 +6,6 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function Personal({ personalInfo }) {
     const { user, profile, editProfile } = useAuthorizationContext();
-    console.log(profile);
     const { workspace } = useWorkspaceContext();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);

@@ -34,6 +34,12 @@ export default class ActionHandler {
             [field]: data.length ? [...data, ...otherEntries[field]] : otherEntries[field],
         };
     };
+    pushItem(field, data, otherEntries) {
+        return {
+            ...otherEntries,
+            [field]: data.length ? [...otherEntries[field], ...data] : otherEntries[field],
+        };
+    };
     removeItem(updateField, callback, otherEntries) {
         return {
             ...otherEntries,

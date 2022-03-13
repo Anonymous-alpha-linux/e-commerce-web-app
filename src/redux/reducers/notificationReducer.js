@@ -4,7 +4,6 @@ import ActionHandler from './handleActions';
 export const initialNotify = {
     notifications: [],
     newNodes: [],
-    user: {},
     loading: true,
     page: 0,
     count: 10,

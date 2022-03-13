@@ -59,10 +59,6 @@ export default function Post({ postHeader, postBody, postFooter }) {
   //   });
   // };
   const parseTime = (time) => {
-    // const secondAgo = new Date(Date.now()).getSeconds() - new Date(time).getSeconds();
-    // const minuteAgo = new Date(Date.now()).getMinutes() - new Date(time).getMinutes();
-    // const hourAgo = new Date(Date.now()).getHours() - new Date(time).getHours();
-    // const dateAgo = new Date(Date.now()).getDate() - new Date(time).getDate();
     const now = new Date(Date.now());
     const end = new Date(time);
     const diff = new Date(now.getTime() - end.getTime());
