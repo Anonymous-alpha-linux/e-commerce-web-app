@@ -44,7 +44,9 @@ const actions = {
     LOAD_MORE_NOTIFICATIONS: 42,
     PUSH_MY_IDEA: 43,
     ADD_NEW_NOTIFICATION: 44,
-    REMOVE_SINGLE_POST: 45
+    REMOVE_SINGLE_POST: 45,
+    LIKE_COMMENT: 46,
+    DISLIKE_COMMENT: 47
 }
 
 export default actions;

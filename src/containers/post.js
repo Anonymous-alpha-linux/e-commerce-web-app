@@ -8,6 +8,11 @@ import { Link } from "react-router-dom";
 import { notifyData, socketTargets } from "../fixtures";
 
 export default function Post({ postHeader, postBody, postFooter }) {
+  const interactTypes = {
+    NO: 'no rate',
+    LIKE: 'like',
+    DISLIKE: 'dislike',
+  }
   const { user } = useAuthorizationContext();
   const { interactPost, getPostComments, deleteSinglePost } = usePostContext();
   const { sendNotification } = useNotifyContext();
@@ -17,6 +22,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
 
   const [openComment, setOpenComment] = useState(false);
   const [interact, setInteract] = useState({ liked: postFooter.isLiked, disliked: postFooter.isDisliked });
+  const [type, setType] = useState(interactTypes.NO);
 
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
@@ -77,7 +83,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
     if (!isFirstRender.current) {
       // interactRef.current(postHeader.id, 'rate', interact, () => {
       // });
-      interactPost(postHeader.id, 'rate', interact, commentId => {
+      interactPost(postHeader.id, type, interact, commentId => {
         console.log(commentId);
       });
     }
@@ -171,7 +177,10 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 onChange={checkedHandler}
                 style={{ display: 'none' }}></input>
               <Icon.CircleIcon
-                onClick={() => { document.getElementById(`like ${postHeader.id}`).click() }}
+                onClick={() => {
+                  setType(interactTypes.LIKE);
+                  document.getElementById(`like ${postHeader.id}`).click();
+                }}
                 style={{
                   marginRight: '10px',
                   color: '#fff',
@@ -200,7 +209,10 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 style={{ display: 'none' }}></input>
               <Text.CenterLine>
                 <Icon.CircleIcon
-                  onClick={() => { document.getElementById(`dislike ${postHeader.id}`).click() }}
+                  onClick={() => {
+                    setType(interactTypes.DISLIKE);
+                    document.getElementById(`dislike ${postHeader.id}`).click();
+                  }}
                   style={{
                     marginRight: '10px',
                     color: '#fff',

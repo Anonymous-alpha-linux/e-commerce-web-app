@@ -46,9 +46,9 @@ export default class ActionHandler {
         // Inside otherEntries including in the initial state
         return {
             ...otherEntries,
-            [updateField]: otherEntries[updateField].map(item => {
+            [updateField]: (typeof callback === 'function') ? otherEntries[updateField].map(item => {
                 return callback(item);
-            }),
+            }) : callback,
         };
     };
 }

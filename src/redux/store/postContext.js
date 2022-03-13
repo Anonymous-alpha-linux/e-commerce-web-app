@@ -61,6 +61,8 @@ export default React.memo(function PostContext({ children }) {
   }, [user]);
   useEffect(() => {
     receiveRealtimeComment();
+    receiveRealTimeLike();
+    receiveRealTimeDisLike();
   }, [socket]);
   // 1. Post for workspace
   function getPosts() {
@@ -121,7 +123,7 @@ export default React.memo(function PostContext({ children }) {
       setError(error.message);
     });
   }
-  async function loadNextPosts(cb) {
+  function loadNextPosts(cb) {
     return axios.get(postAPI, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -196,7 +198,6 @@ export default React.memo(function PostContext({ children }) {
     })
   }
   function deleteSinglePost(postId, cb) {
-    console.log(postId);
     return axios.delete(postAPI, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -288,31 +289,85 @@ export default React.memo(function PostContext({ children }) {
       return updateSinglePost(res.data.response[0]._id);
     }).catch(error => setError(error.message));
   }
-  // async function updateSinglePost(postId, cb) {
-  //   return axios.get(postAPI, {
-  //     headers: {
-  //       'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-  //     },
-  //     params: {
-  //       view: 'singlepost',
-  //       postid: postId
-  //     }
-  //   }).then(res => {
-  //     console.log(res.data.response);
-  //     return setPost({
-  //       type: actions.UPDATE_SINGLE_POST,
-  //       payload: {
-  //         postid: postId,
-  //         data: res.data.response
-  //       }
-  //     });
-  //   }).then(success => {
-  //     cb();
-  //   }).catch(error => {
-  //     setError(error.message);
-  //   })
-  // }
+  function likePost(isLiked, postId, userId) {
+    let isDisliked = postState
+    // .dislikedAccounts.includes(user.accountId);
+    console.log('disliked', isDisliked);
+    if (!isDisliked) {
+      setPost({
+        type: actions.LIKE_POST,
+        postId,
+        userId,
+        isLiked
+      })
+    }
+    else {
+      setPost({
+        type: actions.LIKE_POST,
+        postId,
+        userId,
+        isLiked
+      })
+      setPost({
+        type: actions.DISLIKE_POST,
+        postId,
+        userId,
+        isLiked
+      })
+    }
 
+  }
+  function sendRealTimeLike(postId, userId) {
+    socket.emit('like post', {
+      postId,
+      userId
+    });
+  }
+  function receiveRealTimeLike() {
+    socket.on('like post', data => {
+      const { postId, userId } = data;
+      updateSinglePost(postId);
+    });
+  }
+  function dislikePost(isDisliked, postId, userId) {
+    setPost({
+      type: actions.DISLIKE_POST,
+      postId,
+      userId,
+      isDisliked
+    })
+  }
+  function sendRealTimeDisLike(postId, userId) {
+    socket.emit('dislike post', {
+      postId,
+      userId
+    });
+  }
+  function receiveRealTimeDisLike() {
+    socket.on('dislike post', data => {
+      const { postId, userId } = data;
+      updateSinglePost(postId);
+    });
+  }
+
+  function likeComment(isLiked, postId, userId, commentId) {
+    setPost({
+      type: actions.LIKE_COMMENT,
+      postId,
+      userId,
+      commentId,
+      isLiked
+    })
+  }
+  function dislikeComment(isDisliked, postId, userId, commentId) {
+    setPost({
+      type: actions.LIKE_COMMENT,
+      postId,
+      userId,
+      commentId,
+      isDisliked
+    })
+  }
   // 2. Posts for profile
   function getOwnPosts(cb) {
     setPost({
@@ -586,6 +641,7 @@ export default React.memo(function PostContext({ children }) {
   }
   // 4. Thump-up, thump-down, comment 
   function interactPost(postId, type, input, cb) {
+    console.log(input);
     // Set Loading for waiting post
     if (type === 'rate') {
       return axios.put(postAPI, {
@@ -601,6 +657,53 @@ export default React.memo(function PostContext({ children }) {
           interact: 'rate'
         }
       }).then(res => {
+        const { liked, disliked } = input;
+        likePost(liked, postId, user.accountId);
+        dislikePost(disliked, postId, user.accountId);
+        sendRealTimeLike(liked, postId, user.accountId);
+        sendRealTimeDisLike(disliked, postId, user.accountId);
+        // updateSinglePost(postId);
+      }).catch(error => {
+        setError(error.message);
+      })
+    }
+    else if (type === 'like') {
+      return axios.put(postAPI, {
+        isLiked: input.liked,
+        isDisliked: input.disliked
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        params: {
+          view: 'post',
+          postid: postId,
+          interact: 'rate'
+        }
+      }).then(res => {
+        const { liked, disliked } = input;
+        sendRealTimeLike(postId, user.accountId);
+        updateSinglePost(postId);
+      }).catch(error => {
+        setError(error.message);
+      })
+    }
+    else if (type === 'dislike') {
+      return axios.put(postAPI, {
+        isLiked: input.liked,
+        isDisliked: input.disliked
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        params: {
+          view: 'post',
+          postid: postId,
+          interact: 'rate'
+        }
+      }).then(res => {
+        const { liked, disliked } = input;
+        sendRealTimeDisLike(postId, user.accountId);
         updateSinglePost(postId);
       }).catch(error => {
         setError(error.message);

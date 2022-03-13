@@ -52,6 +52,84 @@ const postReducer = (state, action) => {
         return post;
       }, state));
       return singlePost;
+    case actions.LIKE_POST:
+      return actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("like", action.isLiked ? post.like + 1 : post.like - 1, actionHandler.updateItem("likedAccounts", accounts => {
+          if (action.isLiked) {
+            post.likedAccounts.unshift(action.userId);
+            post.dislikedAccounts.filter(acc => acc === action.userId);
+          }
+          else post.likedAccounts.filter(acc => acc !== action.userId);
+        }, post));
+        return post;
+      }, actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("like", action.isLiked ? post.like + 1 : post.like - 1, actionHandler.updateItem("likedAccounts", accounts => {
+          if (action.isLiked) {
+            post.likedAccounts.unshift(action.userId);
+            post.dislikedAccounts.filter(acc => acc !== action.userId);
+          }
+          else post.likedAccounts.filter(acc => acc !== action.userId);
+        }, post));
+        return post;
+      }, state));
+    case actions.DISLIKE_POST:
+      return actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("dislike", action.isDisliked ? post.dislike + 1 : post.dislike - 1, actionHandler.updateItem("dislikedAccounts", accounts => {
+          if (action.isDisliked) {
+            post.dislikedAccounts.unshift(action.userId);
+            post.likedAccounts.filter(acc => acc !== action.userId);
+          }
+          else post.dislikedAccounts.filter(acc => acc !== action.userId);
+        }, post));
+        return post;
+      }, actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem("dislike", action.isDisliked ? post.dislike + 1 : post.dislike - 1, actionHandler.updateItem("dislikedAccounts", accounts => {
+          if (action.isDisliked) {
+            post.dislikedAccounts.unshift(action.userId);
+            post.likedAccounts.filter(acc => acc !== action.userId);
+          }
+          else post.dislikedAccounts.filter(acc => acc !== action.userId);
+        }, post));
+        return post;
+      }, state));
+    case actions.LIKE_COMMENT:
+      return actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem('comments', comment => {
+          if (comment._id === action.commentId) return actionHandler.updateItem("like", action.isLiked ? post.like + 1 : post.like - 1, actionHandler.updateItem("likedAccounts", accounts => {
+            if (action.isLiked) post.likedAccounts.unshift(action.userId);
+            else post.likedAccounts.filter(acc => acc !== action.userId);
+          }, comment));
+        }, post);
+        return post;
+      }, actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem('comments', comment => {
+          if (comment._id === action.commentId) return actionHandler.updateItem("like", action.isLiked ? post.like + 1 : post.like - 1, actionHandler.updateItem("likedAccounts", accounts => {
+            if (action.isLiked) post.likedAccounts.unshift(action.userId)
+            else post.likedAccounts.filter(acc => acc !== action.userId);
+          }, comment));
+          return comment;
+        }, post);
+        return post;
+      }, state));
+    case actions.DISLIKE_COMMENT:
+      return actionHandler.updateItem("myPosts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem('comments', comment => {
+          if (comment._id === action.commentId) return actionHandler.updateItem("dislike", action.isDisliked ? post.dislike + 1 : post.dislike - 1, actionHandler.updateItem("dislikedAccounts", accounts => {
+            if (action.isDisliked) post.dislikedAccounts.unshift(action.userId);
+            else post.dislikedAccounts.filter(acc => acc !== action.userId);
+          }, comment));
+        }, post);
+        return post;
+      }, actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return actionHandler.updateItem('comments', comment => {
+          if (comment._id === action.commentId) return actionHandler.updateItem("dislike", action.isDisliked ? post.dislike + 1 : post.dislike - 1, actionHandler.updateItem("dislikedAccounts", accounts => {
+            if (action.isDisliked) post.dislikedAccounts.unshift(action.userId)
+            else post.dislikedAccounts.filter(acc => acc !== action.userId);
+          }, comment));
+          return comment;
+        }, post);
+        return post;
+      }, state));
 
     case actions.GET_MY_POST:
       return {
@@ -97,35 +175,6 @@ const postReducer = (state, action) => {
         if (post._id === action.postId) return actionHandler.getListItem("comments", action.payload, post);
         return post;
       }, state));
-    // return {
-    //   ...state,
-    //   posts: state.posts.map(post => {
-    //     if (post._id === action.postid) {
-    //       return {
-    //         ...post,
-    //         comments: action.payload,
-    //         page: 0,
-    //         filter: 0,
-    //         count: 10,
-    //         loadMore: action.payload.length >= 10
-    //       }
-    //     }
-    //     return post;
-    //   }),
-    //   myPosts: state.myPosts.map(post => {
-    //     if (post._id === action.postid) {
-    //       return {
-    //         ...post,
-    //         comments: action.payload,
-    //         page: 0,
-    //         filter: 0,
-    //         count: 10,
-    //         loadMore: action.payload.length >= 10
-    //       }
-    //     }
-    //     return post;
-    //   })
-    // };
     case actions.LOAD_MORE_POST_COMMENT:
       return {
         ...state,
@@ -229,18 +278,6 @@ const postReducer = (state, action) => {
         if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, post);
         return post;
       }, state));
-    // return {
-    //   ...state,
-    //   posts: state.posts.map(post => {
-    //     if (post._id === action.postid) {
-    //       return {
-    //         ...post,
-    //         comments: [action.payload, ...post.comments],
-    //       }
-    //     }
-    //     return post;
-    //   })
-    // };
 
     case actions.GET_COMMENT_REPLIES:
       return {
