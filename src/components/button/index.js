@@ -6,7 +6,6 @@ export default function ButtonComponent({ children, ...restProps }) {
 }
 
 ButtonComponent.Toggle = React.forwardRef(function ({ children, ...props }, ref) {
-
   return <label className="switch">
     <input type="checkbox"
       className="switch__input"

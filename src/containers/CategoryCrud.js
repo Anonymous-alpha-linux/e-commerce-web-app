@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "../containers/styles/_crub.scss";
-import { AnimateComponent } from "../hooks";
 
 let Category = [
   {

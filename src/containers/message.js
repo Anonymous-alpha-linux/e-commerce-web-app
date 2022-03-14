@@ -79,7 +79,7 @@ export default function MessageContainer() {
                                 <Text.Paragraph style={{ margin: 0 }}>This is my chat</Text.Paragraph>
                             </ContainerComponent.Item>
                         </ContainerComponent.Flex>
-                        <ContainerComponent.Flex style={{ height: "50px", alignItems: "DmC6bBayWirRCzLX4dhwOEt5d6w5aJvuQOiLcORN8ZCaxeGAQttCRIEQRAEQRAEQRAEQRAEQRAEQRAEQRAEQRAEQWDnP" }}>
+                        <ContainerComponent.Flex style={{ height: "50px", alignItems: "center" }}>
                             <ContainerComponent.Item style={{ borderRadius: "50%", padding: "0", height: "fit-content" }}>
                                 <Preview.Images style={{
                                     borderRadius: "50%",

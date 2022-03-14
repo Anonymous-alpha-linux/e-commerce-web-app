@@ -5,7 +5,6 @@ import { Text, ContainerComponent, ButtonComponent } from "../components";
 export default function GridPreview({ files }) {
     const [Rows, setRows] = useState([]);
     let imageRegex = /(gif|jpe?g|tiff?|png|webp|bmp)/i;
-
     const Images = useRef(files.filter((file) => imageRegex.test(file.fileFormat)));
     const otherFiles = useRef(!files.some((file) => {
         return imageRegex.test(file.fileFormat);
@@ -88,10 +87,8 @@ export default function GridPreview({ files }) {
                     gap: '5px',
                     width: `100%`,
                     height: otherFiles.current ? `250px` : `100%`
-                }}
-            >
+                }}>
                 {Rows.map((row) => row)}
-
             </ContainerComponent.Pane>}
             {otherFiles.current && <ButtonComponent.Upload className="upload_file" style={{
                 width: `100%`, height: `50px`, textAlign: `center`,

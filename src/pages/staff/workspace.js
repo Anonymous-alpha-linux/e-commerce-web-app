@@ -1,5 +1,9 @@
-import React, { useRef } from "react";
-import { BarChart, ButtonComponent, ContainerComponent, List } from "../../components";
+import React, { useRef, useEffect } from "react";
+import {
+  ButtonComponent,
+  ContainerComponent,
+  List
+} from "../../components";
 import {
   Filter,
   LazyLoading,
@@ -10,19 +14,23 @@ import {
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
+  useNotifyContext,
   usePostContext,
   useWorkspaceContext,
 } from "../../redux";
 
 export default function Workspace() {
-  const { user, socket } = useAuthorizationContext();
+  const { user } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
+  const { sendMessageToSpecificPerson } = useNotifyContext();
+
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const listRef = useRef();
+
   return (
     <ContainerComponent className="workspace" id="workspace">
       <Timespan expireTime={workspace.expireTime}></Timespan>
@@ -42,20 +50,21 @@ export default function Workspace() {
       ></Filter>
       <LazyLoading loader={loadNextPosts}>
         <List className="workspace__postList" ref={listRef}>
-          {posts.map((post) => {
+          {posts.map((post, index) => {
             const {
               _id,
               postAuthor,
               content,
-              attachment,
+              attachments,
               like,
               dislike,
               likedAccounts,
               dislikedAccounts,
               comment,
               hideAuthor,
-              comments
+              comments,
             } = post;
+
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,
@@ -65,15 +74,17 @@ export default function Workspace() {
               date: post.createdAt,
               hideAuthor,
             };
+
             let postBody = {
               content,
-              attachment: attachment.map((attach) => {
-                const { _id, fileType, online_url, filePath, fileFormat } = attach;
+              attachment: attachments.map((attach) => {
+                const { _id, fileType, online_url, filePath, fileFormat } =
+                  attach;
                 return {
                   _id,
                   image: `${online_url || filePath}`,
                   fileType,
-                  fileFormat
+                  fileFormat,
                 };
               }),
             };
@@ -85,19 +96,15 @@ export default function Workspace() {
               likedAccounts,
               dislikedAccounts,
               comment,
-              comments
+              comments,
             };
             return (
-              <List.Item
-                key={post._id}
-                id={post._id}
-              >
+              <List.Item key={`${post._id}-${index}`} id={post._id}>
                 <PostContainer
                   postId={_id}
                   postHeader={postHeader}
                   postBody={postBody}
                   postFooter={postFooter}
-                  removeIdea={() => removeIdea(_id)}
                 ></PostContainer>
               </List.Item>
             );

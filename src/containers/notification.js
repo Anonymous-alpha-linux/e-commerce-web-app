@@ -1,38 +1,40 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ContainerComponent, Icon, Text } from '../components';
-import { useAuthorizationContext } from '../redux';
+import { useNotifyContext } from '../redux';
 import TriggerLoading from './triggerLoading';
 
 export default function NotificationContainer() {
-    const { user, loadMoreNotification } = useAuthorizationContext();
-    return (
-        <ContainerComponent>
-            <Text.Title
+    const { notify, loadMoreNotifications } = useNotifyContext();
+
+    return <ContainerComponent className="notification__container">
+        <Text.Title
+            style={{
+                textAlign: 'center',
+                margin: '7px 0',
+                fontSize: '20px'
+            }}
+        >Notification</Text.Title>
+        <TriggerLoading loadMore={notify.more} loader={loadMoreNotifications}>
+            <ContainerComponent.Flex
+                className="notification__container"
                 style={{
-                    // color: 'white',
-                    textAlign: 'center',
-                    margin: '7px 0',
-                    fontSize: '20px'
+                    width: '100%',
+                    height: '75%',
+                    flexDirection: 'column',
+                    background: 'white',
                 }}
-            >Notification</Text.Title>
-            <TriggerLoading loadMore={user.loadMore} loader={loadMoreNotification}>
-                <ContainerComponent.Flex
-                    className="notification__container"
-                    style={{
-                        width: '100%',
-                        height: '75%',
-                        flexDirection: 'column',
-                        background: 'white',
-                    }}
-                >
-                    {user.notifications.map(notify => {
-                        return <ContainerComponent.Item
-                            style={{
-                                background: 'rgb(238,245,235)',
-                                marginBottom: '3px',
-                                padding: '10px 20px',
-                                height: '64px'
-                            }}>
+            >
+                {notify.notifications.map((notify, index) => {
+                    return <ContainerComponent.Item
+                        key={index}
+                        style={{
+                            background: 'rgb(238,245,235)',
+                            marginBottom: '3px',
+                            padding: '10px 20px',
+                            height: '64px'
+                        }}>
+                        <Link to={notify.url}>
                             <Text.MiddleLine>
                                 <Icon.CircleIcon>
                                     <Icon.Image src={notify.from.profileImage} alt={notify.from.username}></Icon.Image>
@@ -60,10 +62,10 @@ export default function NotificationContainer() {
                                     })}
                                 </Text.Line>
                             </Text.MiddleLine>
-                        </ContainerComponent.Item>
-                    })}
-                </ContainerComponent.Flex>
-            </TriggerLoading>
-        </ContainerComponent>
-    )
+                        </Link>
+                    </ContainerComponent.Item>
+                })}
+            </ContainerComponent.Flex>
+        </TriggerLoading>
+    </ContainerComponent>
 }
