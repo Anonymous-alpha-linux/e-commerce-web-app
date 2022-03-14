@@ -35,7 +35,7 @@ export default function Comment({ postAuthor, postId, commentLogs }) {
     <ContainerComponent.Section
       className="comment__section"
       style={{
-        padding: "10px",
+        padding: "10px 0",
       }}>
       <ContainerComponent.Pane className="comment__header">
         <ContainerComponent.Flex
@@ -56,7 +56,6 @@ export default function Comment({ postAuthor, postId, commentLogs }) {
               <Form.Option value={0}>Most Popular</Form.Option>
               <Form.Option value={1}>Most Favorite</Form.Option>
             </Form.Select>
-            {/* <Filter></Filter> */}
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
       </ContainerComponent.Pane>
@@ -74,13 +73,13 @@ export default function Comment({ postAuthor, postId, commentLogs }) {
           style={{
             paddingTop: "12px",
           }}>
-          {commentLogs.map((comment) => (
-            <Comment.Tab
+          {commentLogs.map((comment) => {
+            return < Comment.Tab
               postId={postId}
               key={comment._id}
               comment={comment}
             ></Comment.Tab>
-          ))}
+          })}
         </ContainerComponent.Pane>
       </TriggerLoading>
     </ContainerComponent.Section>
@@ -170,6 +169,7 @@ Comment.Tab = function CommentTab({ ...props }) {
       inputRef.current.focus();
     }
   }, [openReply]);
+
   return (
     <ContainerComponent.Pane
       className="comment__tab"
@@ -336,12 +336,11 @@ Comment.TabInput = function TabInput({ postAuthor, postId, preReply = "", commen
     private: false,
     commentid: commentId,
   });
-  const loader = useRef(interactPost);
+  const postInputRef = useRef(interactPost);
 
   React.useEffect(() => {
-    loader.current = interactPost;
+    postInputRef.current = interactPost;
   }, [interactPost]);
-
   const inputHandler = (e) => {
     setInput({
       ...input,
@@ -357,11 +356,11 @@ Comment.TabInput = function TabInput({ postAuthor, postId, preReply = "", commen
   const submitHandler = (e) => {
     e.preventDefault();
     if (!commentId) {
-      loader.current(postId, "comment", input, commentId => {
+      postInputRef.current(postId, "comment", input, commentId => {
         sendNotification(notifyData.COMMENT_POST, `/#${commentId}`, postAuthor);
       });
     } else {
-      loader.current(postId, "reply comment", input, replyId => {
+      postInputRef.current(postId, "reply comment", input, replyId => {
         sendNotification(notifyData.COMMENT_POST, `/#${replyId}`, commentId);
       });
     }
@@ -399,26 +398,14 @@ Comment.TabInput = function TabInput({ postAuthor, postId, preReply = "", commen
         ></ButtonComponent.Toggle>
       </Text.Line>
       <Text.Line>
-        <Form
-          method="POST"
-          style={{ width: "100%", padding: "20px 0", margin: "0" }}
-          onSubmit={submitHandler}
-        >
-          <Form.Input
-            placeholder="Leave your comment"
-            name="content"
-            value={input.content}
-            onChange={inputHandler}
-            style={{ width: "calc(100% - 30px)" }}
+        <Form method="POST" style={{ width: "100%", padding: "2px 0 0 30px", margin: "0" }} onSubmit={submitHandler}>
+          <Form.Input name="content" style={{ width: "calc(100% - 30px)" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
           ></Form.Input>
           <input type="submit" style={{ display: "none" }}></input>
-
           <Text.MiddleLine>
-            <Text.CenterLine>
-              <Icon.CircleIcon>
-                <Form.Input component={<FiSend />}></Form.Input>
-              </Icon.CircleIcon>
-            </Text.CenterLine>
+            <Icon.CircleIcon>
+              <Form.Input component={<FiSend />}></Form.Input>
+            </Icon.CircleIcon>
           </Text.MiddleLine>
         </Form>
       </Text.Line>

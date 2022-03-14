@@ -23,7 +23,6 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
 
   let image =
     "https://image.shutterstock.com/image-vector/file-iconvector-illustration-flat-design-260nw-1402633574.jpg";
-  console.log(files);
   useEffect(() => {
     pushFile.current = setFiles;
     deleteFile.current = eliminateFile;
