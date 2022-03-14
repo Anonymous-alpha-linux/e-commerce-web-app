@@ -4,6 +4,8 @@ export const initialAuth = {
     accessToken: localStorage.getItem('accessToken') || 'a.b.c',
     isLoggedIn: false,
     authLoading: true,
+    profile: null,
+    notifications: [],
 };
 const authReducer = (state, action) => {
     switch (action.type) {
@@ -22,6 +24,11 @@ const authReducer = (state, action) => {
             return {
                 ...state,
                 authLoading: false
+            };
+        case actions.GET_PROFILE:
+            return {
+                ...state,
+                profile: action.payload
             };
         case actions.LOGIN_ACTION:
             return {
@@ -45,6 +52,27 @@ const authReducer = (state, action) => {
             return {
                 ...initialAuth,
                 authLoading: false
+            };
+        case actions.PUSH_NOTIFICATION:
+            return {
+                ...state,
+                notifications: [action.payload, ...state.notifications]
+            };
+        case actions.GET_NOTIFICATIONS:
+            console.log(action.payload);
+            return {
+                ...state,
+                notifications: action.payload,
+                loadMore: action.payload.length >= 10,
+                page: 0,
+                count: 10
+            };
+        case actions.LOAD_MORE_NOTIFICATIONS:
+            return {
+                ...state,
+                notifications: action.payload.length && [...state.notifications, ...action.payload],
+                page: state.page + 1,
+                loadMore: action.payload.length >= 10,
             };
         default:
             return state;

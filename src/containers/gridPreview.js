@@ -4,8 +4,12 @@ import { Text, ContainerComponent, ButtonComponent } from "../components";
 
 export default function GridPreview({ files }) {
     const [Rows, setRows] = useState([]);
-    const Images = useRef(files.filter((file) => file.fileType.includes('image')))
-    const otherFiles = useRef(files.some((file) => !file.fileType.includes(`image`)))
+    let imageRegex = /(gif|jpe?g|tiff?|png|webp|bmp)/i;
+
+    const Images = useRef(files.filter((file) => imageRegex.test(file.fileFormat)));
+    const otherFiles = useRef(!files.some((file) => {
+        return imageRegex.test(file.fileFormat);
+    }));
 
     // images = ['linkImage']
     const getRowColumn = () => {
@@ -14,7 +18,6 @@ export default function GridPreview({ files }) {
     };
 
     useEffect(() => {
-
         let [numRow, numColumn] = getRowColumn();
         let rows = [];
         if (Images.current.length > 0) for (let i = 0; i < numRow; i++) {

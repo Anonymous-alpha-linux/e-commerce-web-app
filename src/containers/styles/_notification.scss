@@ -1,5 +1,6 @@
 .notification {
-    &__container{
-       
-    }
+   &__container {
+      width: 100%;
+      max-width: 680px !important;
+   }
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ListMember({ children, ...restProp }) {
+export default function ListMemberComponent({ children, ...restProp }) {
     return (
         <div className="list" {...restProp}>
             {children}
@@ -8,14 +8,14 @@ export default function ListMember({ children, ...restProp }) {
     )
 }
 
-ListMember.SearchForm = function ({ children, ...restProp }) {
+ListMemberComponent.SearchForm = function ({ children, ...restProp }) {
     return (
         <div className="list__searchForm" {...restProp}>
             {children}
         </div>
     )
 } 
-ListMember.Form = function({children,...restProp}){
+ListMemberComponent.Form = function({children,...restProp}){
     return(
         <div className='list__form' {...restProp}>
             {children}

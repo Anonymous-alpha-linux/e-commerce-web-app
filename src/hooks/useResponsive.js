@@ -40,7 +40,7 @@ export default function useMedia(min = 768, max = 1023) {
             setDevice(() => {
                 if (matchMediaRef.current.matches) return `tablet`;
                 else if (!matchMediaRef.current.matches && window.innerWidth <= min - 1)
-                    return `phone`;
+                    return `mobile`;
                 else if (!matchMediaRef.current.matches && window.innerWidth >= max + 1)
                     return `pc`;
             });
