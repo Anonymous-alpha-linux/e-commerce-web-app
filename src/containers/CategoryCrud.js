@@ -7,6 +7,10 @@ import { mainAPI } from "../config";
 import { AddFromWorkspace } from ".";
 
 export default function Crud() {
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
   let PageSize = 8;
   const { categories, removeCategory } = usePostContext();
   const [modal, setModal] = useState(false);
@@ -38,7 +42,7 @@ export default function Crud() {
   }
   function HandleDelete(commentId) {
     return axios
-      .delete(mainAPI.CLOUD_API_MANAGER, {
+      .delete(API, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -164,20 +168,15 @@ function ModalAddFormCategory({ setModal, modal }) {
   const [categoryAdd, setCategoryAdd] = useState({
     categoryName: "",
   });
-  const [newRecord, setNewRecord] = useState(null);
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
   const { getNewCategory } = usePostContext();
   const getNewCategoryRef = useRef(getNewCategory);
   useEffect(() => {
     getNewCategoryRef.current = getNewCategory;
   }, [getNewCategory]);
-
-  const searchFunction = useRef(setCategoryAdd);
-  useEffect(() => {
-    searchFunction.current = setCategoryAdd;
-  }, [setCategoryAdd]);
-  useEffect(() => {
-    console.log(newRecord);
-  }, [newRecord]);
 
   async function HandleNameInput(e) {
     setCategoryAdd({ ...categoryAdd, [e.target.name]: e.target.value });
@@ -189,7 +188,7 @@ function ModalAddFormCategory({ setModal, modal }) {
   }
   function CreateCategory() {
     return axios
-      .post(mainAPI.CLOUD_API_MANAGER, categoryAdd, {
+      .post(API, categoryAdd, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -198,8 +197,6 @@ function ModalAddFormCategory({ setModal, modal }) {
         },
       })
       .then((res) => {
-        console.log(res);
-        setNewRecord(res.data.response);
         getNewCategory(res.data.response);
         setModal(false);
       })

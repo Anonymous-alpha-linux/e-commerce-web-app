@@ -11,6 +11,10 @@ function AddFromWS({ setModal, modal }) {
     expireTime: Date.now(),
   });
 
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
   const { createWorkspace } = useWorkspaceContext();
 
   async function HandleWSInput(e) {
@@ -23,7 +27,7 @@ function AddFromWS({ setModal, modal }) {
   }
   function CreateWorkspace() {
     return axios
-      .post(mainAPI.LOCALHOST_MANAGER, workspaceAdd, {
+      .post(API, workspaceAdd, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
