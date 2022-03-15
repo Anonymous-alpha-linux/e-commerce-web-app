@@ -14,6 +14,14 @@ export default function Crud() {
   let PageSize = 8;
   const { categories, removeCategory } = usePostContext();
   const [modal, setModal] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // const createRef = useRef(function () {
+  //   let response = { _id: Math.random(), name: "" };
+  // });
+  // const removeRef = useRef(function () {});
 
   //Testing WS
   const { workspaces } = useWorkspaceContext();
@@ -81,7 +89,6 @@ export default function Crud() {
           <AddFromWorkspace setModal={setModalWS} modal={modalWS} />
         </div>
       )}
-
       <div
         style={{
           marginTop: "100px",
@@ -263,7 +270,6 @@ function CategoryData({ data, deleteCate, index }) {
     </tr>
   );
 }
-
 function SearchCategory({
   categories,
   currentTableData,
