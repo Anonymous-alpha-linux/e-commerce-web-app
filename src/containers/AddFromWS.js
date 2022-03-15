@@ -1,56 +1,43 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { mainAPI } from "../config";
+import { useWorkspaceContext } from "../redux";
 
 function AddFromWS({ setModal, modal }) {
   const [workspaceAdd, setWorkspaceAdd] = useState({
     workTitle: "",
-    manager: {},
-    members: [],
-    eventTime: new Date(),
-    expireTime: Date(),
+    manager: null,
+    eventTime: Date.now(),
+    expireTime: Date.now(),
   });
 
-  const [newRecord, setNewRecord] = useState(null);
-
-  const WKSFunction = useRef(workspaceAdd);
-
-  useEffect(() => {
-    WKSFunction.current = workspaceAdd;
-  }, [setWorkspaceAdd]);
-  useEffect(() => {
-    console.log(newRecord);
-  }, [newRecord]);
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
+  const { createWorkspace } = useWorkspaceContext();
 
   async function HandleWSInput(e) {
     setWorkspaceAdd({ ...workspaceAdd, [e.target.name]: e.target.value });
   }
 
-  console.log(workspaceAdd.workTitle, "input");
-  console.log(workspaceAdd.expireTime, "input");
-
   async function onSubmit(e) {
     e.preventDefault();
-    const data = {
-      workTitle: workspaceAdd.workTitle,
-      expireTime: workspaceAdd.expireTime,
-    };
-    console.log(data.workTitle);
-    console.log(data.expireTime);
-    // CreateWorkspace();
+    CreateWorkspace();
   }
   function CreateWorkspace() {
     return axios
-      .post(mainAPI.CLOUD_API_MANAGER, workspaceAdd, {
+      .post(API, workspaceAdd, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         params: {
-          view: "workspaces",
+          view: "workspace",
         },
       })
       .then((res) => {
-        setNewRecord(res.data.response);
+        createWorkspace(res.data.response);
+        setModal(false);
       })
       .catch((error) => console.log(error.message));
   }
@@ -69,6 +56,17 @@ function AddFromWS({ setModal, modal }) {
               value={workspaceAdd.workTitle}
             />
           </div>
+          <div className="question-container">
+            <label className="question-label">Close Event(comment, etc.)</label>
+            <input
+              className="row-input"
+              type="date"
+              name="eventTime"
+              onChange={HandleWSInput}
+              value={workspaceAdd.eventTime}
+            />
+          </div>
+
           <div className="question-container">
             <label className="question-label">Closure Date</label>
             <input

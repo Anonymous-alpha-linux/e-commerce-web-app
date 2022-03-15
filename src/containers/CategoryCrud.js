@@ -1,52 +1,70 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import Pagination from "./Pagination";
-import { usePostContext } from "../redux";
+import { usePostContext, useWorkspaceContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
 import { AddFromWorkspace } from ".";
 
-let PageSize = 3;
-
 export default function Crud() {
-  const { categories: categotyAPIData } = usePostContext();
-  const [categories, setCategories] = useState(categotyAPIData);
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
+  let PageSize = 8;
+  const { categories, removeCategory } = usePostContext();
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+<<<<<<< HEAD
+=======
   // const createRef = useRef(function () {
   //   let response = { _id: Math.random(), name: "" };
   // });
   // const removeRef = useRef(function () {});
 
-  const currentTableData = useMemo(() => {
-    const firstPageIndex = (currentPage - 1) * PageSize;
-    const lastPageIndex = firstPageIndex + PageSize;
-    return categories.slice(firstPageIndex, lastPageIndex);
-  }, [currentPage]);
+>>>>>>> c176be26a1d87167f63f4c10fffc944f887c88bf
+  //Testing WS
+  const { workspaces } = useWorkspaceContext();
+  console.log(workspaces, "WS");
+
+  const [modalWS, setModalWS] = useState(false);
+
+  const [dataRecords, setDataRecords] = useState([]);
+  // console.log("re-render crud", categories);
+
+  useEffect(() => {
+    setDataRecords((e) => {
+      const firstPageIndex = (currentPage - 1) * PageSize;
+      const lastPageIndex = firstPageIndex + PageSize;
+      return categories.slice(firstPageIndex, lastPageIndex);
+    });
+  }, [categories, currentPage]);
 
   function deleteCate(e, id) {
     e.preventDefault();
     console.log(id);
-    // HandleDelete(id);
+    HandleDelete(id);
   }
-  function HandleDelete(_id) {
-    return axios.delete(mainAPI.CLOUD_API_MANAGER, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: `category/${_id}`,
-      },
-    });
-    // .then((res) => {
-    //   setNewRecord(res.data.response);
-    // })
-    // .catch((error) => console.log(error.message));
+  function HandleDelete(commentId) {
+    return axios
+      .delete(API, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: `category`,
+          commentid: commentId,
+        },
+      })
+      .then((res) => {
+        // setNewRecord(res.data.response);
+        removeCategory(commentId);
+      })
+      .catch((error) => console.log(error.message));
   }
-
   return (
     <div>
       <h1>Category Crud</h1>
@@ -54,30 +72,23 @@ export default function Crud() {
         Create New Category
       </button>
       {modal && (
-        <div
-        // style={{ height: "0px" }}
-        >
-          <ModalAddFormCategory
-            data={categories}
-            setModal={setModal}
-            modal={modal}
-          />
+        <div style={{ height: "0px" }}>
+          <ModalAddFormCategory setModal={setModal} modal={modal} />
         </div>
       )}
 
-      <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
-        Create New Category
+      {/* test add workspace */}
+      <button
+        className="btn-rounded-green"
+        onClick={() => setModalWS(!modalWS)}
+      >
+        Add WS
       </button>
-      {modal && (
-        <div
-        // style={{ height: "0px" }}
-        >
-          <AddFromWorkspace setModal={setModal} modal={modal} />
+      {modalWS && (
+        <div style={{ hight: "0px" }}>
+          <AddFromWorkspace setModal={setModalWS} modal={modalWS} />
         </div>
       )}
-      {/* <AnimateComponent Class="btn-rounded-green" name="Create New Category">
-          <ModalAddFormCategory />
-        </AnimateComponent> */}
       <div
         style={{
           marginTop: "100px",
@@ -92,27 +103,31 @@ export default function Crud() {
               <th scope="col" style={{ textAlign: "center", width: "40%" }}>
                 Title
               </th>
-              <SearchCategory
-                categories={categories}
-                searchInput={searchInput}
-                setSearchInput={setSearchInput}
-                setFilteredResults={setFilteredResults}
-                currentTableData={categories}
-                filteredResults={filteredResults}
-              />
+              <th>
+                <SearchCategory
+                  categories={categories}
+                  searchInput={searchInput}
+                  setSearchInput={setSearchInput}
+                  setFilteredResults={setFilteredResults}
+                  currentTableData={categories}
+                  filteredResults={filteredResults}
+                />
+              </th>
             </tr>
           </thead>
           <tbody>
             {searchInput !== ""
               ? filteredResults.map((category, index) => (
                   <CategoryData
+                    key={index}
                     data={category}
                     index={index}
                     deleteCate={deleteCate}
                   />
                 ))
-              : currentTableData.map((category, index) => (
+              : dataRecords.map((category, index) => (
                   <CategoryData
+                    key={index}
                     data={category}
                     index={index}
                     deleteCate={deleteCate}
@@ -141,52 +156,46 @@ export default function Crud() {
           />
         )}
       </div>
+      <div className="c-modal__container">
+        {workspaces &&
+          workspaces.map((ws, index) => (
+            <div key={index}>
+              <h6>{index + 1}</h6>
+              <h4>ID: {ws._id}</h4>
+              <h4>Title {ws.workTitle}</h4>
+              <p>EX: {ws.expireTime}</p>
+            </div>
+          ))}
+      </div>
     </div>
   );
 }
 
 function ModalAddFormCategory({ setModal, modal }) {
   const [categoryAdd, setCategoryAdd] = useState({
-    name: "",
+    categoryName: "",
   });
-  const [newRecord, setNewRecord] = useState(null);
-
-  const searchFunction = useRef(setCategoryAdd);
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
+  const { getNewCategory } = usePostContext();
+  const getNewCategoryRef = useRef(getNewCategory);
   useEffect(() => {
-    searchFunction.current = setCategoryAdd;
-  }, [setCategoryAdd]);
-  useEffect(() => {
-    console.log(newRecord);
-  }, [newRecord]);
+    getNewCategoryRef.current = getNewCategory;
+  }, [getNewCategory]);
 
   async function HandleNameInput(e) {
     setCategoryAdd({ ...categoryAdd, [e.target.name]: e.target.value });
   }
-  // console.log(categoryAdd, "input");
 
   async function onSubmit(e) {
     e.preventDefault();
-
-    //ramdon ID
-    // var newId = "xxxx-4xx-yxx-xxx".replace(/[xy]/g, function (c) {
-    //   var r = (Math.random() * 16) | 0,
-    //     v = c === "x" ? r : (r & 0x3) | 0x8;
-    //   return v.toString(16);
-    // });
-    // const data = {
-    //   _id: newId,
-    //   name: categoryAdd.name,
-    // };
-    // console.log(data, "Submit");
-    // Instead of using the real-time response
-    // Using static response data
-    // let res = { data: { response: { _id: Math.random() + 1, name: "" } } };
-    // setNewRecord(res.data.response);
     CreateCategory();
   }
   function CreateCategory() {
     return axios
-      .post(mainAPI.CLOUD_API_MANAGER, categoryAdd, {
+      .post(API, categoryAdd, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -195,8 +204,8 @@ function ModalAddFormCategory({ setModal, modal }) {
         },
       })
       .then((res) => {
-        console.log(res);
-        setNewRecord(res.data.response);
+        getNewCategory(res.data.response);
+        setModal(false);
       })
       .catch((error) => console.log(error.message));
   }
@@ -210,9 +219,9 @@ function ModalAddFormCategory({ setModal, modal }) {
             <input
               className="row-input"
               type="text"
-              name="name"
+              name="categoryName"
               onChange={HandleNameInput}
-              value={categoryAdd.name}
+              value={categoryAdd.categoryName}
             />
           </div>
         </div>
@@ -240,7 +249,7 @@ function ModalAddFormCategory({ setModal, modal }) {
 
 function CategoryData({ data, deleteCate, index }) {
   return (
-    <tr key={data._id}>
+    <tr key={index}>
       <td style={{ textAlign: "center", width: "40%" }}>
         {index + 1}
         {/* {parseInt(data._id, 8)} */}
@@ -261,7 +270,6 @@ function CategoryData({ data, deleteCate, index }) {
     </tr>
   );
 }
-
 function SearchCategory({
   categories,
   currentTableData,
@@ -295,14 +303,12 @@ function SearchCategory({
   };
 
   return (
-    <>
-      <input
-        className="search-textbox"
-        type="text"
-        value={searchInput}
-        placeholder="Search..."
-        onChange={inputHandler}
-      />
-    </>
+    <input
+      className="search-textbox"
+      type="text"
+      value={searchInput}
+      placeholder="Search..."
+      onChange={inputHandler}
+    />
   );
 }
