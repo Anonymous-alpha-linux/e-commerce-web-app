@@ -20,6 +20,21 @@
   }
 }
 
+//Search category
+.search-textbox {
+  min-width: 200px;
+  width: 30%;
+  height: 0.8rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 15px;
+  transition: width 250ms ease-in-out;
+  &:focus {
+    width: 40%;
+  }
+}
 // VARIABLES
 $box-height: 40px;
 $border-radius: 20px;
