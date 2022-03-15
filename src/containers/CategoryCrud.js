@@ -1,55 +1,12 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
-// import "../containers/styles/_crub.scss";
-// import { AnimateComponent } from "../hooks";
+
 import Pagination from "./Pagination";
 import { usePostContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
+import { AddFromWorkspace } from ".";
 
-let Category = [
-  {
-    id: 1,
-    name: "Business",
-  },
-  {
-    id: 2,
-    name: "Art",
-  },
-  {
-    id: "9beb-4e7-90c-405",
-    name: "IT",
-  },
-  {
-    id: 4,
-    name: "English",
-  },
-  {
-    id: 5,
-    name: "Game",
-  },
-  {
-    id: 6,
-    name: "Guu",
-  },
-  {
-    id: 7,
-    name: "Team",
-  },
-  {
-    id: 8,
-    name: "Idol",
-  },
-  {
-    id: 9,
-    name: "Reading",
-  },
-  {
-    id: "d8a4-43c-b7e-65b",
-    name: "Photo",
-  },
-];
-
-let PageSize = 5;
+let PageSize = 3;
 
 export default function Crud() {
   const { categories: categotyAPIData } = usePostContext();
@@ -59,10 +16,10 @@ export default function Crud() {
   const [filteredResults, setFilteredResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const createRef = useRef(function () {
-    let response = { _id: Math.random(), name: "" };
-  });
-  const removeRef = useRef(function () {});
+  // const createRef = useRef(function () {
+  //   let response = { _id: Math.random(), name: "" };
+  // });
+  // const removeRef = useRef(function () {});
 
   const currentTableData = useMemo(() => {
     const firstPageIndex = (currentPage - 1) * PageSize;
@@ -70,8 +27,24 @@ export default function Crud() {
     return categories.slice(firstPageIndex, lastPageIndex);
   }, [currentPage]);
 
-  function deleteCate(e) {
+  function deleteCate(e, id) {
     e.preventDefault();
+    console.log(id);
+    // HandleDelete(id);
+  }
+  function HandleDelete(_id) {
+    return axios.delete(mainAPI.CLOUD_API_MANAGER, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: `category/${_id}`,
+      },
+    });
+    // .then((res) => {
+    //   setNewRecord(res.data.response);
+    // })
+    // .catch((error) => console.log(error.message));
   }
 
   return (
@@ -82,15 +55,24 @@ export default function Crud() {
       </button>
       {modal && (
         <div
-          style={{
-            height: "0px",
-          }}
+        // style={{ height: "0px" }}
         >
           <ModalAddFormCategory
             data={categories}
             setModal={setModal}
             modal={modal}
           />
+        </div>
+      )}
+
+      <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
+        Create New Category
+      </button>
+      {modal && (
+        <div
+        // style={{ height: "0px" }}
+        >
+          <AddFromWorkspace setModal={setModal} modal={modal} />
         </div>
       )}
       {/* <AnimateComponent Class="btn-rounded-green" name="Create New Category">
@@ -115,23 +97,34 @@ export default function Crud() {
                 searchInput={searchInput}
                 setSearchInput={setSearchInput}
                 setFilteredResults={setFilteredResults}
-                currentTableData={currentTableData}
+                currentTableData={categories}
                 filteredResults={filteredResults}
               />
             </tr>
           </thead>
           <tbody>
             {searchInput !== ""
-              ? filteredResults.map((category) => (
-                  <CategoryData data={category} deleteCate={deleteCate} />
+              ? filteredResults.map((category, index) => (
+                  <CategoryData
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
                 ))
-              : currentTableData.map((category) => (
-                  <CategoryData data={category} deleteCate={deleteCate} />
+              : currentTableData.map((category, index) => (
+                  <CategoryData
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
                 ))}
             {categories && !categories.length && (
               <tr>
                 <td>
-                  <div>Coategry Emty</div>
+                  <h2>No Coategry</h2>
+                </td>
+                <td>
+                  <h2>Empty</h2>
                 </td>
               </tr>
             )}
@@ -142,7 +135,7 @@ export default function Crud() {
           <Pagination
             className="pagination-bar"
             currentPage={currentPage}
-            totalCount={Category.length}
+            totalCount={categories.length}
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           />
@@ -154,7 +147,7 @@ export default function Crud() {
 
 function ModalAddFormCategory({ setModal, modal }) {
   const [categoryAdd, setCategoryAdd] = useState({
-    categoryName: "",
+    name: "",
   });
   const [newRecord, setNewRecord] = useState(null);
 
@@ -169,7 +162,7 @@ function ModalAddFormCategory({ setModal, modal }) {
   async function HandleNameInput(e) {
     setCategoryAdd({ ...categoryAdd, [e.target.name]: e.target.value });
   }
-  console.log(categoryAdd, "input");
+  // console.log(categoryAdd, "input");
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -180,19 +173,18 @@ function ModalAddFormCategory({ setModal, modal }) {
     //     v = c === "x" ? r : (r & 0x3) | 0x8;
     //   return v.toString(16);
     // });
-
     // const data = {
     //   _id: newId,
     //   name: categoryAdd.name,
     // };
     // console.log(data, "Submit");
     // Instead of using the real-time response
-    // createCategory();
     // Using static response data
-    let res = { data: { response: { _id: Math.random() + 1, name: "" } } };
-    setNewRecord(res.data.response);
+    // let res = { data: { response: { _id: Math.random() + 1, name: "" } } };
+    // setNewRecord(res.data.response);
+    CreateCategory();
   }
-  function createCategory() {
+  function CreateCategory() {
     return axios
       .post(mainAPI.CLOUD_API_MANAGER, categoryAdd, {
         headers: {
@@ -203,6 +195,7 @@ function ModalAddFormCategory({ setModal, modal }) {
         },
       })
       .then((res) => {
+        console.log(res);
         setNewRecord(res.data.response);
       })
       .catch((error) => console.log(error.message));
@@ -217,9 +210,9 @@ function ModalAddFormCategory({ setModal, modal }) {
             <input
               className="row-input"
               type="text"
-              name="categoryName"
+              name="name"
               onChange={HandleNameInput}
-              value={categoryAdd.categoryName}
+              value={categoryAdd.name}
             />
           </div>
         </div>
@@ -245,12 +238,13 @@ function ModalAddFormCategory({ setModal, modal }) {
   );
 }
 
-function CategoryData({ data, deleteCate }) {
+function CategoryData({ data, deleteCate, index }) {
   return (
-    <tr key={data.id}>
+    <tr key={data._id}>
       <td style={{ textAlign: "center", width: "40%" }}>
-        {parseInt(data._id, 16)}
-        {data.id}
+        {index + 1}
+        {/* {parseInt(data._id, 8)} */}
+        {/* {data._id} */}
       </td>
       <td style={{ textAlign: "center", width: "40%" }}>{data.name}</td>
       <td
@@ -260,8 +254,8 @@ function CategoryData({ data, deleteCate }) {
           width: "120px",
         }}
       >
-        <button onClick={() => deleteCate()} className="btn-red">
-          {data.isDeleting ? <span></span> : <span>Delete</span>}
+        <button onClick={(e) => deleteCate(e, data._id)} className="btn-red">
+          {data._id === "" ? <span></span> : <span>Delete</span>}
         </button>
       </td>
     </tr>
@@ -288,8 +282,8 @@ function SearchCategory({
     if (searchInput !== "") {
       const filteredData = currentTableData.filter((item) => {
         return (
-          item.name.toLowerCase().indexOf(searchInput.toLowerCase()) !== -1
-          // item.name.toLowerCase().includes(searchInput)
+          // item.name.toLowerCase().indexOf(searchInput.toLowerCase()) !== -1
+          item.name.toLowerCase().includes(searchInput.toLowerCase())
         );
       });
       searchFunction.current(filteredData);
