@@ -85,11 +85,9 @@ export default function Comment({ postAuthor, postId, commentLogs }) {
     </ContainerComponent.Section>
   );
 }
-
 Comment.Tab = function CommentTab({ ...props }) {
   const { user } = useAuthorizationContext();
   const { interactPost, getCommentReplies, loadNextReplies } = usePostContext();
-
   const {
     _id,
     body,
@@ -101,11 +99,9 @@ Comment.Tab = function CommentTab({ ...props }) {
     dislike,
     reply,
     replies,
-    account: { username, profileImage },
+    account: { _id: targetId, username, profileImage },
     loadMore,
   } = props.comment;
-  const { postId } = props;
-
   const parseTime = (time) => {
     const now = new Date(Date.now());
     const end = new Date(time);
@@ -131,7 +127,7 @@ Comment.Tab = function CommentTab({ ...props }) {
     disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
     commentId: _id,
   });
-  const [openReply, setOpenReply] = useState(false);
+  const [openReplyInput, setOpenReply] = useState(false);
   const [openReplyLog, setOpenReplyLog] = useState(false);
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
@@ -168,13 +164,14 @@ Comment.Tab = function CommentTab({ ...props }) {
     loadMoreRepliesRef.current = loadNextReplies;
   }, [loadNextReplies])
   React.useEffect(() => {
-    if (openReply) {
+    if (openReplyInput) {
       inputRef.current.focus();
     }
-  }, [openReply]);
+  }, [openReplyInput]);
 
   return (
-    <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', boxShadow: '2px 2px 5px #000', margin: '12px 0', padding: '10px' }} onMouseLeave={() => setOpenReply(false)}>
+    <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', border: '1px solid #000', margin: '12px 0', padding: '10px' }} onMouseLeave={() => setOpenReply(false)}>
+
       <Text.MiddleLine className="comment__header">
         <Icon.CircleIcon
           style={{
@@ -186,6 +183,7 @@ Comment.Tab = function CommentTab({ ...props }) {
           <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
         </Icon.CircleIcon>
       </Text.MiddleLine>
+
       <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
         <Text.MiddleLine>
           <Text.Bold style={{ margin: 0 }}>
@@ -203,6 +201,7 @@ Comment.Tab = function CommentTab({ ...props }) {
           </Text.Paragraph>
         </Text.Line>
       </Text.MiddleLine>
+
       <Text.Line className="comment__interacts">
         <Text.MiddleLine className="comment__like">
           <input
@@ -266,8 +265,8 @@ Comment.Tab = function CommentTab({ ...props }) {
 
         <Text.MiddleLine className="comment__replyBtn"
           onClick={() => {
-            setOpenReply(!openReply);
-            if (openReply) {
+            setOpenReply(!openReplyInput);
+            if (openReplyInput) {
               document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
               });
             }
@@ -278,35 +277,31 @@ Comment.Tab = function CommentTab({ ...props }) {
           }}>
           Reply ({reply})
         </Text.MiddleLine>
-        {openReply && <Text.Line className="comment__reply">
-          <Comment.TabReplyInput
-            forwardedRef={inputRef}
-            preReply={username}
-            closeReply={() => setOpenReply(false)}
-            postId={props.postId}
-            commentId={_id}
-          ></Comment.TabReplyInput>
-        </Text.Line>}
+        <Text.Line className="comment__reply">
+          {openReplyInput &&
+            <Comment.TabInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={props.postId} commentId={_id} ></Comment.TabInput>
+          }
+        </Text.Line>
       </Text.Line>
 
       <ContainerComponent.Pane className="comment__reply">
         {!openReplyLog && <Text.Line onClick={async () => {
-          await addRepliesRef.current(postId, _id, () => {
+          await addRepliesRef.current(props.postId, _id, () => {
             setOpenReplyLog(true);
           });
         }}>
           {reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle> || <></>}
         </Text.Line>
           ||
-          <TriggerLoading loader={() => loadMoreRepliesRef.current(postId, _id, () => { })}
+          <TriggerLoading loader={() => loadMoreRepliesRef.current(props.postId, _id, () => { })}
             loadMore={loadMore}>
             <ContainerComponent className="comment-reply__log">
-              {replies.map(comment => {
-                return <Comment.Tab
-                  comment={comment}
-                  key={comment._id}
+              {replies.map(reply => {
+                return <Comment.ReplyTab
+                  comment={reply}
+                  key={reply._id}
                   postId={props.postId}>
-                </Comment.Tab>
+                </Comment.ReplyTab>
               })}
             </ContainerComponent>
           </TriggerLoading>}
@@ -314,8 +309,7 @@ Comment.Tab = function CommentTab({ ...props }) {
     </ContainerComponent.Pane>
   );
 };
-
-Comment.TabInput = function TabInput({ postAuthor, postId, preReply = "", commentId }) {
+Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, postAuthor, postId, commentId }) {
   const { user } = useAuthorizationContext();
   const { interactPost } = usePostContext();
   const { sendNotification } = useNotifyContext();
@@ -389,7 +383,7 @@ Comment.TabInput = function TabInput({ postAuthor, postId, preReply = "", commen
       </Text.Line>
       <Text.Line>
         <Form method="POST" style={{ width: "100%", padding: "2px 0 0 30px", margin: "0" }} onSubmit={submitHandler}>
-          <Form.Input name="content" style={{ width: "calc(100% - 30px)" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
+          <Form.Input ref={forwardedRef} name="content" style={{ width: "calc(100% - 30px)" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
           ></Form.Input>
           <input type="submit" style={{ display: "none" }}></input>
           <Text.MiddleLine>
@@ -402,115 +396,9 @@ Comment.TabInput = function TabInput({ postAuthor, postId, preReply = "", commen
     </ContainerComponent.Pane>
   );
 };
-
-Comment.TabReplyInput = function TabReplyInput({
-  forwardedRef,
-  postId,
-  closeReply,
-  preReply = "",
-  commentId,
-}) {
-  const { user } = useAuthorizationContext();
-  const { interactPost } = usePostContext();
-
-  const [input, setInput] = useState({
-    pre: preReply,
-    content: `${preReply && `@${preReply}`} `,
-    private: false,
-    commentid: commentId,
-  });
-  const loader = useRef(interactPost);
-  React.useEffect(() => {
-    loader.current = interactPost;
-  }, [interactPost]);
-
-  const inputHandler = (e) => {
-    setInput({
-      ...input,
-      [e.target.name]: e.target.value,
-    });
-  };
-  const checkedHandler = (e) => {
-    setInput((input) => ({
-      ...input,
-      [e.target.name]: e.target.checked,
-    }));
-  };
-  const submitHandler = (e) => {
-    e.preventDefault();
-    loader.current(postId, "reply comment", input, () => { });
-    closeReply();
-    setInput({
-      pre: "",
-      content: "",
-      private: false,
-    });
-  };
-  const onBlurHandler = (e) => {
-    closeReply();
-  };
-
-  return (
-    <ContainerComponent.Pane
-      className="comment-reply__container"
-      id="comment__reply"
-      onMouseLeave={onBlurHandler}
-    >
-      <Text.Line>
-        <Text.MiddleLine style={{ marginRight: "20px" }}>
-          <Icon.CircleIcon
-            style={{
-              background: "#163d3c",
-              color: "#fff",
-              padding: 0,
-            }}
-          >
-            <Icon.Image src={user.profileImage}></Icon.Image>
-          </Icon.CircleIcon>
-        </Text.MiddleLine>
-        <Text.MiddleLine style={{ marginRight: "12px" }}>
-          <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
-        </Text.MiddleLine>
-        <ButtonComponent.Toggle
-          onText="Hide"
-          offText="Show"
-          id="private"
-          name="private"
-          value={input.private}
-          onChange={checkedHandler}
-        ></ButtonComponent.Toggle>
-      </Text.Line>
-      <Text.Line>
-        <Form
-          method="POST"
-          style={{ padding: "0 20px", width: "100%" }}
-          onSubmit={submitHandler}>
-          <Form.Input
-            ref={forwardedRef}
-            placeholder="Leave your comment"
-            name="content"
-            value={input.content}
-            onChange={inputHandler}
-            style={{ width: "calc(100% - 60px)" }}
-          ></Form.Input>
-          <input type="submit" style={{ display: "none" }}></input>
-
-          <Text.MiddleLine>
-            <Text.CenterLine>
-              <Icon.CircleIcon>
-                <Form.Input component={<FiSend />}></Form.Input>
-              </Icon.CircleIcon>
-            </Text.CenterLine>
-          </Text.MiddleLine>
-        </Form>
-      </Text.Line>
-    </ContainerComponent.Pane>
-  );
-};
 Comment.ReplyTab = function ReplyTab({ ...props }) {
   const { user } = useAuthorizationContext();
   const { interactPost, getCommentReplies } = usePostContext();
-
   const {
     _id,
     body,
@@ -525,6 +413,7 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
     account: { username, profileImage },
     loadMore,
   } = props.comment;
+  console.log(props);
   const { postId } = props;
 
   const parseTime = (time) => {
@@ -551,7 +440,7 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
     disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
     commentId: _id,
   });
-  const [openReply, setOpenReply] = useState(false);
+  const [openReplyInput, setOpenReply] = useState(false);
   const [openReplyLog, setOpenReplyLog] = useState(false);
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
@@ -585,18 +474,20 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
     addRepliesRef.current = getCommentReplies;
   }, [getCommentReplies]);
   React.useEffect(() => {
-    if (openReply) {
+    if (openReplyInput) {
       inputRef.current.focus();
     }
-  }, [openReply]);
+  }, [openReplyInput]);
 
   return (
-    <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', boxShadow: '2px 2px 5px #000', margin: '12px 0', padding: '10px 10px' }} onMouseLeave={() => setOpenReply(false)}>
+    <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', margin: '12px 0', padding: '10px 10px' }} onMouseLeave={() => setOpenReply(false)}>
+
       <Text.MiddleLine className="comment__header">
         <Icon.CircleIcon style={{ width: "30px", height: "30px", padding: 0, }}>
           <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
         </Icon.CircleIcon>
       </Text.MiddleLine>
+
       <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
         <Text.MiddleLine>
           <Text.Bold style={{ margin: 0 }}>
@@ -614,6 +505,7 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
           </Text.Paragraph>
         </Text.Line>
       </Text.MiddleLine>
+
       <Text.Line className="comment__interacts">
         <Text.MiddleLine className="comment__like">
           <input type="checkbox" name="like" id={`like - ${_id} `} value={interact.liked} onChange={checkedHandler} style={{ display: "none" }}></input>
@@ -638,8 +530,8 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
 
         <Text.MiddleLine className="comment__replyBtn"
           onClick={() => {
-            setOpenReply(!openReply);
-            if (openReply) {
+            setOpenReply(!openReplyInput);
+            if (openReplyInput) {
               document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
               });
             }
@@ -650,12 +542,15 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
           }}>
           Reply ({reply})
         </Text.MiddleLine>
-        {openReply && <Text.Line className="comment__reply">
-          <Comment.TabReply forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={_id}></Comment.TabReply>
-        </Text.Line>}
+
+        <Text.Line className="comment__reply">
+          {openReplyInput &&
+            <Comment.TabReply forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={_id}></Comment.TabReply>
+          }
+        </Text.Line>
       </Text.Line>
 
-      <ContainerComponent.Pane className="comment__reply">
+      <ContainerComponent.Pane className="comment__container">
         {!openReplyLog && <Text.Line onClick={async () => {
           await addRepliesRef.current(postId, _id, () => {
             setOpenReplyLog(false);
@@ -681,3 +576,91 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
     </ContainerComponent.Pane>
   );
 }
+Comment.TabReplyInput = function TabReplyInput({ forwardedRef, preReply = "", closeReply, postAuthor, postId, commentId }) {
+  const { user } = useAuthorizationContext();
+  const { interactPost } = usePostContext();
+  const { sendNotification } = useNotifyContext();
+
+  const [input, setInput] = useState({
+    pre: preReply,
+    content: preReply ? `@${preReply}` : "",
+    private: false,
+    commentid: commentId,
+  });
+  const postInputRef = useRef(interactPost);
+
+  React.useEffect(() => {
+    postInputRef.current = interactPost;
+  }, [interactPost]);
+  const inputHandler = (e) => {
+    setInput({
+      ...input,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const checkedHandler = (e) => {
+    setInput((input) => ({
+      ...input,
+      [e.target.name]: e.target.checked,
+    }));
+  };
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (!commentId) {
+      postInputRef.current(postId, "comment", input, commentId => {
+        sendNotification(notifyData.COMMENT_POST, `/#${commentId}`, postAuthor);
+      });
+    } else {
+      postInputRef.current(postId, "reply comment", input, replyId => {
+        sendNotification(notifyData.COMMENT_POST, `/#${replyId}`, commentId);
+      });
+    }
+    setInput({
+      pre: "",
+      content: "",
+      private: false,
+    });
+  };
+
+  return (
+    <ContainerComponent.Pane className="tab-reply__input">
+      <Text.Line>
+        <Text.MiddleLine style={{ marginRight: "20px" }}>
+          <Icon.CircleIcon
+            style={{
+              background: "#163d3c",
+              color: "#fff",
+              padding: 0,
+            }}
+          >
+            <Icon.Image src={user.profileImage}></Icon.Image>
+          </Icon.CircleIcon>
+        </Text.MiddleLine>
+        <Text.MiddleLine style={{ marginRight: "12px" }}>
+          <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
+        </Text.MiddleLine>
+        <ButtonComponent.Toggle
+          onText="Hide"
+          offText="Show"
+          id="private"
+          name="private"
+          value={input.private}
+          onChange={checkedHandler}
+        ></ButtonComponent.Toggle>
+      </Text.Line>
+      <Text.Line>
+        <Form method="POST" style={{ width: "100%", padding: "2px 0 0 30px", margin: "0" }} onSubmit={submitHandler}>
+          <Form.Input ref={forwardedRef} name="content" style={{ width: "calc(100% - 30px)" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
+          ></Form.Input>
+          <input type="submit" style={{ display: "none" }}></input>
+          <Text.MiddleLine>
+            <Icon.CircleIcon>
+              <Form.Input component={<FiSend />}></Form.Input>
+            </Icon.CircleIcon>
+          </Text.MiddleLine>
+        </Form>
+      </Text.Line>
+    </ContainerComponent.Pane>
+  );
+};
+

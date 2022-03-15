@@ -14,6 +14,9 @@ export default function Crud() {
   let PageSize = 8;
   const { categories, removeCategory } = usePostContext();
   const [modal, setModal] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   //Testing WS
   const { workspaces } = useWorkspaceContext();
@@ -21,10 +24,7 @@ export default function Crud() {
 
   const [modalWS, setModalWS] = useState(false);
 
-  const [searchInput, setSearchInput] = useState("");
-  const [filteredResults, setFilteredResults] = useState([]);
   const [dataRecords, setDataRecords] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   // console.log("re-render crud", categories);
 
   useEffect(() => {

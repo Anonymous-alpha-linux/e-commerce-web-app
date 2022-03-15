@@ -271,10 +271,10 @@ const postReducer = (state, action) => {
       };
     case actions.CREATE_POST_COMMENT:
       return actionHandler.updateItem("posts", post => {
-        if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, post);
+        if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, { ...post, comment: post.comment + 1 });
         return post
       }, actionHandler.updateItem("myPosts", post => {
-        if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, post);
+        if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, { ...post, comment: post.comment + 1 });
         return post;
       }, state));
 

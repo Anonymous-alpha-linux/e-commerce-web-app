@@ -92,6 +92,7 @@ export default React.memo(function PostContext({ children }) {
     receiveRealtimeComment();
     receiveRealTimeLike();
     receiveRealTimeDisLike();
+    receiveRealtimeCommentReply();
   }, [socket]);
   // 1. Post for workspace
   function getPosts() {
@@ -727,6 +728,19 @@ export default React.memo(function PostContext({ children }) {
         setError(error.message);
       });
   }
+  function sendRealtimeCommentReply(postId, commentId, replyId) {
+    socket.emit("reply comment", {
+      postId,
+      commentId,
+      replyId,
+    });
+  }
+  function receiveRealtimeCommentReply() {
+    socket.on("reply comment", (res) => {
+      const { postId, commentId, replyId } = res;
+      addCommentReply(postId, commentId, replyId);
+    });
+  }
   function updateCommentReplies(postId, commentId, cb) {
     return;
   }
@@ -918,12 +932,10 @@ export default React.memo(function PostContext({ children }) {
         .then((res) => {
           console.log(res.data.response);
           const replyId = res.data.response._id;
-          addCommentReply(postId, input.commentid, replyId, () => {
-            cb();
-          });
-        })
-        .then((success) => {
-          cb();
+          addCommentReply(postId, input.commentid, replyId, () => {});
+          const data = { postId, commentId: input.commentid, replyId };
+          sendRealtimeCommentReply(postId, data.commentId, replyId);
+          cb(data);
         })
         .catch((error) => {
           setError(error.message);
