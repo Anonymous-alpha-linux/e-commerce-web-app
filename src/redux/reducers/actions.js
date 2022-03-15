@@ -50,6 +50,10 @@ const actions = {
     GET_MANAGER: 50,
     SELECT_PAGE: 51,
     GET_WORKSPACE: 52,
+    ADD_NESTED_REPLY: 53,
+    LOAD_MORE_NESTED_REPLIES: 54,
+    GET_NESTED_REPLIES: 55,
+    
 }
 
 export default actions;

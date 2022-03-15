@@ -11,6 +11,8 @@ import { Loading } from "../../pages";
 import { io } from "socket.io-client";
 import actions from "../reducers/actions";
 import { authReducer, initialAuth } from "../reducers";
+import { Toast } from "../../containers";
+import { toastTypes } from "../../fixtures";
 
 const AuthenticationContextAPI = createContext();
 
@@ -22,22 +24,27 @@ export default function AuthenticationContext({ children }) {
       : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
 
   const [message, setMessage] = useState("");
+  const [info, setInfo] = useState('');
   const [error, setError] = useState("");
+  const [toastList, setToastList] = useState([]);
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
   useEffect(() => {
-    try {
-      onLoadUser(() => {
-        getProfile();
-      });
-    } catch (error) {
-      setError(error.message);
-    }
+    onLoadUser(() => {
+      getProfile();
+    });
     return () => {
       cancelTokenSource.cancel();
     };
   }, []);
+  useEffect(() => {
+    if (error || message || info)
+      setToastList([...toastList, {
+        message: error || message || '',
+        type: (error && toastTypes.ERROR) || (message && toastTypes.SUCCESS) || (info && toastTypes.INFO)
+      }]);
+  }, [error, message, info]);
   const onLoadUser = (cb) => {
     return axios
       .get(authAPI, {
@@ -54,15 +61,12 @@ export default function AuthenticationContext({ children }) {
 
         let socket = io(host);
         socket.auth = { accessToken: localStorage.getItem('accessToken') };
-
-        return setSocket(socket);
-      }).then(success => {
-        cb();
+        setSocket(socket);
       }).catch(error => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
         });
-        setError(error.message);
+        setInfo("Login to system");
       })
   };
   function login(data) {
@@ -175,14 +179,17 @@ export default function AuthenticationContext({ children }) {
         editProfile,
         setError,
         setMessage,
+        setInfo
       }}
     >
       {children}
-      {(message || error) && <div style={{
+      {/* {toastList.length && <div style={{
         position: 'fixed',
         bottom: '20px',
         right: '20px'
-      }}>{message || error}</div>}
+      }}>
+        {toastList.map((toast, index) => <Toast message={toast.message} timeout={3000} key={index + 1} type={toast.type}></Toast>)}
+      </div>} */}
     </AuthenticationContextAPI.Provider>
   );
 }

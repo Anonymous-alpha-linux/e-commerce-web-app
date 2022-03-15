@@ -13,17 +13,23 @@
   transform: translateX(-50%);
 }
 
+.ToastMessage.info .Bar {
+  background-color: blue;
+}
+
 .ToastMessage.warning .Bar {
   background-color: yellow;
 }
+
 .ToastMessage.success .Bar {
   background-color: rgb(3, 160, 3);
 }
+
 .ToastMessage.error .Bar {
   background-color: rgb(233, 62, 62);
 }
 
-.ToastMessage > span {
+.ToastMessage>span {
   margin: 12px 0;
   display: block;
   font-size: 12px;
@@ -32,7 +38,7 @@
   font-style: italic;
 }
 
-.ToastMessage > .Loader {
+.ToastMessage>.Loader {
   width: 100%;
   height: 10px;
   border-radius: 20px;
@@ -40,7 +46,7 @@
   padding: 2px;
 }
 
-.Loader > .Bar {
+.Loader>.Bar {
   width: 100%;
   height: 100%;
   border-radius: 20px;
@@ -60,6 +66,7 @@
   from {
     width: 100%;
   }
+
   to {
     width: 0;
   }
