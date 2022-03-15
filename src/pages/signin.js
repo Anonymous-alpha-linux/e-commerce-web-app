@@ -38,7 +38,6 @@ const Login = () => {
     },
     [input]
   );
-  useEffect(() => { }, []);
 
   if (user.isLoggedIn) {
     return <Navigate to={"/"} state={{ from: location }} replace />;

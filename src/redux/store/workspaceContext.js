@@ -1,46 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, useReducer } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useReducer } from 'react'
 import axios from 'axios';
 import { mainAPI } from '../../config';
-import actions from '../reducers/actions';
 import { useAuthorizationContext } from '.';
 import { Loading } from '../../pages';
+import { initialWorkspacePage, workspaceReducer, reduxActions as actions } from '../reducers';
 
 const WorkspaceContextAPI = createContext();
-const workspaceReducer = (state, action) => {
-    switch (action.type) {
-        case actions.GET_WORKSPACE_ACTION:
-            return {
-                ...state,
-                ...action.payload
-            };
-        case actions.WORKSPACE_ACTION:
-            return {
-                ...state,
-                workspaces: action.payload.workspaces,
-                workspace: action.payload.workspace,
-                workspaceLoading: false
-            };
-        case actions.SET_POST_ACTION:
-            return {
-                ...state,
-                posts: [...state, ...action.payload.posts]
-            };
-        case actions.SET_LOADING:
-            return {
-                ...state,
-                workspaceLoading: action.loading
-            };
-        default:
-            return state;
-    }
-}
-const initialWorkspacePage = {
-    workspace: null,
-    posts: [],
-    workspaces: [],
-    workspaceLoading: true,
-    page: 0
-}
 
 export default React.memo(function WorkspaceContext({ children }) {
     const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
@@ -51,34 +16,32 @@ export default React.memo(function WorkspaceContext({ children }) {
     const { REACT_APP_ENVIRONMENT } = process.env;
     const workspaceAPI = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
 
-    useEffect(() => {
-        try {
-            onLoadWorkspace();
-        } catch (error) {
-            setError(error.message);
-        }
-        return () => {
-            cancelTokenSource.cancel();
-        }
-    }, [user]);
 
-    function onLoadWorkspace() {
+    useEffect(() => {
+        if (!workspaceState.page) {
+            localStorage.setItem("workspace", 0);
+        }
+        onLoadWorkspaceList();
+    }, []);
+    useEffect(() => {
+        // onLoadWorkspace(workspaceState.workspaces[index]._id);
+    }, [workspaceState.workspaces]);
+
+    function onLoadWorkspaceList() {
         return axios.get(workspaceAPI, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
             },
             params: {
                 view: 'workspace',
-                page: workspaceState.page
             }
         }).then(res => {
+            const index = Number(localStorage.getItem("workspace")) || 0;
             setWorkspace({
-                type: actions.WORKSPACE_ACTION,
-                payload: {
-                    workspace: res.data.response.find(workspace => workspace._id === user.workspace),
-                    workspaces: res.data.response
-                }
+                type: actions.GET_WORKSPACE_LIST,
+                payload: res.data.response
             });
+            onLoadWorkspace(res.data.response[index]);
         }).catch(error => {
             setWorkspace({
                 type: actions.SET_LOADING,
@@ -87,9 +50,43 @@ export default React.memo(function WorkspaceContext({ children }) {
             setError(error.message)
         });
     }
+    function onLoadWorkspace(workspace) {
+        onLoadManagerInfo(workspace.manager);
+        setWorkspace({
+            type: actions.GET_WORKSPACE,
+            payload: workspace,
+        });
+    }
+    function onLoadManagerInfo(managerId) {
+        return axios.get(workspaceAPI, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            params: {
+                view: 'manager',
+                accountid: managerId,
+            }
+        }).then(res => {
+            const { manager, profile } = res.data.response;
+            setWorkspace({
+                type: actions.GET_MANAGER,
+                payload: {
+                    ...manager,
+                    profile
+                }
+            });
+        }).catch(error => setError(error.message));
+    }
+    function selectWorkspaceIndex(page) {
+        localStorage.setItem('workspace', page);
+        setWorkspace({
+            type: actions.SELECT_PAGE,
+            page: page
+        });
+    }
 
     const contextValue = { workspace: workspaceState.workspace, workspaces: workspaceState.workspaces, loading: workspaceState.workspaceLoading };
-    if (contextValue.loading) return <Loading className="workspace__loading"></Loading>
+    if (workspaceState.workspaceLoading) return <Loading className="workspace__loading"></Loading>
 
     return (
         <WorkspaceContextAPI.Provider value={contextValue}>

@@ -46,14 +46,11 @@ export default function PostModal() {
     } = usePostContext();
     const privateChecked = useRef(null);
     const mountedRef = useRef(false);
-    const checkedCondition = useRef();
+    const checkedCondition = useRef(false);
     const getFileRef = useRef(getFile);
     const cancelTokenSource = axios.CancelToken.source();
+    // const [staffURL, host] = process.env.REACT_APP_ENVIRONMENT === "development" ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
-    const [staffURL, host] =
-        process.env.REACT_APP_ENVIRONMENT === "development"
-            ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
-            : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
     const isOverflowFile = (currentFileList, fileSize) => {
         const currentSize = currentFileList.reduce((prev, file) => {
@@ -64,7 +61,8 @@ export default function PostModal() {
     const editHandler = (e) => {
         e.preventDefault();
         setLoading(true);
-        postIdea(input, res => {
+        postIdea(input, postId => {
+            console.log(postId);
             setLoading(false);
             navigate("/");
         }, {
@@ -83,7 +81,6 @@ export default function PostModal() {
             if (!checkedCondition.current.checked) {
                 throw new Error("Please checked our terms and condition");
             }
-
             // 2. Post a new idea
             postIdea(input, postId => {
                 setLoading(false);
@@ -108,22 +105,22 @@ export default function PostModal() {
         }));
     };
     const pushInputHandler = (e) => {
-        const filter = Array.from(e.target.files).map((file) => {
-            let size = file.size / 1024;
-            console.log(file);
-            if (isOverflowFile(input.files, size)) {
-                alert("File size is overflow");
-                setError("File size is overflow");
-                return null;
-            } else {
+        const filter = Array.from(e.target.files)
+            .map((file) => {
+                let size = file.size / 1024;
+                if (isOverflowFile(input.files, size)) {
+                    alert("File size is overflow");
+                    setError("File size is overflow");
+                    return;
+                }
                 return file;
-            }
-        }).filter((file) => file);
-        console.log(!!filter.length);
+            })
+            .filter((file) => file);
+
         setInput((input) => {
             return {
                 ...input,
-                files: filter.length ? [...input.files, ...filter] : input.files,
+                files: [...input.files, ...filter],
             };
         });
     };
@@ -137,33 +134,41 @@ export default function PostModal() {
     useEffect(() => {
         mountedRef.current = true;
         setLoading(true);
-        if (id && posts.length) {
+        if (id) {
             // Stage 1
-            console.log('edit post');
-            getSinglePost(id, post => {
+            Promise.resolve({
+                then: function (resolve, reject) {
+                    try {
+                        getSinglePost(id, post => {
+                            resolve(post);
+                        })
+                    } catch (error) {
+                        reject(error.message);
+                    }
+                }
+            }).then(post => {
                 return Promise.all([
                     post,
-                    ...post.attachment.map(attach => {
+                    ...post.attachments.map(attach => {
                         return new Promise((resolve, reject) => {
                             getFileRef.current(attach, file => {
                                 resolve(file);
                             }).catch(error => reject(error));
                         });
                     })])
-                    .then(data => {
-                        const [post, ...files] = data;
-                        const { content, hideAuthor, category } = post;
-                        if (mountedRef.current) {
-                            setInput({
-                                ...input,
-                                content: content,
-                                private: hideAuthor,
-                                categories: category.map((single) => single._id),
-                                files: files,
-                            });
-                            setLoading(false);
-                        }
-                    })
+            }).then(data => {
+                const [post, ...files] = data;
+                const { content, hideAuthor, categories } = post;
+                if (mountedRef.current) {
+                    setInput(input => ({
+                        ...input,
+                        content: content,
+                        private: hideAuthor,
+                        categories: categories.map((single) => single._id),
+                        files: files,
+                    }));
+                    setLoading(false);
+                }
             }).catch(error => {
                 if (mountedRef.current) {
                     setLoading(false);
@@ -182,7 +187,6 @@ export default function PostModal() {
     useEffect(() => {
         getFileRef.current = getFile;
     }, [getFile]);
-
     return (
         <ContainerComponent.Section className="postModal__container">
             <Form

@@ -21,7 +21,6 @@ export default function NotificationContext({ children }) {
             receiveNotification();
             receiveCommentFromAnother();
             receiveMessageFromAnother();
-            console.log(socket);
             handleError()
         }
         return () => {
@@ -45,12 +44,14 @@ export default function NotificationContext({ children }) {
                 page: notify.page,
                 count: notify.count
             }
-        }).then(res => setNotify({
-            type: actions.GET_NOTIFICATIONS,
-            payload: res.data.response
-        }))
+        })
+            .then(res => {
+                setNotify({
+                    type: actions.GET_NOTIFICATIONS,
+                    payload: res.data.response
+                });
+            })
             .catch(e => {
-                console.log(e.message);
                 setError(e.message);
             });
     }
@@ -73,7 +74,7 @@ export default function NotificationContext({ children }) {
     }
     function getSession() {
         socket.on('session', sessionId => {
-            console.log('connected to socket server', sessionId);
+            console.log('Your session id:', sessionId);
         });
     }
     function receiveNotification() {
@@ -117,7 +118,6 @@ export default function NotificationContext({ children }) {
     }
     function receiveCommentFromAnother() {
         socket.on("comment", data => {
-
         });
     }
     function sendMessageToSpecificPerson(accountId, message) {

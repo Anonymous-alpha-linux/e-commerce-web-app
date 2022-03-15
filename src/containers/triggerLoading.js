@@ -10,7 +10,6 @@ export default function TriggerLoading({ children, ...restProps }) {
      */
     const [loading, setLoading] = useState(false);
     const loader = useRef(restProps.loader);
-    console.log(restProps.loadMore);
 
     useEffect(() => {
         loader.current = restProps.loader;
