@@ -78,7 +78,7 @@ function App() {
                     </ProtectedPage>
                   }
                 >
-                  <Route index element={<Workspace></Workspace>} />
+                  {/* <Route index element={<Workspace></Workspace>} /> */}
                   <Route
                     index
                     element={<DashboardManager></DashboardManager>}
