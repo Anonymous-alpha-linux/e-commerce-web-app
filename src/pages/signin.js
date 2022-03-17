@@ -25,17 +25,8 @@ const Login = () => {
       });
       await login(input);
     } catch (error) {
-      console.log(error);
-      if (error.toString().includes("401")) {
-        setMessage("Email or password is not valid");
-        setError("");
-        setUser({
-          type: actions.AUTHENTICATE_FAILED,
-        });
-      } else {
-        setError(error.message);
-        setMessage("");
-      }
+      setError(error.message);
+      setMessage("");
     }
   };
   const inputHandler = React.useCallback(

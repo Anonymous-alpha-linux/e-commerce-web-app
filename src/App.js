@@ -30,6 +30,7 @@ import {
   Personal,
   PostModal,
   Searchbar,
+  MenuContainer,
 } from "./containers";
 import { useAuthorizationContext } from "./redux";
 import roles from "./fixtures/roles";
@@ -42,9 +43,10 @@ function App() {
 
   return (
     <BrowserRouter>
-      {(user.role === roles.ADMIN && <AdminSidebar></AdminSidebar>) || (
-        <Nav></Nav>
-      )}
+      {(user.role === roles.ADMIN && <AdminSidebar></AdminSidebar>) ||
+        (user.role === roles.QA_MANAGER && <MenuContainer></MenuContainer>) || (
+          <Nav></Nav>
+        )}
       <Routes>
         <Route path="login" element={<Login></Login>}></Route>
         <Route path="register" element={<Register></Register>}></Route>
@@ -76,7 +78,7 @@ function App() {
                     </ProtectedPage>
                   }
                 >
-                  {/* <Route index element={<Workspace></Workspace>} /> */}
+                  <Route index element={<Workspace></Workspace>} />
                   <Route
                     index
                     element={<DashboardManager></DashboardManager>}

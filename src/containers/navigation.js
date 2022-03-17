@@ -111,7 +111,7 @@ export default function Navigation() {
                   );
                 })}
 
-                <ContainerComponent.Item
+                {/* <ContainerComponent.Item
                   onClick={() => setDropdown((prev) => !prev)}
                 >
                   {"QA Manager feature"}
@@ -126,7 +126,7 @@ export default function Navigation() {
                       })}
                     </Dropdown.Content>
                   )}
-                </ContainerComponent.Item>
+                </ContainerComponent.Item> */}
               </ContainerComponent.Flex>
             </ContainerComponent.MiddleInner>
           </ContainerComponent.Item>
@@ -166,7 +166,7 @@ const Navigator = ({ closeNavigator }) => {
         onClick={closeNavigator}
       ></ContainerComponent.BackDrop>
 
-      {dropdown && (
+      {/* {dropdown && (
         <ContainerComponent.Flex
           style={{
             position: "absolute",
@@ -191,7 +191,7 @@ const Navigator = ({ closeNavigator }) => {
             );
           })}
         </ContainerComponent.Flex>
-      )}
+      )} */}
 
       <ContainerComponent.GridThreeColumns>
         {navigators.map((navigate, index) => (
@@ -217,7 +217,7 @@ const Navigator = ({ closeNavigator }) => {
           </ContainerComponent.Item>
         ))}
 
-        <ContainerComponent.Item
+        {/* <ContainerComponent.Item
           onClick={() => {
             setDropdown((prev) => !prev);
           }}
@@ -233,7 +233,7 @@ const Navigator = ({ closeNavigator }) => {
               {"QA Manager features"}
             </Icon.Label>
           </ContainerComponent.MiddleInner>
-        </ContainerComponent.Item>
+        </ContainerComponent.Item> */}
       </ContainerComponent.GridThreeColumns>
     </ContainerComponent>
   );
