@@ -24,7 +24,7 @@ export default function GridPreview({ files }) {
             <ContainerComponent.Flex className="post_review__container" style={{ padding: '10px 0' }}>
                 {data.slice(0, 4).map((file, index) => {
                     return <ContainerComponent.Item key={file._id} style={{ flexBasis: '50%', flexGrow: '1', maxHeight: '240px', position: 'relative' }}>
-                        <ContainerComponent.Pane style={{ overflow: 'hidden', border: '1px soli #333' }}>
+                        <ContainerComponent.Pane style={{ overflow: 'hidden', border: '1px soli #333', width: '100%', height: '100%' }}>
                             <Preview.Images image={file.image} alt={"Preview Image"}></Preview.Images>
                             {index > 2 && <ContainerComponent.Inner style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: '100%', height: '100%', background: '#999', opacity: '0.6', color: '#fff', fontWeight: '500', fontSize: '3em' }}>
                                 <Text.AbsoluteMiddle><Text.Center>{data.length - 3}+</Text.Center></Text.AbsoluteMiddle>

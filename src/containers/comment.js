@@ -113,48 +113,16 @@ Comment.Tab = function CommentTab({ ...props }) {
     if (diff.getUTCDate() < 30) return diff.getUTCDate() + " days ago";
     return `${new Date(time).toLocaleString("en-us", { dateStyle: "full" })}`;
   };
-
   const isFirstRender = useRef(true);
-  // const interactRef = useRef(interactPost);
   const addRepliesRef = useRef(getCommentReplies);
   const loadMoreRepliesRef = useRef(loadNextReplies);
   const inputRef = useRef();
-
-  // const [interact, setInteract] = useState({
-  //   liked: !!likedAccounts.find((acc) => acc._id === user.accountId),
-  //   disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
-  //   commentId: _id,
-  // });
   const [openReplyInput, setOpenReply] = useState(false);
   const [openReplyLog, setOpenReplyLog] = useState(false);
-  // const checkedHandler = async (e) => {
-  //   if (e.target.name === "like") {
-  //     setInteract({
-  //       ...interact,
-  //       liked: !interact.liked,
-  //       disliked: interact.disliked && false,
-  //     });
-  //   }
-  //   if (e.target.name === "dislike") {
-  //     setInteract({
-  //       ...interact,
-  //       disliked: !interact.disliked,
-  //       liked: interact.liked && false,
-  //     });
-  //   }
-  // };
 
-  // React.useEffect(() => {
-  //   if (!isFirstRender.current) {
-  //     interactRef.current(props.postId, "rate comment", interact, () => { });
-  //   }
-  // }, [interact]);
   React.useEffect(() => {
     isFirstRender.current = false;
   }, []);
-  // React.useEffect(() => {
-  //   interactRef.current = interactPost;
-  // }, [interactRef]);
   React.useEffect(() => {
     addRepliesRef.current = getCommentReplies;
   }, [getCommentReplies]);
@@ -174,12 +142,7 @@ Comment.Tab = function CommentTab({ ...props }) {
         <ContainerComponent.Item>
           <Text.MiddleLine className="comment__header">
             <Icon.CircleIcon
-              style={{
-                width: "30px",
-                height: "30px",
-                padding: 0,
-              }}
-            >
+              style={{ width: "30px", height: "30px", padding: 0, }}>
               <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
             </Icon.CircleIcon>
           </Text.MiddleLine>
@@ -222,69 +185,10 @@ Comment.Tab = function CommentTab({ ...props }) {
         </Text.MiddleLine>
       </InteractFooter>
       <Text.Line className="comment__reply">
-        {openReplyInput && <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={props.postId} commentId={_id} ></Comment.TabReplyInput>}
+        {openReplyInput && <Comment.TabInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={props.postId} commentId={_id}
+        // forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={rootComment}
+        ></Comment.TabInput>}
       </Text.Line>
-      {/* <Text.Line className="comment__interacts">
-        <Text.MiddleLine className="comment__like">
-          <input
-            type="checkbox"
-            name="like"
-            id={`like - ${_id} `}
-            value={interact.liked}
-            onChange={checkedHandler}
-            style={{ display: "none" }}
-          ></input>
-          <Icon.CircleIcon
-            className="comment__likeIcon"
-            onClick={() => {
-              document.getElementById(`like - ${_id} `).click();
-            }}
-          >
-            <FaThumbsUp
-              stroke="#000"
-              strokeWidth={20}
-              style={{
-                fill: `${interact.liked ? "blue" : "transparent"} `,
-                position: "absolute",
-                top: "50%",
-                transform: "translate(-50%,-50%)",
-                left: "50%",
-              }}
-            />
-          </Icon.CircleIcon>
-          {like}
-        </Text.MiddleLine>
-
-        <Text.MiddleLine className="comment__dislike" style={{ margin: "0 10px" }}>
-          <input
-            type="checkbox"
-            name="dislike"
-            id={`dislike ${_id} `}
-            value={interact.disliked}
-            onChange={checkedHandler}
-            style={{ display: "none" }}
-          ></input>
-          <Icon.CircleIcon
-            className="comment__dislikeIcon"
-            onClick={() => {
-              document.getElementById(`dislike ${_id} `).click();
-            }}
-          >
-            <FaThumbsDown
-              stroke="#000"
-              strokeWidth={20}
-              style={{
-                fill: `${interact.disliked ? "blue" : "transparent"} `,
-                position: "absolute",
-                top: "50%",
-                transform: "translate(-50%,-50%)",
-                left: "50%",
-              }}
-            />
-          </Icon.CircleIcon>
-          {dislike}
-        </Text.MiddleLine>
-      </Text.Line> */}
 
       <ContainerComponent.Pane className="comment__reply">
         {!openReplyLog && <Text.Line onClick={async () => {
@@ -345,7 +249,7 @@ Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, 
       });
     } else {
       postInputRef.current(postId, "reply comment", input, replyId => {
-        sendNotification(notifyData.COMMENT_POST, `/#${replyId}`, commentId);
+        sendNotification(notifyData.REPLY_COMMENT, `/#${replyId}`, postAuthor);
       });
     }
     setInput({
@@ -430,45 +334,13 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
   };
 
   const isFirstRender = useRef(true);
-  // const interactRef = useRef(interactPost);
   const addRepliesRef = useRef(getCommentReplies);
   const inputRef = useRef();
-
-  // const [interact, setInteract] = useState({
-  //   liked: !!likedAccounts.find((acc) => acc._id === user.accountId),
-  //   disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
-  //   commentId: _id,
-  // });
   const [openReplyInput, setOpenReply] = useState(false);
   const [openReplyLog, setOpenReplyLog] = useState(false);
-  // const checkedHandler = async (e) => {
-  //   if (e.target.name === "like") {
-  //     setInteract({
-  //       ...interact,
-  //       liked: !interact.liked,
-  //       disliked: interact.disliked && false,
-  //     });
-  //   }
-  //   if (e.target.name === "dislike") {
-  //     setInteract({
-  //       ...interact,
-  //       disliked: !interact.disliked,
-  //       liked: interact.liked && false,
-  //     });
-  //   }
-  // };
-
-  // React.useEffect(() => {
-  //   if (!isFirstRender.current) {
-  //     interactRef.current(props.postId, "rate comment", interact, () => { });
-  //   }
-  // }, [interact]);
   React.useEffect(() => {
     isFirstRender.current = false;
   }, []);
-  // React.useEffect(() => {
-  //   interactRef.current = interactPost;
-  // }, [interactRef]);
   React.useEffect(() => {
     addRepliesRef.current = getCommentReplies;
   }, [getCommentReplies]);

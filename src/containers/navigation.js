@@ -196,13 +196,13 @@ const AuthStatus = React.memo(function AuthStatus({
         flexWrap: "nowrap",
       }}
     >
-      <ContainerComponent.Item>
+      {/* <ContainerComponent.Item>
         <Icon.CircleIcon>
           <Link to="/portal/message">
             <AiOutlineMessage></AiOutlineMessage>
           </Link>
         </Icon.CircleIcon>
-      </ContainerComponent.Item>
+      </ContainerComponent.Item> */}
       <ContainerComponent.Item>
         <Icon.CircleIcon onClick={turnOffBadge}>
           <Link to="/portal/notification">

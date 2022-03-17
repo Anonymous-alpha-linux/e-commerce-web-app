@@ -2,9 +2,11 @@ import React, { useState, useRef } from "react";
 import { ContainerComponent, Icon, Text, Preview, Dropdown } from "../components";
 import { FaThumbsUp, FaThumbsDown, FaRegEdit, FaEraser } from "react-icons/fa";
 import { IoIosArrowDown } from 'react-icons/io';
+import { HiDownload } from 'react-icons/hi';
 import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
+import { roles } from "../fixtures";
 // import { notifyData, socketTargets } from "../fixtures";
 
 export default function Post({ postHeader, postBody, postFooter }) {
@@ -144,6 +146,18 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 </Text.MiddleLine>
               </Text.Line>
             </Dropdown.Item>
+            {user.role === roles.QA_MANAGER && <Dropdown.Item>
+              <Text.Line>
+                <Text.MiddleLine>
+                  <Icon>
+                    <HiDownload></HiDownload>
+                  </Icon>
+                </Text.MiddleLine>
+                <Text.MiddleLine>
+                  Download
+                </Text.MiddleLine>
+              </Text.Line>
+            </Dropdown.Item>}
           </DropDownButton>
         </Text.RightLine>}
       </ContainerComponent.Pane>

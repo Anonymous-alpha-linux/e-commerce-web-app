@@ -50,9 +50,28 @@ function App() {
                 </ProtectedPage>}>
                 {/* <Route index element={<Workspace></Workspace>} /> */}
                 <Route index element={<DashboardManager></DashboardManager>} />
+                <Route path="/workspace" element={<Workspace></Workspace>} />
                 <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
                 <Route path="/management/member" element={<ListMember></ListMember>} />
                 <Route path="/management/staff" element={<StaffCRUD></StaffCRUD>} />
+                <Route path="profile" element={<Profile></Profile>}>
+                  <Route path="personal" element={<Personal></Personal>} />
+                  <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
+                </Route>
+                <Route path="history" element={<MyPost></MyPost>} />
+                <Route path="q&a" element={<QA></QA>}></Route>
+                <Route path="portal/" element={<Portal></Portal>}>
+                  <Route path="idea" element={<PostModal />} >
+                  </Route>
+                  <Route path="idea/:id" element={<PostModal />} >
+                  </Route>
+                  <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
+                  <Route path="message" element={<MessageContainer></MessageContainer>}>
+                    <Route path=":id" element={<MessageBox></MessageBox>}></Route>
+                  </Route>
+                  <Route path="search" element={<Searchbar></Searchbar>} />
+                  <Route path="addgroup" element={<AddGroupContainer></AddGroupContainer>} />
+                </Route>
               </Route>) ||
               // 3. QA coordinator
               (user.role === roles.QA_COORDINATOR && <Route path=""
@@ -61,14 +80,13 @@ function App() {
                 </ProtectedPage>}>
                 <Route index element={<Workspace></Workspace>} />
                 <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
+
               </Route>) ||
               // 4. Staff
               (user.role === roles.STAFF &&
-                <Route
-                  path=""
-                  element={<ProtectedPage authorized={[roles.STAFF]}>
-                    <Staff></Staff>
-                  </ProtectedPage>}>
+                <Route path="" element={<ProtectedPage authorized={[roles.STAFF]}>
+                  <Staff></Staff>
+                </ProtectedPage>}>
                   <Route index element={<Workspace></Workspace>}></Route>
                   <Route path="profile" element={<Profile></Profile>}>
                     <Route path="personal" element={<Personal></Personal>} />
