@@ -54,7 +54,7 @@ export default React.memo(function WorkspaceContext({ children }) {
       })
       .then((res) => {
         const index = Number(localStorage.getItem("workspace")) || 0;
-        console.log(res.data);
+
         setWorkspace({
           type: actions.GET_WORKSPACE_LIST,
           payload: res.data.response,

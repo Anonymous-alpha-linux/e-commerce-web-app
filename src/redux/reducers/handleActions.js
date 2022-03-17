@@ -1,5 +1,3 @@
-import { calculateNewValue } from "@testing-library/user-event/dist/utils";
-
 export default class ActionHandler {
     constructor(state, action) {
         this.state = state;

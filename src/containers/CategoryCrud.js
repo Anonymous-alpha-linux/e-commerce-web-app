@@ -17,21 +17,8 @@ export default function Crud() {
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-
-<<<<<<< HEAD
-=======
-  // const createRef = useRef(function () {
-  //   let response = { _id: Math.random(), name: "" };
-  // });
-  // const removeRef = useRef(function () {});
-
->>>>>>> c176be26a1d87167f63f4c10fffc944f887c88bf
-  //Testing WS
   const { workspaces } = useWorkspaceContext();
-  console.log(workspaces, "WS");
-
   const [modalWS, setModalWS] = useState(false);
-
   const [dataRecords, setDataRecords] = useState([]);
   // console.log("re-render crud", categories);
 
@@ -46,9 +33,9 @@ export default function Crud() {
   function deleteCate(e, id) {
     e.preventDefault();
     console.log(id);
-    HandleDelete(id);
+    handleDelete(id);
   }
-  function HandleDelete(commentId) {
+  function handleDelete(commentId) {
     return axios
       .delete(API, {
         headers: {
@@ -118,25 +105,25 @@ export default function Crud() {
           <tbody>
             {searchInput !== ""
               ? filteredResults.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))
+                <CategoryData
+                  key={index}
+                  data={category}
+                  index={index}
+                  deleteCate={deleteCate}
+                />
+              ))
               : dataRecords.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))}
-            {categories && !categories.length && (
+                <CategoryData
+                  key={index}
+                  data={category}
+                  index={index}
+                  deleteCate={deleteCate}
+                />
+              ))}
+            {!categories?.length && (
               <tr>
                 <td>
-                  <h2>No Coategry</h2>
+                  <h2>No Category</h2>
                 </td>
                 <td>
                   <h2>Empty</h2>
@@ -146,15 +133,13 @@ export default function Crud() {
           </tbody>
         </table>
 
-        {searchInput === "" && (
-          <Pagination
-            className="pagination-bar"
-            currentPage={currentPage}
-            totalCount={categories.length}
-            pageSize={PageSize}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
-        )}
+        <Pagination
+          className="pagination-bar"
+          currentPage={currentPage}
+          totalCount={categories.length}
+          pageSize={PageSize}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
       <div className="c-modal__container">
         {workspaces &&
@@ -246,7 +231,6 @@ function ModalAddFormCategory({ setModal, modal }) {
     </div>
   );
 }
-
 function CategoryData({ data, deleteCate, index }) {
   return (
     <tr key={index}>

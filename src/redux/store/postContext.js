@@ -40,7 +40,7 @@ const categoryReducer = (state, action) => {
         isUpdated: true,
       };
     case actions.ADD_CATEGORY:
-      console.log(action.payload);
+
       return {
         ...state,
         categories: [...state.categories, action.payload],
@@ -67,9 +67,6 @@ export default React.memo(function PostContext({ children }) {
     categoryReducer,
     initialCategories
   );
-  useEffect(() => {
-    console.log("new categories has updated", categoryState);
-  }, [categoryState.categories]);
   const [showUpdate, setShowUpdate] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -150,7 +147,7 @@ export default React.memo(function PostContext({ children }) {
           filter: filter,
         });
       })
-      .then((success) => {})
+      .then((success) => { })
       .catch((error) => {
         setPost({
           type: actions.SET_OFF_LOADING,
@@ -288,7 +285,7 @@ export default React.memo(function PostContext({ children }) {
     });
     // Check if the postIdea options are pass with edit copyright
     if (options?.isEdit) {
-      return editIdea(input, cb, options);
+      return editIdea(input, formData, cb, options);
     }
     return axios
       .post(postAPI, formData, {
@@ -298,7 +295,7 @@ export default React.memo(function PostContext({ children }) {
         },
         params: {
           view: "post",
-          postid: input.postid,
+          // postid: input.postid,
         },
       })
       .then((res) => {
@@ -310,25 +307,25 @@ export default React.memo(function PostContext({ children }) {
         setError(err.message);
       });
   }
-  function editIdea(input, cb, options) {
+  function editIdea(input, formData, cb, options) {
     // Create form submission for post and upload files
-    const formData = new FormData();
+    // const formData = new FormData();
     // Deflat input file to single file array for appending to formdata for uploading
-    input.files
-      .reduce((p, c) => [...p, c.file], [])
-      .forEach((file) => {
-        formData.append("files", file);
-      });
+    // input.files
+    // .reduce((p, c) => [...p, c.file], [])
+    // .forEach((file) => {
+    //   formData.append("files", file);
+    // });
     // Append post body to form data
-    Object.keys(input).forEach((key) => {
-      if (Array.isArray(input[key])) {
-        input[key].forEach((item) => {
-          formData.append(key, item);
-        });
-        return;
-      }
-      formData.append(key, input[key]);
-    });
+    // Object.keys(input).forEach((key) => {
+    //   if (Array.isArray(input[key])) {
+    //     input[key].forEach((item) => {
+    //       formData.append(key, item);
+    //     });
+    //     return;
+    //   }
+    //   formData.append(key, input[key]);
+    // });
     return axios
       .put(postAPI, formData, {
         headers: {
@@ -341,8 +338,9 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        console.log(res.data.response);
+        updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
-        return updateSinglePost(res.data.response[0]._id);
       })
       .catch((error) => setError(error.message));
   }
@@ -628,8 +626,8 @@ export default React.memo(function PostContext({ children }) {
         return setPost({
           type: actions.UPDATE_POST_COMMENT,
           payload: res.data.response,
-          postid: postId,
-          commentid: commentId,
+          postId: postId,
+          commentId: commentId,
         });
       })
       .then((success) => {
@@ -701,7 +699,7 @@ export default React.memo(function PostContext({ children }) {
     const replyPage = postState.posts
       .find((post) => post._id === postId)
       .comments.find((comment) => comment._id === commentId).page;
-    console.log(replyPage);
+
     return axios
       .get(postAPI, {
         headers: {
@@ -715,7 +713,7 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data);
+
         setPost({
           type: actions.LOAD_MORE_COMMENT_REPLIES,
           payload: res.data.response,
@@ -741,8 +739,36 @@ export default React.memo(function PostContext({ children }) {
       addCommentReply(postId, commentId, replyId);
     });
   }
-  function updateCommentReplies(postId, commentId, cb) {
-    return;
+  function updateCommentReply(postId, commentId, replyId, cb) {
+    return axios
+      .get(postAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "singlecomment",
+          postid: postId,
+          commentid: replyId,
+        },
+      })
+      .then((res) => {
+        return setPost({
+          type: actions.UPDATE_COMMENT_REPLY,
+          payload: res.data.response,
+          postId: postId,
+          commentId: commentId,
+          replyId: replyId
+        });
+      })
+      .then((success) => {
+        cb();
+      })
+      .catch((error) => {
+        setPost({
+          type: actions.SET_OFF_LOADING,
+        });
+        setError(error.message);
+      });
   }
   function addCommentReply(postId, commentId, replyId, cb) {
     return axios
@@ -756,7 +782,7 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data.response);
+
         setPost({
           type: actions.ADD_COMMENT_REPLY,
           payload: [res.data.response],
@@ -904,7 +930,7 @@ export default React.memo(function PostContext({ children }) {
           }
         )
         .then((res) => {
-          return updateSingleComment(postId, input.commentId, cb);
+          updateSingleComment(postId, input.commentId, cb);
         })
         .catch((error) => {
           setError(error.message);
@@ -930,12 +956,36 @@ export default React.memo(function PostContext({ children }) {
           }
         )
         .then((res) => {
-          console.log(res.data.response);
           const replyId = res.data.response._id;
-          addCommentReply(postId, input.commentid, replyId, () => {});
+          addCommentReply(postId, input.commentid, replyId, () => { });
           const data = { postId, commentId: input.commentid, replyId };
           sendRealtimeCommentReply(postId, data.commentId, replyId);
           cb(data);
+        })
+        .catch((error) => {
+          setError(error.message);
+        });
+    } else if (type === "rate reply") {
+      return axios
+        .put(
+          postAPI,
+          {
+            isLiked: input.liked,
+            isDisliked: input.disliked,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+            params: {
+              view: "comment",
+              commentid: input.replyId,
+              interact: "rate",
+            },
+          }
+        )
+        .then((res) => {
+          updateCommentReply(postId, input.commentId, input.replyId, cb);
         })
         .catch((error) => {
           setError(error.message);
@@ -1010,7 +1060,7 @@ export default React.memo(function PostContext({ children }) {
       .then((data) => cb(data))
       .catch((error) => setError(error.message));
   }
-  function getGzipFile() {}
+  function getGzipFile() { }
   // 9. Category
   function getNewCategory(data) {
     setCategory({

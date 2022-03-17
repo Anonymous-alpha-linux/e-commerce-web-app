@@ -9,7 +9,6 @@ import {
 } from "../components";
 import { ConditionContainer, UploadForm } from ".";
 import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
-import { mainAPI } from "../config";
 import { notifyData, socketTargets } from '../fixtures';
 
 import { Loading } from "../pages";
@@ -62,7 +61,6 @@ export default function PostModal() {
         e.preventDefault();
         setLoading(true);
         postIdea(input, postId => {
-            console.log(postId);
             setLoading(false);
             navigate("/");
         }, {

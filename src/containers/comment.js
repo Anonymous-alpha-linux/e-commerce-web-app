@@ -1,11 +1,9 @@
 import React, { useRef, useState } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
-import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components";
-import { useAuthorizationContext, useNotifyContext, usePostContext, useWorkspaceContext, } from "../redux";
+import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components"; import { useAuthorizationContext, useNotifyContext, usePostContext, useWorkspaceContext, } from "../redux";
 import { notifyData, socketTargets } from '../fixtures'
-import { TriggerLoading } from ".";
-
+import { InteractFooter, TriggerLoading } from ".";
 export default function Comment({ postAuthor, postId, commentLogs }) {
   const { workspace } = useWorkspaceContext();
   const { posts, loadNextComments, filterPostComment } = usePostContext();
@@ -117,46 +115,46 @@ Comment.Tab = function CommentTab({ ...props }) {
   };
 
   const isFirstRender = useRef(true);
-  const interactRef = useRef(interactPost);
+  // const interactRef = useRef(interactPost);
   const addRepliesRef = useRef(getCommentReplies);
   const loadMoreRepliesRef = useRef(loadNextReplies);
   const inputRef = useRef();
 
-  const [interact, setInteract] = useState({
-    liked: !!likedAccounts.find((acc) => acc._id === user.accountId),
-    disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
-    commentId: _id,
-  });
+  // const [interact, setInteract] = useState({
+  //   liked: !!likedAccounts.find((acc) => acc._id === user.accountId),
+  //   disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
+  //   commentId: _id,
+  // });
   const [openReplyInput, setOpenReply] = useState(false);
   const [openReplyLog, setOpenReplyLog] = useState(false);
-  const checkedHandler = async (e) => {
-    if (e.target.name === "like") {
-      setInteract({
-        ...interact,
-        liked: !interact.liked,
-        disliked: interact.disliked && false,
-      });
-    }
-    if (e.target.name === "dislike") {
-      setInteract({
-        ...interact,
-        disliked: !interact.disliked,
-        liked: interact.liked && false,
-      });
-    }
-  };
+  // const checkedHandler = async (e) => {
+  //   if (e.target.name === "like") {
+  //     setInteract({
+  //       ...interact,
+  //       liked: !interact.liked,
+  //       disliked: interact.disliked && false,
+  //     });
+  //   }
+  //   if (e.target.name === "dislike") {
+  //     setInteract({
+  //       ...interact,
+  //       disliked: !interact.disliked,
+  //       liked: interact.liked && false,
+  //     });
+  //   }
+  // };
 
-  React.useEffect(() => {
-    if (!isFirstRender.current) {
-      interactRef.current(props.postId, "rate comment", interact, () => { });
-    }
-  }, [interact]);
+  // React.useEffect(() => {
+  //   if (!isFirstRender.current) {
+  //     interactRef.current(props.postId, "rate comment", interact, () => { });
+  //   }
+  // }, [interact]);
   React.useEffect(() => {
     isFirstRender.current = false;
   }, []);
-  React.useEffect(() => {
-    interactRef.current = interactPost;
-  }, [interactRef]);
+  // React.useEffect(() => {
+  //   interactRef.current = interactPost;
+  // }, [interactRef]);
   React.useEffect(() => {
     addRepliesRef.current = getCommentReplies;
   }, [getCommentReplies]);
@@ -172,37 +170,61 @@ Comment.Tab = function CommentTab({ ...props }) {
   return (
     <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', border: '1px solid #000', margin: '12px 0', padding: '10px' }} onMouseLeave={() => setOpenReply(false)}>
 
-      <Text.MiddleLine className="comment__header">
-        <Icon.CircleIcon
-          style={{
-            width: "30px",
-            height: "30px",
-            padding: 0,
-          }}
-        >
-          <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
-        </Icon.CircleIcon>
-      </Text.MiddleLine>
+      <ContainerComponent.Flex style={{ flexWrap: 'nowrap' }}>
+        <ContainerComponent.Item>
+          <Text.MiddleLine className="comment__header">
+            <Icon.CircleIcon
+              style={{
+                width: "30px",
+                height: "30px",
+                padding: 0,
+              }}
+            >
+              <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
+            </Icon.CircleIcon>
+          </Text.MiddleLine>
+        </ContainerComponent.Item>
+        <ContainerComponent.Item>
+          <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
+            <Text.MiddleLine>
+              <Text.Bold style={{ margin: 0 }}>
+                <Text>{!hideAuthor ? username : "Anonymous"}</Text>
+              </Text.Bold>
+            </Text.MiddleLine>
 
-      <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
-        <Text.MiddleLine>
-          <Text.Bold style={{ margin: 0 }}>
-            <Text>{!hideAuthor ? username : "Anonymous"}</Text>
-          </Text.Bold>
+            <Text.MiddleLine>
+              <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
+            </Text.MiddleLine>
+
+            <Text.Line>
+              <Text.Paragraph style={{ margin: "8px 0" }}>
+                {body}
+              </Text.Paragraph>
+            </Text.Line>
+          </Text.MiddleLine>
+        </ContainerComponent.Item>
+      </ContainerComponent.Flex>
+
+      <InteractFooter className="comment__interacts" interactLoader={(interact) => interactPost(props.postId, "rate comment", interact, () => { })} entity={{ commentId: _id }}  {...props.comment}>
+        <Text.MiddleLine className="comment__replyBtn"
+          onClick={() => {
+            setOpenReply(!openReplyInput);
+            if (openReplyInput) {
+              document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
+              });
+            }
+            else {
+              document.getElementById(`comment__tab-${_id}`).removeEventListener('mouseenter', () => {
+              });
+            }
+          }}>
+          Reply ({reply})
         </Text.MiddleLine>
-
-        <Text.MiddleLine>
-          <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
-        </Text.MiddleLine>
-
-        <Text.Line>
-          <Text.Paragraph style={{ margin: "8px 0" }}>
-            {body}
-          </Text.Paragraph>
-        </Text.Line>
-      </Text.MiddleLine>
-
-      <Text.Line className="comment__interacts">
+      </InteractFooter>
+      <Text.Line className="comment__reply">
+        {openReplyInput && <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={props.postId} commentId={_id} ></Comment.TabReplyInput>}
+      </Text.Line>
+      {/* <Text.Line className="comment__interacts">
         <Text.MiddleLine className="comment__like">
           <input
             type="checkbox"
@@ -262,27 +284,7 @@ Comment.Tab = function CommentTab({ ...props }) {
           </Icon.CircleIcon>
           {dislike}
         </Text.MiddleLine>
-
-        <Text.MiddleLine className="comment__replyBtn"
-          onClick={() => {
-            setOpenReply(!openReplyInput);
-            if (openReplyInput) {
-              document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
-              });
-            }
-            else {
-              document.getElementById(`comment__tab-${_id}`).removeEventListener('mouseenter', () => {
-              });
-            }
-          }}>
-          Reply ({reply})
-        </Text.MiddleLine>
-        <Text.Line className="comment__reply">
-          {openReplyInput &&
-            <Comment.TabInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={props.postId} commentId={_id} ></Comment.TabInput>
-          }
-        </Text.Line>
-      </Text.Line>
+      </Text.Line> */}
 
       <ContainerComponent.Pane className="comment__reply">
         {!openReplyLog && <Text.Line onClick={async () => {
@@ -290,14 +292,12 @@ Comment.Tab = function CommentTab({ ...props }) {
             setOpenReplyLog(true);
           });
         }}>
-          {reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle> || <></>}
-        </Text.Line>
-          ||
-          <TriggerLoading loader={() => loadMoreRepliesRef.current(props.postId, _id, () => { })}
-            loadMore={loadMore}>
+          {!!reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle>}
+        </Text.Line> || <TriggerLoading loader={() => loadMoreRepliesRef.current(props.postId, _id, () => { })} loadMore={loadMore}>
             <ContainerComponent className="comment-reply__log">
               {replies.map(reply => {
                 return <Comment.ReplyTab
+                  rootComment={_id}
                   comment={reply}
                   key={reply._id}
                   postId={props.postId}>
@@ -413,8 +413,7 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
     account: { username, profileImage },
     loadMore,
   } = props.comment;
-  console.log(props);
-  const { postId } = props;
+  const { rootComment, postId } = props;
 
   const parseTime = (time) => {
     const now = new Date(Date.now());
@@ -431,45 +430,45 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
   };
 
   const isFirstRender = useRef(true);
-  const interactRef = useRef(interactPost);
+  // const interactRef = useRef(interactPost);
   const addRepliesRef = useRef(getCommentReplies);
   const inputRef = useRef();
 
-  const [interact, setInteract] = useState({
-    liked: !!likedAccounts.find((acc) => acc._id === user.accountId),
-    disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
-    commentId: _id,
-  });
+  // const [interact, setInteract] = useState({
+  //   liked: !!likedAccounts.find((acc) => acc._id === user.accountId),
+  //   disliked: !!dislikedAccounts.find((acc) => acc._id === user.accountId),
+  //   commentId: _id,
+  // });
   const [openReplyInput, setOpenReply] = useState(false);
   const [openReplyLog, setOpenReplyLog] = useState(false);
-  const checkedHandler = async (e) => {
-    if (e.target.name === "like") {
-      setInteract({
-        ...interact,
-        liked: !interact.liked,
-        disliked: interact.disliked && false,
-      });
-    }
-    if (e.target.name === "dislike") {
-      setInteract({
-        ...interact,
-        disliked: !interact.disliked,
-        liked: interact.liked && false,
-      });
-    }
-  };
+  // const checkedHandler = async (e) => {
+  //   if (e.target.name === "like") {
+  //     setInteract({
+  //       ...interact,
+  //       liked: !interact.liked,
+  //       disliked: interact.disliked && false,
+  //     });
+  //   }
+  //   if (e.target.name === "dislike") {
+  //     setInteract({
+  //       ...interact,
+  //       disliked: !interact.disliked,
+  //       liked: interact.liked && false,
+  //     });
+  //   }
+  // };
 
-  React.useEffect(() => {
-    if (!isFirstRender.current) {
-      interactRef.current(props.postId, "rate comment", interact, () => { });
-    }
-  }, [interact]);
+  // React.useEffect(() => {
+  //   if (!isFirstRender.current) {
+  //     interactRef.current(props.postId, "rate comment", interact, () => { });
+  //   }
+  // }, [interact]);
   React.useEffect(() => {
     isFirstRender.current = false;
   }, []);
-  React.useEffect(() => {
-    interactRef.current = interactPost;
-  }, [interactRef]);
+  // React.useEffect(() => {
+  //   interactRef.current = interactPost;
+  // }, [interactRef]);
   React.useEffect(() => {
     addRepliesRef.current = getCommentReplies;
   }, [getCommentReplies]);
@@ -481,32 +480,57 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
 
   return (
     <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', margin: '12px 0', padding: '10px 10px' }} onMouseLeave={() => setOpenReply(false)}>
+      <ContainerComponent.Flex style={{ flexWrap: 'nowrap' }}>
+        <ContainerComponent.Item>
+          <Text.MiddleLine className="comment__header">
+            <Icon.CircleIcon style={{ width: "30px", height: "30px", padding: 0, }}>
+              <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
+            </Icon.CircleIcon>
+          </Text.MiddleLine>
+        </ContainerComponent.Item>
+        <ContainerComponent.Item>
+          <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
+            <Text.MiddleLine>
+              <Text.Bold style={{ margin: 0 }}>
+                <Text>{!hideAuthor ? username : "Anonymous"}</Text>
+              </Text.Bold>
+            </Text.MiddleLine>
 
-      <Text.MiddleLine className="comment__header">
-        <Icon.CircleIcon style={{ width: "30px", height: "30px", padding: 0, }}>
-          <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
-        </Icon.CircleIcon>
-      </Text.MiddleLine>
+            <Text.MiddleLine>
+              <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
+            </Text.MiddleLine>
 
-      <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
-        <Text.MiddleLine>
-          <Text.Bold style={{ margin: 0 }}>
-            <Text>{!hideAuthor ? username : "Anonymous"}</Text>
-          </Text.Bold>
+            <Text.Line>
+              <Text.Paragraph style={{ margin: "8px 0" }}>
+                {body}
+              </Text.Paragraph>
+            </Text.Line>
+          </Text.MiddleLine>
+        </ContainerComponent.Item>
+      </ContainerComponent.Flex>
+
+      <InteractFooter className="comment__interacts" interactLoader={(interact) => interactPost(props.postId, "rate reply", interact, () => { })} entity={{ commentId: rootComment, replyId: _id }}  {...props.comment}>
+        <Text.MiddleLine className="comment__replyBtn"
+          onClick={() => {
+            setOpenReply(!openReplyInput);
+            if (openReplyInput) {
+              document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
+              });
+            }
+            else {
+              document.getElementById(`comment__tab-${_id}`).removeEventListener('mouseenter', () => {
+              });
+            }
+          }}>
+          Reply
         </Text.MiddleLine>
-
-        <Text.MiddleLine>
-          <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
-        </Text.MiddleLine>
-
-        <Text.Line>
-          <Text.Paragraph style={{ margin: "8px 0" }}>
-            {body}
-          </Text.Paragraph>
-        </Text.Line>
-      </Text.MiddleLine>
-
-      <Text.Line className="comment__interacts">
+      </InteractFooter>
+      <Text.Line>
+        {openReplyInput &&
+          <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={rootComment}></Comment.TabReplyInput>
+        }
+      </Text.Line>
+      {/* <Text.Line className="comment__interacts">
         <Text.MiddleLine className="comment__like">
           <input type="checkbox" name="like" id={`like - ${_id} `} value={interact.liked} onChange={checkedHandler} style={{ display: "none" }}></input>
           <Icon.CircleIcon className="comment__likeIcon" onClick={() => { document.getElementById(`like - ${_id} `).click(); }}>
@@ -540,30 +564,27 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
               });
             }
           }}>
-          Reply ({reply})
+          Reply
         </Text.MiddleLine>
 
-        <Text.Line className="comment__reply">
+        <Text.Line>
           {openReplyInput &&
-            <Comment.TabReply forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={_id}></Comment.TabReply>
+            <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={rootComment}></Comment.TabReplyInput>
           }
         </Text.Line>
-      </Text.Line>
+      </Text.Line> */}
 
       <ContainerComponent.Pane className="comment__container">
         {!openReplyLog && <Text.Line onClick={async () => {
-          await addRepliesRef.current(postId, _id, () => {
+          addRepliesRef.current(postId, rootComment, () => {
             setOpenReplyLog(false);
           });
         }}>
-          {reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle> || <></>}
-        </Text.Line>
-          ||
-          <TriggerLoading loader={() => getCommentReplies(postId, _id, () => { })}
-            loadMore={replies.length < reply}>
+          {/* {reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle> || <></>} */}
+        </Text.Line> || <TriggerLoading loader={() => getCommentReplies(postId, _id, () => { })}
+          loadMore={replies.length < reply}>
             <ContainerComponent className="comment-reply__log">
               {replies.map(comment => {
-                console.log(comment)
                 return <Comment.Tab
                   comment={comment}
                   key={comment._id}
@@ -573,6 +594,7 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
             </ContainerComponent>
           </TriggerLoading>}
       </ContainerComponent.Pane>
+
     </ContainerComponent.Pane>
   );
 }
@@ -608,18 +630,19 @@ Comment.TabReplyInput = function TabReplyInput({ forwardedRef, preReply = "", cl
     e.preventDefault();
     if (!commentId) {
       postInputRef.current(postId, "comment", input, commentId => {
-        sendNotification(notifyData.COMMENT_POST, `/#${commentId}`, postAuthor);
+        sendNotification(notifyData.REPLY_COMMENT, `/#${commentId}`, postAuthor);
       });
     } else {
       postInputRef.current(postId, "reply comment", input, replyId => {
         sendNotification(notifyData.COMMENT_POST, `/#${replyId}`, commentId);
       });
     }
-    setInput({
-      pre: "",
-      content: "",
-      private: false,
-    });
+    closeReply();
+    // setInput({
+    //   pre: "",
+    //   content: "",
+    //   private: false,
+    // });
   };
 
   return (

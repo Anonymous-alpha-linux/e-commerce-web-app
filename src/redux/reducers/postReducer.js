@@ -33,14 +33,13 @@ const postReducer = (state, action) => {
     case actions.FILTER_POST_LIST:
       return actionHandler.filterListItem('posts', action.payload, { postLoading: false });
     case actions.PUSH_IDEA:
-      console.log(action.payload);
       return actionHandler.unshiftItem('posts', action.payload, actionHandler.unshiftItem('myPosts', action.payload, state));
     case actions.UPDATE_SINGLE_POST:
       return actionHandler.updateItem('myPosts', post => {
-        if (post._id === action.postId) return action.payload;
+        if (post._id === action.postId) return { ...post, ...action.payload };
         return post;
       }, actionHandler.updateItem('posts', post => {
-        if (post._id === action.postId) return action.payload;
+        if (post._id === action.postId) return { ...post, ...action.payload };
         return post;
       }, state));
     case actions.REMOVE_SINGLE_POST:
@@ -131,6 +130,7 @@ const postReducer = (state, action) => {
         return post;
       }, state));
 
+
     case actions.GET_MY_POST:
       return {
         ...state,
@@ -201,13 +201,10 @@ const postReducer = (state, action) => {
         }),
       };
     case actions.FILTER_POST_COMMENT:
-      console.log(state.posts);
       return {
         ...state,
         posts: state.posts.map(post => {
           if (post._id === action.postid) {
-            console.log('filter post comment');
-            console.log(action, post);
             return {
               ...post,
               comments: action.payload,
@@ -232,43 +229,15 @@ const postReducer = (state, action) => {
         })
       };
     case actions.UPDATE_POST_COMMENT:
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    ...action.payload
-                  }
-                }
-                return comment;
-              })
-            }
-          }
+      return actionHandler.updateItem("posts",
+        post => {
+          if (post._id === action.postId) return actionHandler.updateItem("comments", comment => comment._id === action.commentId ? { ...comment, ...action.payload } : comment, post);
           return post;
-        }),
-        myPosts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    ...action.payload
-                  }
-                }
-                return comment;
-              })
-            }
-          }
-          return post;
-        }),
-      };
+        }, actionHandler.updateItem("myPosts",
+          post => {
+            if (post._id === action.postId) return actionHandler.updateItem("comments", comment => comment._id === action.commentId ? { ...comment, ...action.payload } : comment, post);
+            return post;
+          }, state));
     case actions.CREATE_POST_COMMENT:
       return actionHandler.updateItem("posts", post => {
         if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, { ...post, comment: post.comment + 1 });
@@ -277,6 +246,7 @@ const postReducer = (state, action) => {
         if (post._id === action.postId) return actionHandler.unshiftItem("comments", action.payload, { ...post, comment: post.comment + 1 });
         return post;
       }, state));
+
 
     case actions.GET_COMMENT_REPLIES:
       return actionHandler.updateItem("posts", post => {
@@ -293,34 +263,27 @@ const postReducer = (state, action) => {
         return post;
       }, state));
     case actions.UPDATE_COMMENT_REPLY:
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    replies: comment.replies.map(reply => {
-                      if (reply._id === action.payload._id) {
-                        return {
-                          ...reply,
-                          ...action.payload
-                        }
-                      }
-                      return reply;
-                    })
-                  }
-                }
-                return comment;
-              })
-            }
-          }
+      return actionHandler.updateItem("posts",
+        post => {
+          if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+            if (comment._id === action.commentId) return actionHandler.updateItem("replies", reply => {
+              if (reply._id === action.replyId) return { ...reply, ...action.payload };
+              return reply;
+            }, comment);
+            return comment
+          }, post);
           return post;
-        })
-      };
+        }, actionHandler.updateItem("myPosts",
+          post => {
+            if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
+              if (comment._id === action.commentId) return actionHandler.updateItem("replies", reply => {
+                if (reply._id === action.replyId) return { ...reply, ...action.payload };
+                return reply;
+              }, comment);
+              return comment
+            }, post);
+            return post;
+          }, state));
     case actions.LOAD_MORE_COMMENT_REPLIES:
       return actionHandler.updateItem("posts", post => {
         if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
@@ -343,7 +306,7 @@ const postReducer = (state, action) => {
       */
       return actionHandler.updateItem("posts", post => {
         if (post._id === action.postId) return actionHandler.updateItem("comments", comment => {
-          if (comment._id === action.commentId) { console.log(comment.replies, action.payload); return actionHandler.unshiftItem("replies", action.payload, { ...comment, reply: comment.reply + 1 }); }
+          if (comment._id === action.commentId) { return actionHandler.pushItem("replies", action.payload, { ...comment, reply: comment.reply + 1 }); }
           return comment;
         }, post)
         return post;
@@ -354,35 +317,35 @@ const postReducer = (state, action) => {
         }, post)
         return post;
       }, state));
-    case actions.UPDATE_COMMENT_REPLY:
-      return {
-        ...state,
-        posts: state.posts.map(post => {
-          if (post._id === action.postid) {
-            return {
-              ...post,
-              comments: post.comments.map(comment => {
-                if (comment._id === action.commentid) {
-                  return {
-                    ...comment,
-                    replies: comment.replies.map(reply => {
-                      if (reply._id === action.payload._id) {
-                        return {
-                          ...reply,
-                          ...action.payload
-                        }
-                      }
-                      return reply;
-                    })
-                  }
-                }
-                return comment;
-              })
-            }
-          }
-          return post;
-        })
-      };
+    // case actions.UPDATE_COMMENT_REPLY:
+    //   return {
+    //     ...state,
+    //     posts: state.posts.map(post => {
+    //       if (post._id === action.postid) {
+    //         return {
+    //           ...post,
+    //           comments: post.comments.map(comment => {
+    //             if (comment._id === action.commentid) {
+    //               return {
+    //                 ...comment,
+    //                 replies: comment.replies.map(reply => {
+    //                   if (reply._id === action.payload._id) {
+    //                     return {
+    //                       ...reply,
+    //                       ...action.payload
+    //                     }
+    //                   }
+    //                   return reply;
+    //                 })
+    //               }
+    //             }
+    //             return comment;
+    //           })
+    //         }
+    //       }
+    //       return post;
+    //     })
+    //   };
 
     case actions.SET_LOADING:
       return {

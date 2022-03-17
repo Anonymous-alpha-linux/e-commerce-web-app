@@ -5,7 +5,7 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
-import { notifyData, socketTargets } from "../fixtures";
+// import { notifyData, socketTargets } from "../fixtures";
 
 export default function Post({ postHeader, postBody, postFooter }) {
   const interactTypes = {
@@ -77,10 +77,8 @@ export default function Post({ postHeader, postBody, postFooter }) {
   }, [getPostComments])
   React.useEffect(() => {
     if (!isFirstRender.current) {
-      // interactRef.current(postHeader.id, 'rate', interact, () => {
-      // });
       interactPost(postHeader.id, type, interact, commentId => {
-        console.log(commentId);
+        // console.log(commentId);
       });
     }
   }, [interact]);

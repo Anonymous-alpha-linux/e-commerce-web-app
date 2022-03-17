@@ -20,10 +20,6 @@ const Pagination = (props) => {
     pageSize,
   });
 
-  if (currentPage === 0 || paginationRange.length < 2) {
-    return null;
-  }
-
   const onNext = () => {
     onPageChange(currentPage + 1);
   };
@@ -33,6 +29,9 @@ const Pagination = (props) => {
   };
 
   let lastPage = paginationRange[paginationRange.length - 1];
+  if (currentPage === 0 || paginationRange.length < 2) {
+    return null;
+  }
   return (
     <ul
       className={classnames("pagination-container", { [className]: className })}

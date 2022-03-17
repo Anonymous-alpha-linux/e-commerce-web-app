@@ -31,3 +31,4 @@ export { default as TriggerLoading } from "./triggerLoading";
 export { default as Crud } from "./CategoryCrud";
 export { default as AddFromWorkspace } from "./AddFromWS";
 export { default as Toast } from "./toast";
+export { default as InteractFooter } from './interaction';
