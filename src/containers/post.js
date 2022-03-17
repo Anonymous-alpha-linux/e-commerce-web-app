@@ -118,22 +118,24 @@ export default function Post({ postHeader, postBody, postFooter }) {
             }}>{parseTime(postHeader.date)}</Text.Date>
           </ContainerComponent.Flex>
         </ContainerComponent.InlineGroup>
-        {user.accountId === postHeader.postAuthor && <Text.RightLine>
+        {(user.accountId === postHeader.postAuthor || [roles.QA_COORDINATOR, roles.QA_MANAGER].includes(user.role)) && <Text.RightLine>
           <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
-            <Dropdown.Item>
-              <Link to={`/portal/idea/${postHeader.id}`}>
-                <Text.Line>
-                  <Text.MiddleLine>
-                    <Icon>
-                      <FaRegEdit></FaRegEdit>
-                    </Icon>
-                  </Text.MiddleLine>
-                  <Text.MiddleLine>
-                    Edit
-                  </Text.MiddleLine>
-                </Text.Line>
-              </Link>
-            </Dropdown.Item>
+            {postHeader.postAuthor === user.accountId &&
+              <Dropdown.Item>
+                <Link to={`/portal/idea/${postHeader.id}`}>
+                  <Text.Line>
+                    <Text.MiddleLine>
+                      <Icon>
+                        <FaRegEdit></FaRegEdit>
+                      </Icon>
+                    </Text.MiddleLine>
+                    <Text.MiddleLine>
+                      Edit
+                    </Text.MiddleLine>
+                  </Text.Line>
+                </Link>
+              </Dropdown.Item>
+            }
             <Dropdown.Item>
               <Text.Line onClick={() => deleteSinglePost(postHeader.id)}>
                 <Text.MiddleLine>
