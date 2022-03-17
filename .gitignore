@@ -20,8 +20,9 @@ package-lock.json
 .env.test.local
 .env.production.local
 
+.env*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock*
+ypackage-lock.json
+arn.lock*

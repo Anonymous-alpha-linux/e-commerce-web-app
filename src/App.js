@@ -16,7 +16,7 @@ import {
   StaffCRUD
 } from './pages';
 
-import { AddGroupContainer, ManagerInfo, MessageContainer, NotificationContainer, Personal, PostModal, Searchbar } from "./containers";
+import { AddGroupContainer, DashboardHeader, ManagerInfo, MessageContainer, NotificationContainer, Personal, PostModal, Searchbar } from "./containers";
 import { useAuthorizationContext, NotifyContext } from "./redux";
 import roles from './fixtures/roles';
 import './scss/main.scss';
@@ -25,11 +25,12 @@ import Signout from "./pages/signout";
 
 function App() {
   const { user } = useAuthorizationContext();
-
   return (
     <NotifyContext>
       <BrowserRouter>
-        {user.role === roles.ADMIN && <AdminSidebar></AdminSidebar> || <Nav></Nav>}
+        {(user.role === roles.ADMIN && <AdminSidebar></AdminSidebar>)
+          || ((user.role === roles.QA_MANAGER || user.role === roles.QA_COORDINATOR) && <DashboardHeader></DashboardHeader>)
+          || <Nav></Nav>}
         <Routes>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
