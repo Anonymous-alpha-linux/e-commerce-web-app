@@ -85,21 +85,21 @@ export default function Crud() {
           <tbody>
             {searchInput !== ""
               ? filteredResults.map((category, index) => (
-                <CategoryData
-                  key={index}
-                  data={category}
-                  index={index}
-                  deleteCate={deleteCate}
-                />
-              ))
+                  <CategoryData
+                    key={index}
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
+                ))
               : dataRecords.map((category, index) => (
-                <CategoryData
-                  key={index}
-                  data={category}
-                  index={index}
-                  deleteCate={deleteCate}
-                />
-              ))}
+                  <CategoryData
+                    key={index}
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
+                ))}
             {!categories?.length && (
               <tr>
                 <td>

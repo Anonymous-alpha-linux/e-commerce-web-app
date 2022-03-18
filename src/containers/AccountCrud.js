@@ -1,17 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
-import { usePostContext } from "../redux";
+import { useAdminContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
+import useValidate from "../hooks/useValidate";
 
 export default function AccountCrud() {
   const [API] =
     process.env.REACT_APP_ENVIRONMENT === "development"
-      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
-      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
+      ? [mainAPI.LOCALHOST_ADMIN, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.LOCALHOST_ADMIN, mainAPI.CLOUD_HOST];
   let PageSize = 8;
-  const { accounts } = usePostContext();
+  const { accounts } = useAdminContext();
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
@@ -52,7 +53,7 @@ export default function AccountCrud() {
   return (
     <div className="categoryCRUD__root">
       <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
-        Create New Category
+        Register New Account
       </button>
       {modal && (
         <div style={{ height: "0px" }}>
@@ -64,13 +65,22 @@ export default function AccountCrud() {
         <table className="table table-style">
           <thead>
             <tr>
-              <th scope="col" style={{ textAlign: "center", width: "40%" }}>
+              <th scope="col" style={{ textAlign: "center", width: "5%" }}>
                 ID
               </th>
-              <th scope="col" style={{ textAlign: "center", width: "40%" }}>
-                Title
+              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                User Name
               </th>
-              <th>
+              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                Email
+              </th>
+              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                Register date
+              </th>
+              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                Role
+              </th>
+              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
                 <SearchCategory
                   accounts={accounts}
                   searchInput={searchInput}
@@ -126,18 +136,22 @@ export default function AccountCrud() {
 }
 
 function ModalAddFormAccount({ setModal, modal }) {
+  const { roles } = useAdminContext();
   const [accAdd, setaccAdd] = useState({
-    // categoryName: "",
+    username: "",
+    email: "",
+    profileImage:
+      "https://cdn.dribbble.com/users/1577045/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png?compress=1&resize=400x300",
+    password: "",
+    repassword: "",
+    role: roles[0]._id,
   });
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [API] =
     process.env.REACT_APP_ENVIRONMENT === "development"
-      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
-      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
-  //   const { getNewCategory } = usePostContext();
-  //   const getNewCategoryRef = useRef(getNewCategory);
-  //   useEffect(() => {
-  //     getNewCategoryRef.current = getNewCategory;
-  //   }, [getNewCategory]);
+      ? [mainAPI.CLOUD_API_ADMIN, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
 
   async function HandleNameInput(e) {
     setaccAdd({ ...accAdd, [e.target.name]: e.target.value });
@@ -145,7 +159,17 @@ function ModalAddFormAccount({ setModal, modal }) {
 
   async function onSubmit(e) {
     e.preventDefault();
-    // CreateAccount();
+    try {
+      Object.entries(accAdd).forEach(([key, value]) => {
+        const validator = new useValidate(value);
+        if (key === "username") validator.isEmpty();
+        else if (key === "email") validator.isEmpty().isEmail();
+        else if (key === "password") validator.isEmpty();
+        else if (key === "repassword") validator.isEmpty();
+      });
+    } catch (error) {
+      setError(error.message);
+    }
   }
   function CreateAccount() {
     return axios
@@ -169,14 +193,50 @@ function ModalAddFormAccount({ setModal, modal }) {
       <form>
         <div className="form-container">
           <div className="question-container">
-            <label className="question-label">Category Name</label>
+            <label className="question-label">User Name</label>
             <input
               className="row-input"
               type="text"
-              name="categoryName"
+              name="username"
               onChange={HandleNameInput}
-              value={accAdd.categoryName}
+              value={accAdd.username}
             />
+            <label className="question-label">Email</label>
+            <input
+              className="row-input"
+              type="text"
+              name="email"
+              onChange={HandleNameInput}
+              value={accAdd.email}
+            />
+            <label className="question-label">Password</label>
+            <input
+              className="row-input"
+              type="password"
+              name="password"
+              onChange={HandleNameInput}
+              value={accAdd.password}
+            />
+            <label className="question-label">Confirm Password</label>
+            <input
+              className="row-input"
+              type="password"
+              name="repassword"
+              onChange={HandleNameInput}
+              value={accAdd.repassword}
+            />
+            <label className="question-label">Select Role</label>
+            <select
+              className="row-input"
+              type="select"
+              name="role"
+              onChange={HandleNameInput}
+              value={accAdd.role}
+            >
+              {roles.map((role) => (
+                <option value={role._id}>{role.roleName}</option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="form-container">
@@ -196,6 +256,7 @@ function ModalAddFormAccount({ setModal, modal }) {
             </button>
           </div>
         </div>
+        {error && <p>{error}</p>}
       </form>
     </div>
   );
@@ -203,19 +264,32 @@ function ModalAddFormAccount({ setModal, modal }) {
 function AccountData({ data, deleteCate, index }) {
   return (
     <tr key={index}>
-      <td style={{ textAlign: "center", width: "40%" }}>
-        {index + 1}
-        {/* {parseInt(data._id, 8)} */}
-        {/* {data._id} */}
+      <td style={{ textAlign: "center", width: "5%" }}>{index + 1}</td>
+      <td style={{ textAlign: "center", width: "10%" }}>{data.username}</td>
+      <td style={{ textAlign: "center", width: "10%" }}>{data.email}</td>
+      <td style={{ textAlign: "center", width: "10%" }}>
+        {new Date(data.createdAt).toLocaleString("en-uk", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })}
       </td>
-      <td style={{ textAlign: "center", width: "40%" }}>{data.name}</td>
+      <td style={{ textAlign: "center", width: "10%" }}>
+        {data.role.roleName}
+      </td>
       <td
         style={{
           textAlign: "center",
           whiteSpace: "nowrap",
-          width: "120px",
+          width: "10%",
         }}
       >
+        <button onClick={(e) => {}} className="btn-blue">
+          {data._id === "" ? <span></span> : <span>Detail</span>}
+        </button>
+        <button onClick={(e) => {}} className="btn-warning">
+          {data._id === "" ? <span></span> : <span>Edit</span>}
+        </button>
         <button onClick={(e) => deleteCate(e, data._id)} className="btn-red">
           {data._id === "" ? <span></span> : <span>Delete</span>}
         </button>
@@ -242,8 +316,10 @@ function SearchCategory({
     if (searchInput !== "") {
       const filteredData = currentTableData.filter((item) => {
         return (
-          // item.name.toLowerCase().indexOf(searchInput.toLowerCase()) !== -1
-          item.name.toLowerCase().includes(searchInput.toLowerCase())
+          item.username.toLowerCase().includes(searchInput.toLowerCase()) ||
+          item.email.toLowerCase().includes(searchInput.toLowerCase()) ||
+          item.createdAt.includes(searchInput) ||
+          item.role.roleName.toLowerCase().includes(searchInput.toLowerCase())
         );
       });
       searchFunction.current(filteredData);
