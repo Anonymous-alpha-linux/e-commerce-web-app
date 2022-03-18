@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
-import { usePostContext, useWorkspaceContext } from "../redux";
+import { usePostContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
-import { AddFromWorkspace } from ".";
 
 export default function Crud() {
   const [API, host] =
@@ -17,8 +16,6 @@ export default function Crud() {
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const { workspaces } = useWorkspaceContext();
-  const [modalWS, setModalWS] = useState(false);
   const [dataRecords, setDataRecords] = useState([]);
   // console.log("re-render crud", categories);
 
@@ -53,8 +50,7 @@ export default function Crud() {
       .catch((error) => console.log(error.message));
   }
   return (
-    <div>
-      <h1>Category Crud</h1>
+    <div className="categoryCRUD__root">
       <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
         Create New Category
       </button>
@@ -64,23 +60,7 @@ export default function Crud() {
         </div>
       )}
 
-      {/* test add workspace */}
-      <button
-        className="btn-rounded-green"
-        onClick={() => setModalWS(!modalWS)}
-      >
-        Add WS
-      </button>
-      {modalWS && (
-        <div style={{ hight: "0px" }}>
-          <AddFromWorkspace setModal={setModalWS} modal={modalWS} />
-        </div>
-      )}
-      <div
-        style={{
-          marginTop: "100px",
-        }}
-      >
+      <div className="table__container">
         <table className="table table-style">
           <thead>
             <tr>
@@ -140,17 +120,6 @@ export default function Crud() {
           pageSize={PageSize}
           onPageChange={(page) => setCurrentPage(page)}
         />
-      </div>
-      <div className="c-modal__container">
-        {workspaces &&
-          workspaces.map((ws, index) => (
-            <div key={index}>
-              <h6>{index + 1}</h6>
-              <h4>ID: {ws._id}</h4>
-              <h4>Title {ws.workTitle}</h4>
-              <p>EX: {ws.expireTime}</p>
-            </div>
-          ))}
       </div>
     </div>
   );

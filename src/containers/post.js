@@ -7,6 +7,8 @@ import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
 import { Link } from "react-router-dom";
 import { roles } from "../fixtures";
+import axios from "axios";
+import { mainAPI } from "../config";
 // import { notifyData, socketTargets } from "../fixtures";
 
 export default function Post({ postHeader, postBody, postFooter }) {
@@ -42,6 +44,16 @@ export default function Post({ postHeader, postBody, postFooter }) {
       });
     }
   };
+  const downloadHandler = async (e) => {
+    return axios.get(`${mainAPI.LOCALHOST_HOST}/api/v1/download`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        postid: postHeader.id
+      },
+    }).then(res => console.log('download successfully')).catch(err => console.log(err.message));
+  }
   // const downloadZIPFile = async (e) => {
   //   console.log(postBody);
   //   return Promise.all(
@@ -149,7 +161,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
               </Text.Line>
             </Dropdown.Item>
             {user.role === roles.QA_MANAGER && <Dropdown.Item>
-              <Text.Line>
+              <Text.Line onClick={downloadHandler}>
                 <Text.MiddleLine>
                   <Icon>
                     <HiDownload></HiDownload>

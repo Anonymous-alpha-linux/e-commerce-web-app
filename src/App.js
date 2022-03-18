@@ -29,8 +29,7 @@ function App() {
     <NotifyContext>
       <BrowserRouter>
         {(user.role === roles.ADMIN && <AdminSidebar></AdminSidebar>)
-          || ((user.role === roles.QA_MANAGER || user.role === roles.QA_COORDINATOR) && <DashboardHeader></DashboardHeader>)
-          || <Nav></Nav>}
+          || (user.role === roles.STAFF && <Nav></Nav>)}
         <Routes>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
@@ -114,7 +113,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </NotifyContext>
+    </NotifyContext >
   );
 }
 
