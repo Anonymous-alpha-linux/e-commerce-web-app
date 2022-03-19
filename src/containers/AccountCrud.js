@@ -5,6 +5,9 @@ import { useAdminContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
 import useValidate from "../hooks/useValidate";
+import { Icon } from "../components";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { roles } from "../fixtures";
 
 export default function AccountCrud() {
   const [API] =
@@ -14,6 +17,7 @@ export default function AccountCrud() {
   let PageSize = 8;
   const { accounts } = useAdminContext();
   const [modal, setModal] = useState(false);
+  const [modalEdit, setModalEdit] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,11 +32,12 @@ export default function AccountCrud() {
     });
   }, [accounts, currentPage]);
 
-  function deleteCate(e, id) {
+  function deleteAcc(e, id) {
     e.preventDefault();
     console.log(id);
-    handleDelete(id);
+    // handleDelete(id);
   }
+
   function handleDelete(commentId) {
     return axios
       .delete(API, {
@@ -99,7 +104,7 @@ export default function AccountCrud() {
                     key={index}
                     data={accounts}
                     index={index}
-                    deleteCate={deleteCate}
+                    deleteAcc={deleteAcc}
                   />
                 ))
               : dataRecords.map((accounts, index) => (
@@ -107,7 +112,7 @@ export default function AccountCrud() {
                     key={index}
                     data={accounts}
                     index={index}
-                    deleteCate={deleteCate}
+                    deleteAcc={deleteAcc}
                   />
                 ))}
             {!accounts?.length && (
@@ -122,7 +127,6 @@ export default function AccountCrud() {
             )}
           </tbody>
         </table>
-
         <Pagination
           className="pagination-bar"
           currentPage={currentPage}
@@ -131,6 +135,102 @@ export default function AccountCrud() {
           onPageChange={(page) => setCurrentPage(page)}
         />
       </div>
+    </div>
+  );
+}
+
+function AccFromEdit({ modalEdit, setModalEdit, data }) {
+  const { roles: ROLES } = useAdminContext();
+  const [input, setInput] = useState({
+    username: data.username,
+    email: data.email,
+    role: data.role._id,
+  });
+  console.log(data);
+  // const [API] =
+  //   process.env.REACT_APP_ENVIRONMENT === "development"
+  // ? [mainAPI.CLOUD_API_ADMIN, mainAPI.LOCALHOST_HOST]
+  //     : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
+
+  async function HandleNameInput(e) {
+    setInput({ ...input, [e.target.name]: e.target.value });
+  }
+  console.log(input);
+  async function onSubmit(e) {
+    e.preventDefault();
+
+    // CreateAccount();
+  }
+  return (
+    <div className="c-modal__containerAccount">
+      <form>
+        <div className="form-container">
+          <div className="question-container">
+            <div className="row">
+              <div className="col-2">
+                <label className="question-label">User Name</label>
+                <input
+                  className="row-input"
+                  type="text"
+                  name="username"
+                  placeholder="New user name"
+                  onChange={HandleNameInput}
+                  value={input.username}
+                />
+              </div>
+              <div className="col-2">
+                <label className="question-label">Email</label>
+                <input
+                  className="row-input"
+                  type="text"
+                  placeholder="New Email"
+                  name="email"
+                  onChange={HandleNameInput}
+                  value={input.email}
+                />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-1">
+                <label className="question-label">Select Role</label>
+                <select
+                  style={{ width: "100%", maxWidth: "200px" }}
+                  className="row-input"
+                  type="select"
+                  name="role"
+                  onChange={HandleNameInput}
+                  defaultValue={input.role}
+                >
+                  {ROLES.filter(
+                    (role) => ![roles.ADMIN].includes(role.roleName)
+                  ).map((role) => (
+                    <option key={role._id} value={role._id}>
+                      {role.roleName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="form-container">
+          <div className="question-container">
+            <button
+              type="submit"
+              className="submit_Register "
+              onClick={onSubmit}
+            >
+              Save Edit
+            </button>
+            <button
+              className="btn-trans-Cancel"
+              onClick={() => setModalEdit(!modalEdit)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }
@@ -144,8 +244,34 @@ function ModalAddFormAccount({ setModal, modal }) {
       "https://cdn.dribbble.com/users/1577045/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png?compress=1&resize=400x300",
     password: "",
     repassword: "",
-    role: roles[0]._id,
+    role: roles._id,
   });
+
+  const [passwordShown, setPasswordShown] = useState(false);
+  const togglePassword = (e) => {
+    e.preventDefault();
+    setPasswordShown(!passwordShown);
+  };
+  const [confirmShown, setConfirmShown] = useState(false);
+  const toggleConfirm = (e) => {
+    e.preventDefault();
+    setConfirmShown(!confirmShown);
+  };
+
+  const IconTaggle = ({ Action, Condition }) => {
+    return (
+      <>
+        <Icon style={{ marginTop: "4.5rem" }} onClick={Action}>
+          {!Condition ? (
+            <AiFillEyeInvisible size={20} />
+          ) : (
+            <AiFillEye size={20} />
+          )}
+        </Icon>
+      </>
+    );
+  };
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [API] =
@@ -154,7 +280,7 @@ function ModalAddFormAccount({ setModal, modal }) {
       : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
 
   async function HandleNameInput(e) {
-    setaccAdd({ ...accAdd, [e.target.name]: e.target.value });
+    setaccAdd({ ...accAdd, [e.target.name]: e.target.value }, [setaccAdd]);
   }
 
   async function onSubmit(e) {
@@ -167,11 +293,29 @@ function ModalAddFormAccount({ setModal, modal }) {
         else if (key === "password") validator.isEmpty();
         else if (key === "repassword") validator.isEmpty();
       });
+      if (accAdd.role == null) throw new Error("Select Assign Role");
+      if (accAdd.password !== accAdd["repassword"])
+        throw new Error("Your confirm password is incorrectly");
     } catch (error) {
       setError(error.message);
     }
+
+    const data = {
+      Username: accAdd.username,
+      Email: accAdd.email,
+      Pass: accAdd.password,
+      Role: accAdd.role,
+    };
+    console.log(data);
+    // CreateAccount();
   }
   function CreateAccount() {
+    // const { getNewAccount } = useAdminContext();
+    // const getNewAccountRef = useRef(getNewAccount);
+    // useEffect(() => {
+    //   getNewAccountRef.current = getNewAccount;
+    // }, [getNewAccount]);
+
     return axios
       .post(API, accAdd, {
         headers: {
@@ -182,71 +326,106 @@ function ModalAddFormAccount({ setModal, modal }) {
         },
       })
       .then((res) => {
-        // getNewCategory(res.data.response);
+        // getNewAccount(res.data.response);
         setModal(false);
       })
       .catch((error) => console.log(error.message));
   }
 
   return (
-    <div className="c-modal__container">
+    <div className="c-modal__containerAccount">
       <form>
         <div className="form-container">
           <div className="question-container">
-            <label className="question-label">User Name</label>
-            <input
-              className="row-input"
-              type="text"
-              name="username"
-              onChange={HandleNameInput}
-              value={accAdd.username}
-            />
-            <label className="question-label">Email</label>
-            <input
-              className="row-input"
-              type="text"
-              name="email"
-              onChange={HandleNameInput}
-              value={accAdd.email}
-            />
-            <label className="question-label">Password</label>
-            <input
-              className="row-input"
-              type="password"
-              name="password"
-              onChange={HandleNameInput}
-              value={accAdd.password}
-            />
-            <label className="question-label">Confirm Password</label>
-            <input
-              className="row-input"
-              type="password"
-              name="repassword"
-              onChange={HandleNameInput}
-              value={accAdd.repassword}
-            />
-            <label className="question-label">Select Role</label>
-            <select
-              className="row-input"
-              type="select"
-              name="role"
-              onChange={HandleNameInput}
-              value={accAdd.role}
-            >
-              {roles.map((role) => (
-                <option value={role._id}>{role.roleName}</option>
-              ))}
-            </select>
+            <div className="row">
+              <div className="col-2">
+                <label className="question-label">User Name</label>
+                <input
+                  className="row-input"
+                  type="text"
+                  name="username"
+                  placeholder="New user name"
+                  onChange={HandleNameInput}
+                  value={accAdd.username}
+                />
+              </div>
+              <div className="col-2">
+                <label className="question-label">Email</label>
+                <input
+                  className="row-input"
+                  type="text"
+                  placeholder="New Email"
+                  name="email"
+                  onChange={HandleNameInput}
+                  value={accAdd.email}
+                />
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-2">
+                <label className="question-label">Password</label>
+                <input
+                  className="row-input"
+                  type={!passwordShown ? "password" : "text"}
+                  placeholder="Password"
+                  name="password"
+                  onChange={HandleNameInput}
+                  value={accAdd.password}
+                  autocomplete="new-password"
+                />
+              </div>
+              <div className="col-iconPass">
+                <IconTaggle Action={togglePassword} Condition={passwordShown} />
+              </div>
+              <div className="col-2">
+                <label className="question-label">Confirm</label>
+                <input
+                  className="row-input"
+                  type={!confirmShown ? "password" : "text"}
+                  placeholder="Pass Again"
+                  name="repassword"
+                  onChange={HandleNameInput}
+                  value={accAdd.repassword}
+                />
+              </div>
+              <div className="col-iconPass">
+                <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-1">
+                <label className="question-label">Select Role</label>
+                <select
+                  style={{ width: "100%", maxWidth: "200px" }}
+                  className="row-input"
+                  type="select"
+                  name="role"
+                  onChange={HandleNameInput}
+                  value={accAdd.role}
+                >
+                  <option value={roles._id}>Empty</option>
+                  {roles.map(
+                    (role) =>
+                      role.roleName !== "admin" && (
+                        <option key={role._id} value={role._id}>
+                          {role.roleName}
+                        </option>
+                      )
+                  )}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
         <div className="form-container">
           <div className="question-container">
             <button
               type="submit"
-              className="submit_category"
+              className="submit_Register "
               onClick={onSubmit}
             >
-              Add
+              Register
             </button>
             <button
               className="btn-trans-Cancel"
@@ -256,16 +435,28 @@ function ModalAddFormAccount({ setModal, modal }) {
             </button>
           </div>
         </div>
-        {error && <p>{error}</p>}
+        {error && (
+          <p
+            style={{
+              color: "red",
+              fontWeight: "900",
+            }}
+          >
+            {error}
+          </p>
+        )}
       </form>
     </div>
   );
 }
-function AccountData({ data, deleteCate, index }) {
+function AccountData({ data, deleteAcc, index }) {
+  const [modalEdit, setModalEdit] = useState(false);
   return (
     <tr key={index}>
       <td style={{ textAlign: "center", width: "5%" }}>{index + 1}</td>
-      <td style={{ textAlign: "center", width: "10%" }}>{data.username}</td>
+      <td style={{ textAlign: "center", width: "10%", marginLeft: "5%" }}>
+        {data.username}
+      </td>
       <td style={{ textAlign: "center", width: "10%" }}>{data.email}</td>
       <td style={{ textAlign: "center", width: "10%" }}>
         {new Date(data.createdAt).toLocaleString("en-uk", {
@@ -287,10 +478,22 @@ function AccountData({ data, deleteCate, index }) {
         <button onClick={(e) => {}} className="btn-blue">
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>
-        <button onClick={(e) => {}} className="btn-warning">
+        <button
+          onClick={() => setModalEdit(!modalEdit)}
+          className="btn-warning"
+        >
           {data._id === "" ? <span></span> : <span>Edit</span>}
         </button>
-        <button onClick={(e) => deleteCate(e, data._id)} className="btn-red">
+        {modalEdit && (
+          <div style={{ height: "0px" }}>
+            <AccFromEdit
+              setModalEdit={setModalEdit}
+              modalEdit={modalEdit}
+              data={data}
+            />
+          </div>
+        )}
+        <button onClick={(e) => deleteAcc(e, data._id)} className="btn-red">
           {data._id === "" ? <span></span> : <span>Delete</span>}
         </button>
       </td>
