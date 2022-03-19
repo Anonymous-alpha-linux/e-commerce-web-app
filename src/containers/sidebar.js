@@ -46,7 +46,7 @@ export default function Sidebar({ closeSidebar }) {
                       {item.icon}
                     </Icon>
                   </Text.MiddleLine>
-                  <Text.MiddleLine style={{ width: '80%' }}>
+                  <Text.MiddleLine style={{ width: '80%', paddingLeft: '2rem' }}>
                     <Text.Title>
                       {item.title}
                     </Text.Title>
@@ -55,33 +55,27 @@ export default function Sidebar({ closeSidebar }) {
               </Link>
             </ContainerComponent.Item>
           )}
-          <ContainerComponent.Item
-            style={{
-              width: "100%",
-              padding: "20px",
-              display: "flex",
-              alignItems: "center",
-              position: "relative",
-            }}
-          >
-            <Icon>
-              <MdOutlineWork style={{ fontSize: "35px" }}></MdOutlineWork>
-            </Icon>
-            <Text.Title
-              style={{
-                left: "50%",
-                transform: "translateX(-50%)",
-                position: "absolute",
-              }}
-            >
-              Workspace
-            </Text.Title>
-            <Icon
-              style={{ position: "absolute", right: "5%", fontSize: "25px" }}
-              onClick={ToggleSwitch}
-            >
-              <AiFillRightCircle></AiFillRightCircle>
-            </Icon>
+          <ContainerComponent.Item style={{ width: "100%", padding: "20px", position: "relative" }}>
+            <Text.Line>
+              <Text.MiddleLine style={{ width: '20%' }}>
+                <Icon style={{ fontSize: '30px' }}>
+                  <MdOutlineWork></MdOutlineWork>
+                </Icon>
+              </Text.MiddleLine>
+              <Text.MiddleLine style={{ width: '80%', paddingLeft: '2rem' }}>
+                <Text.Title>
+                  Workspace
+                </Text.Title>
+              </Text.MiddleLine>
+              <Text.RightLine>
+                <Icon
+                  style={{ position: "absolute", right: "5%", fontSize: "25px" }}
+                  onClick={ToggleSwitch}
+                >
+                  <AiFillRightCircle></AiFillRightCircle>
+                </Icon>
+              </Text.RightLine>
+            </Text.Line>
           </ContainerComponent.Item>
           <ContainerComponent.Toggle
             className={switchToggle ? "show" : "hide"}
@@ -97,7 +91,7 @@ export default function Sidebar({ closeSidebar }) {
               Add Workspace
             </Text.Title>
           </ContainerComponent.Item>
-          <ContainerComponent.Item style={{ maxHeight: '120px', overflowY: 'scroll' }}>
+          <ContainerComponent.Item style={{ maxHeight: '160px', overflowY: 'scroll' }}>
             {
               workspaces && workspaces.map((item, index) => <ContainerComponent.Item key={index + 1} >
                 <ContainerComponent.Inner style={{ margin: "0" }}>
