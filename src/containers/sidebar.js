@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from "react";
 
-import { ButtonComponent, ContainerComponent, Form, Icon, Preview, Text } from '../components'
-import { FaHome, FaPenSquare, FaSignOutAlt } from 'react-icons/fa';
+import { ButtonComponent, ContainerComponent, Icon, Preview, Text } from '../components'
 import { MdOutlineWork } from 'react-icons/md';
-import { AiFillCaretDown, AiFillPieChart, AiFillRightCircle } from 'react-icons/ai';
-import { GrDocumentText } from 'react-icons/gr'
-import { RiAccountCircleFill } from 'react-icons/ri'
+import { AiFillCaretDown, AiFillRightCircle } from 'react-icons/ai';
 import { TiPlus } from 'react-icons/ti'
 import { GrStackOverflow } from "react-icons/gr"
 
 import { Link } from "react-router-dom";
 import { sidebarData } from "../fixtures";
-import { icons } from "react-icons";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import { AddFromWorkspace } from ".";
 
-export default function Sidebar() {
+export default function Sidebar({ closeSidebar }) {
   const [switchToggle, setSwitchToggle] = useState(false);
   const [modalWS, setModalWS] = useState(false);
   const { workspaces } = useWorkspaceContext();
@@ -40,20 +36,22 @@ export default function Sidebar() {
           <Text> {user.account}</Text>
         </Text.CenterLine>
         <ContainerComponent.Flex>
-          {sidebarData.map(item =>
-            <ContainerComponent.Item className="" style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center", position: "relative", }}>
-              <Icon style={{ fontSize: '30px' }}>
-                {item.icon}
-              </Icon>
-              <Text.Title
-                style={{
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  position: "absolute",
-                }}
-              >
-                {item.title}
-              </Text.Title>
+          {sidebarData.map((item, index) =>
+            <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{ width: "100%", padding: "20px", position: "relative" }}>
+              <Link to={item.link}>
+                <Text.Line>
+                  <Text.MiddleLine>
+                    <Icon style={{ fontSize: '30px' }}>
+                      {item.icon}
+                    </Icon>
+                  </Text.MiddleLine>
+                  <Text.MiddleLine style={{}}>
+                    <Text.Title>
+                      {item.title}
+                    </Text.Title>
+                  </Text.MiddleLine>
+                </Text.Line>
+              </Link>
             </ContainerComponent.Item>
           )}
           <ContainerComponent.Item
@@ -100,10 +98,10 @@ export default function Sidebar() {
             </Text.Title>
           </ContainerComponent.Item>
           {
-            workspaces && workspaces.map((item) => <ContainerComponent.Item key={item.id} >
+            workspaces && workspaces.map((item, index) => <ContainerComponent.Item key={index + 1} >
               <ContainerComponent.Inner style={{ margin: "0" }}>
               </ContainerComponent.Inner>
-              <EditToggle item={item}></EditToggle>
+              <EditToggle item={item} clickLoader={closeSidebar}></EditToggle>
             </ContainerComponent.Item>
             )
           }
@@ -123,7 +121,7 @@ export default function Sidebar() {
   );
 }
 
-const EditToggle = ({ item }) => {
+const EditToggle = ({ item, clickLoader }) => {
   const [switchToggleChild, setSwitchToggleChild] = useState(false);
   const [editToggle, setEditToggle] = useState(false);
 
@@ -156,13 +154,27 @@ const EditToggle = ({ item }) => {
           {editToggle &&
             <ContainerComponent.Toggle className={switchToggleChild ? "opera" : "empty"} style={{ display: "flex", justifyContent: "center", position: 'absolute', border: '1px solid', borderRadius: '10px', right: 0, padding: '20px', zIndex: 3, background: '#fff' }}>
               <ContainerComponent.Flex style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "15px" }}>
-                <ButtonComponent>Add QA Coodinator</ButtonComponent>
-                <ButtonComponent style={{ width: "177px", textAlign: "center" }}>Edit Time/Title</ButtonComponent>
+                <ButtonComponent>
+                  <Link to="/management/staff" style={{ color: '#fff' }} onClick={clickLoader}>
+                    <Text.Line>
+                      Add QA Coodinator
+                    </Text.Line>
+                  </Link>
+                </ButtonComponent>
+                <ButtonComponent>
+                  <Link to="/management/member" style={{ color: '#fff' }} onClick={clickLoader}>
+                    <Text.Line>
+                      Add Member
+                    </Text.Line>
+                  </Link>
+                </ButtonComponent>
+                <ButtonComponent style={{ width: "177px", textAlign: "center" }}>
+                  Edit Time/Title
+                </ButtonComponent>
               </ContainerComponent.Flex>
             </ContainerComponent.Toggle>}
         </Text.Line>
       </ContainerComponent.Item>
-
     </>
   )
 }

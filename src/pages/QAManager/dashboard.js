@@ -8,7 +8,6 @@ export default function Dashboard() {
       <ContainerComponent.Pane className="overview__container">
         <DashboardOverview></DashboardOverview>
       </ContainerComponent.Pane>
-      <Crud></Crud>
       <ContainerComponent.Pane style={{ maxWidth: '650px' }}>
         <BarChart></BarChart>
       </ContainerComponent.Pane>
