@@ -53,7 +53,7 @@ function App() {
                 <Route path="/workspace" element={<Workspace></Workspace>} />
                 <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
                 <Route path="/management/member" element={<ListMember></ListMember>} />
-                <Route path="/management/staff" element={<StaffCRUD></StaffCRUD>} />
+                <Route path="/management/staff" element={<StaffCRUD filter={roles.QA_COORDINATOR}></StaffCRUD>} />
                 <Route path="profile" element={<Profile></Profile>}>
                   <Route path="personal" element={<Personal></Personal>} />
                   <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
@@ -113,7 +113,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </NotifyContext >
+    </NotifyContext>
   );
 }
 

@@ -32,7 +32,7 @@ function DashBoardHeader({ children }) {
                     </ContainerComponent.Item>
                 </ContainerComponent.Flex>
             </ContainerComponent>
-            {openSideBar && <Sidebar></Sidebar>}
+            {openSideBar && <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>}
             <ContainerComponent.Section className="sidebar__content">
                 {children}
             </ContainerComponent.Section>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CSSTransition } from "react-transition-group";
+
 export default function AnimateComponent({ children,
   timeout,
   component,
