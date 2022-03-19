@@ -3,10 +3,11 @@ import React, { useState, useEffect } from "react";
 import { ButtonComponent, ContainerComponent, Icon, Preview, Text } from '../components'
 import { MdOutlineWork } from 'react-icons/md';
 import { AiFillCaretDown, AiFillRightCircle } from 'react-icons/ai';
-import { TiPlus } from 'react-icons/ti'
-import { GrStackOverflow } from "react-icons/gr"
+import { TiPlus } from 'react-icons/ti';
+import { GrStackOverflow } from "react-icons/gr";
+import { GoSignOut } from 'react-icons/go';
 
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { sidebarData } from "../fixtures";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import { AddFromWorkspace } from ".";
@@ -40,12 +41,12 @@ export default function Sidebar({ closeSidebar }) {
             <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{ width: "100%", padding: "20px", position: "relative" }}>
               <Link to={item.link}>
                 <Text.Line>
-                  <Text.MiddleLine>
+                  <Text.MiddleLine style={{ width: '20%' }}>
                     <Icon style={{ fontSize: '30px' }}>
                       {item.icon}
                     </Icon>
                   </Text.MiddleLine>
-                  <Text.MiddleLine style={{}}>
+                  <Text.MiddleLine style={{ width: '80%' }}>
                     <Text.Title>
                       {item.title}
                     </Text.Title>
@@ -86,7 +87,6 @@ export default function Sidebar({ closeSidebar }) {
             className={switchToggle ? "show" : "hide"}
             style={{ margin: "0 auto" }}>
           </ContainerComponent.Toggle>
-
         </ContainerComponent.Flex>
         <ContainerComponent.Toggle className={switchToggle ? "show" : "hide"} style={{ margin: "0 auto" }}>
           <ContainerComponent.Item style={{ width: "100%", padding: 20, paddingTop: 25, boxShadow: '2px 0 5px #000', display: "flex", alignItems: "center", gap: "20px", position: "relative" }} onClick={() => setModalWS(!modalWS)}>
@@ -97,16 +97,34 @@ export default function Sidebar({ closeSidebar }) {
               Add Workspace
             </Text.Title>
           </ContainerComponent.Item>
-          {
-            workspaces && workspaces.map((item, index) => <ContainerComponent.Item key={index + 1} >
-              <ContainerComponent.Inner style={{ margin: "0" }}>
-              </ContainerComponent.Inner>
-              <EditToggle item={item} clickLoader={closeSidebar}></EditToggle>
-            </ContainerComponent.Item>
-            )
-          }
+          <ContainerComponent.Item style={{ maxHeight: '120px', overflowY: 'scroll' }}>
+            {
+              workspaces && workspaces.map((item, index) => <ContainerComponent.Item key={index + 1} >
+                <ContainerComponent.Inner style={{ margin: "0" }}>
+                </ContainerComponent.Inner>
+                <EditToggle item={item} clickLoader={closeSidebar}></EditToggle>
+              </ContainerComponent.Item>
+              )
+            }
+          </ContainerComponent.Item>
         </ContainerComponent.Toggle>
       </ContainerComponent.Inner>
+      <ContainerComponent.Pane style={{ position: 'absolute', bottom: 0, width: '100%', padding: '20px' }}>
+        <Link to="/logout">
+          <Text.Line>
+            <Text.MiddleLine style={{ width: '20%' }}>
+              <Icon style={{ fontSize: '30px' }}>
+                <GoSignOut></GoSignOut>
+              </Icon>
+            </Text.MiddleLine>
+            <Text.MiddleLine style={{ width: '80%' }}>
+              <Text.Title>
+                Logout
+              </Text.Title>
+            </Text.MiddleLine>
+          </Text.Line>
+        </Link>
+      </ContainerComponent.Pane>
     </ContainerComponent.Toggle>
     {modalWS && (
       <>
