@@ -19,7 +19,7 @@ export default [
     },
     {
         icon: <FaPenSquare></FaPenSquare>,
-        title: 'Post',
+        title: 'Category',
     },
     {
         icon: <RiAccountCircleFill></RiAccountCircleFill>,
