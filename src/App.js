@@ -1,11 +1,19 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
-  Home, Login, ProtectedPage, Register, ForgetPassword, Nav,
+  Home,
+  Login,
+  ProtectedPage,
+  Register,
+  ForgetPassword,
+  Nav,
   Staff,
   QACoordinator,
-  AdminSidebar, Admin,
+  AdminSidebar,
+  Admin,
   QAManager,
-  Workspace, Profile, QA,
+  Workspace,
+  Profile,
+  QA,
   Portal,
   WorkspaceGroup,
   Loading,
@@ -13,13 +21,23 @@ import {
   DashboardManager,
   CategoryManagement,
   ListMember,
-  StaffCRUD
-} from './pages';
+  StaffCRUD,
+  AdminDashBoard,
+} from "./pages";
 
-import { AddGroupContainer, DashboardHeader, ManagerInfo, MessageContainer, NotificationContainer, Personal, PostModal, Searchbar } from "./containers";
+import {
+  AddGroupContainer,
+  DashboardHeader,
+  ManagerInfo,
+  MessageContainer,
+  NotificationContainer,
+  Personal,
+  PostModal,
+  Searchbar,
+} from "./containers";
 import { useAuthorizationContext, NotifyContext } from "./redux";
-import roles from './fixtures/roles';
-import './scss/main.scss';
+import roles from "./fixtures/roles";
+import "./scss/main.scss";
 import { MessageBox } from "./components";
 import Signout from "./pages/signout";
 
@@ -28,89 +46,170 @@ function App() {
   return (
     <NotifyContext>
       <BrowserRouter>
-        {(user.role === roles.ADMIN && <AdminSidebar></AdminSidebar>)
-          || (user.role === roles.STAFF && <Nav></Nav>)}
+        {(user.role === roles.ADMIN && <AdminSidebar></AdminSidebar>) ||
+          (user.role === roles.STAFF && <Nav></Nav>)}
         <Routes>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
           <Route path="logout" element={<Signout></Signout>}></Route>
-          <Route path="reset_password" element={<ForgetPassword></ForgetPassword>}></Route>
+          <Route
+            path="reset_password"
+            element={<ForgetPassword></ForgetPassword>}
+          ></Route>
           <Route path="/" element={<Home></Home>}>
             {
               // 1. Admin Role
-              (user.role === roles.ADMIN && <Route path=""
-                element={<ProtectedPage authorized={[roles.ADMIN]}>
-                  <Admin></Admin>
-                </ProtectedPage>}>
-              </Route>) ||
-              // 2. QA manager
-              (user.role === roles.QA_MANAGER && <Route path=""
-                element={<ProtectedPage authorized={[roles.QA_MANAGER]}>
-                  <QAManager></QAManager>
-                </ProtectedPage>}>
-                {/* <Route index element={<Workspace></Workspace>} /> */}
-                <Route index element={<DashboardManager></DashboardManager>} />
-                <Route path="/workspace" element={<Workspace></Workspace>} />
-                <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
-                <Route path="/management/member" element={<ListMember></ListMember>} />
-                <Route path="/management/staff" element={<StaffCRUD filter={roles.QA_COORDINATOR}></StaffCRUD>} />
-                <Route path="profile" element={<Profile></Profile>}>
-                  <Route path="personal" element={<Personal></Personal>} />
-                  <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
+              (user.role === roles.ADMIN && (
+                <Route
+                  path=""
+                  element={
+                    <ProtectedPage authorized={[roles.ADMIN]}>
+                      <Admin></Admin>
+                    </ProtectedPage>
+                  }
+                >
+                  <Route index element={<AdminDashBoard></AdminDashBoard>} />
                 </Route>
-                <Route path="history" element={<MyPost></MyPost>} />
-                <Route path="q&a" element={<QA></QA>}></Route>
-                <Route path="portal/" element={<Portal></Portal>}>
-                  <Route path="idea" element={<PostModal />} >
-                  </Route>
-                  <Route path="idea/:id" element={<PostModal />} >
-                  </Route>
-                  <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
-                  <Route path="message" element={<MessageContainer></MessageContainer>}>
-                    <Route path=":id" element={<MessageBox></MessageBox>}></Route>
-                  </Route>
-                  <Route path="search" element={<Searchbar></Searchbar>} />
-                  <Route path="addgroup" element={<AddGroupContainer></AddGroupContainer>} />
-                </Route>
-              </Route>) ||
-              // 3. QA coordinator
-              (user.role === roles.QA_COORDINATOR && <Route path=""
-                element={<ProtectedPage authorized={[roles.QA_COORDINATOR]}>
-                  <QACoordinator></QACoordinator>
-                </ProtectedPage>}>
-                <Route index element={<Workspace></Workspace>} />
-                <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
-
-              </Route>) ||
-              // 4. Staff
-              (user.role === roles.STAFF &&
-                <Route path="" element={<ProtectedPage authorized={[roles.STAFF]}>
-                  <Staff></Staff>
-                </ProtectedPage>}>
-                  <Route index element={<Workspace></Workspace>}></Route>
-                  <Route path="profile" element={<Profile></Profile>}>
-                    <Route path="personal" element={<Personal></Personal>} />
-                    <Route path="manager" element={<ManagerInfo></ManagerInfo>} />
-                  </Route>
-                  <Route path="history" element={<MyPost></MyPost>} />
-                  <Route path="q&a" element={<QA></QA>}></Route>
-                  <Route path="portal/" element={<Portal></Portal>}>
-                    <Route path="idea" element={<PostModal />} >
+              )) ||
+                // 2. QA manager
+                (user.role === roles.QA_MANAGER && (
+                  <Route
+                    path=""
+                    element={
+                      <ProtectedPage authorized={[roles.QA_MANAGER]}>
+                        <QAManager></QAManager>
+                      </ProtectedPage>
+                    }
+                  >
+                    {/* <Route index element={<Workspace></Workspace>} /> */}
+                    <Route
+                      index
+                      element={<DashboardManager></DashboardManager>}
+                    />
+                    <Route
+                      path="/workspace"
+                      element={<Workspace></Workspace>}
+                    />
+                    <Route
+                      path="/management/category"
+                      element={<CategoryManagement></CategoryManagement>}
+                    />
+                    <Route
+                      path="/management/member"
+                      element={<ListMember></ListMember>}
+                    />
+                    <Route
+                      path="/management/staff"
+                      element={<StaffCRUD></StaffCRUD>}
+                    />
+                    <Route path="profile" element={<Profile></Profile>}>
+                      <Route path="personal" element={<Personal></Personal>} />
+                      <Route
+                        path="manager"
+                        element={<ManagerInfo></ManagerInfo>}
+                      />
                     </Route>
-                    <Route path="idea/:id" element={<PostModal />} >
+                    <Route path="history" element={<MyPost></MyPost>} />
+                    <Route path="q&a" element={<QA></QA>}></Route>
+                    <Route path="portal/" element={<Portal></Portal>}>
+                      <Route path="idea" element={<PostModal />}></Route>
+                      <Route path="idea/:id" element={<PostModal />}></Route>
+                      <Route
+                        path="notification"
+                        element={
+                          <NotificationContainer></NotificationContainer>
+                        }
+                      />
+                      <Route
+                        path="message"
+                        element={<MessageContainer></MessageContainer>}
+                      >
+                        <Route
+                          path=":id"
+                          element={<MessageBox></MessageBox>}
+                        ></Route>
+                      </Route>
+                      <Route path="search" element={<Searchbar></Searchbar>} />
+                      <Route
+                        path="addgroup"
+                        element={<AddGroupContainer></AddGroupContainer>}
+                      />
                     </Route>
-                    <Route path="notification" element={<NotificationContainer></NotificationContainer>} />
-                    <Route path="message" element={<MessageContainer></MessageContainer>}>
-                      <Route path=":id" element={<MessageBox></MessageBox>}></Route>
-                    </Route>
-                    <Route path="search" element={<Searchbar></Searchbar>} />
-                    <Route path="addgroup" element={<AddGroupContainer></AddGroupContainer>} />
                   </Route>
-                  <Route path="workspace" element={<WorkspaceGroup></WorkspaceGroup>} />
-                </Route>)}
+                )) ||
+                // 3. QA coordinator
+                (user.role === roles.QA_COORDINATOR && (
+                  <Route
+                    path=""
+                    element={
+                      <ProtectedPage authorized={[roles.QA_COORDINATOR]}>
+                        <QACoordinator></QACoordinator>
+                      </ProtectedPage>
+                    }
+                  >
+                    <Route index element={<Workspace></Workspace>} />
+                    <Route
+                      path="/management/category"
+                      element={<CategoryManagement></CategoryManagement>}
+                    />
+                  </Route>
+                )) ||
+                // 4. Staff
+                (user.role === roles.STAFF && (
+                  <Route
+                    path=""
+                    element={
+                      <ProtectedPage authorized={[roles.STAFF]}>
+                        <Staff></Staff>
+                      </ProtectedPage>
+                    }
+                  >
+                    <Route index element={<Workspace></Workspace>}></Route>
+                    <Route path="profile" element={<Profile></Profile>}>
+                      <Route path="personal" element={<Personal></Personal>} />
+                      <Route
+                        path="manager"
+                        element={<ManagerInfo></ManagerInfo>}
+                      />
+                    </Route>
+                    <Route path="history" element={<MyPost></MyPost>} />
+                    <Route path="q&a" element={<QA></QA>}></Route>
+                    <Route path="portal/" element={<Portal></Portal>}>
+                      <Route path="idea" element={<PostModal />}></Route>
+                      <Route path="idea/:id" element={<PostModal />}></Route>
+                      <Route
+                        path="notification"
+                        element={
+                          <NotificationContainer></NotificationContainer>
+                        }
+                      />
+                      <Route
+                        path="message"
+                        element={<MessageContainer></MessageContainer>}
+                      >
+                        <Route
+                          path=":id"
+                          element={<MessageBox></MessageBox>}
+                        ></Route>
+                      </Route>
+                      <Route path="search" element={<Searchbar></Searchbar>} />
+                      <Route
+                        path="addgroup"
+                        element={<AddGroupContainer></AddGroupContainer>}
+                      />
+                    </Route>
+                    <Route
+                      path="workspace"
+                      element={<WorkspaceGroup></WorkspaceGroup>}
+                    />
+                  </Route>
+                ))
+            }
           </Route>
-          <Route path="/*" element={<h1>404 Error: Page Not Found...</h1>}>
-          </Route>
+          <Route
+            path="/*"
+            element={<h1>404 Error: Page Not Found...</h1>}
+          ></Route>
         </Routes>
       </BrowserRouter>
     </NotifyContext>
