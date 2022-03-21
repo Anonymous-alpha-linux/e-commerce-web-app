@@ -38,9 +38,7 @@ export default React.memo(function WorkspaceContext({ children }) {
     }
     onLoadWorkspaceList();
   }, []);
-  useEffect(() => {
-    // onLoadWorkspace(workspaceState.workspaces[index]._id);
-  }, [workspaceState.workspaces]);
+
 
   function onLoadWorkspaceList() {
     return axios
@@ -54,12 +52,11 @@ export default React.memo(function WorkspaceContext({ children }) {
       })
       .then((res) => {
         const index = Number(localStorage.getItem("workspace")) || 0;
-
         setWorkspace({
           type: actions.GET_WORKSPACE_LIST,
           payload: res.data.response,
         });
-        onLoadWorkspace(res.data.response[index]);
+        onLoadWorkspace();
       })
       .catch((error) => {
         setWorkspace({
@@ -69,12 +66,23 @@ export default React.memo(function WorkspaceContext({ children }) {
         setError(error.message);
       });
   }
-  function onLoadWorkspace(workspace) {
-    onLoadManagerInfo(workspace.manager);
-    setWorkspace({
-      type: actions.GET_WORKSPACE,
-      payload: workspace,
-    });
+  function onLoadWorkspace() {
+    return axios.get(workspaceAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "myworkspace",
+      }
+    }).then(res => {
+      setWorkspace({
+        type: actions.GET_WORKSPACE,
+        payload: res.data.response
+      })
+      onLoadManagerInfo(res.data.response.manger);
+    }).catch(err => {
+      setError(err.message);
+    })
   }
   function onLoadManagerInfo(managerId) {
     return axios
@@ -124,6 +132,19 @@ export default React.memo(function WorkspaceContext({ children }) {
       type: actions.CREATE_WORKSPACE,
       payload: workspace,
     });
+  }
+  function getWorkspaceForManager() {
+    return axios.get(mainAPI.LOCALHOST_MANAGER, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "workspace",
+      }
+    }).then(res => setWorkspace({
+      type: actions.GET_MANAGER_WORKSPACE,
+      payload: res.data.response
+    }))
   }
   const contextValue = {
     workspace: workspaceState.workspace,

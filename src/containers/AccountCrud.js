@@ -22,7 +22,6 @@ export default function AccountCrud() {
     const [filteredResults, setFilteredResults] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [dataRecords, setDataRecords] = useState([]);
-    // console.log("re-render crud", accounts);
 
     useEffect(() => {
         setDataRecords((e) => {
