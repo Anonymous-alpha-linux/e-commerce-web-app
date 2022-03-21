@@ -72,14 +72,9 @@ function App() {
               )) ||
               // 2. QA manager
               (user.role === roles.QA_MANAGER && (
-                <Route
-                  path=""
-                  element={
-                    <ProtectedPage authorized={[roles.QA_MANAGER]}>
-                      <QAManager></QAManager>
-                    </ProtectedPage>
-                  }
-                >
+                <Route path="" element={<ProtectedPage authorized={[roles.QA_MANAGER]}>
+                  <QAManager></QAManager>
+                </ProtectedPage>}>
                   {/* <Route index element={<Workspace></Workspace>} /> */}
                   <Route
                     index
@@ -94,11 +89,11 @@ function App() {
                     element={<CategoryManagement></CategoryManagement>}
                   />
                   <Route
-                    path="/management/member"
+                    path="/management/member/:id"
                     element={<ListMember></ListMember>}
                   />
                   <Route
-                    path="/management/staff"
+                    path="/management/staff/:id"
                     element={<StaffCRUD></StaffCRUD>}
                   />
                   <Route path="profile" element={<Profile></Profile>}>

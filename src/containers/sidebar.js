@@ -20,8 +20,10 @@ export default function Sidebar({ closeSidebar }) {
   const ToggleSwitch = () => {
     switchToggle ? setSwitchToggle(false) : setSwitchToggle(true);
   };
-  return (<>
-    <ContainerComponent.Toggle className="sidebar__root">
+  return (<ContainerComponent.Section
+  // className="sidebar__root"
+  >
+    <ContainerComponent.Toggle className="sidebar__inner">
       <ContainerComponent.Inner>
         <ContainerComponent.Flex style={{ justifyContent: "center", alignItems: "center", padding: "5px", }}>
           <Preview.Images
@@ -91,7 +93,7 @@ export default function Sidebar({ closeSidebar }) {
               Add Workspace
             </Text.Title>
           </ContainerComponent.Item>
-          <ContainerComponent.Item style={{ maxHeight: '160px', overflowY: 'scroll' }}>
+          <ContainerComponent.Item style={{ maxHeight: '260px', overflowY: 'scroll' }}>
             {
               workspaces && workspaces.map((item, index) => <ContainerComponent.Item key={index + 1} >
                 <ContainerComponent.Inner style={{ margin: "0" }}>
@@ -103,7 +105,7 @@ export default function Sidebar({ closeSidebar }) {
           </ContainerComponent.Item>
         </ContainerComponent.Toggle>
       </ContainerComponent.Inner>
-      <ContainerComponent.Pane style={{ position: 'absolute', bottom: 0, width: '100%', padding: '20px' }}>
+      <ContainerComponent.Pane className="logout__button" style={{ bottom: 0, width: '100%', padding: '20px' }}>
         <Link to="/logout">
           <Text.Line>
             <Text.MiddleLine style={{ width: '20%' }}>
@@ -129,7 +131,7 @@ export default function Sidebar({ closeSidebar }) {
         </div>
       </>
     )}
-  </>
+  </ContainerComponent.Section>
   );
 }
 
@@ -167,14 +169,14 @@ const EditToggle = ({ item, clickLoader }) => {
             <ContainerComponent.Toggle className={switchToggleChild ? "opera" : "empty"} style={{ display: "flex", justifyContent: "center", position: 'absolute', border: '1px solid', borderRadius: '10px', right: 0, padding: '20px', zIndex: 3, background: '#fff' }}>
               <ContainerComponent.Flex style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "15px" }}>
                 <ButtonComponent>
-                  <Link to="/management/staff" style={{ color: '#fff' }} onClick={clickLoader}>
+                  <Link to={`/management/staff/${item._id}`} style={{ color: '#fff' }} onClick={clickLoader}>
                     <Text.Line>
-                      Add QA Coodinator
+                      Assign QA Coordinator
                     </Text.Line>
                   </Link>
                 </ButtonComponent>
                 <ButtonComponent>
-                  <Link to="/management/member" style={{ color: '#fff' }} onClick={clickLoader}>
+                  <Link to={`/management/member/${item._id}`} style={{ color: '#fff' }} onClick={clickLoader}>
                     <Text.Line>
                       Add Member
                     </Text.Line>

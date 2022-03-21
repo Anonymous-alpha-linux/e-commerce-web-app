@@ -36,16 +36,7 @@ export default function Navigation() {
   }, [window.screen.width]);
 
   return (
-    <ContainerComponent
-      className="navigation__container"
-      style={{
-        background: "#163d3c",
-        position: "sticky",
-        top: 0,
-        left: 0,
-        zIndex: 100,
-      }}
-    >
+    <ContainerComponent className="navigation__container" style={{ background: "#163d3c", position: "sticky", top: 0, left: 0, zIndex: 100, }}>
       <ContainerComponent.Flex className="navigation__grid" columns={screenColumn}>
         <ContainerComponent.Item>
           <ContainerComponent.Flex
@@ -106,11 +97,11 @@ export default function Navigation() {
           ></AuthStatus>
         </ContainerComponent.Item>
       </ContainerComponent.Flex>
-      {openNavigator && (
-        <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
-      )}
-      {/* {openMessage && <MessageContainer></MessageContainer>} */}
-
+      {
+        openNavigator && (
+          <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
+        )
+      }
     </ContainerComponent>
   );
 }
