@@ -100,17 +100,22 @@ export default React.memo(function WorkspaceContext({ children }) {
       .catch((error) => setError(error.message));
   }
   function getWorkspaceMembers(workspaceId) {
-    return axios.get(workspaceAPI, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: "member",
-        workspaceid: workspaceId
-      }
-    }).then(res => setWorkspace({
-      type: actions.GET_WORKSPACE
-    })).catch(error => setError(error.message));
+    return axios
+      .get(workspaceAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "member",
+          workspaceid: workspaceId,
+        },
+      })
+      .then((res) =>
+        setWorkspace({
+          type: actions.GET_WORKSPACE,
+        })
+      )
+      .catch((error) => setError(error.message));
   }
   function selectWorkspaceIndex(page) {
     localStorage.setItem("workspace", page);
@@ -130,7 +135,7 @@ export default React.memo(function WorkspaceContext({ children }) {
     workspaces: workspaceState.workspaces,
     loading: workspaceState.workspaceLoading,
     createWorkspace,
-    getWorkspaceMembers
+    getWorkspaceMembers,
   };
   if (workspaceState.workspaceLoading)
     return <Loading className="workspace__loading"></Loading>;
