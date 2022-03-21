@@ -24,10 +24,10 @@ export default function AdminContext({ children }) {
             ? [mainAPI.LOCALHOST_ADMIN, mainAPI.LOCALHOST_HOST]
             : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
     useEffect(() => {
-        getAccountList();
+        getAccountList()
         getRoleList();
     }, []);
-    function getAccountList() {
+    function getAccountList(cb) {
         return axios
             .get(adminAPI, {
                 headers: {
@@ -38,15 +38,14 @@ export default function AdminContext({ children }) {
                 },
             })
             .then((res) => {
-                console.log(res.data);
-                setState({
-                    ...state,
+                setState(o => ({
+                    ...o,
                     accounts: res.data.response,
-                });
+                }))
             })
             .catch((error) => console.log(error.message));
     }
-    function getRoleList() {
+    function getRoleList(cb) {
         return axios
             .get(adminAPI, {
                 headers: {
@@ -57,10 +56,10 @@ export default function AdminContext({ children }) {
                 },
             })
             .then((res) => {
-                setState({
-                    ...state,
+                setState(o => ({
+                    ...o,
                     roles: res.data.response
-                });
+                }))
             })
             .catch((error) => console.log(error.message));
     }
