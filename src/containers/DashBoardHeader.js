@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { VscThreeBars } from "react-icons/vsc";
-import { ContainerComponent, Icon, LogoIcon, Text } from "../components";
+import {
+  AnimateComponent,
+  ContainerComponent,
+  Icon,
+  LogoIcon,
+  Text,
+} from "../components";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import Sidebar from "./sidebar";
 
@@ -9,7 +15,7 @@ function DashBoardHeader({ children }) {
   const { user } = useAuthorizationContext();
   const [openSideBar, setOpenSidebar] = useState(false);
   return (
-    <>
+    <ContainerComponent className="manager_root">
       <ContainerComponent
         className="manager__header"
         style={{
@@ -44,16 +50,23 @@ function DashBoardHeader({ children }) {
                             <Text.Title style={{ color: "white" }}>Idea</Text.Title>
                             <Text.Title style={{ background: "#f79817", width: "35px", textAlign: "center", borderRadius: "20px" }}>Hub</Text.Title>
                         </ContainerComponent.Pane> */}
-                        <LogoIcon></LogoIcon>
-                    </ContainerComponent.Item>
-                </ContainerComponent.Flex>
-            </ContainerComponent>
-            {openSideBar && <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>}
-            <ContainerComponent.Section className="sidebar__content">
-                {children}
-            </ContainerComponent.Section>
-        </>
-    )
+            <LogoIcon></LogoIcon>
+          </ContainerComponent.Item>
+        </ContainerComponent.Flex>
+      </ContainerComponent>
+      <ContainerComponent className="manager__body">
+        <AnimateComponent.SlideRight
+          className="sidebar__root"
+          state={openSideBar}
+        >
+          <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>
+        </AnimateComponent.SlideRight>
+        <ContainerComponent.Section className="sidebar__content">
+          {children}
+        </ContainerComponent.Section>
+      </ContainerComponent>
+    </ContainerComponent>
+  );
 }
 
 export default DashBoardHeader;

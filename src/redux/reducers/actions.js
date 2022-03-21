@@ -56,6 +56,8 @@ const actions = {
   ADD_CATEGORY: 56,
   REMOVE_CATEGORY: 57,
   CREATE_WORKSPACE: 58,
+  GET_WORKSPACE_MEMBER: 59,
+  ASSIGN_MEMBER_TO_WORKSPACE: 60
 };
 
 export default actions;

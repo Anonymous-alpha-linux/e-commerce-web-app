@@ -14,6 +14,11 @@ export default function workspaceReducer(state, action) {
       return actionHandler.updateItem("workspace", action.payload, state);
     case actions.GET_WORKSPACE_LIST:
       return actionHandler.updateItem("workspaces", action.payload, state);
+    case actions.GET_WORKSPACE_MEMBER:
+      return actions.updateItem("workspaces", workspace => {
+        if (workspace === action.workspaceId) return actionHandler.getListItem("members", action.payload, workspace);
+        return workspace;
+      }, state)
     case actions.GET_MANAGER:
       return actionHandler.updateItem(
         "workspace",

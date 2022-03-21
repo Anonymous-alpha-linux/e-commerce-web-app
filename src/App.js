@@ -46,8 +46,7 @@ function App() {
   return (
     <NotifyContext>
       <BrowserRouter>
-        {(user.role === roles.ADMIN && <AdminSidebar></AdminSidebar>) ||
-          (user.role === roles.STAFF && <Nav></Nav>)}
+        {user.role === roles.STAFF && <Nav></Nav>}
         <Routes>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
@@ -95,11 +94,11 @@ function App() {
                       element={<CategoryManagement></CategoryManagement>}
                     />
                     <Route
-                      path="/management/member"
+                      path="/management/member/:id"
                       element={<ListMember></ListMember>}
                     />
                     <Route
-                      path="/management/staff"
+                      path="/management/staff/:id"
                       element={<StaffCRUD></StaffCRUD>}
                     />
                     <Route path="profile" element={<Profile></Profile>}>

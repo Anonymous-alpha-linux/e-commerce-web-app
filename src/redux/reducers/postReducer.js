@@ -317,35 +317,6 @@ const postReducer = (state, action) => {
         }, post)
         return post;
       }, state));
-    // case actions.UPDATE_COMMENT_REPLY:
-    //   return {
-    //     ...state,
-    //     posts: state.posts.map(post => {
-    //       if (post._id === action.postid) {
-    //         return {
-    //           ...post,
-    //           comments: post.comments.map(comment => {
-    //             if (comment._id === action.commentid) {
-    //               return {
-    //                 ...comment,
-    //                 replies: comment.replies.map(reply => {
-    //                   if (reply._id === action.payload._id) {
-    //                     return {
-    //                       ...reply,
-    //                       ...action.payload
-    //                     }
-    //                   }
-    //                   return reply;
-    //                 })
-    //               }
-    //             }
-    //             return comment;
-    //           })
-    //         }
-    //       }
-    //       return post;
-    //     })
-    //   };
 
     case actions.SET_LOADING:
       return {
