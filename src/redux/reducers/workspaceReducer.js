@@ -11,6 +11,7 @@ export default function workspaceReducer(state, action) {
   const actionHandler = new ActionHandler(state, action);
   switch (action.type) {
     case actions.GET_WORKSPACE:
+      console.log(action.payload);
       return actionHandler.updateItem("workspace", action.payload, state);
     case actions.GET_WORKSPACE_LIST:
       return actionHandler.updateItem("workspaces", action.payload, state);

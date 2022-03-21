@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { mainAPI } from "../../config";
+import { Loading } from "../../pages";
 const AdminContextAPI = createContext();
 
 export default function AdminContext({ children }) {
@@ -11,10 +12,9 @@ export default function AdminContext({ children }) {
     GET_ALL_WORKSPACE: 3,
     ASSIGN_ROLE_TO_ACCOUNT: 6,
   };
-  // const [accounts, setAccounts] = useState([]);
-  // const [roles, setRoles] = useState([]);
   const [state, setState] = useState({
     accounts: [],
+    roles: [],
     errors: [],
     messages: [],
     loading: true,
@@ -38,10 +38,11 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
+        console.log(res.data);
         setState({
+          ...state,
           accounts: res.data.response,
         });
-        // setAccounts(res.data.response);
       })
       .catch((error) => console.log(error.message));
   }
@@ -57,9 +58,9 @@ export default function AdminContext({ children }) {
       })
       .then((res) => {
         setState({
+          ...state,
           roles: res.data.response,
         });
-        // setRoles(res.data.response);
       })
       .catch((error) => console.log(error.message));
   }
