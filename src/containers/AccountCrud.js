@@ -16,6 +16,7 @@ export default function AccountCrud() {
             : [mainAPI.LOCALHOST_ADMIN, mainAPI.CLOUD_HOST];
     let PageSize = 8;
     const { accounts } = useAdminContext();
+    console.log(useAdminContext());
     const [modal, setModal] = useState(false);
     const [modalEdit, setModalEdit] = useState(false);
     const [searchInput, setSearchInput] = useState("");
