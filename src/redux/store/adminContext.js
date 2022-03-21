@@ -4,11 +4,24 @@ import { mainAPI } from "../../config";
 const AdminContextAPI = createContext();
 
 export default function AdminContext({ children }) {
-  const [accounts, setAccounts] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const options = {
+    ASSIGN_MEMBERS_TO_WORKSPACE: 0,
+    SET_CLOSURE_TIME: 1,
+    SET_EVENT_TIME: 2,
+    GET_ALL_WORKSPACE: 3,
+    ASSIGN_ROLE_TO_ACCOUNT: 6,
+  };
+  // const [accounts, setAccounts] = useState([]);
+  // const [roles, setRoles] = useState([]);
+  const [state, setState] = useState({
+    accounts: [],
+    errors: [],
+    messages: [],
+    loading: true,
+  });
   const [adminAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
-      ? [mainAPI.CLOUD_API_ADMIN, mainAPI.LOCALHOST_HOST]
+      ? [mainAPI.LOCALHOST_ADMIN, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
   useEffect(() => {
     getAccountList();
@@ -25,8 +38,10 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data.response);
-        setAccounts(res.data.response);
+        setState({
+          accounts: res.data.response,
+        });
+        // setAccounts(res.data.response);
       })
       .catch((error) => console.log(error.message));
   }
@@ -41,16 +56,36 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data.response);
-        setRoles(res.data.response);
+        setState({
+          roles: res.data.response,
+        });
       })
       .catch((error) => console.log(error.message));
+  }
+  function addNewAccount(username, password, email, role) {
+    return axios
+      .post(mainAPI.CLOUD_API_REGISTER, {
+        username,
+        email,
+        password,
+        role,
+      })
+      .then((res) =>
+        setState({
+          accounts: [res.data.response, ...state.accounts],
+        })
+      )
+      .catch((error) =>
+        setState({
+          errors: [state.errors, error.message],
+        })
+      );
   }
   return (
     <AdminContextAPI.Provider
       value={{
-        accounts,
-        roles,
+        ...state,
+        addNewAccount,
       }}
     >
       {children}

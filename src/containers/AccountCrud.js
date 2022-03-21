@@ -61,8 +61,10 @@ export default function AccountCrud() {
         Register New Account
       </button>
       {modal && (
-        <div style={{ height: "0px" }}>
-          <ModalAddFormAccount setModal={setModal} modal={modal} />
+        <div className="MadalBackDrop">
+          <div className="MobalCenter">
+            <ModalAddFormAccount setModal={setModal} modal={modal} />
+          </div>
         </div>
       )}
 
@@ -141,56 +143,160 @@ export default function AccountCrud() {
 
 function AccFromEdit({ modalEdit, setModalEdit, data }) {
   const { roles: ROLES } = useAdminContext();
+  const [error, setError] = useState("");
   const [input, setInput] = useState({
     username: data.username,
     email: data.email,
+    password: data.password,
+    newpassword: "",
     role: data.role._id,
   });
-  console.log(data);
   // const [API] =
   //   process.env.REACT_APP_ENVIRONMENT === "development"
   // ? [mainAPI.CLOUD_API_ADMIN, mainAPI.LOCALHOST_HOST]
   //     : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
 
-  async function HandleNameInput(e) {
+  const [passwordShown, setPasswordShown] = useState(false);
+  const togglePassword = (e) => {
+    e.preventDefault();
+    setPasswordShown(!passwordShown);
+  };
+  const [confirmShown, setConfirmShown] = useState(false);
+  const toggleConfirm = (e) => {
+    e.preventDefault();
+    setConfirmShown(!confirmShown);
+  };
+
+  const IconTaggle = ({ Action, Condition }) => {
+    return (
+      <>
+        <Icon style={{ marginTop: "4.5rem" }} onClick={Action}>
+          {!Condition ? (
+            <AiFillEyeInvisible size={20} />
+          ) : (
+            <AiFillEye size={20} />
+          )}
+        </Icon>
+      </>
+    );
+  };
+
+  async function handleNameInput(e) {
     setInput({ ...input, [e.target.name]: e.target.value });
   }
-  console.log(input);
-  async function onSubmit(e) {
-    e.preventDefault();
+  // console.log(input);
 
-    // CreateAccount();
+  async function onSubmitName(e) {
+    e.preventDefault();
+  }
+  async function onSubmitEmail(e) {
+    e.preventDefault();
+  }
+  async function onSubmitRole(e) {
+    e.preventDefault();
+  }
+
+  async function onSubmitPassword(e) {
+    e.preventDefault();
+    try {
+      if (input.password !== input["newpassword"])
+        throw new Error("Your confirm password is incorrectly");
+    } catch (error) {
+      setError(error.message);
+    }
   }
   return (
     <div className="c-modal__containerAccount">
-      <form>
-        <div className="form-container">
-          <div className="question-container">
-            <div className="row">
-              <div className="col-2">
-                <label className="question-label">User Name</label>
+      <div className="form-container">
+        <div className="question-container">
+          <div className="row" style={{ textAlign: "left" }}>
+            <div className="col-1">
+              <form>
+                <h4 className="question-label">User Name</h4>
                 <input
                   className="row-input"
                   type="text"
                   name="username"
                   placeholder="New user name"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   value={input.username}
                 />
-              </div>
-              <div className="col-2">
-                <label className="question-label">Email</label>
+                <button
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitName}
+                >
+                  Name Edit
+                </button>
+              </form>
+            </div>
+            <div className="col-1">
+              <form>
+                <h4 className="question-label">Email</h4>
                 <input
                   className="row-input"
+                  style={{ maxWidth: "250px" }}
                   type="text"
                   placeholder="New Email"
                   name="email"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   value={input.email}
                 />
+                <button
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitEmail}
+                >
+                  Email Edit
+                </button>
+              </form>
+            </div>
+          </div>
+          <form>
+            <div className="row" style={{ textAlign: "left" }}>
+              <div className="col-2">
+                <label className="question-label">Password</label>
+                <input
+                  className="row-input"
+                  type={!passwordShown ? "password" : "text"}
+                  placeholder="Password"
+                  name="password"
+                  onChange={handleNameInput}
+                  value={input.password}
+                  autoComplete="new-password"
+                />
+                <button
+                  style={{
+                    width: "100px",
+                  }}
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitPassword}
+                >
+                  Pass Edit
+                </button>
+              </div>
+              <div className="col-iconPass">
+                <IconTaggle Action={togglePassword} Condition={passwordShown} />
+              </div>
+              <div className="col-2">
+                <label className="question-label">Confirm</label>
+                <input
+                  className="row-input"
+                  type={!confirmShown ? "password" : "text"}
+                  placeholder="New Pass Again"
+                  name="newpassword"
+                  onChange={handleNameInput}
+                  value={input.newpassword}
+                />
+              </div>
+              <div className="col-iconPass">
+                <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
               </div>
             </div>
-            <div className="row">
+          </form>
+          <div className="row" style={{ textAlign: "left" }}>
+            <form>
               <div className="col-1">
                 <label className="question-label">Select Role</label>
                 <select
@@ -198,7 +304,7 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
                   className="row-input"
                   type="select"
                   name="role"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   defaultValue={input.role}
                 >
                   {ROLES.filter(
@@ -209,34 +315,47 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
                     </option>
                   ))}
                 </select>
+                <button
+                  style={{
+                    width: "100px",
+                  }}
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitRole}
+                >
+                  Role Edit
+                </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
-        <div className="form-container">
-          <div className="question-container">
-            <button
-              type="submit"
-              className="submit_Register "
-              onClick={onSubmit}
-            >
-              Save Edit
-            </button>
-            <button
-              className="btn-trans-Cancel"
-              onClick={() => setModalEdit(!modalEdit)}
-            >
-              Close
-            </button>
-          </div>
+      </div>
+      <div className="form-container">
+        <div className="question-container">
+          <button
+            className="btn-trans-Cancel"
+            onClick={() => setModalEdit(!modalEdit)}
+          >
+            Close
+          </button>
         </div>
-      </form>
+      </div>
+      {error && (
+        <p
+          style={{
+            color: "red",
+            fontWeight: "900",
+          }}
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }
 
 function ModalAddFormAccount({ setModal, modal }) {
-  const { roles } = useAdminContext();
+  const { roles, addNewAccount } = useAdminContext();
   const [accAdd, setaccAdd] = useState({
     username: "",
     email: "",
@@ -244,7 +363,7 @@ function ModalAddFormAccount({ setModal, modal }) {
       "https://cdn.dribbble.com/users/1577045/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png?compress=1&resize=400x300",
     password: "",
     repassword: "",
-    role: roles._id,
+    role: roles[0]._id,
   });
 
   const [passwordShown, setPasswordShown] = useState(false);
@@ -274,12 +393,12 @@ function ModalAddFormAccount({ setModal, modal }) {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [API] =
+  const [API, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.CLOUD_API_ADMIN, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
 
-  async function HandleNameInput(e) {
+  async function handleNameInput(e) {
     setaccAdd({ ...accAdd, [e.target.name]: e.target.value }, [setaccAdd]);
   }
 
@@ -294,42 +413,20 @@ function ModalAddFormAccount({ setModal, modal }) {
         else if (key === "repassword") validator.isEmpty();
       });
       if (accAdd.role == null) throw new Error("Select Assign Role");
-      if (accAdd.password !== accAdd["repassword"])
+      if (accAdd.password !== accAdd.repassword)
         throw new Error("Your confirm password is incorrectly");
     } catch (error) {
       setError(error.message);
     }
-
-    const data = {
-      Username: accAdd.username,
-      Email: accAdd.email,
-      Pass: accAdd.password,
-      Role: accAdd.role,
-    };
-    console.log(data);
-    // CreateAccount();
+    createAccount();
   }
-  function CreateAccount() {
-    // const { getNewAccount } = useAdminContext();
-    // const getNewAccountRef = useRef(getNewAccount);
-    // useEffect(() => {
-    //   getNewAccountRef.current = getNewAccount;
-    // }, [getNewAccount]);
-
-    return axios
-      .post(API, accAdd, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        params: {
-          view: "category",
-        },
-      })
-      .then((res) => {
-        // getNewAccount(res.data.response);
-        setModal(false);
-      })
-      .catch((error) => console.log(error.message));
+  function createAccount() {
+    return addNewAccount(
+      accAdd.username,
+      accAdd.password,
+      accAdd.email,
+      accAdd.role
+    );
   }
 
   return (
@@ -345,7 +442,7 @@ function ModalAddFormAccount({ setModal, modal }) {
                   type="text"
                   name="username"
                   placeholder="New user name"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   value={accAdd.username}
                 />
               </div>
@@ -356,7 +453,7 @@ function ModalAddFormAccount({ setModal, modal }) {
                   type="text"
                   placeholder="New Email"
                   name="email"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   value={accAdd.email}
                 />
               </div>
@@ -370,7 +467,7 @@ function ModalAddFormAccount({ setModal, modal }) {
                   type={!passwordShown ? "password" : "text"}
                   placeholder="Password"
                   name="password"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   value={accAdd.password}
                   autocomplete="new-password"
                 />
@@ -385,7 +482,7 @@ function ModalAddFormAccount({ setModal, modal }) {
                   type={!confirmShown ? "password" : "text"}
                   placeholder="Pass Again"
                   name="repassword"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   value={accAdd.repassword}
                 />
               </div>
@@ -401,7 +498,7 @@ function ModalAddFormAccount({ setModal, modal }) {
                   className="row-input"
                   type="select"
                   name="role"
-                  onChange={HandleNameInput}
+                  onChange={handleNameInput}
                   value={accAdd.role}
                 >
                   <option value={roles._id}>Empty</option>
@@ -451,6 +548,7 @@ function ModalAddFormAccount({ setModal, modal }) {
 }
 function AccountData({ data, deleteAcc, index }) {
   const [modalEdit, setModalEdit] = useState(false);
+  const [modalDetail, setModalDetail] = useState(false);
   return (
     <tr key={index}>
       <td style={{ textAlign: "center", width: "5%" }}>{index + 1}</td>
@@ -475,9 +573,23 @@ function AccountData({ data, deleteAcc, index }) {
           width: "10%",
         }}
       >
-        <button onClick={(e) => {}} className="btn-blue">
+        <button
+          onClick={() => setModalDetail(!modalDetail)}
+          className="btn-blue"
+        >
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>
+        {modalDetail && (
+          <div className="MadalBackDrop">
+            <div className="MobalCenter">
+              <DetailAcc
+                setModalDetail={setModalDetail}
+                modalDetail={modalDetail}
+                data={data}
+              />
+            </div>
+          </div>
+        )}
         <button
           onClick={() => setModalEdit(!modalEdit)}
           className="btn-warning"
@@ -485,12 +597,14 @@ function AccountData({ data, deleteAcc, index }) {
           {data._id === "" ? <span></span> : <span>Edit</span>}
         </button>
         {modalEdit && (
-          <div style={{ height: "0px" }}>
-            <AccFromEdit
-              setModalEdit={setModalEdit}
-              modalEdit={modalEdit}
-              data={data}
-            />
+          <div className="MadalBackDrop">
+            <div className="MobalCenter">
+              <AccFromEdit
+                setModalEdit={setModalEdit}
+                modalEdit={modalEdit}
+                data={data}
+              />
+            </div>
           </div>
         )}
         <button onClick={(e) => deleteAcc(e, data._id)} className="btn-red">
@@ -541,5 +655,93 @@ function SearchCategory({
       placeholder="Search..."
       onChange={inputHandler}
     />
+  );
+}
+
+function DetailAcc({ modalDetail, setModalDetail, data }) {
+  // console.log(data);
+  const pic =
+    "https://cdn.dribbble.com/users/1577045/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png?compress=1&resize=400x300";
+  return (
+    <div className="c-modal__containerAccount">
+      <form>
+        <div className="form-container">
+          <div className="question-container">
+            <div className="Detail">
+              <img className="Detail__profile-pic" src={pic} alt="" />
+            </div>
+            <div
+              className="row"
+              style={{
+                textAlign: "left",
+              }}
+            >
+              <div className="col-2">
+                <strong
+                  style={{
+                    color: "#40916C",
+                    fontSize: "18px",
+                  }}
+                >
+                  Name:{" "}
+                </strong>
+                {data.username}
+              </div>
+              <div className="col-2">
+                <strong
+                  style={{
+                    color: "#40916C",
+                    fontSize: "18px",
+                  }}
+                >
+                  Job:{" "}
+                </strong>
+                {data.role.roleName}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-1">
+                <strong
+                  style={{
+                    color: "#40916C",
+                    fontSize: "18px",
+                  }}
+                >
+                  Email:{" "}
+                </strong>
+                {data.email}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-1">
+                <strong
+                  style={{
+                    color: "#40916C",
+                    fontSize: "15px",
+                  }}
+                >
+                  Register Date:{" "}
+                </strong>
+                {new Date(data.createdAt).toLocaleString("en-uk", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="form-container">
+          <div className="question-container">
+            <button
+              className="btn-trans-Cancel"
+              onClick={() => setModalDetail(!modalDetail)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 }
