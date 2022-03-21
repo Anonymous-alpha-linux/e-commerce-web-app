@@ -5,7 +5,7 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { HiDownload } from 'react-icons/hi';
 import { Comment, DropDownButton, GridPreview } from ".";
 import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { roles } from "../fixtures";
 import axios from "axios";
 import { mainAPI } from "../config";
@@ -27,6 +27,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
   const [openComment, setOpenComment] = useState(false);
   const [interact, setInteract] = useState({ liked: postFooter.isLiked, disliked: postFooter.isDisliked });
   const [type, setType] = useState(interactTypes.NO);
+  let navigate = useNavigate();
 
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
@@ -52,7 +53,19 @@ export default function Post({ postHeader, postBody, postFooter }) {
       params: {
         postid: postHeader.id
       },
-    }).then(res => console.log('download successfully')).catch(err => console.log(err.message));
+    }).then(res => {
+      const link = document.createElement('a');
+      link.href = res.data.response;
+
+      // Append to html link element page
+      document.body.appendChild(link);
+
+      // Start download
+      link.click();
+
+      // Clean up and remove the link
+      link.parentNode.removeChild(link);
+    }).catch(err => console.log(err.message));
   }
   // const downloadZIPFile = async (e) => {
   //   console.log(postBody);

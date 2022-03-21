@@ -44,16 +44,16 @@ function DashBoardHeader({ children }) {
                             <Text.Title style={{ color: "white" }}>Idea</Text.Title>
                             <Text.Title style={{ background: "#f79817", width: "35px", textAlign: "center", borderRadius: "20px" }}>Hub</Text.Title>
                         </ContainerComponent.Pane> */}
-            <LogoIcon></LogoIcon>
-          </ContainerComponent.Item>
-        </ContainerComponent.Flex>
-      </ContainerComponent>
-      {openSideBar && <Sidebar></Sidebar>}
-      <ContainerComponent.Section className="sidebar__content">
-        {children}
-      </ContainerComponent.Section>
-    </>
-  );
+                        <LogoIcon></LogoIcon>
+                    </ContainerComponent.Item>
+                </ContainerComponent.Flex>
+            </ContainerComponent>
+            {openSideBar && <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>}
+            <ContainerComponent.Section className="sidebar__content">
+                {children}
+            </ContainerComponent.Section>
+        </>
+    )
 }
 
 export default DashBoardHeader;
