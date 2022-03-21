@@ -1,5 +1,6 @@
 .ToastMessage {
   width: 280px;
+  height: 100px;
   border-radius: 20px;
   background-color: #fff;
   border: 1px solid #000;
