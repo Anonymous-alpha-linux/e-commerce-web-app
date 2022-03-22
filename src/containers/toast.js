@@ -3,26 +3,40 @@ import { toastTypes } from "../fixtures";
 import styles from "./styles/ToastMessage.module.css";
 import { useAuthorizationContext } from "../redux";
 
-export default function ToastMessage({ message, timeout, type = toastTypes.WARNING }) {
-  const { setError, setMessage, setInfo } = useAuthorizationContext();
+export default function ToastMessage({
+  message,
+  error,
+  timeout,
+  type = toastTypes.WARNING,
+  setError,
+  setMessage,
+}) {
   const toastRef = useRef();
   useEffect(() => {
-    // ToastRef.current.style.opacity = 1;
-    // const LoaderBar = ToastRef.current.lastElementChild.children[0];
     toastRef.current.style.width = "0%";
     const timeoutVal = setTimeout(() => {
-      setError("");
-      setMessage("");
-      setInfo("");
+      setError((o) => "");
+      setMessage((o) => "");
     }, timeout + 100);
     return () => {
       clearTimeout(timeoutVal);
     };
   }, []);
   return (
-    <div className={`${styles.ToastMessage} ${styles[type]}`}>
-      <h3>{type.toUpperCase()}</h3>
-      <span>{message}</span>
+    <div
+      className={`${styles.ToastMessage} ${
+        styles[error ? toastTypes.ERROR : toastTypes.SUCCESS]
+      }`}
+    >
+      <h5
+        style={{
+          color: `${error ? "red" : "green"}`,
+          textTransform: "uppercase",
+        }}
+      >
+        {error ? "error" : "success"}
+      </h5>
+      {/* <span>{message}</span> */}
       <div className={styles.Loader}>
         <div
           className={styles.Bar}

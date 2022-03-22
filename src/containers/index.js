@@ -34,3 +34,5 @@ export { default as Toast } from "./toast";
 export { default as InteractFooter } from "./interaction";
 export { default as DashboardHeader } from "./DashBoardHeader";
 export { default as AccountCrud } from "./AccountCrud";
+export { default as AttachmentCrub } from "./AttachmentCrub";
+export { default as SecondPagination } from "./pagination2";
