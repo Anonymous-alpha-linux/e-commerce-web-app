@@ -1,10 +1,11 @@
 import React from "react";
-import { AccountCrud } from "../../containers";
+import { AccountCrud, AttachmentCrub } from "../../containers";
 
 function Dashboard() {
   return (
     <>
       <AccountCrud />
+      <AttachmentCrub />
     </>
   );
 }

@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { VscThreeBars } from "react-icons/vsc";
-import { AnimateComponent, ContainerComponent, Icon, LogoIcon, Text } from "../components";
+import {
+  AnimateComponent,
+  ContainerComponent,
+  Icon,
+  LogoIcon,
+  Text,
+} from "../components";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import Sidebar from "./sidebar";
 
@@ -18,10 +24,24 @@ function DashBoardHeader({ children }) {
   }, [sideBarRef.current?.clientWidth]);
   return (
     <ContainerComponent className="manager_root">
-      <ContainerComponent className="manager__header" style={{ padding: "10px 25px", position: "sticky", top: 0, left: 0, zIndex: 10, }}>
-        <ContainerComponent.Flex style={{ justifyContent: "space-between", alignItems: "center" }}>
+      <ContainerComponent
+        className="manager__header"
+        style={{
+          padding: "10px 25px",
+          position: "sticky",
+          top: 0,
+          left: 0,
+          zIndex: 10,
+        }}
+      >
+        <ContainerComponent.Flex
+          style={{ justifyContent: "space-between", alignItems: "center" }}
+        >
           <ContainerComponent.Item>
-            <Icon onClick={() => setOpenSidebar((e) => !e)} style={{ cursor: "pointer" }}>
+            <Icon
+              onClick={() => setOpenSidebar((e) => !e)}
+              style={{ cursor: "pointer" }}
+            >
               <VscThreeBars style={{ fontSize: "25px" }}></VscThreeBars>
             </Icon>
           </ContainerComponent.Item>
@@ -51,7 +71,7 @@ function DashBoardHeader({ children }) {
         </ContainerComponent.Section>
       </ContainerComponent>
     </ContainerComponent>
-  )
+  );
 }
 
 export default DashBoardHeader;

@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
 
-import { ButtonComponent, ContainerComponent, Icon, Preview, Text } from '../components'
-import { MdOutlineWork } from 'react-icons/md';
-import { AiFillCaretDown, AiFillRightCircle } from 'react-icons/ai';
-import { TiPlus } from 'react-icons/ti';
+import {
+  AnimateComponent,
+  ButtonComponent,
+  ContainerComponent,
+  Icon,
+  Preview,
+  Text,
+} from "../components";
+import { MdOutlineWork } from "react-icons/md";
+import { AiFillCaretDown, AiFillRightCircle } from "react-icons/ai";
+import { TiPlus } from "react-icons/ti";
 import { GrStackOverflow } from "react-icons/gr";
-import { GoSignOut } from 'react-icons/go';
+import { GoSignOut } from "react-icons/go";
 
 import { Link, Navigate } from "react-router-dom";
 import { sidebarData } from "../fixtures";
@@ -44,24 +51,25 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
               <Text> {user.account}</Text>
             </Text.CenterLine>
             <ContainerComponent.Flex>
-              {sidebarData.map((item, index) =>
-                <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{ width: "100%", padding: "20px", position: "relative" }}>
-                  <Link to={item.link}>
-                    <Text.Line>
-                      <Text.MiddleLine style={{ width: '20%' }}>
-                        <Icon style={{ fontSize: '30px' }}>
-                          {item.icon}
-                        </Icon>
-                      </Text.MiddleLine>
-                      <Text.MiddleLine style={{ width: '80%', paddingLeft: '2rem' }}>
-                        <Text.Title>
-                          {item.title}
-                        </Text.Title>
-                      </Text.MiddleLine>
-                    </Text.Line>
-                  </Link>
-                </ContainerComponent.Item>
-              )}
+              {
+                sidebarData.map((item, index) =>
+                  <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{ width: "100%", padding: "20px", position: "relative" }}>
+                    <Link to={item.link}>
+                      <Text.Line>
+                        <Text.MiddleLine style={{ width: '20%' }}>
+                          <Icon style={{ fontSize: '30px' }}>
+                            {item.icon}
+                          </Icon>
+                        </Text.MiddleLine>
+                        <Text.MiddleLine style={{ width: '80%', paddingLeft: '2rem' }}>
+                          <Text.Title>
+                            {item.title}
+                          </Text.Title>
+                        </Text.MiddleLine>
+                      </Text.Line>
+                    </Link>
+                  </ContainerComponent.Item>
+                )}
               <ContainerComponent.Item style={{ width: "100%", padding: "20px", position: "relative" }}>
                 <Text.Line>
                   <Text.MiddleLine style={{ width: '20%' }}>
@@ -151,58 +159,82 @@ const EditToggle = ({ item, clickLoader }) => {
             </ContainerComponent.Pane>
           </Text.MiddleLine>
           <Text.MiddleLine>
-            <Icon
-              style={{ fontSize: "20px" }}
-            >
-              <AiFillCaretDown key={item.id} onClick={() => setEditToggle(!editToggle)}></AiFillCaretDown>
+            <Icon style={{ fontSize: "20px" }}>
+              <AiFillCaretDown
+                key={item.id}
+                onClick={() => setEditToggle(!editToggle)}
+              ></AiFillCaretDown>
             </Icon>
           </Text.MiddleLine>
         </ContainerComponent.Flex>
-        <Text.Line style={{ width: '100%' }}>
-          {editToggle &&
-            <ContainerComponent.Toggle className={switchToggleChild ? "opera" : "empty"} style={{ display: "flex", justifyContent: "center", position: 'absolute', border: '1px solid', borderRadius: '10px', right: 0, padding: '20px', zIndex: 3, background: '#fff' }}>
-              <ContainerComponent.Flex style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "15px" }}>
+        <Text.Line style={{ width: "100%" }}>
+          {editToggle && (
+            <ContainerComponent.Toggle
+              className={switchToggleChild ? "opera" : "empty"}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                position: "absolute",
+                border: "1px solid",
+                borderRadius: "10px",
+                right: 0,
+                padding: "20px",
+                zIndex: 3,
+                background: "#fff",
+              }}
+            >
+              <ContainerComponent.Flex
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  gap: "15px",
+                }}
+              >
                 <ButtonComponent>
-                  <Link to={`/management/staff/${item._id}`} style={{ color: '#fff' }} onClick={clickLoader}>
-                    <Text.Line>
-                      Assign QA Coordinator
-                    </Text.Line>
+                  <Link
+                    to={`/management/staff/${item._id}`}
+                    style={{ color: "#fff" }}
+                    onClick={clickLoader}
+                  >
+                    <Text.Line>Assign QA Coordinator</Text.Line>
                   </Link>
                 </ButtonComponent>
                 <ButtonComponent>
-                  <Link to={`/management/member/${item._id}`} style={{ color: '#fff' }} onClick={clickLoader}>
-                    <Text.Line>
-                      Add Member
-                    </Text.Line>
+                  <Link
+                    to={`/management/member/${item._id}`}
+                    style={{ color: "#fff" }}
+                    onClick={clickLoader}
+                  >
+                    <Text.Line>Add Member</Text.Line>
                   </Link>
                 </ButtonComponent>
-                <ButtonComponent style={{ width: "177px", textAlign: "center" }}>
+                <ButtonComponent
+                  style={{ width: "177px", textAlign: "center" }}
+                >
                   Edit Time/Title
                 </ButtonComponent>
               </ContainerComponent.Flex>
-            </ContainerComponent.Toggle>}
+            </ContainerComponent.Toggle>
+          )}
         </Text.Line>
       </ContainerComponent.Item>
     </>
-  )
-}
+  );
+};
 
-function TimespanChild({
-  startTime = Date.now(),
-  expireTime,
-}) {
+function TimespanChild({ startTime = Date.now(), expireTime }) {
   const startDate = new Date(startTime);
   const expireDate = new Date(expireTime);
   const [counterTimer, setCounterTimer] = useState({
     days: expireDate.getDate() - startDate.getDate(),
     hours: 23 - startDate.getHours(),
     minutes: 59 - startDate.getMinutes(),
-    seconds: 59 - startDate.getSeconds()
+    seconds: 59 - startDate.getSeconds(),
   });
 
   useEffect(() => {
     let timeout = setTimeout(() => {
-
       setCounterTimer({
         days: expireDate.getDate() - startDate.getDate(),
         hours: 23 - startDate.getHours(),
@@ -213,45 +245,54 @@ function TimespanChild({
 
     return () => {
       clearTimeout(timeout);
-    }
+    };
   }, [counterTimer]);
 
-  return <ContainerComponent.Section
-
-    className="timespan__container"
-  >
-    <ContainerComponent.Inner
-      style={{
-        margin: '0 auto',
-        textAlign: 'center',
-      }}
-    >
-      <ContainerComponent.Flex
+  return (
+    <ContainerComponent.Section className="timespan__container">
+      <ContainerComponent.Inner
         style={{
-          // alignItems: 'center',
-          justifyContent: 'center',
+          margin: "0 auto",
+          textAlign: "center",
         }}
       >
-        <ContainerComponent.Item style={{ fontSize: "13px", padding: "5px 0" }} >
-          <ButtonComponent style={{ padding: "5px 15px" }}>{`${counterTimer.hours < 10 && '0' || ''}${counterTimer.hours}`} </ButtonComponent>
-        </ContainerComponent.Item>
+        <ContainerComponent.Flex
+          style={{
+            // alignItems: 'center',
+            justifyContent: "center",
+          }}
+        >
+          <ContainerComponent.Item
+            style={{ fontSize: "13px", padding: "5px 0" }}
+          >
+            <ButtonComponent style={{ padding: "5px 15px" }}>
+              {`${(counterTimer.hours < 10 && "0") || ""}${counterTimer.hours}`}{" "}
+            </ButtonComponent>
+          </ContainerComponent.Item>
 
-        <ContainerComponent.Item >
-          <Text>:</Text>
-        </ContainerComponent.Item>
+          <ContainerComponent.Item>
+            <Text>:</Text>
+          </ContainerComponent.Item>
 
-        <ContainerComponent.Item style={{ fontSize: "13px", padding: "5px 0" }}>
-          <ButtonComponent style={{ padding: "5px 10px" }}>{`${counterTimer.minutes < 10 && '0' || ''}${counterTimer.minutes}`}</ButtonComponent>
-        </ContainerComponent.Item>
+          <ContainerComponent.Item
+            style={{ fontSize: "13px", padding: "5px 0" }}
+          >
+            <ButtonComponent style={{ padding: "5px 10px" }}>{`${(counterTimer.minutes < 10 && "0") || ""
+              }${counterTimer.minutes}`}</ButtonComponent>
+          </ContainerComponent.Item>
 
-        <ContainerComponent.Item>
-          <Text>:</Text>
-        </ContainerComponent.Item>
+          <ContainerComponent.Item>
+            <Text>:</Text>
+          </ContainerComponent.Item>
 
-        <ContainerComponent.Item style={{ fontSize: "13px", padding: "5px 0" }}>
-          <ButtonComponent style={{ padding: "5px 10px" }}>{`${counterTimer.seconds < 10 && '0' || ''}${counterTimer.seconds}`}</ButtonComponent>
-        </ContainerComponent.Item>
-      </ContainerComponent.Flex>
-    </ContainerComponent.Inner>
-  </ContainerComponent.Section>
+          <ContainerComponent.Item
+            style={{ fontSize: "13px", padding: "5px 0" }}
+          >
+            <ButtonComponent style={{ padding: "5px 10px" }}>{`${(counterTimer.seconds < 10 && "0") || ""
+              }${counterTimer.seconds}`}</ButtonComponent>
+          </ContainerComponent.Item>
+        </ContainerComponent.Flex>
+      </ContainerComponent.Inner>
+    </ContainerComponent.Section>
+  );
 }
