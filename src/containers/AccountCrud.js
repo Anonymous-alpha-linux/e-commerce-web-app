@@ -7,7 +7,8 @@ import { mainAPI } from "../config";
 import useValidate from "../hooks/useValidate";
 import { Icon } from "../components";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { roles } from "../fixtures";
+import { roles, toastTypes } from "../fixtures";
+import { Toast } from ".";
 
 export default function AccountCrud() {
   const [API] =
@@ -16,13 +17,12 @@ export default function AccountCrud() {
       : [mainAPI.LOCALHOST_ADMIN, mainAPI.CLOUD_HOST];
   let PageSize = 8;
   const { accounts } = useAdminContext();
+  // console.log(accounts);
   const [modal, setModal] = useState(false);
-  const [modalEdit, setModalEdit] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [dataRecords, setDataRecords] = useState([]);
-  // console.log("re-render crud", accounts);
 
   useEffect(() => {
     setDataRecords((e) => {
@@ -31,30 +31,6 @@ export default function AccountCrud() {
       return accounts.slice(firstPageIndex, lastPageIndex);
     });
   }, [accounts, currentPage]);
-
-  function deleteAcc(e, id) {
-    e.preventDefault();
-    console.log(id);
-    // handleDelete(id);
-  }
-
-  function handleDelete(commentId) {
-    return axios
-      .delete(API, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        params: {
-          view: `category`,
-          commentid: commentId,
-        },
-      })
-      .then((res) => {
-        // setNewRecord(res.data.response);
-        // removeCategory(commentId);
-      })
-      .catch((error) => console.log(error.message));
-  }
   return (
     <div className="categoryCRUD__root">
       <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
@@ -88,7 +64,7 @@ export default function AccountCrud() {
                 Role
               </th>
               <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                <SearchCategory
+                <SearchAccount
                   accounts={accounts}
                   searchInput={searchInput}
                   setSearchInput={setSearchInput}
@@ -102,20 +78,10 @@ export default function AccountCrud() {
           <tbody>
             {searchInput !== ""
               ? filteredResults.map((accounts, index) => (
-                  <AccountData
-                    key={index}
-                    data={accounts}
-                    index={index}
-                    deleteAcc={deleteAcc}
-                  />
+                  <AccountData key={index} data={accounts} index={index} />
                 ))
               : dataRecords.map((accounts, index) => (
-                  <AccountData
-                    key={index}
-                    data={accounts}
-                    index={index}
-                    deleteAcc={deleteAcc}
-                  />
+                  <AccountData key={index} data={accounts} index={index} />
                 ))}
             {!accounts?.length && (
               <tr>
@@ -142,7 +108,14 @@ export default function AccountCrud() {
 }
 
 function AccFromEdit({ modalEdit, setModalEdit, data }) {
-  const { roles: ROLES } = useAdminContext();
+  const {
+    roles: ROLES,
+    editUsername,
+    editEmail,
+    editPassword,
+    editRole,
+  } = useAdminContext();
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [input, setInput] = useState({
     username: data.username,
@@ -155,7 +128,6 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
   //   process.env.REACT_APP_ENVIRONMENT === "development"
   // ? [mainAPI.CLOUD_API_ADMIN, mainAPI.LOCALHOST_HOST]
   //     : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
-
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePassword = (e) => {
     e.preventDefault();
@@ -184,16 +156,27 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
   async function handleNameInput(e) {
     setInput({ ...input, [e.target.name]: e.target.value });
   }
-  // console.log(input);
 
   async function onSubmitName(e) {
     e.preventDefault();
+    editUsername(input.username, data._id, ({ message, error }) => {
+      if (error) setError(error);
+      else setMessage(message);
+    });
   }
   async function onSubmitEmail(e) {
     e.preventDefault();
+    editEmail(input.email, data._id, ({ message, error }) => {
+      if (error) setError(error);
+      else setMessage(message);
+    });
   }
   async function onSubmitRole(e) {
     e.preventDefault();
+    editRole(input.role, data._id, ({ message, error }) => {
+      if (error) setError(error);
+      else setMessage(message);
+    });
   }
 
   async function onSubmitPassword(e) {
@@ -201,161 +184,181 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
     try {
       if (input.password !== input["newpassword"])
         throw new Error("Your confirm password is incorrectly");
+      editPassword(input.password, data._id);
     } catch (error) {
       setError(error.message);
+      setTimeout(() => setError(!error), 3000);
     }
   }
   return (
-    <div className="c-modal__containerAccount">
-      <div className="form-container">
-        <div className="question-container">
-          <div className="row" style={{ textAlign: "left" }}>
-            <div className="col-1">
-              <form>
-                <h4 className="question-label">User Name</h4>
-                <input
-                  className="row-input"
-                  type="text"
-                  name="username"
-                  placeholder="New user name"
-                  onChange={handleNameInput}
-                  value={input.username}
-                />
-                <button
-                  type="submit"
-                  className="submit_edit"
-                  onClick={onSubmitName}
-                >
-                  Name Edit
-                </button>
-              </form>
-            </div>
-            <div className="col-1">
-              <form>
-                <h4 className="question-label">Email</h4>
-                <input
-                  className="row-input"
-                  style={{ maxWidth: "250px" }}
-                  type="text"
-                  placeholder="New Email"
-                  name="email"
-                  onChange={handleNameInput}
-                  value={input.email}
-                />
-                <button
-                  type="submit"
-                  className="submit_edit"
-                  onClick={onSubmitEmail}
-                >
-                  Email Edit
-                </button>
-              </form>
-            </div>
-          </div>
-          <form>
+    <>
+      <div className="c-modal__containerAccount">
+        <div className="form-container">
+          <div className="question-container">
             <div className="row" style={{ textAlign: "left" }}>
-              <div className="col-2">
-                <label className="question-label">Password</label>
-                <input
-                  className="row-input"
-                  type={!passwordShown ? "password" : "text"}
-                  placeholder="Password"
-                  name="password"
-                  onChange={handleNameInput}
-                  value={input.password}
-                  autoComplete="new-password"
-                />
-                <button
-                  style={{
-                    width: "100px",
-                  }}
-                  type="submit"
-                  className="submit_edit"
-                  onClick={onSubmitPassword}
-                >
-                  Pass Edit
-                </button>
+              <div className="col-1">
+                <form>
+                  <h4 className="question-label">User Name</h4>
+                  <input
+                    style={{ width: "100%", maxWidth: "160px" }}
+                    className="row-input"
+                    type="text"
+                    name="username"
+                    placeholder="New user name"
+                    onChange={handleNameInput}
+                    value={input.username}
+                  />
+                  <button
+                    type="submit"
+                    className="submit_edit"
+                    onClick={onSubmitName}
+                  >
+                    Edit name
+                  </button>
+                </form>
               </div>
-              <div className="col-iconPass">
-                <IconTaggle Action={togglePassword} Condition={passwordShown} />
-              </div>
-              <div className="col-2">
-                <label className="question-label">Confirm</label>
-                <input
-                  className="row-input"
-                  type={!confirmShown ? "password" : "text"}
-                  placeholder="New Pass Again"
-                  name="newpassword"
-                  onChange={handleNameInput}
-                  value={input.newpassword}
-                />
-              </div>
-              <div className="col-iconPass">
-                <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
+              <div className="col-1">
+                <form>
+                  <h4 className="question-label">Email</h4>
+                  <input
+                    className="row-input"
+                    style={{ width: "100%", maxWidth: "140px" }}
+                    type="text"
+                    placeholder="New Email"
+                    name="email"
+                    onChange={handleNameInput}
+                    value={input.email}
+                  />
+                  <button
+                    type="submit"
+                    className="submit_edit"
+                    onClick={onSubmitEmail}
+                  >
+                    Edit email
+                  </button>
+                </form>
               </div>
             </div>
-          </form>
-          <div className="row" style={{ textAlign: "left" }}>
             <form>
-              <div className="col-1">
-                <label className="question-label">Select Role</label>
-                <select
-                  style={{ width: "100%", maxWidth: "200px" }}
-                  className="row-input"
-                  type="select"
-                  name="role"
-                  onChange={handleNameInput}
-                  defaultValue={input.role}
-                >
-                  {ROLES.filter(
-                    (role) => ![roles.ADMIN].includes(role.roleName)
-                  ).map((role) => (
-                    <option key={role._id} value={role._id}>
-                      {role.roleName}
-                    </option>
-                  ))}
-                </select>
-                <button
+              <div className="row" style={{ textAlign: "left" }}>
+                <div className="col-2">
+                  <label className="question-label">New Password</label>
+                  <input
+                    className="row-input"
+                    type={!passwordShown ? "password" : "text"}
+                    placeholder="new Password"
+                    name="password"
+                    onChange={handleNameInput}
+                    value={input.password}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    style={{
+                      width: "100px",
+                    }}
+                    type="submit"
+                    className="submit_edit"
+                    onClick={onSubmitPassword}
+                  >
+                    Edit pass
+                  </button>
+                </div>
+                <div className="col-iconPass">
+                  <IconTaggle
+                    Action={togglePassword}
+                    Condition={passwordShown}
+                  />
+                </div>
+                <div className="col-2">
+                  <label className="question-label">Confirm</label>
+                  <input
+                    className="row-input"
+                    type={!confirmShown ? "password" : "text"}
+                    placeholder="New Pass Again"
+                    name="newpassword"
+                    onChange={handleNameInput}
+                    value={input.newpassword}
+                  />
+                </div>
+                <div className="col-iconPass">
+                  <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
+                </div>
+              </div>
+              {error && (
+                <p
                   style={{
-                    width: "100px",
+                    color: "red",
+                    fontWeight: "900",
                   }}
-                  type="submit"
-                  className="submit_edit"
-                  onClick={onSubmitRole}
                 >
-                  Role Edit
-                </button>
+                  {error}
+                </p>
+              )}
+            </form>
+            <form>
+              <div className="row" style={{ textAlign: "left" }}>
+                <div className="col-1">
+                  <label className="question-label">Select Role</label>
+                  <select
+                    style={{ width: "100%", maxWidth: "200px" }}
+                    className="row-input"
+                    type="select"
+                    name="role"
+                    onChange={handleNameInput}
+                    defaultValue={input.role}
+                  >
+                    {ROLES.filter(
+                      (role) => ![roles.ADMIN].includes(role.roleName)
+                    ).map((role) => (
+                      <option key={role._id} value={role._id}>
+                        {role.roleName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-2">
+                  <button
+                    style={{
+                      width: "100px",
+                      marginTop: "60px",
+                    }}
+                    type="submit"
+                    className="submit_edit"
+                    onClick={onSubmitRole}
+                  >
+                    Edit role
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
-      </div>
-      <div className="form-container">
-        <div className="question-container">
+        <div className="row" style={{ justifyContent: "right" }}>
           <button
+            style={{ textAlign: "left", fontWeight: "bold" }}
             className="btn-trans-Cancel"
             onClick={() => setModalEdit(!modalEdit)}
           >
-            Close
+            <stong>Exit</stong>
           </button>
         </div>
       </div>
-      {error && (
-        <p
-          style={{
-            color: "red",
-            fontWeight: "900",
-          }}
-        >
-          {error}
-        </p>
+      {(error || message) && (
+        <Toast
+          error={error}
+          message={message}
+          setError={setError}
+          setMessage={setMessage}
+          timeout={3000}
+        ></Toast>
       )}
-    </div>
+    </>
   );
 }
 
 function ModalAddFormAccount({ setModal, modal }) {
-  const { roles, addNewAccount } = useAdminContext();
+  const { roles, createNewAccount } = useAdminContext();
+
   const [accAdd, setaccAdd] = useState({
     username: "",
     email: "",
@@ -393,11 +396,6 @@ function ModalAddFormAccount({ setModal, modal }) {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [API, host] =
-    process.env.REACT_APP_ENVIRONMENT === "development"
-      ? [mainAPI.CLOUD_API_ADMIN, mainAPI.LOCALHOST_HOST]
-      : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
-
   async function handleNameInput(e) {
     setaccAdd({ ...accAdd, [e.target.name]: e.target.value }, [setaccAdd]);
   }
@@ -419,136 +417,157 @@ function ModalAddFormAccount({ setModal, modal }) {
       setError(error.message);
     }
     createAccount();
+    setModal(!modal);
   }
   function createAccount() {
-    return addNewAccount(
+    return createNewAccount(
       accAdd.username,
-      accAdd.password,
       accAdd.email,
+      accAdd.password,
       accAdd.role
     );
   }
 
   return (
-    <div className="c-modal__containerAccount">
-      <form>
-        <div className="form-container">
-          <div className="question-container">
-            <div className="row">
-              <div className="col-2">
-                <label className="question-label">User Name</label>
-                <input
-                  className="row-input"
-                  type="text"
-                  name="username"
-                  placeholder="New user name"
-                  onChange={handleNameInput}
-                  value={accAdd.username}
-                />
+    <>
+      <div className="c-modal__containerAccount">
+        <form>
+          <div className="form-container">
+            <div className="question-container">
+              <div className="row">
+                <div className="col-2">
+                  <label className="question-label">User Name</label>
+                  <input
+                    className="row-input"
+                    type="text"
+                    name="username"
+                    placeholder="New user name"
+                    onChange={handleNameInput}
+                    value={accAdd.username}
+                  />
+                </div>
+                <div className="col-2">
+                  <label className="question-label">Email</label>
+                  <input
+                    className="row-input"
+                    type="text"
+                    placeholder="New Email"
+                    name="email"
+                    onChange={handleNameInput}
+                    value={accAdd.email}
+                  />
+                </div>
               </div>
-              <div className="col-2">
-                <label className="question-label">Email</label>
-                <input
-                  className="row-input"
-                  type="text"
-                  placeholder="New Email"
-                  name="email"
-                  onChange={handleNameInput}
-                  value={accAdd.email}
-                />
+              <div className="row">
+                <div className="col-2">
+                  <label className="question-label">Password</label>
+                  <input
+                    className="row-input"
+                    type={!passwordShown ? "password" : "text"}
+                    placeholder="Password"
+                    name="password"
+                    onChange={handleNameInput}
+                    value={accAdd.password}
+                    autocomplete="new-password"
+                  />
+                </div>
+                <div className="col-iconPass">
+                  <IconTaggle
+                    Action={togglePassword}
+                    Condition={passwordShown}
+                  />
+                </div>
+                <div className="col-2">
+                  <label className="question-label">Confirm</label>
+                  <input
+                    className="row-input"
+                    type={!confirmShown ? "password" : "text"}
+                    placeholder="Pass Again"
+                    name="repassword"
+                    onChange={handleNameInput}
+                    value={accAdd.repassword}
+                  />
+                </div>
+                <div className="col-iconPass">
+                  <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
+                </div>
               </div>
-            </div>
-
-            <div className="row">
-              <div className="col-2">
-                <label className="question-label">Password</label>
-                <input
-                  className="row-input"
-                  type={!passwordShown ? "password" : "text"}
-                  placeholder="Password"
-                  name="password"
-                  onChange={handleNameInput}
-                  value={accAdd.password}
-                  autocomplete="new-password"
-                />
-              </div>
-              <div className="col-iconPass">
-                <IconTaggle Action={togglePassword} Condition={passwordShown} />
-              </div>
-              <div className="col-2">
-                <label className="question-label">Confirm</label>
-                <input
-                  className="row-input"
-                  type={!confirmShown ? "password" : "text"}
-                  placeholder="Pass Again"
-                  name="repassword"
-                  onChange={handleNameInput}
-                  value={accAdd.repassword}
-                />
-              </div>
-              <div className="col-iconPass">
-                <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-1">
-                <label className="question-label">Select Role</label>
-                <select
-                  style={{ width: "100%", maxWidth: "200px" }}
-                  className="row-input"
-                  type="select"
-                  name="role"
-                  onChange={handleNameInput}
-                  value={accAdd.role}
-                >
-                  <option value={roles._id}>Empty</option>
-                  {roles.map(
-                    (role) =>
-                      role.roleName !== "admin" && (
-                        <option key={role._id} value={role._id}>
-                          {role.roleName}
-                        </option>
-                      )
-                  )}
-                </select>
+              <div className="row">
+                <div className="col-1">
+                  <label className="question-label">Select Role</label>
+                  <select
+                    style={{ width: "100%", maxWidth: "200px" }}
+                    className="row-input"
+                    type="select"
+                    name="role"
+                    onChange={handleNameInput}
+                    value={accAdd.role}
+                  >
+                    <option value={roles._id}>Empty</option>
+                    {roles.map(
+                      (role) =>
+                        role.roleName !== "admin" && (
+                          <option key={role._id} value={role._id}>
+                            {role.roleName}
+                          </option>
+                        )
+                    )}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="form-container">
-          <div className="question-container">
-            <button
-              type="submit"
-              className="submit_Register "
-              onClick={onSubmit}
-            >
-              Register
-            </button>
-            <button
-              className="btn-trans-Cancel"
-              onClick={() => setModal(!modal)}
-            >
-              Close
-            </button>
+          <div className="form-container">
+            <div className="question-container">
+              <button
+                type="submit"
+                className="submit_Register "
+                onClick={onSubmit}
+              >
+                Register
+              </button>
+              <button
+                className="btn-trans-Cancel"
+                onClick={() => setModal(!modal)}
+              >
+                Close
+              </button>
+            </div>
           </div>
-        </div>
-        {error && (
-          <p
-            style={{
-              color: "red",
-              fontWeight: "900",
-            }}
-          >
-            {error}
-          </p>
-        )}
-      </form>
-    </div>
+          {error && (
+            <p
+              style={{
+                color: "red",
+                fontWeight: "900",
+              }}
+            >
+              {error}
+            </p>
+          )}
+        </form>
+      </div>
+      {(error || message) && (
+        <Toast
+          error={error}
+          message={message}
+          setError={setError}
+          setMessage={setMessage}
+          timeout={3000}
+        ></Toast>
+      )}
+    </>
   );
 }
-function AccountData({ data, deleteAcc, index }) {
+function AccountData({ data, index }) {
   const [modalEdit, setModalEdit] = useState(false);
   const [modalDetail, setModalDetail] = useState(false);
+  const [block, setBlockacc] = useState(false);
+
+  function blockAccount(e, id) {
+    e.preventDefault();
+    console.log(id);
+    setBlockacc(!block);
+  }
   return (
     <tr key={index}>
       <td style={{ textAlign: "center", width: "5%" }}>{index + 1}</td>
@@ -607,14 +626,17 @@ function AccountData({ data, deleteAcc, index }) {
             </div>
           </div>
         )}
-        <button onClick={(e) => deleteAcc(e, data._id)} className="btn-red">
-          {data._id === "" ? <span></span> : <span>Delete</span>}
+        <button
+          onClick={(e) => blockAccount(e, data._id)}
+          className={block ? "btn-gray" : "btn-red"}
+        >
+          {block ? <span>Unblock</span> : <span>Block</span>}
         </button>
       </td>
     </tr>
   );
 }
-function SearchCategory({
+function SearchAccount({
   accounts,
   currentTableData,
   searchInput,
@@ -667,9 +689,7 @@ function DetailAcc({ modalDetail, setModalDetail, data }) {
       <form>
         <div className="form-container">
           <div className="question-container">
-            <div className="Detail">
-              <img className="Detail__profile-pic" src={pic} alt="" />
-            </div>
+            <ProfilePoster pic={pic} />
             <div
               className="row"
               style={{
@@ -745,3 +765,12 @@ function DetailAcc({ modalDetail, setModalDetail, data }) {
     </div>
   );
 }
+const ProfilePoster = ({ pic }) => {
+  return (
+    <label className="custom-file-upload">
+      <div className="img-Account">
+        <img src={pic} />
+      </div>
+    </label>
+  );
+};

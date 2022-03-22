@@ -46,6 +46,13 @@
     border: 2px solid var(--darkGray);
     box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
   }
+  &__frame {
+    height: 100%;
+    width: 80%;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
 
   &__container {
     background: white;
@@ -355,6 +362,21 @@ $color-accent-light: #40916c;
   cursor: pointer;
   background: linear-gradient(270deg, #458c92, #151f18);
   margin-bottom: 25px;
+}
+.img-Account {
+  margin: auto;
+  position: relative;
+  width: 90px;
+  height: 90px;
+  overflow: hidden;
+  border-radius: 50%;
+  &__pic {
+    border-radius: 100%;
+    width: 50%;
+    max-width: 40%;
+    height: 50%;
+    box-shadow: -1px -1px 2px rgb(154, 159, 165);
+  }
 }
 
 .img-wrap {

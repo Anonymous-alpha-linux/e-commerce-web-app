@@ -40,7 +40,6 @@ const categoryReducer = (state, action) => {
         isUpdated: true,
       };
     case actions.ADD_CATEGORY:
-
       return {
         ...state,
         categories: [...state.categories, action.payload],
@@ -147,7 +146,7 @@ export default React.memo(function PostContext({ children }) {
           filter: filter,
         });
       })
-      .then((success) => { })
+      .then((success) => {})
       .catch((error) => {
         setPost({
           type: actions.SET_OFF_LOADING,
@@ -713,7 +712,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-
         setPost({
           type: actions.LOAD_MORE_COMMENT_REPLIES,
           payload: res.data.response,
@@ -757,7 +755,7 @@ export default React.memo(function PostContext({ children }) {
           payload: res.data.response,
           postId: postId,
           commentId: commentId,
-          replyId: replyId
+          replyId: replyId,
         });
       })
       .then((success) => {
@@ -782,7 +780,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-
         setPost({
           type: actions.ADD_COMMENT_REPLY,
           payload: [res.data.response],
@@ -957,7 +954,7 @@ export default React.memo(function PostContext({ children }) {
         )
         .then((res) => {
           const replyId = res.data.response._id;
-          addCommentReply(postId, input.commentid, replyId, () => { });
+          addCommentReply(postId, input.commentid, replyId, () => {});
           const data = { postId, commentId: input.commentid, replyId };
           sendRealtimeCommentReply(postId, data.commentId, replyId);
           cb(data);
@@ -1060,7 +1057,7 @@ export default React.memo(function PostContext({ children }) {
       .then((data) => cb(data))
       .catch((error) => setError(error.message));
   }
-  function getGzipFile() { }
+  function getGzipFile() {}
   // 9. Category
   function getNewCategory(data) {
     setCategory({
