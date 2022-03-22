@@ -1058,6 +1058,31 @@ export default React.memo(function PostContext({ children }) {
       .catch((error) => setError(error.message));
   }
   function getGzipFile() {}
+  async function downloadHandler(attachmentId) {
+    return axios
+      .get(`${host}/api/v1/download`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          attachmentid: attachmentId,
+        },
+      })
+      .then((res) => {
+        const link = document.createElement("a");
+        link.href = res.data.response;
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      })
+      .catch((err) => console.log(err.message));
+  }
   // 9. Category
   function getNewCategory(data) {
     setCategory({
@@ -1096,6 +1121,7 @@ export default React.memo(function PostContext({ children }) {
     filterMyPost,
     interactPost,
     getGzipFile,
+    downloadHandler,
     getOwnPosts,
     getPostComments,
     loadNextComments,

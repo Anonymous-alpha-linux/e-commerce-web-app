@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
-import { usePostContext, useAdminContext } from "../redux";
+import { useAdminContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
 import { Icon } from "../components";
@@ -16,23 +16,25 @@ export default function AttachmentCrub() {
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
 
   const { attachments, getAttachmentByPage } = useAdminContext();
-  console.log(attachments);
+  // console.log(attachments.records, "attach");
+  const [currentPage, changeCurrentPage] = usePagination2(0);
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
-  // const [dataRecords, setDataRecords] = useState([]);
+  const [dataRecords, setDataRecords] = useState([]);
 
-  const [currentPage, changeCurrentPage] = usePagination2(0);
+  const AttacchmentRecord = attachments.data.find(
+    (item) => item.page === currentPage
+  )?.records;
 
-  // useEffect(() => {
-  // if (!attachments.loading) {
-  // setDataRecords(
-  //   attachments.data.find((item) => item.page === currentPage)?.records
-  // );
-  // }
-  // }, [attachments.data]);
+  console.log(AttacchmentRecord);
+  useEffect(() => {
+    if (!attachments.loading) {
+      setDataRecords(AttacchmentRecord);
+    }
+  }, [attachments.data]);
 
-  function deleteAttachment(e, id) {
+  function delectAttechment(e, id) {
     e.preventDefault();
     console.log(id);
     // handleDelete(id);
@@ -77,11 +79,11 @@ export default function AttachmentCrub() {
               </th>
               <th scope="col" style={{ textAlign: "center", width: "10%" }}>
                 <SearchAttechment
-                  Attechment={attachments.data}
+                  Attechment={AttacchmentRecord}
                   searchInput={searchInput}
                   setSearchInput={setSearchInput}
                   setFilteredResults={setFilteredResults}
-                  currentTableData={attachments.data}
+                  currentTableData={AttacchmentRecord}
                   filteredResults={filteredResults}
                 />
               </th>
@@ -94,19 +96,17 @@ export default function AttachmentCrub() {
                     key={index}
                     data={attachment}
                     index={index}
-                    deleteAttachment={deleteAttachment}
+                    delectAttechment={delectAttechment}
                   />
                 ))
-              : attachments.data
-                  .find((a) => a.page === currentPage)
-                  .records.map((attachment, index) => {
-                    <AttachmentData
-                      key={index}
-                      data={attachment}
-                      index={index}
-                      deleteAttachment={deleteAttachment}
-                    />;
-                  })}
+              : dataRecords.map((attachment, index) => (
+                  <AttachmentData
+                    key={index}
+                    data={attachment}
+                    index={index}
+                    delectAttechment={delectAttechment}
+                  />
+                ))}
             {!attachments.data?.length && (
               <tr>
                 <td>
@@ -125,34 +125,48 @@ export default function AttachmentCrub() {
           lastPage={attachments.pages}
           onChangePage={changeCurrentPage}
           onLoadData={getAttachmentByPage}
-        ></SecondPagination>
-
-        {/* <Pagination
-          className="pagination-bar"
-          currentPage={attachments.currentPage}
-          totalCount={attachments.documentCount.lenght}
-          pageSize={attachments.count}
-          onPageChange={(page) => setCurrentPage(page)}
-        /> */}
-        {/* {res.data.pages.map((page, index) => (
-          <span onClick={() => {}}>{index + 1}</span>
-        ))} */}
+        />
       </div>
     </div>
   );
 }
 
-function AttachmentData({ data, deleteAttachment, index }) {
-  const [modalDownload, setModalDownload] = useState(false);
+function AttachmentData({ data, delectAttechment, index }) {
   const [modalDetail, setModalDetail] = useState(false);
+  const { downloadAttachmentQAM } = useAdminContext();
+
+  function downloadFile(e, attachmentID) {
+    e.preventDefault();
+    // console.log(attachmentID);
+    downloadAttachmentQAM(attachmentID);
+  }
+
+  //convert number to bytes
+  function bytesToSize(bytes, seperator = "") {
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    if (bytes == 0) return "n/a";
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+    if (i === 0) return `${bytes}${seperator}${sizes[i]}`;
+    return `${(bytes / 1024 ** i).toFixed(1)}${seperator}${sizes[i]}`;
+  }
+
   return (
     <tr key={index}>
       <td style={{ textAlign: "center", width: "3%" }}>{index + 1}</td>
-      <td style={{ textAlign: "center", width: "15%", marginLeft: "5%" }}>
-        {/* {data.fileName} */}
+      <td
+        style={{
+          textAlign: "center",
+          width: "15%",
+          fontSize: "14px",
+          marginLeft: "5%",
+        }}
+      >
+        {data.fileName.substring(10, 30)}
       </td>
       <td style={{ textAlign: "center", width: "5%" }}>{data.fileType}</td>
-      <td style={{ textAlign: "center", width: "5%" }}>{data.fileSize}</td>
+      <td style={{ textAlign: "center", width: "5%" }}>
+        {bytesToSize(data.fileSize)}
+      </td>
       <td style={{ textAlign: "center", width: "10%" }}>
         {new Date(data.createdAt).toLocaleString("en-uk", {
           day: "2-digit",
@@ -180,18 +194,19 @@ function AttachmentData({ data, deleteAttachment, index }) {
                 setModalDetail={setModalDetail}
                 modalDetail={modalDetail}
                 data={data}
+                downloadFile={downloadFile}
               />
             </div>
           </div>
         )}
         <button
-          onClick={() => setModalDownload(!modalDownload)}
+          onClick={(e) => downloadFile(e, data._id)}
           className="btn-green"
         >
           {data._id === "" ? <span></span> : <span>Download</span>}
         </button>
         <button
-          onClick={(e) => deleteAttachment(e, data._id)}
+          onClick={(e) => delectAttechment(e, data._id)}
           className="btn-red"
         >
           {data._id === "" ? <span></span> : <span>Delete</span>}
@@ -221,7 +236,6 @@ function SearchAttechment({
       const filteredData = currentTableData.filter((item) => {
         return (
           item.fileName.toLowerCase().includes(searchInput.toLowerCase()) ||
-          item.fileSize.toLowerCase().includes(searchInput.toLowerCase()) ||
           item.fileType.toLowerCase().includes(searchInput.toLowerCase()) ||
           item.createdAt.toLowerCase().includes(searchInput.toLowerCase())
         );
@@ -245,10 +259,17 @@ function SearchAttechment({
   );
 }
 
-function DetailFlie({ modalDetail, setModalDetail, data }) {
-  // console.log(data);
+function DetailFlie({ modalDetail, setModalDetail, data, downloadFile }) {
+  console.log(data, "id");
   const pic =
     "https://cdn.lifehack.org/wp-content/uploads/2012/12/come-up-with-ideas.jpg";
+  function bytesToSize(bytes, seperator = "") {
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    if (bytes == 0) return "n/a";
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+    if (i === 0) return `${bytes}${seperator}${sizes[i]}`;
+    return `${(bytes / 1024 ** i).toFixed(1)}${seperator}${sizes[i]}`;
+  }
   return (
     <>
       <div className="Attachment__container ">
@@ -258,7 +279,7 @@ function DetailFlie({ modalDetail, setModalDetail, data }) {
             className="btn-trans-Cancel"
             onClick={() => setModalDetail(!modalDetail)}
           >
-            <stong>Exit</stong>
+            Exit
           </button>
         </div>
         <div className="form-container">
@@ -269,28 +290,39 @@ function DetailFlie({ modalDetail, setModalDetail, data }) {
                 textAlign: "left",
               }}
             >
-              <div className="col-0">
+              <div
+                className="col-1"
+                style={{
+                  marginRight: "40px",
+                }}
+              >
                 <ProfilePoster pic={pic} />
               </div>
               <div
-                className="col-3"
+                className="col-2"
                 style={{
-                  paddingLeft: "15px",
-                  fontSize: "15px",
+                  width: "70%",
+                  fontWeight: "bolder",
+                  marginRight: "10px",
                 }}
               >
-                <strong>Name Poster: </strong>
+                {data.fileName.substring(18, 28)}
                 <br />
-                <h4>Post Title </h4>
+                {data.fileFormat}
               </div>
-              <div className="col-2 ">
-                <strong> </strong>
-                <br />
-                <h5>Size</h5>
+              <div
+                className="col-2"
+                style={{
+                  width: "70%",
+                  fontWeight: "bolder",
+                  marginRight: "20px",
+                }}
+              >
+                {bytesToSize(data.fileSize)}
               </div>
-              <div className="col-0">
+              <div className="col-2">
                 <div style={{ marginTop: "20px" }}>
-                  <Icon>
+                  <Icon href={data.filePath} download>
                     <FaDownload
                       size={35}
                       onMouseOver={({ target }) =>
@@ -299,6 +331,7 @@ function DetailFlie({ modalDetail, setModalDetail, data }) {
                       onMouseOut={({ target }) =>
                         (target.style.color = "black")
                       }
+                      onClick={(e) => downloadFile(e, data._id)}
                     />
                   </Icon>
                 </div>
@@ -306,7 +339,7 @@ function DetailFlie({ modalDetail, setModalDetail, data }) {
             </div>
             <div className="row">
               <div className="col-12 " style={{ textAlign: "center" }}>
-                <FileBoby pic={pic} dat={data} />
+                <FileBoby data={data} />
               </div>
             </div>
           </div>
@@ -325,11 +358,19 @@ const ProfilePoster = ({ pic }) => {
     </label>
   );
 };
-const FileBoby = ({ pic, data }) => {
+const FileBoby = ({ data }) => {
+  const imageRegex = new RegExp("image/*");
+
+  if (imageRegex.test(data.fileType))
+    return (
+      <div className="Attachment__frame">
+        <img className="Attachment__fileItem" src={data.online_url} />
+      </div>
+    );
   return (
     <>
       <div className="Attachment__frame">
-        <img className="Attachment__fileItem" src={pic} />
+        <div> this FIle documentC</div>
       </div>
     </>
   );
