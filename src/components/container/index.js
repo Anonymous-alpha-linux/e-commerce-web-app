@@ -69,8 +69,8 @@ ContainerComponent.Link = function ({ children, ...restProps }) {
     return <a className="container__link" href={restProps.path}>{children}</a>
 }
 
-ContainerComponent.Section = function ({ children, ...restProps }) {
-    return <div {...restProps} className={`container__section ${restProps.className}`}>{children}</div>
+ContainerComponent.Section = function ({ children, forwardRef, ...restProps }) {
+    return <div {...restProps} ref={forwardRef} className={`container__section ${restProps.className}`}>{children}</div>
 }
 ContainerComponent.Hero = React.forwardRef(function ({ children, ...restProps }, ref) {
     return <div className="container__hero" ref={ref} {...restProps}>

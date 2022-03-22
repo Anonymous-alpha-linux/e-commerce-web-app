@@ -6,10 +6,11 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { login, user } = useAuthorizationContext();
+
   const [input, setInput] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+
   const location = useLocation();
   //toast
   const submitHandler = (e) => {
@@ -47,22 +48,23 @@ const Login = () => {
     <>
       <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
       <ContainerComponent.Hero></ContainerComponent.Hero>
-      <Form
+      <Form className="sign-in__root"
         method={"POST"}
         onSubmit={submitHandler}
         style={{
+          backgroundColor: '#fff',
+          borderRadius: '10px 10px 10px 10px',
           position: "absolute",
-          width: "95%",
+          width: "100%",
           maxWidth: "550px",
           minWidth: "335px",
           padding: "10px",
           top: "50%",
           left: "50%",
           transform: "translate(-50%,-50%)",
-          zIndex: "1",
+          zIndex: "10",
         }}
       >
-        <Form.Logo image=""></Form.Logo>
         <Form.Container>
           <Form.Title>LOG IN</Form.Title>
           <Form.Input
@@ -73,6 +75,7 @@ const Login = () => {
             autoComplete={"true"}
             value={input.name}
           ></Form.Input>
+
           <Form.Input
             placeholder="Password"
             type="password"
@@ -80,7 +83,7 @@ const Login = () => {
             onChange={inputHandler}
             autoComplete="current-password"
           ></Form.Input>
-          <Link to="/reset_password">Forgot your Password?</Link>
+          {/* <Link to="/reset_password">Forgot your Password?</Link> */}
           <Form.Input
             type="submit"
             value="sign in"
@@ -88,6 +91,7 @@ const Login = () => {
             style={{
               background: "black",
               color: "#fff",
+              textTransform: 'uppercase',
             }}
           ></Form.Input>
         </Form.Container>

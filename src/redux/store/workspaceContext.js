@@ -9,28 +9,18 @@ import axios from "axios";
 import { mainAPI } from "../../config";
 import { useAuthorizationContext } from ".";
 import { Loading } from "../../pages";
-import {
-  initialWorkspacePage,
-  workspaceReducer,
-  reduxActions as actions,
-} from "../reducers";
+import { initialWorkspacePage, workspaceReducer, reduxActions as actions, } from "../reducers";
 
 const WorkspaceContextAPI = createContext();
 
 export default React.memo(function WorkspaceContext({ children }) {
-  const [workspaceState, setWorkspace] = useReducer(
-    workspaceReducer,
-    initialWorkspacePage
-  );
+  const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
   const { user } = useAuthorizationContext();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const cancelTokenSource = axios.CancelToken.source();
   const { REACT_APP_ENVIRONMENT } = process.env;
-  const workspaceAPI =
-    REACT_APP_ENVIRONMENT === "development"
-      ? mainAPI.LOCALHOST_STAFF
-      : mainAPI.CLOUD_API_STAFF;
+  const workspaceAPI = REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
 
   useEffect(() => {
     if (!workspaceState.page) {
@@ -48,10 +38,11 @@ export default React.memo(function WorkspaceContext({ children }) {
         },
         params: {
           view: "workspace",
+          page: 0,
+          count: 2,
         },
       })
       .then((res) => {
-        const index = Number(localStorage.getItem("workspace")) || 0;
         setWorkspace({
           type: actions.GET_WORKSPACE_LIST,
           payload: res.data.response,

@@ -34,8 +34,6 @@ export default function AccountCrud() {
 
     function deleteAcc(e, id) {
         e.preventDefault();
-        console.log(id);
-        // handleDelete(id);
     }
 
     function handleDelete(commentId) {
