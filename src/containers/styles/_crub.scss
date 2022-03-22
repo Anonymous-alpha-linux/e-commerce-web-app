@@ -19,6 +19,7 @@
       position: relative;
       border: 2px solid var(--darkGray);
       box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
+      margin: 0 auto;
    }
    &__containerAccount {
       background: white;
@@ -249,12 +250,17 @@ $color-accent-light: #40916c;
    // margin: 0 auto;
    // bottom: 0;
 }
-
+.col-0 {
+   flex: 1;
+}
 .col-2 {
    flex: 2;
 }
 .col-3 {
    flex: 3;
+}
+.col-12 {
+   flex: 12;
 }
 .submit_Register {
    // margin: $space-between;
@@ -267,4 +273,91 @@ $color-accent-light: #40916c;
    color: white;
    cursor: pointer;
    margin: 0 auto;
+}
+.submit_edit {
+   // margin: $space-between;
+   height: $box-height;
+   width: 70%;
+   background: $color-accent-light;
+   @include border($border-radius);
+   font-weight: 600;
+   text-transform: capitalize;
+   color: white;
+   cursor: pointer;
+   margin: 0 auto;
+}
+
+.MadalBackDrop {
+   width: 100%;
+   height: 100%;
+   background-color: rgba(104, 100, 100, 0.5);
+   position: fixed;
+   top: 0;
+   left: 0;
+}
+.MobalCenter {
+   height: 0px;
+   z-index: 10;
+   position: fixed;
+   top: 15%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+}
+
+/* for profile image */
+.Detail {
+   margin: auto;
+   &__profile-pic {
+      border-radius: 100%;
+      width: 50%;
+      max-width: 40%;
+      height: 50%;
+      box-shadow: -1px -1px 2px rgb(154, 159, 165);
+   }
+   &__profile-pic:hover {
+      box-shadow: 1px 1px 3px rgb(156, 161, 167);
+      // width: 75%;
+      // height: 75%;
+   }
+}
+
+.custom-file-upload {
+   border-radius: 50%;
+   display: inline-block;
+   position: relative;
+   padding: 2px;
+   cursor: pointer;
+   background: linear-gradient(270deg, #458c92, #151f18);
+   margin-bottom: 25px;
+}
+.img-Account {
+   margin: auto;
+   position: relative;
+   width: 90px;
+   height: 90px;
+   overflow: hidden;
+   border-radius: 50%;
+   &__pic {
+      border-radius: 100%;
+      width: 50%;
+      max-width: 40%;
+      height: 50%;
+      box-shadow: -1px -1px 2px rgb(154, 159, 165);
+   }
+}
+
+.img-wrap {
+   margin: auto;
+   position: relative;
+   width: 60px;
+   height: 60px;
+   overflow: hidden;
+   border-radius: 50%;
+   &__pic {
+      border-radius: 100%;
+      width: 50%;
+      max-width: 40%;
+      height: 50%;
+      box-shadow: -1px -1px 2px rgb(154, 159, 165);
+   }
 }
