@@ -1,7 +1,9 @@
 import { useRef, useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import { toastTypes } from "../fixtures";
 import styles from "./styles/ToastMessage.module.css";
 import { useAuthorizationContext } from "../redux";
+import { Text } from "../components";
 
 export default function ToastMessage({
   message,
@@ -23,27 +25,30 @@ export default function ToastMessage({
     };
   }, []);
   return (
-    <div
-      className={`${styles.ToastMessage} ${
-        styles[error ? toastTypes.ERROR : toastTypes.SUCCESS]
-      }`}
-    >
-      <h5
-        style={{
-          color: `${error ? "red" : "green"}`,
-          textTransform: "uppercase",
-        }}
+    (
+      <div
+        className={`${styles.ToastMessage} ${
+          styles[error ? toastTypes.ERROR : toastTypes.SUCCESS]
+        }`}
       >
-        {error ? "error" : "success"}
-      </h5>
-      {/* <span>{message}</span> */}
-      <div className={styles.Loader}>
-        <div
-          className={styles.Bar}
-          ref={toastRef}
-          style={{ "--timeout": `${timeout / 1000}s` }}
-        ></div>
+        <h5
+          style={{
+            color: `${error ? "red" : "green"}`,
+            textTransform: "uppercase",
+          }}
+        >
+          {error ? "error" : "success"}
+        </h5>
+        {/* <span>{message}</span> */}
+        <div className={styles.Loader}>
+          <div
+            className={styles.Bar}
+            ref={toastRef}
+            style={{ "--timeout": `${timeout / 1000}s` }}
+          ></div>
+        </div>
       </div>
-    </div>
+    ),
+    document.body
   );
 }

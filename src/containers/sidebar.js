@@ -18,18 +18,23 @@ import { Link, Navigate } from "react-router-dom";
 import { sidebarData } from "../fixtures";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import { AddFromWorkspace } from ".";
+import { useModal } from "../hooks";
+import Modal from "./modal";
 
-export default function Sidebar({ closeSidebar }) {
-  const [switchToggle, setSwitchToggle] = useState(false);
-  const [modalWS, setModalWS] = useState(false);
+export default function Sidebar({ closeSidebar, forwardRef }) {
+  // const [switchToggle, setSwitchToggle] = useState(false);
+  // const [modalWS, setModalWS] = useState(false);
+  const [modalWS, setModalWS] = useModal(false);
+  const [switchToggle, setSwitchToggle] = useModal(false);
   const { workspaces } = useWorkspaceContext();
   const { user } = useAuthorizationContext();
-  const ToggleSwitch = () => {
-    switchToggle ? setSwitchToggle(false) : setSwitchToggle(true);
-  };
+
   return (
     <>
-      <ContainerComponent.Section>
+      <ContainerComponent.Section
+        forwardRef={forwardRef}
+        // className="sidebar__root
+      >
         <ContainerComponent.Toggle className="sidebar__inner">
           <ContainerComponent.Inner>
             <ContainerComponent.Flex
@@ -99,18 +104,15 @@ export default function Sidebar({ closeSidebar }) {
                         right: "5%",
                         fontSize: "25px",
                       }}
-                      onClick={ToggleSwitch}
+                      onClick={setSwitchToggle}
                     >
                       <AiFillRightCircle></AiFillRightCircle>
                     </Icon>
                   </Text.RightLine>
                 </Text.Line>
               </ContainerComponent.Item>
-              <ContainerComponent.Toggle
-                className={switchToggle ? "show" : "hide"}
-                style={{ margin: "0 auto" }}
-              ></ContainerComponent.Toggle>
             </ContainerComponent.Flex>
+
             <ContainerComponent.Toggle
               className={switchToggle ? "show" : "hide"}
               style={{ margin: "0 auto" }}
@@ -152,19 +154,16 @@ export default function Sidebar({ closeSidebar }) {
               >
                 {workspaces &&
                   workspaces.map((item, index) => (
-                    <ContainerComponent.Item key={index + 1}>
-                      <ContainerComponent.Inner
-                        style={{ margin: "0" }}
-                      ></ContainerComponent.Inner>
-                      <EditToggle
-                        item={item}
-                        clickLoader={closeSidebar}
-                      ></EditToggle>
-                    </ContainerComponent.Item>
+                    <EditToggle
+                      item={item}
+                      key={index + 1}
+                      clickLoader={closeSidebar}
+                    ></EditToggle>
                   ))}
               </ContainerComponent.Item>
             </ContainerComponent.Toggle>
           </ContainerComponent.Inner>
+
           <ContainerComponent.Pane
             className="logout__button"
             style={{ bottom: 0, width: "100%", padding: "20px" }}
@@ -184,26 +183,9 @@ export default function Sidebar({ closeSidebar }) {
           </ContainerComponent.Pane>
         </ContainerComponent.Toggle>
       </ContainerComponent.Section>
-
-      {modalWS && (
-        <>
-          <ContainerComponent.BackDrop
-            style={{ zIndex: 2 }}
-          ></ContainerComponent.BackDrop>
-          <div
-            style={{
-              height: "0px",
-              zIndex: "10",
-              position: "fixed",
-              top: "20%",
-              left: "50%",
-              transform: "translate(-50%,-50%)",
-            }}
-          >
-            <AddFromWorkspace setModal={setModalWS} modal={modalWS} />
-          </div>
-        </>
-      )}
+      <Modal isShowing={modalWS} toggle={setModalWS}>
+        <AddFromWorkspace setModal={setModalWS} modal={modalWS} />
+      </Modal>
     </>
   );
 }
@@ -215,8 +197,7 @@ const EditToggle = ({ item, clickLoader }) => {
   return (
     <>
       <ContainerComponent.Item
-        className="c-modal__container"
-        style={{ width: "100%", padding: "10px" }}
+        style={{ width: "100%", padding: "10px", minWidth: "230px" }}
       >
         <ContainerComponent.Flex
           style={{ alignItems: "center", justifyContent: "space-between" }}

@@ -20,7 +20,6 @@ function AddFromWS({ setModal, modal }) {
   async function HandleWSInput(e) {
     setWorkspaceAdd({ ...workspaceAdd, [e.target.name]: e.target.value });
   }
-
   async function onSubmit(e) {
     e.preventDefault();
     CreateWorkspace();

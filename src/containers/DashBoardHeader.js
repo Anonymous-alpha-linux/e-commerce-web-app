@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { VscThreeBars } from "react-icons/vsc";
 import {
   AnimateComponent,
@@ -13,7 +13,16 @@ import Sidebar from "./sidebar";
 function DashBoardHeader({ children }) {
   const { workspace } = useWorkspaceContext();
   const { user } = useAuthorizationContext();
+
   const [openSideBar, setOpenSidebar] = useState(false);
+
+  const sideBarRef = useState(null);
+
+  useEffect(() => {
+    console.log(sideBarRef.current);
+    document.querySelector(".sidebar__content").style.marginLeft =
+      sideBarRef.current?.clientWidth + "px";
+  }, [sideBarRef.current?.clientWidth]);
   return (
     <ContainerComponent className="manager_root">
       <ContainerComponent
@@ -59,7 +68,10 @@ function DashBoardHeader({ children }) {
           className="sidebar__root"
           state={openSideBar}
         >
-          <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>
+          <Sidebar
+            closeSidebar={() => setOpenSidebar(false)}
+            forwardRef={sideBarRef}
+          ></Sidebar>
         </AnimateComponent.SlideRight>
         <ContainerComponent.Section className="sidebar__content">
           {children}

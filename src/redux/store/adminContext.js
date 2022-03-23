@@ -1,7 +1,9 @@
 import axios from "axios";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { mainAPI } from "../../config";
+import { toastTypes } from "../../fixtures";
 import { Loading } from "../../pages";
+import { useAuthorizationContext } from "./authContext";
 const AdminContextAPI = createContext();
 
 export default function AdminContext({ children }) {
@@ -27,6 +29,7 @@ export default function AdminContext({ children }) {
     messages: [],
     loading: true,
   });
+  const { pushToast } = useAuthorizationContext();
   const [adminAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_ADMIN, mainAPI.LOCALHOST_HOST]
@@ -39,8 +42,7 @@ export default function AdminContext({ children }) {
   useEffect(() => {
     getAccountList();
     getRoleList();
-    getAttachmentListQAM();
-    // getAttachmentByPage(1);
+    getAttachmentList();
   }, []);
   function getAccountList(cb) {
     return axios
@@ -58,7 +60,12 @@ export default function AdminContext({ children }) {
           accounts: res.data.response,
         }));
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) =>
+        pushToast({
+          message: error.message,
+          type: toastTypes.ERROR,
+        })
+      );
   }
   function getRoleList(cb) {
     return axios
@@ -237,7 +244,7 @@ export default function AdminContext({ children }) {
   }
   function blockAccount(accountId, cb) {}
 
-  function getAttachmentListQAM(cb) {
+  function getAttachmentList(cb) {
     return axios
       .get(managerAPI, {
         headers: {
@@ -250,7 +257,6 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setState((o) => ({
           ...o,
           attachments: {
@@ -266,14 +272,23 @@ export default function AdminContext({ children }) {
           },
         }));
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) =>
+        pushToast({
+          message: error.message,
+          type: toastTypes.ERROR,
+        })
+      );
   }
   function getAttachmentByPage(page, cb) {
     if (!state.attachments.data.some((item) => item.page === page)) {
       setState((o) => ({
         ...o,
-        loading: true,
+        attachments: {
+          ...o.attachments,
+          loading: true,
+        },
       }));
+
       return axios
         .get(managerAPI, {
           headers: {
@@ -289,9 +304,9 @@ export default function AdminContext({ children }) {
           console.log(res.data);
           setState((o) => ({
             ...o,
-            loading: false,
             attachments: {
               ...o.attachments,
+              loading: false,
               data: [
                 ...o.attachments.data,
                 {
@@ -330,6 +345,9 @@ export default function AdminContext({ children }) {
         link.parentNode.removeChild(link);
       })
       .catch((err) => console.log(err.message));
+  }
+  function removeAttachment(attachmentId, postId) {
+    return axios.delete();
   }
   function assignMemberToWorkspace() {}
   function assignRoleToAccount() {}
