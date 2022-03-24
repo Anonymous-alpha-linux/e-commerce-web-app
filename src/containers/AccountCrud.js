@@ -2,13 +2,15 @@ import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
 import { useAdminContext } from "../redux";
-import axios from "axios";
 import { mainAPI } from "../config";
 import useValidate from "../hooks/useValidate";
-import { Icon } from "../components";
+import { Icon, Text } from "../components";
+import { Loader } from '../containers';
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { roles, toastTypes } from "../fixtures";
 import { Toast } from ".";
+import { useModal } from "../hooks";
+import Modal from "./modal";
 
 export default function AccountCrud() {
   const [API] =
@@ -16,7 +18,7 @@ export default function AccountCrud() {
       ? [mainAPI.LOCALHOST_ADMIN, mainAPI.LOCALHOST_HOST]
       : [mainAPI.LOCALHOST_ADMIN, mainAPI.CLOUD_HOST];
   let PageSize = 8;
-  const { accounts } = useAdminContext();
+  const { accounts: { data, loading } } = useAdminContext();
   // console.log(accounts);
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -28,9 +30,9 @@ export default function AccountCrud() {
     setDataRecords((e) => {
       const firstPageIndex = (currentPage - 1) * PageSize;
       const lastPageIndex = firstPageIndex + PageSize;
-      return accounts.slice(firstPageIndex, lastPageIndex);
+      return data.slice(firstPageIndex, lastPageIndex);
     });
-  }, [accounts, currentPage]);
+  }, [data, currentPage]);
   return (
     <div className="categoryCRUD__root">
       <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
@@ -44,7 +46,7 @@ export default function AccountCrud() {
         </div>
       )}
 
-      <div className="table__container">
+      <div className="table__container" style={{ overflowX: 'scroll', boxShadow: '-1px 1px #000,-1px 1px #000', padding: '10px 0' }}>
         <table className="table table-style">
           <thead>
             <tr>
@@ -65,18 +67,24 @@ export default function AccountCrud() {
               </th>
               <th scope="col" style={{ textAlign: "center", width: "10%" }}>
                 <SearchAccount
-                  accounts={accounts}
+                  accounts={data}
                   searchInput={searchInput}
                   setSearchInput={setSearchInput}
                   setFilteredResults={setFilteredResults}
-                  currentTableData={accounts}
+                  currentTableData={data}
                   filteredResults={filteredResults}
                 />
               </th>
             </tr>
           </thead>
           <tbody>
-            {searchInput !== ""
+            {loading ? (<tr>
+              <td colSpan={6}>
+                <Text.Line style={{ position: 'relative' }}>
+                  <Loader></Loader>
+                </Text.Line>
+              </td>
+            </tr>) : searchInput !== ""
               ? filteredResults.map((accounts, index) => (
                   <AccountData key={index} data={accounts} index={index} />
                 ))
@@ -98,7 +106,7 @@ export default function AccountCrud() {
         <Pagination
           className="pagination-bar"
           currentPage={currentPage}
-          totalCount={accounts.length}
+          totalCount={data.length}
           pageSize={PageSize}
           onPageChange={(page) => setCurrentPage(page)}
         />
@@ -567,8 +575,8 @@ function ModalAddFormAccount({ setModal, modal }) {
 }
 function AccountData({ data, index }) {
   const [modalEdit, setModalEdit] = useState(false);
-  const [modalDetail, setModalDetail] = useState(false);
   const [block, setBlockacc] = useState(false);
+  const [showModalDetail, toggleModalDetail] = useModal(false);
 
   function blockAccount(e, id) {
     e.preventDefault();
@@ -600,22 +608,19 @@ function AccountData({ data, index }) {
         }}
       >
         <button
-          onClick={() => setModalDetail(!modalDetail)}
+          onClick={toggleModalDetail}
           className="btn-blue"
         >
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>
-        {modalDetail && (
-          <div className="MadalBackDrop">
-            <div className="MobalCenter">
-              <DetailAcc
-                setModalDetail={setModalDetail}
-                modalDetail={modalDetail}
-                data={data}
-              />
-            </div>
-          </div>
-        )}
+
+        <Modal isShowing={showModalDetail} toggle={toggleModalDetail}>
+          <DetailAcc
+            setModalDetail={toggleModalDetail}
+            data={data}
+          />
+        </Modal>
+
         <button
           onClick={() => setModalEdit(!modalEdit)}
           className="btn-warning"
@@ -687,7 +692,7 @@ function SearchAccount({
   );
 }
 
-function DetailAcc({ modalDetail, setModalDetail, data }) {
+function DetailAcc({ setModalDetail, data }) {
   // console.log(data);
   const pic =
     "https://cdn.dribbble.com/users/1577045/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png?compress=1&resize=400x300";
@@ -762,7 +767,7 @@ function DetailAcc({ modalDetail, setModalDetail, data }) {
           <div className="question-container">
             <button
               className="btn-trans-Cancel"
-              onClick={() => setModalDetail(!modalDetail)}
+              onClick={() => setModalDetail()}
             >
               Close
             </button>

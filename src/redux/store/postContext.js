@@ -146,7 +146,7 @@ export default React.memo(function PostContext({ children }) {
           filter: filter,
         });
       })
-      .then((success) => {})
+      .then((success) => { })
       .catch((error) => {
         setPost({
           type: actions.SET_OFF_LOADING,
@@ -794,8 +794,12 @@ export default React.memo(function PostContext({ children }) {
         setError(error.message);
       });
   }
+
   // 4. Thump-up, thump-down, comment
   function interactPost(postId, type, input, cb) {
+    const { liked, disliked } = input;
+    likePost(liked, postId, user.accountId);
+    dislikePost(disliked, postId, user.accountId);
     // Set Loading for waiting post
     if (type === "rate") {
       return axios
@@ -817,12 +821,8 @@ export default React.memo(function PostContext({ children }) {
           }
         )
         .then((res) => {
-          const { liked, disliked } = input;
-          likePost(liked, postId, user.accountId);
-          dislikePost(disliked, postId, user.accountId);
           sendRealTimeLike(liked, postId, user.accountId);
           sendRealTimeDisLike(disliked, postId, user.accountId);
-          // updateSinglePost(postId);
         })
         .catch((error) => {
           setError(error.message);
@@ -954,7 +954,7 @@ export default React.memo(function PostContext({ children }) {
         )
         .then((res) => {
           const replyId = res.data.response._id;
-          addCommentReply(postId, input.commentid, replyId, () => {});
+          addCommentReply(postId, input.commentid, replyId);
           const data = { postId, commentId: input.commentid, replyId };
           sendRealtimeCommentReply(postId, data.commentId, replyId);
           cb(data);

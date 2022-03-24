@@ -43,9 +43,11 @@ export default React.memo(function WorkspaceContext({ children }) {
         },
       })
       .then((res) => {
+        console.log(res.data);
         setWorkspace({
           type: actions.GET_WORKSPACE_LIST,
           payload: res.data.response,
+          others: { totalWorkspace: res.data.totalWorkspace }
         });
         onLoadWorkspace();
       })
@@ -143,6 +145,7 @@ export default React.memo(function WorkspaceContext({ children }) {
     }))
   }
   const contextValue = {
+    ...workspaceState,
     workspace: workspaceState.workspace,
     workspaces: workspaceState.workspaces,
     loading: workspaceState.workspaceLoading,

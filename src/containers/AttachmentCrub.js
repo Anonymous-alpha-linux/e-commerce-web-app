@@ -1,30 +1,31 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
-import { usePostContext, useAdminContext } from "../redux";
+import { useAdminContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
-import { Icon, Loader } from "../components";
+import { Icon, Text } from "../components";
+import { Loader } from "../containers";
 import { FaDownload } from "react-icons/fa";
-import { usePagination2 } from "../hooks";
+import { useModal, usePagination2 } from "../hooks";
 import { SecondPagination } from ".";
-
+import Modal from "./modal";
 export default function AttachmentCrub() {
   const [API, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
 
-  const { attachments, getAttachmentByPage } = useAdminContext();
+  const { attachments, getAttachmentByPage, deleteSingleAttachment } = useAdminContext();
   const getAttachmentByPageRef = useRef(getAttachmentByPage);
   const [searchInput, setSearchInput] = useState("");
+
   const [filteredResults, setFilteredResults] = useState([]);
   const [attachRecord, setAttachRecord] = useState();
   const [dataRecords, setDataRecords] = useState([]);
 
   const [currentPage, changeCurrentPage] = usePagination2(0);
-
-  // console.log(attachRecord);
+  
   useEffect(() => {
     if (!attachments.loading) {
       setDataRecords(
@@ -40,31 +41,12 @@ export default function AttachmentCrub() {
     getAttachmentByPageRef.current = getAttachmentByPage;
   }, [getAttachmentByPage]);
 
-  function deleteAttachment(e, id) {
-    e.preventDefault();
-    console.log(id);
-    // handleDelete(id);
-  }
-  function handleDelete(commentId) {
-    return axios
-      .delete(API, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        params: {
-          view: `category`,
-          commentid: commentId,
-        },
-      })
-      .then((res) => {
-        // setNewRecord(res.data.response);
-        // removeCategory(commentId);
-      })
-      .catch((error) => console.log(error.message));
+  function deleteAttachment(attachmentId) {
+    deleteSingleAttachment(attachmentId, currentPage);
   }
   return (
     <div className="categoryCRUD__root">
-      <div className="table__container">
+      <div className="table__container" style={{ overflowX: 'scroll' }}>
         <table className="table table-style">
           <thead>
             <tr>
@@ -96,30 +78,13 @@ export default function AttachmentCrub() {
             </tr>
           </thead>
           <tbody>
-            {searchInput !== ""
-              ? filteredResults.map((attachment, index) => {
-                  console.log(attachment);
-                  return (
-                    <AttachmentData
-                      key={index}
-                      data={attachment}
-                      index={index}
-                      deleteAttachment={deleteAttachment}
-                    />
-                  );
-                })
-              : dataRecords.map((attachment, index) => {
-                  return (
-                    <AttachmentData
-                      key={index}
-                      data={attachment}
-                      index={index}
-                      deleteAttachment={deleteAttachment}
-                    />
-                  );
-                })}
-            {attachments.loading && <Loader></Loader>}
-            {!attachments.data?.length && (
+            {attachments.loading ? (<tr>
+              <td colSpan={6}>
+                <Text.Line style={{ position: 'relative' }}>
+                  <Loader></Loader>
+                </Text.Line>
+              </td>
+            </tr>) : !attachments.data?.length && (
               <tr>
                 <td>
                   <h2>No Category</h2>
@@ -128,24 +93,41 @@ export default function AttachmentCrub() {
                   <h2>Empty</h2>
                 </td>
               </tr>
-            )}
+            ) || searchInput !== ""
+              ? filteredResults.map((attachment, index) => {
+                return (
+                  <AttachmentData
+                    key={index}
+                    data={attachment}
+                    index={index}
+                    deleteAttachment={deleteAttachment}
+                  />
+                )
+              })
+              : dataRecords.map((attachment, index) => {
+                return <AttachmentData
+                  key={index}
+                  data={attachment}
+                  index={index}
+                  deleteAttachment={deleteAttachment}
+                />;
+              })}
           </tbody>
         </table>
-        <SecondPagination
-          page={currentPage}
-          firstPage={1}
-          lastPage={attachments.pages}
-          onChangePage={changeCurrentPage}
-          onLoadData={getAttachmentByPageRef.current}
-        ></SecondPagination>
       </div>
+      <SecondPagination
+        page={currentPage}
+        firstPage={1}
+        lastPage={attachments.pages}
+        onChangePage={changeCurrentPage}
+        onLoadData={getAttachmentByPageRef.current}
+      ></SecondPagination>
     </div>
   );
 }
 function AttachmentData({ data, deleteAttachment, index }) {
-  const [modalDetail, setModalDetail] = useState(false);
-  const { downloadAttachmentQAM } = useAdminContext();
-
+  const [showModalDetail, toggleModalDetail] = useModal();
+  const { downloadSingleAttachment } = useAdminContext();
   function bytesToSize(bytes, seperator = "") {
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     if (bytes == 0) return "n/a";
@@ -154,11 +136,6 @@ function AttachmentData({ data, deleteAttachment, index }) {
     return `${(bytes / 1024 ** i).toFixed(1)}${seperator}${sizes[i]}`;
   }
 
-  async function downloadFile(e, attachmentId) {
-    e.preventDefault();
-    console.log(attachmentId);
-    downloadAttachmentQAM(attachmentId);
-  }
   return (
     <tr key={index}>
       <td style={{ textAlign: "center", width: "3%" }}>{index + 1}</td>
@@ -184,42 +161,35 @@ function AttachmentData({ data, deleteAttachment, index }) {
         }}
       >
         <button
-          onClick={() => setModalDetail(!modalDetail)}
+          onClick={() => toggleModalDetail()}
           className="btn-blue"
         >
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>
-        {modalDetail && (
-          <div className="MadalBackDrop">
-            <div className="MobalCenter">
-              <DetailFlie
-                setModalDetail={setModalDetail}
-                modalDetail={modalDetail}
-                data={data}
-                downloadFile={downloadFile}
-                bytesToSize={bytesToSize}
-              />
-            </div>
-          </div>
-        )}
         <button
-          onClick={(e) => downloadFile(e, data._id)}
+          onClick={() => { downloadSingleAttachment(data._id) }}
           className="btn-green"
         >
           {data._id === "" ? <span></span> : <span>Download</span>}
         </button>
         <button
-          onClick={(e) => deleteAttachment(e, data._id)}
+          onClick={() => deleteAttachment(data._id)}
           className="btn-red"
         >
           {data._id === "" ? <span></span> : <span>Delete</span>}
         </button>
       </td>
+      <Modal isShowing={showModalDetail} toggle={toggleModalDetail}>
+        <DetailFile
+          setModalDetail={toggleModalDetail}
+          data={data}
+        />
+      </Modal>
     </tr>
   );
 }
 function SearchAttachment({
-  Attechment,
+  attachment,
   currentTableData,
   searchInput,
   setSearchInput,
@@ -247,10 +217,8 @@ function SearchAttachment({
         );
       });
       searchFunction.current(filteredData);
-      // console.log(filteredResults, "Filer");
     } else {
-      searchFunction.current(Attechment);
-      // console.log(Attechment, "Cate");
+      searchFunction.current(attachment);
     }
   };
 
@@ -264,14 +232,8 @@ function SearchAttachment({
     />
   );
 }
-function DetailFlie({
-  modalDetail,
-  setModalDetail,
-  data,
-  downloadFile,
-  bytesToSize,
-}) {
-  // console.log(data);
+
+function DetailFile({ setModalDetail, data,  bytesToSize }) {
   const pic =
     "https://cdn.lifehack.org/wp-content/uploads/2012/12/come-up-with-ideas.jpg";
   return (
@@ -281,9 +243,9 @@ function DetailFlie({
           <button
             style={{ textAlign: "left", fontWeight: "bold" }}
             className="btn-trans-Cancel"
-            onClick={() => setModalDetail(!modalDetail)}
+            onClick={() => setModalDetail()}
           >
-            <stong>Exit</stong>
+            <strong>Exit</strong>
           </button>
         </div>
         <div className="form-container">
@@ -334,7 +296,7 @@ function DetailFlie({
     </>
   );
 }
-const ProfilePoster = ({ pic }) => {
+function ProfilePoster({ pic }) {
   return (
     <label className="custom-file-upload">
       <div className="img-wrap">
@@ -344,7 +306,12 @@ const ProfilePoster = ({ pic }) => {
   );
 };
 const FileBoby = ({ data }) => {
+  const PDF =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/833px-PDF_file_icon.svg.png";
+  const CSV =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Micorsoft_Excel_2016-2019_CSV_Icon.svg/1200px-Micorsoft_Excel_2016-2019_CSV_Icon.svg.png";
   const imageRegex = new RegExp("image/*");
+  const csvRegex = new RegExp("csv/*");
 
   if (imageRegex.test(data.fileType))
     return (
@@ -352,10 +319,17 @@ const FileBoby = ({ data }) => {
         <img className="Attachment__fileItem" src={data.online_url} />
       </div>
     );
+  if (csvRegex.test(data.fileType))
+    return (
+      <div className="Attachment__frame">
+        <img className="Attachment__fileItem" src={CSV} />
+      </div>
+    );
   return (
     <>
       <div className="Attachment__frame">
-        <div>document</div>
+        <img className="Attachment__fileItem" src={PDF} />
+        <p></p>
       </div>
     </>
   );
