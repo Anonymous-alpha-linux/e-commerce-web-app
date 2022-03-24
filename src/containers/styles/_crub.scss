@@ -1,52 +1,85 @@
 .c-modal {
-   position: absolute;
-   height: 100%;
-   width: 100%;
-   top: 0;
-   left: 0;
-   background-color: rgba(#333, 0.4);
-   display: flex;
-   justify-content: center;
-   align-items: center;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(#333, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-   &__container {
-      background: white;
-      min-width: 320px;
-      max-width: 480px;
-      width: 100%;
-      border-radius: 20px;
-      padding: 10px;
-      position: relative;
-      border: 2px solid var(--darkGray);
-      box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
-      margin: 0 auto;
-   }
-   &__containerAccount {
-      background: white;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 20px;
-      padding: 10px;
-      position: relative;
-      border: 2px solid var(--darkGray);
-      box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
-   }
+  &__container {
+    background: white;
+    width: 320px;
+    border-radius: 20px;
+    padding: 10px;
+    position: relative;
+    border: 2px solid var(--darkGray);
+    box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
+  }
+  &__containerAccount {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 20px;
+    padding: 10px;
+    position: relative;
+    border: 2px solid var(--darkGray);
+    box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
+  }
+}
+
+.Attachment {
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  &__fileItem {
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    max-height: 230px;
+    border-radius: 20px;
+    padding: 10px;
+    position: relative;
+    border: 2px solid var(--darkGray);
+    box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
+  }
+  &__frame {
+    height: 100%;
+    width: 80%;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
+
+  &__container {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 20px;
+    padding: 10px;
+    position: relative;
+    border: 2px solid var(--darkGray);
+    box-shadow: 6px 6px 15px 1px rgba(#3c4856, 0.3);
+  }
 }
 
 //Search category
 .search-textbox {
-   min-width: 200px;
-   width: 30%;
-   height: 0.8rem;
-   padding: 1rem;
-   margin-bottom: 0.5rem;
-   border: 1px solid #ccc;
-   border-radius: 20px;
-   font-size: 15px;
-   transition: width 250ms ease-in-out;
-   &:focus {
-      width: 40%;
-   }
+  min-width: 200px;
+  width: 30%;
+  height: 0.8rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 15px;
+  transition: width 250ms ease-in-out;
+  &:focus {
+    width: 40%;
+  }
 }
 // VARIABLES
 $box-height: 40px;
@@ -60,304 +93,394 @@ $color-dark: #c5c3c6;
 $color-accent-dark: #46494c;
 $color-accent-light: #40916c;
 @mixin border($radius) {
-   border-radius: $radius;
-   border: 1px solid $color-dark;
+  border-radius: $radius;
+  border: 1px solid $color-dark;
 }
 
 @mixin shadow($color) {
-   box-shadow: 0 0 6px $color;
+  box-shadow: 0 0 6px $color;
 }
 
 // FORM CONTAINER
 
 @mixin block($height) {
-   display: block;
-   margin: 10px 0;
-   padding: 5px 10px;
-   height: $height;
-   width: 100%;
+  display: block;
+  margin: 10px 0;
+  padding: 5px 10px;
+  height: $height;
+  width: 100%;
 }
 
 // QUESTIONS
 .question-container {
-   margin: $space-between;
-   background: white;
+  margin: $space-between;
+  background: white;
 }
 .question-label {
-   @include block($box-height);
-   padding-top: 0;
-   line-height: $box-height;
-   font-weight: bold;
-   color: black;
+  @include block($box-height);
+  padding-top: 0;
+  line-height: $box-height;
+  font-weight: bold;
+  color: black;
 }
 .row-input {
-   @include block($box-height);
-   background: $color-light;
-   margin: 0 auto;
-   @include border($border-radius);
+  @include block($box-height);
+  background: $color-light;
+  margin: 0 auto;
+  @include border($border-radius);
 }
 
 .row-input:focus {
-   @include shadow($color-dark);
+  @include shadow($color-dark);
 }
 
 .submit_category {
-   // margin: $space-between;
-   height: $box-height;
-   width: 60%;
-   background: $color-accent-light;
-   @include border($border-radius);
-   font-weight: 600;
-   text-transform: capitalize;
-   color: white;
-   cursor: pointer;
-   margin: 0 auto;
+  // margin: $space-between;
+  height: $box-height;
+  width: 60%;
+  background: $color-accent-light;
+  @include border($border-radius);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: white;
+  cursor: pointer;
+  margin: 0 auto;
 }
 
 .submit_category:hover {
-   @include shadow($color-dark);
+  @include shadow($color-dark);
 }
 
 .table {
-   &.table-style {
-      border-collapse: separate;
-      border-spacing: 0 0px;
+  &.table-style {
+    border-collapse: separate;
+    border-spacing: 0 0px;
 
-      tr {
-         td:last-child {
-            border-left: 0 solid #f4f9fb;
-         }
-         &:hover {
-            background-color: #f2f8fb !important;
-         }
+    tr {
+      td:last-child {
+        border-left: 0 solid #f4f9fb;
       }
-
-      & > thead {
-         border-right: 5px solid rgba(55, 64, 68, 0.6);
-         height: auto;
-
-         & > tr {
-            & > td {
-               border-top: 0px;
-               line-height: 50px;
-            }
-         }
+      &:hover {
+        background-color: #f2f8fb !important;
       }
+    }
 
-      & > tbody {
-         & > tr {
-            box-shadow: 1px 0px 7px 0 rgba(55, 64, 68, 0.6);
-            background: #fff;
-            & > td {
-               border-bottom: 3px solid rgb(57, 66, 57);
-               line-height: 50px;
+    & > thead {
+      border-right: 5px solid rgba(55, 64, 68, 0.6);
+      height: auto;
 
-               &:last-child {
-                  text-align: center;
-               }
-            }
-         }
+      & > tr {
+        & > td {
+          border-top: 0px;
+          line-height: 50px;
+        }
       }
+    }
 
-      & > tfoot {
-         & > tr {
-            & > td {
-               border-top: 0px;
-               line-height: 50px;
-            }
-         }
+    & > tbody {
+      & > tr {
+        box-shadow: 1px 0px 7px 0 rgba(55, 64, 68, 0.6);
+        background: #fff;
+        & > td {
+          border-bottom: 3px solid rgb(57, 66, 57);
+          line-height: 50px;
+
+          &:last-child {
+            text-align: center;
+          }
+        }
       }
-   }
+    }
+
+    & > tfoot {
+      & > tr {
+        & > td {
+          border-top: 0px;
+          line-height: 50px;
+        }
+      }
+    }
+  }
 }
 .wrapper_mobile {
-   background-color: #e5e5e5;
-   padding: 20px;
-   border-radius: 20px;
-   width: 100%;
-   max-width: 700px;
-   margin: 0 auto;
+  background-color: #e5e5e5;
+  padding: 20px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .row {
-   display: flex;
+  display: flex;
 }
 [class*="col-"] {
-   margin: 5px;
+  margin: 5px;
 }
 
 .allItem {
-   height: fit-content;
-   padding: 2px;
-   display: flex;
-   align-items: center;
+  height: fit-content;
+  padding: 2px;
+  display: flex;
+  align-items: center;
 }
 
 .col-1 {
-   flex: none;
+  flex: none;
 }
 .col-iconPass {
-   flex: none;
-   // margin: 0 auto;
-   // bottom: 0;
+  flex: none;
+  // margin: 0 auto;
+  // bottom: 0;
 }
 
 .col-2 {
-   flex: 2;
+  flex: 2;
 }
 .col-3 {
-   flex: 3;
+  flex: 3;
 }
 .submit_Register {
-   // margin: $space-between;
-   height: $box-height;
-   width: 40%;
-   background: $color-accent-light;
-   @include border($border-radius);
-   font-weight: 600;
-   text-transform: capitalize;
-   color: white;
-   cursor: pointer;
-   margin: 0 auto;
+  // margin: $space-between;
+  height: $box-height;
+  width: 40%;
+  background: $color-accent-light;
+  @include border($border-radius);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: white;
+  cursor: pointer;
+  margin: 0 auto;
 }
 .wrapper_mobile {
-   background-color: #e5e5e5;
-   padding: 20px;
-   border-radius: 20px;
-   width: 100%;
-   max-width: 700px;
-   margin: 0 auto;
+  background-color: #e5e5e5;
+  padding: 20px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .row {
-   display: flex;
+  display: flex;
 }
 [class*="col-"] {
-   margin: 5px;
+  margin: 5px;
 }
 
 .allItem {
-   height: fit-content;
-   padding: 2px;
-   display: flex;
-   align-items: center;
+  height: fit-content;
+  padding: 2px;
+  display: flex;
+  align-items: center;
 }
 
 .col-1 {
-   flex: none;
+  flex: none;
 }
 .col-iconPass {
-   flex: none;
-   // margin: 0 auto;
-   // bottom: 0;
+  flex: none;
+  // margin: 0 auto;
+  // bottom: 0;
 }
 .col-0 {
-   flex: 1;
+  flex: 1;
 }
 .col-2 {
-   flex: 2;
+  flex: 2;
 }
 .col-3 {
-   flex: 3;
+  flex: 3;
 }
 .col-12 {
-   flex: 12;
+  flex: 12;
+}
+.col-12 {
+  flex: 12;
 }
 .submit_Register {
-   // margin: $space-between;
-   height: $box-height;
-   width: 40%;
-   background: $color-accent-light;
-   @include border($border-radius);
-   font-weight: 600;
-   text-transform: capitalize;
-   color: white;
-   cursor: pointer;
-   margin: 0 auto;
+  // margin: $space-between;
+  height: $box-height;
+  width: 40%;
+  background: $color-accent-light;
+  @include border($border-radius);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: white;
+  cursor: pointer;
+  margin: 0 auto;
 }
 .submit_edit {
-   // margin: $space-between;
-   height: $box-height;
-   width: 70%;
-   background: $color-accent-light;
-   @include border($border-radius);
-   font-weight: 600;
-   text-transform: capitalize;
-   color: white;
-   cursor: pointer;
-   margin: 0 auto;
+  // margin: $space-between;
+  height: $box-height;
+  width: 70%;
+  background: $color-accent-light;
+  @include border($border-radius);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: white;
+  cursor: pointer;
+  margin: 0 auto;
 }
 
 .MadalBackDrop {
-   width: 100%;
-   height: 100%;
-   background-color: rgba(104, 100, 100, 0.5);
-   position: fixed;
-   top: 0;
-   left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(104, 100, 100, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 .MobalCenter {
-   height: 0px;
-   z-index: 10;
-   position: fixed;
-   top: 15%;
-   left: 50%;
-   transform: translate(-50%, -50%);
+  height: 0px;
+  z-index: 10;
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* for profile image */
 .Detail {
-   margin: auto;
-   &__profile-pic {
-      border-radius: 100%;
-      width: 50%;
-      max-width: 40%;
-      height: 50%;
-      box-shadow: -1px -1px 2px rgb(154, 159, 165);
-   }
-   &__profile-pic:hover {
-      box-shadow: 1px 1px 3px rgb(156, 161, 167);
-      // width: 75%;
-      // height: 75%;
-   }
+  margin: auto;
+  &__profile-pic {
+    border-radius: 100%;
+    width: 50%;
+    max-width: 40%;
+    height: 50%;
+    box-shadow: -1px -1px 2px rgb(154, 159, 165);
+  }
+  &__profile-pic:hover {
+    box-shadow: 1px 1px 3px rgb(156, 161, 167);
+    // width: 75%;
+    // height: 75%;
+  }
 }
 
 .custom-file-upload {
-   border-radius: 50%;
-   display: inline-block;
-   position: relative;
-   padding: 2px;
-   cursor: pointer;
-   background: linear-gradient(270deg, #458c92, #151f18);
-   margin-bottom: 25px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  padding: 2px;
+  cursor: pointer;
+  background: linear-gradient(270deg, #458c92, #151f18);
+  margin-bottom: 25px;
 }
 .img-Account {
-   margin: auto;
-   position: relative;
-   width: 90px;
-   height: 90px;
-   overflow: hidden;
-   border-radius: 50%;
-   &__pic {
-      border-radius: 100%;
-      width: 50%;
-      max-width: 40%;
-      height: 50%;
-      box-shadow: -1px -1px 2px rgb(154, 159, 165);
-   }
+  margin: auto;
+  position: relative;
+  width: 90px;
+  height: 90px;
+  overflow: hidden;
+  border-radius: 50%;
+  &__pic {
+    border-radius: 100%;
+    width: 50%;
+    max-width: 40%;
+    height: 50%;
+    box-shadow: -1px -1px 2px rgb(154, 159, 165);
+  }
 }
 
 .img-wrap {
-   margin: auto;
-   position: relative;
-   width: 60px;
-   height: 60px;
-   overflow: hidden;
-   border-radius: 50%;
-   &__pic {
-      border-radius: 100%;
-      width: 50%;
-      max-width: 40%;
-      height: 50%;
-      box-shadow: -1px -1px 2px rgb(154, 159, 165);
-   }
+  margin: auto;
+  position: relative;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 50%;
+  &__pic {
+    border-radius: 100%;
+    width: 50%;
+    max-width: 40%;
+    height: 50%;
+    box-shadow: -1px -1px 2px rgb(154, 159, 165);
+  }
+}
+.submit_edit {
+  // margin: $space-between;
+  height: $box-height;
+  width: 70%;
+  background: $color-accent-light;
+  @include border($border-radius);
+  font-weight: 600;
+  text-transform: capitalize;
+  color: white;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.MadalBackDrop {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(104, 100, 100, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+.MobalCenter {
+  height: 0px;
+  z-index: 10;
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* for profile image */
+.Detail {
+  margin: auto;
+  &__profile-pic {
+    border-radius: 100%;
+    width: 50%;
+    max-width: 40%;
+    height: 50%;
+    box-shadow: -1px -1px 2px rgb(154, 159, 165);
+  }
+  &__profile-pic:hover {
+    box-shadow: 1px 1px 3px rgb(156, 161, 167);
+    // width: 75%;
+    // height: 75%;
+  }
+}
+
+.custom-file-upload {
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  padding: 2px;
+  cursor: pointer;
+  background: linear-gradient(270deg, #458c92, #151f18);
+  margin-bottom: 25px;
+}
+.img-Account {
+  margin: auto;
+  position: relative;
+  width: 90px;
+  height: 90px;
+  overflow: hidden;
+  border-radius: 50%;
+  &__pic {
+    border-radius: 100%;
+    width: 50%;
+    max-width: 40%;
+    height: 50%;
+    box-shadow: -1px -1px 2px rgb(154, 159, 165);
+  }
+}
+
+.img-wrap {
+  margin: auto;
+  position: relative;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 50%;
+  &__pic {
+    border-radius: 100%;
+    width: 50%;
+    max-width: 40%;
+    height: 50%;
+    box-shadow: -1px -1px 2px rgb(154, 159, 165);
+  }
 }

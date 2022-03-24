@@ -42,10 +42,10 @@ export default function AdminContext({ children }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_ADMIN, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_ADMIN, mainAPI.CLOUD_HOST];
-  const [managerAPI, host2] =
+  const managerAPI =
     process.env.REACT_APP_ENVIRONMENT === "development"
-      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
-      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
+      ? mainAPI.LOCALHOST_MANAGER
+      : mainAPI.CLOUD_API_MANAGER;
 
   useEffect(() => {
     getAccountList();
@@ -72,10 +72,12 @@ export default function AdminContext({ children }) {
           }
         }));
       })
-      .catch((error) => pushToast({
-        message: error.message,
-        type: toastTypes.ERROR
-      }));
+      .catch((error) =>
+        pushToast({
+          message: error.message,
+          type: toastTypes.ERROR,
+        })
+      );
   }
   function getRoleList(cb) {
     return axios
@@ -186,7 +188,7 @@ export default function AdminContext({ children }) {
       })
       .catch((error) => cb(error.message));
   }
-  function editPassword(password, accountId) {
+  function editPassword(password, accountId, cb) {
     return axios
       .put(
         adminAPI,
@@ -210,6 +212,9 @@ export default function AdminContext({ children }) {
           ...o,
           messages: [...o.messages, "Changed password successfully"],
         }));
+        cb({
+          message: "Edit Email successfully",
+        });
       })
       .catch((error) => pushToast({ message: error.message, type: toastTypes.ERROR }));
   }
@@ -249,7 +254,7 @@ export default function AdminContext({ children }) {
       })
       .catch((error) => cb({ error: error.message }));
   }
-  function blockAccount(accountId, cb) { }
+  function blockAccount(accountId, cb) {}
   function getAttachmentList(cb) {
     return axios
       .get(managerAPI, {
@@ -282,10 +287,12 @@ export default function AdminContext({ children }) {
           },
         }));
       })
-      .catch((error) => pushToast({
-        message: error.message,
-        type: toastTypes.ERROR
-      }));
+      .catch((error) =>
+        pushToast({
+          message: error.message,
+          type: toastTypes.ERROR,
+        })
+      );
   }
   function getAttachmentByPage(page, cb) {
     // console.log(page, state.attachments.fetchedPage.indexOf(page));

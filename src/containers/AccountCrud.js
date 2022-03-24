@@ -86,12 +86,12 @@ export default function AccountCrud() {
               </td>
             </tr>) : searchInput !== ""
               ? filteredResults.map((accounts, index) => (
-                <AccountData key={index} data={accounts} index={index} />
-              ))
+                  <AccountData key={index} data={accounts} index={index} />
+                ))
               : dataRecords.map((accounts, index) => (
-                <AccountData key={index} data={accounts} index={index} />
-              ))}
-            {!data?.length && (
+                  <AccountData key={index} data={accounts} index={index} />
+                ))}
+            {!accounts?.length && (
               <tr>
                 <td>
                   <h2>No Account</h2>
@@ -192,7 +192,10 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
     try {
       if (input.password !== input["newpassword"])
         throw new Error("Your confirm password is incorrectly");
-      editPassword(input.password, data._id);
+      editPassword(input.password, data._id, ({ message, error }) => {
+        if (error) setError(error);
+        else setMessage(message);
+      });
     } catch (error) {
       setError(error.message);
       setTimeout(() => setError(!error), 3000);
@@ -432,7 +435,11 @@ function ModalAddFormAccount({ setModal, modal }) {
       accAdd.username,
       accAdd.email,
       accAdd.password,
-      accAdd.role
+      accAdd.role,
+      ({ message, error }) => {
+        if (error) setError(error);
+        else setMessage(message);
+      }
     );
   }
 

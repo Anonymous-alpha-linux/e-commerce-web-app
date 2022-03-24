@@ -21,15 +21,18 @@ export default function AttachmentCrub() {
   const [searchInput, setSearchInput] = useState("");
 
   const [filteredResults, setFilteredResults] = useState([]);
+  const [attachRecord, setAttachRecord] = useState();
   const [dataRecords, setDataRecords] = useState([]);
 
   const [currentPage, changeCurrentPage] = usePagination2(0);
+  
   useEffect(() => {
     if (!attachments.loading) {
       // setDataRecords(attachments.data.find((item) => item.page === currentPage).records);
       setDataRecords(attachments.data);
+      setAttachRecord(attachments.data);
     }
-  }, [attachments.data]);
+  }, [attachments.data,attachRecord]);
   useEffect(() => {
 
   }, [currentPage]);
@@ -64,11 +67,11 @@ export default function AttachmentCrub() {
               </th>
               <th scope="col" style={{ textAlign: "center", width: "10%" }}>
                 <SearchAttachment
-                  attachment={attachments.data}
+                  Attechment={attachRecord}
                   searchInput={searchInput}
                   setSearchInput={setSearchInput}
                   setFilteredResults={setFilteredResults}
-                  currentTableData={attachments.data}
+                  currentTableData={attachRecord}
                   filteredResults={filteredResults}
                 />
               </th>
@@ -126,15 +129,24 @@ export default function AttachmentCrub() {
 function AttachmentData({ data, deleteAttachment, index }) {
   const [showModalDetail, toggleModalDetail] = useModal();
   const { downloadSingleAttachment } = useAdminContext();
+  function bytesToSize(bytes, seperator = "") {
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    if (bytes == 0) return "n/a";
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+    if (i === 0) return `${bytes}${seperator}${sizes[i]}`;
+    return `${(bytes / 1024 ** i).toFixed(1)}${seperator}${sizes[i]}`;
+  }
 
   return (
     <tr key={index}>
       <td style={{ textAlign: "center", width: "3%" }}>{index + 1}</td>
       <td style={{ textAlign: "center", width: "15%", marginLeft: "5%" }}>
-        {data.fileName}
+        {data.fileName.slice(75, data.fileName.length)}
       </td>
       <td style={{ textAlign: "center", width: "5%" }}>{data.fileType}</td>
-      <td style={{ textAlign: "center", width: "5%" }}>{data.fileSize}</td>
+      <td style={{ textAlign: "center", width: "5%" }}>
+        {bytesToSize(data.fileSize)}
+      </td>
       <td style={{ textAlign: "center", width: "10%" }}>
         {new Date(data.createdAt).toLocaleString("en-uk", {
           day: "2-digit",
@@ -175,7 +187,6 @@ function AttachmentData({ data, deleteAttachment, index }) {
         />
       </Modal>
     </tr>
-
   );
 }
 function SearchAttachment({
@@ -198,8 +209,10 @@ function SearchAttachment({
     if (searchInput !== "") {
       const filteredData = currentTableData.filter((item) => {
         return (
-          item.fileName.toLowerCase().includes(searchInput.toLowerCase()) ||
-          item.fileSize.toLowerCase().includes(searchInput.toLowerCase()) ||
+          item.fileName
+            .slice(75, item.fileName.length)
+            .toLowerCase()
+            .includes(searchInput.toLowerCase()) ||
           item.fileType.toLowerCase().includes(searchInput.toLowerCase()) ||
           item.createdAt.toLowerCase().includes(searchInput.toLowerCase())
         );
@@ -220,7 +233,8 @@ function SearchAttachment({
     />
   );
 }
-function DetailFile({ setModalDetail, data }) {
+
+function DetailFile({ setModalDetail, data,  bytesToSize }) {
   const pic =
     "https://cdn.lifehack.org/wp-content/uploads/2012/12/come-up-with-ideas.jpg";
   return (
@@ -241,38 +255,32 @@ function DetailFile({ setModalDetail, data }) {
               className="row"
               style={{
                 textAlign: "left",
+                fontWeight: "bolder",
               }}
             >
-              <div className="col-0">
+              <div className="col-2" style={{ marginRight: "50px" }}>
                 <ProfilePoster pic={pic} />
               </div>
-              <div
-                className="col-3"
-                style={{
-                  paddingLeft: "15px",
-                  fontSize: "15px",
-                }}
-              >
-                <strong>Name Poster: </strong>
+              <div className="col-2" style={{ marginRight: "30px" }}>
+                {data.fileName.substring(18, 30)}
                 <br />
-                <h4>Post Title:</h4>
+                {data.fileType}
               </div>
-              <div className="col-2 ">
-                <strong> </strong>
-                <br />
-                <h5>Size</h5>
+              <div className="col-2 " style={{ marginRight: "30px" }}>
+                {bytesToSize(data.fileSize)}
               </div>
-              <div className="col-0">
-                <div style={{ marginTop: "20px" }}>
+              <div className="col-2">
+                <div style={{ marginTop: "20px", marginLeft: "10px" }}>
                   <Icon>
                     <FaDownload
-                      size={35}
+                      size={45}
                       onMouseOver={({ target }) =>
                         (target.style.color = "#33EFAB")
                       }
                       onMouseOut={({ target }) =>
                         (target.style.color = "black")
                       }
+                      onClick={(e) => downloadFile(e, data._id)}
                     />
                   </Icon>
                 </div>
@@ -280,7 +288,7 @@ function DetailFile({ setModalDetail, data }) {
             </div>
             <div className="row">
               <div className="col-12 " style={{ textAlign: "center" }}>
-                <FileBoby pic={pic} dat={data} />
+                <FileBoby data={data} />
               </div>
             </div>
           </div>
@@ -298,11 +306,31 @@ function ProfilePoster({ pic }) {
     </label>
   );
 };
-const FileBoby = ({ pic, data }) => {
+const FileBoby = ({ data }) => {
+  const PDF =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/833px-PDF_file_icon.svg.png";
+  const CSV =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Micorsoft_Excel_2016-2019_CSV_Icon.svg/1200px-Micorsoft_Excel_2016-2019_CSV_Icon.svg.png";
+  const imageRegex = new RegExp("image/*");
+  const csvRegex = new RegExp("csv/*");
+
+  if (imageRegex.test(data.fileType))
+    return (
+      <div className="Attachment__frame">
+        <img className="Attachment__fileItem" src={data.online_url} />
+      </div>
+    );
+  if (csvRegex.test(data.fileType))
+    return (
+      <div className="Attachment__frame">
+        <img className="Attachment__fileItem" src={CSV} />
+      </div>
+    );
   return (
     <>
       <div className="Attachment__frame">
-        <img className="Attachment__fileItem" src={pic} />
+        <img className="Attachment__fileItem" src={PDF} />
+        <p></p>
       </div>
     </>
   );

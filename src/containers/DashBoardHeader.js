@@ -53,10 +53,6 @@ function DashBoardHeader({ children }) {
           </ContainerComponent.Item>
 
           <ContainerComponent.Item>
-            {/* <ContainerComponent.Pane style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", width: "60px", height: "60px", background: "black", borderRadius: "50%" }}>
-                            <Text.Title style={{ color: "white" }}>Idea</Text.Title>
-                            <Text.Title style={{ background: "#f79817", width: "35px", textAlign: "center", borderRadius: "20px" }}>Hub</Text.Title>
-                        </ContainerComponent.Pane> */}
             <LogoIcon></LogoIcon>
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
