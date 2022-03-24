@@ -28,14 +28,14 @@ export default function AttachmentCrub() {
   
   useEffect(() => {
     if (!attachments.loading) {
-      setDataRecords(
-        attachments.data.find((item) => item.page === currentPage).records
-      );
-      setAttachRecord(
-        attachments.data.find((item) => item.page === currentPage).records
-      );
+      // setDataRecords(attachments.data.find((item) => item.page === currentPage).records);
+      setDataRecords(attachments.data);
+      setAttachRecord(attachments.data);
     }
-  }, [attachments.data, currentPage, attachRecord]);
+  }, [attachments.data,attachRecord]);
+  useEffect(() => {
+
+  }, [currentPage]);
 
   useEffect(() => {
     getAttachmentByPageRef.current = getAttachmentByPage;
@@ -104,7 +104,7 @@ export default function AttachmentCrub() {
                   />
                 )
               })
-              : dataRecords.map((attachment, index) => {
+              : dataRecords.slice(currentPage * attachments.count, (currentPage + 1) * attachments.count).map((attachment, index) => {
                 return <AttachmentData
                   key={index}
                   data={attachment}
@@ -122,6 +122,7 @@ export default function AttachmentCrub() {
         onChangePage={changeCurrentPage}
         onLoadData={getAttachmentByPageRef.current}
       ></SecondPagination>
+      {/* <SecondPagination page={currentPage} pages={attachments.pages} changePage={changeCurrentPage}></SecondPagination> */}
     </div>
   );
 }

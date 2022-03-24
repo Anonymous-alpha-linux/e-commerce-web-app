@@ -581,7 +581,7 @@ function AccountData({ data, index }) {
   function blockAccount(e, id) {
     e.preventDefault();
     console.log(id);
-    setBlockacc(!block);
+    // setBlockacc(!block);
   }
   return (
     <tr key={index}>

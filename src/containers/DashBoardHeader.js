@@ -18,9 +18,9 @@ function DashBoardHeader({ children }) {
 
   const sideBarRef = useState(null);
 
-  useEffect(() => {
-    document.querySelector('.sidebar__content').style.marginLeft = sideBarRef.current?.clientWidth + 'px';
-  }, [sideBarRef.current?.clientWidth]);
+  // useEffect(() => {
+  //   document.querySelector('.sidebar__content').style.marginLeft = sideBarRef.current?.clientWidth + 'px';
+  // }, [sideBarRef.current?.clientWidth]);
   return (
     <ContainerComponent className="manager_root">
       <ContainerComponent
@@ -53,23 +53,13 @@ function DashBoardHeader({ children }) {
           </ContainerComponent.Item>
 
           <ContainerComponent.Item>
-            {/* <ContainerComponent.Pane style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", width: "60px", height: "60px", background: "black", borderRadius: "50%" }}>
-                            <Text.Title style={{ color: "white" }}>Idea</Text.Title>
-                            <Text.Title style={{ background: "#f79817", width: "35px", textAlign: "center", borderRadius: "20px" }}>Hub</Text.Title>
-                        </ContainerComponent.Pane> */}
             <LogoIcon></LogoIcon>
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
       </ContainerComponent>
       <ContainerComponent className="manager__body">
-        <AnimateComponent.SlideRight
-          className="sidebar__root"
-          state={openSideBar}
-        >
-          <Sidebar
-            closeSidebar={() => setOpenSidebar(false)}
-            forwardRef={sideBarRef}
-          ></Sidebar>
+        <AnimateComponent.SlideRight className="sidebar__root" state={openSideBar}>
+          <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>
         </AnimateComponent.SlideRight>
         <ContainerComponent.Section className="sidebar__content">
           {children}
