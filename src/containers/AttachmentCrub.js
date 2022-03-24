@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
+import { FaDownload, FaTimes } from "react-icons/fa";
 
-import Pagination from "./Pagination";
 import { useAdminContext } from "../redux";
-import axios from "axios";
 import { mainAPI } from "../config";
 import { Icon, Text } from "../components";
 import { Loader } from "../containers";
-import { FaDownload } from "react-icons/fa";
 import { useModal, usePagination2 } from "../hooks";
 import { SecondPagination } from ".";
 import Modal from "./modal";
+
+
 export default function AttachmentCrub() {
   const [API, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
@@ -25,14 +25,14 @@ export default function AttachmentCrub() {
   const [dataRecords, setDataRecords] = useState([]);
 
   const [currentPage, changeCurrentPage] = usePagination2(0);
-  
+
   useEffect(() => {
     if (!attachments.loading) {
       // setDataRecords(attachments.data.find((item) => item.page === currentPage).records);
       setDataRecords(attachments.data);
       setAttachRecord(attachments.data);
     }
-  }, [attachments.data,attachRecord]);
+  }, [attachments.data, attachRecord]);
   useEffect(() => {
 
   }, [currentPage]);
@@ -182,8 +182,10 @@ function AttachmentData({ data, deleteAttachment, index }) {
       </td>
       <Modal isShowing={showModalDetail} toggle={toggleModalDetail}>
         <DetailFile
+          bytesToSize={bytesToSize}
           setModalDetail={toggleModalDetail}
           data={data}
+          downloadFile={downloadSingleAttachment}
         />
       </Modal>
     </tr>
@@ -234,54 +236,54 @@ function SearchAttachment({
   );
 }
 
-function DetailFile({ setModalDetail, data,  bytesToSize }) {
+function DetailFile({ setModalDetail, data, bytesToSize, downloadFile }) {
   const pic =
     "https://cdn.lifehack.org/wp-content/uploads/2012/12/come-up-with-ideas.jpg";
   return (
     <>
-      <div className="Attachment__container ">
+      <div className="Attachment__container " style={{ borderRadius: '20px', padding: '10px 15px' }}>
         <div className="row" style={{ justifyContent: "right" }}>
           <button
-            style={{ textAlign: "left", fontWeight: "bold" }}
+            style={{ textAlign: "left", fontWeight: "bold", fontSize: '20px' }}
             className="btn-trans-Cancel"
             onClick={() => setModalDetail()}
           >
-            <strong>Exit</strong>
+            <Icon>
+              <FaTimes></FaTimes>
+            </Icon>
           </button>
         </div>
         <div className="form-container">
-          <div className="question-container">
+          <div>
             <div
               className="row"
               style={{
                 textAlign: "left",
                 fontWeight: "bolder",
+                fontSize: '1rem'
               }}
             >
-              <div className="col-2" style={{ marginRight: "50px" }}>
+              <div className="col-2" style={{}}>
                 <ProfilePoster pic={pic} />
               </div>
-              <div className="col-2" style={{ marginRight: "30px" }}>
+              <div className="col-2" style={{}}>
                 {data.fileName.substring(18, 30)}
                 <br />
                 {data.fileType}
               </div>
-              <div className="col-2 " style={{ marginRight: "30px" }}>
+              <div className="col-2 " style={{}}>
                 {bytesToSize(data.fileSize)}
               </div>
               <div className="col-2">
-                <div style={{ marginTop: "20px", marginLeft: "10px" }}>
-                  <Icon>
-                    <FaDownload
-                      size={45}
-                      onMouseOver={({ target }) =>
-                        (target.style.color = "#33EFAB")
-                      }
-                      onMouseOut={({ target }) =>
-                        (target.style.color = "black")
-                      }
-                      onClick={(e) => downloadFile(e, data._id)}
-                    />
+                <div style={{ fontSize: '1.2rem' }}>
+                  <Icon onMouseOver={({ target }) =>
+                    (target.style.color = "#33EFAB")
+                  }
+                    onMouseOut={({ target }) =>
+                      (target.style.color = "black")
+                    }
+                    onClick={() => downloadFile(data._id)}>
+                    <FaDownload />
                   </Icon>
                 </div>
               </div>

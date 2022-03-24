@@ -86,12 +86,12 @@ export default function AccountCrud() {
               </td>
             </tr>) : searchInput !== ""
               ? filteredResults.map((accounts, index) => (
-                  <AccountData key={index} data={accounts} index={index} />
-                ))
+                <AccountData key={index} data={accounts} index={index} />
+              ))
               : dataRecords.map((accounts, index) => (
-                  <AccountData key={index} data={accounts} index={index} />
-                ))}
-            {!accounts?.length && (
+                <AccountData key={index} data={accounts} index={index} />
+              ))}
+            {!data?.length && (
               <tr>
                 <td>
                   <h2>No Account</h2>
