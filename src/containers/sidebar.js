@@ -32,7 +32,6 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
   return (
     <>
       <ContainerComponent.Section
-        forwardRef={forwardRef}
       // className="sidebar__root
       >
         <ContainerComponent.Toggle className="sidebar__inner">

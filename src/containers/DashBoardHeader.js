@@ -18,9 +18,9 @@ function DashBoardHeader({ children }) {
 
   const sideBarRef = useState(null);
 
-  useEffect(() => {
-    document.querySelector('.sidebar__content').style.marginLeft = sideBarRef.current?.clientWidth + 'px';
-  }, [sideBarRef.current?.clientWidth]);
+  // useEffect(() => {
+  //   document.querySelector('.sidebar__content').style.marginLeft = sideBarRef.current?.clientWidth + 'px';
+  // }, [sideBarRef.current?.clientWidth]);
   return (
     <ContainerComponent className="manager_root">
       <ContainerComponent
@@ -63,7 +63,7 @@ function DashBoardHeader({ children }) {
       </ContainerComponent>
       <ContainerComponent className="manager__body">
         <AnimateComponent.SlideRight className="sidebar__root" state={openSideBar}>
-          <Sidebar closeSidebar={() => setOpenSidebar(false)} forwardRef={sideBarRef}></Sidebar>
+          <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>
         </AnimateComponent.SlideRight>
         <ContainerComponent.Section className="sidebar__content">
           {children}

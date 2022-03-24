@@ -25,6 +25,7 @@ export default function AdminContext({ children }) {
     },
     attachments: {
       data: [],
+      fetchedPage: [],
       currentPage: 0,
       count: 5,
       documentCount: 0,
@@ -92,7 +93,7 @@ export default function AdminContext({ children }) {
           roles: res.data.response,
         }));
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => pushToast({ message: error.message, type: toastTypes.ERROR }));
   }
   function createNewAccount(username, email, password, role, cb) {
     return axios
@@ -210,7 +211,7 @@ export default function AdminContext({ children }) {
           messages: [...o.messages, "Changed password successfully"],
         }));
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => pushToast({ message: error.message, type: toastTypes.ERROR }));
   }
   function editRole(role, accountId, cb) {
     return axios
@@ -267,13 +268,14 @@ export default function AdminContext({ children }) {
           attachments: {
             ...o.attachments,
             loading: false,
-            data: [{
-              page: 0,
-              records: res.data.response
-            }],
-            // data: [
-            //   ...res.data.response
-            // ],
+            // data: [{
+            //   page: 0,
+            //   records: res.data.response
+            // }],
+            data: [
+              ...res.data.response
+            ],
+            fetchedPage: [0],
             currentPage: 0,
             documentCount: res.data.attachmentCount,
             pages: res.data.pages,
@@ -286,7 +288,9 @@ export default function AdminContext({ children }) {
       }));
   }
   function getAttachmentByPage(page, cb) {
-    if (!state.attachments.data.some((item) => item.page === page)) {
+    // console.log(page, state.attachments.fetchedPage.indexOf(page));
+    // if (!state.attachments.data.some((item) => item.page === page)) {
+    if (state.attachments.fetchedPage.indexOf(page) === -1) {
       setState((o) => ({
         ...o,
         attachments: {
@@ -307,24 +311,27 @@ export default function AdminContext({ children }) {
           },
         })
         .then((res) => {
-          setState((o) => ({
-            ...o,
-            attachments: {
-              ...o.attachments,
-              loading: false,
-              data: [
-                ...o.attachments.data,
-                {
-                  records: res.data.response,
-                  page: page,
-                },
-              ],
-              // data: [
-              //   ...o.attachments.data, ...res.data.response
-              // ],
-              currentPage: page,
-            },
-          }));
+          setState((o) => {
+            const newData = o.attachments.data.slice();
+            newData.splice((page + 1) * o.attachments.count, 0, ...res.data.response);
+            return ({
+              ...o,
+              attachments: {
+                ...o.attachments,
+                loading: false,
+                currentPage: page,
+                fetchedPage: [...o.attachments.fetchedPage, page],
+                data: newData
+                // data: [
+                //   ...o.attachments.data,
+                //   {
+                //     records: res.data.response,
+                //     page: page,
+                //   },
+                // ],
+              },
+            })
+          });
         })
         .catch((error) => pushToast({
           message: error.message,
@@ -338,16 +345,16 @@ export default function AdminContext({ children }) {
         ...o,
         attachments: {
           ...o.attachments,
-          // data: o.attachments.data.filter(attachment => attachment._id !== attachmentId)
-          data: o.attachments.data.map(attachment => {
-            if (attachment.page === currentPage) {
-              return {
-                ...attachment,
-                records: attachment.records.filter(attachment => attachment._id !== attachmentId)
-              }
-            }
-            return attachment;
-          })
+          data: o.attachments.data.filter(attachment => attachment._id !== attachmentId),
+          // data: o.attachments.data.map(attachment => {
+          //   if (attachment.page === currentPage) {
+          //     return {
+          //       ...attachment,
+          //       records: attachment.records.filter(attachment => attachment._id !== attachmentId)
+          //     }
+          //   }
+          //   return attachment;
+          // })
         }
       }
     });
@@ -381,7 +388,6 @@ export default function AdminContext({ children }) {
         attachmentid: attachmentId
       },
     }).then(res => {
-      console.log(res.data);
       const link = document.createElement('a');
       link.href = res.data.response;
 
