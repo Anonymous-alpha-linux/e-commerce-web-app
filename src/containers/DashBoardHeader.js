@@ -19,7 +19,6 @@ function DashBoardHeader({ children }) {
   const sideBarRef = useState(null);
 
   useEffect(() => {
-    console.log(sideBarRef.current);
     document.querySelector('.sidebar__content').style.marginLeft = sideBarRef.current?.clientWidth + 'px';
   }, [sideBarRef.current?.clientWidth]);
   return (
@@ -49,7 +48,7 @@ function DashBoardHeader({ children }) {
           <ContainerComponent.Item>
             <Text.Title>Welcome to {workspace.workTitle}</Text.Title>
             <Text.Subtitle style={{ textAlign: "center" }}>
-              Hello {user.account}
+              Hello, {user.role.toUpperCase()}-{user.account}
             </Text.Subtitle>
           </ContainerComponent.Item>
 

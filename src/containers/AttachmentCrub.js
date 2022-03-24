@@ -1,31 +1,33 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
-import { usePostContext, useAdminContext } from "../redux";
+import { useAdminContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
-import { Icon, Loader } from "../components";
+import { Icon, Text } from "../components";
+import { Loader } from "../containers";
 import { FaDownload } from "react-icons/fa";
-import { usePagination2 } from "../hooks";
+import { useModal, usePagination2 } from "../hooks";
 import { SecondPagination } from ".";
-
+import Modal from "./modal";
 export default function AttachmentCrub() {
   const [API, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
 
-  const { attachments, getAttachmentByPage } = useAdminContext();
+  const { attachments, getAttachmentByPage, deleteSingleAttachment } = useAdminContext();
   const getAttachmentByPageRef = useRef(getAttachmentByPage);
   const [searchInput, setSearchInput] = useState("");
+
   const [filteredResults, setFilteredResults] = useState([]);
   const [dataRecords, setDataRecords] = useState([]);
 
   const [currentPage, changeCurrentPage] = usePagination2(0);
-
   useEffect(() => {
     if (!attachments.loading) {
       setDataRecords(attachments.data.find((item) => item.page === currentPage).records);
+      // setDataRecords(attachments.data);
     }
   }, [attachments.data, currentPage]);
 
@@ -33,31 +35,12 @@ export default function AttachmentCrub() {
     getAttachmentByPageRef.current = getAttachmentByPage;
   }, [getAttachmentByPage]);
 
-  function deleteAttachment(e, id) {
-    e.preventDefault();
-    console.log(id);
-    // handleDelete(id);
-  }
-  function handleDelete(commentId) {
-    return axios
-      .delete(API, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        params: {
-          view: `category`,
-          commentid: commentId,
-        },
-      })
-      .then((res) => {
-        // setNewRecord(res.data.response);
-        // removeCategory(commentId);
-      })
-      .catch((error) => console.log(error.message));
+  function deleteAttachment(attachmentId) {
+    deleteSingleAttachment(attachmentId, currentPage);
   }
   return (
     <div className="categoryCRUD__root">
-      <div className="table__container">
+      <div className="table__container" style={{ overflowX: 'scroll' }}>
         <table className="table table-style">
           <thead>
             <tr>
@@ -78,7 +61,7 @@ export default function AttachmentCrub() {
               </th>
               <th scope="col" style={{ textAlign: "center", width: "10%" }}>
                 <SearchAttachment
-                  Attechment={attachments.data}
+                  attachment={attachments.data}
                   searchInput={searchInput}
                   setSearchInput={setSearchInput}
                   setFilteredResults={setFilteredResults}
@@ -89,15 +72,23 @@ export default function AttachmentCrub() {
             </tr>
           </thead>
           <tbody>
-            {attachments.loading && <tr>
+            {attachments.loading ? (<tr>
               <td colSpan={6}>
-                <Loader></Loader>
+                <Text.Line style={{ position: 'relative' }}>
+                  <Loader></Loader>
+                </Text.Line>
               </td>
-            </tr>
-            }
-            {searchInput !== ""
+            </tr>) : !attachments.data?.length && (
+              <tr>
+                <td>
+                  <h2>No Category</h2>
+                </td>
+                <td>
+                  <h2>Empty</h2>
+                </td>
+              </tr>
+            ) || searchInput !== ""
               ? filteredResults.map((attachment, index) => {
-                console.log(attachment);
                 return (
                   <AttachmentData
                     key={index}
@@ -115,44 +106,23 @@ export default function AttachmentCrub() {
                   deleteAttachment={deleteAttachment}
                 />;
               })}
-            {!attachments.data?.length && (
-              <tr>
-                <td>
-                  <h2>No Category</h2>
-                </td>
-                <td>
-                  <h2>Empty</h2>
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
-        <SecondPagination
-          page={currentPage}
-          firstPage={1}
-          lastPage={attachments.pages}
-          onChangePage={changeCurrentPage}
-          onLoadData={getAttachmentByPageRef.current}
-        ></SecondPagination>
-
-        {/* <Pagination
-          className="pagination-bar"
-          currentPage={attachments.currentPage}
-          totalCount={attachments.documentCount.lenght}
-          pageSize={attachments.count}
-          onPageChange={(page) => setCurrentPage(page)}
-        /> */}
-        {/* {res.data.pages.map((page, index) => (
-          <span onClick={() => {}}>{index + 1}</span>
-        ))} */}
       </div>
+      <SecondPagination
+        page={currentPage}
+        firstPage={1}
+        lastPage={attachments.pages}
+        onChangePage={changeCurrentPage}
+        onLoadData={getAttachmentByPageRef.current}
+      ></SecondPagination>
     </div>
   );
 }
 function AttachmentData({ data, deleteAttachment, index }) {
-  const [modalDownload, setModalDownload] = useState(false);
-  const [modalDetail, setModalDetail] = useState(false);
-  console.log(data);
+  const [showModalDetail, toggleModalDetail] = useModal();
+  const { downloadSingleAttachment } = useAdminContext();
+
   return (
     <tr key={index}>
       <td style={{ textAlign: "center", width: "3%" }}>{index + 1}</td>
@@ -176,40 +146,36 @@ function AttachmentData({ data, deleteAttachment, index }) {
         }}
       >
         <button
-          onClick={() => setModalDetail(!modalDetail)}
+          onClick={() => toggleModalDetail()}
           className="btn-blue"
         >
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>
-        {modalDetail && (
-          <div className="MadalBackDrop">
-            <div className="MobalCenter">
-              <DetailFlie
-                setModalDetail={setModalDetail}
-                modalDetail={modalDetail}
-                data={data}
-              />
-            </div>
-          </div>
-        )}
         <button
-          onClick={() => setModalDownload(!modalDownload)}
+          onClick={() => { downloadSingleAttachment(data._id) }}
           className="btn-green"
         >
           {data._id === "" ? <span></span> : <span>Download</span>}
         </button>
         <button
-          onClick={(e) => deleteAttachment(e, data._id)}
+          onClick={() => deleteAttachment(data._id)}
           className="btn-red"
         >
           {data._id === "" ? <span></span> : <span>Delete</span>}
         </button>
       </td>
+      <Modal isShowing={showModalDetail} toggle={toggleModalDetail}>
+        <DetailFile
+          setModalDetail={toggleModalDetail}
+          data={data}
+        />
+      </Modal>
     </tr>
+
   );
 }
 function SearchAttachment({
-  Attechment,
+  attachment,
   currentTableData,
   searchInput,
   setSearchInput,
@@ -235,10 +201,8 @@ function SearchAttachment({
         );
       });
       searchFunction.current(filteredData);
-      // console.log(filteredResults, "Filer");
     } else {
-      searchFunction.current(Attechment);
-      // console.log(Attechment, "Cate");
+      searchFunction.current(attachment);
     }
   };
 
@@ -252,8 +216,7 @@ function SearchAttachment({
     />
   );
 }
-function DetailFlie({ modalDetail, setModalDetail, data }) {
-  // console.log(data);
+function DetailFile({ setModalDetail, data }) {
   const pic =
     "https://cdn.lifehack.org/wp-content/uploads/2012/12/come-up-with-ideas.jpg";
   return (
@@ -263,9 +226,9 @@ function DetailFlie({ modalDetail, setModalDetail, data }) {
           <button
             style={{ textAlign: "left", fontWeight: "bold" }}
             className="btn-trans-Cancel"
-            onClick={() => setModalDetail(!modalDetail)}
+            onClick={() => setModalDetail()}
           >
-            <stong>Exit</stong>
+            <strong>Exit</strong>
           </button>
         </div>
         <div className="form-container">
@@ -288,7 +251,7 @@ function DetailFlie({ modalDetail, setModalDetail, data }) {
               >
                 <strong>Name Poster: </strong>
                 <br />
-                <h4>Post Title </h4>
+                <h4>Post Title:</h4>
               </div>
               <div className="col-2 ">
                 <strong> </strong>
@@ -322,7 +285,7 @@ function DetailFlie({ modalDetail, setModalDetail, data }) {
     </>
   );
 }
-const ProfilePoster = ({ pic }) => {
+function ProfilePoster({ pic }) {
   return (
     <label className="custom-file-upload">
       <div className="img-wrap">

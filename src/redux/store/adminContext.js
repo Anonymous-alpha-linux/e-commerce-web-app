@@ -15,7 +15,14 @@ export default function AdminContext({ children }) {
     CHANGE_ROLE: 4,
   };
   const [state, setState] = useState({
-    accounts: [],
+    accounts: {
+      data: [],
+      currentPage: 0,
+      count: 5,
+      documentCount: 0,
+      pages: 0,
+      loading: true,
+    },
     attachments: {
       data: [],
       currentPage: 0,
@@ -57,7 +64,11 @@ export default function AdminContext({ children }) {
       .then((res) => {
         setState((o) => ({
           ...o,
-          accounts: res.data.response,
+          accounts: {
+            ...o.accounts,
+            loading: false,
+            data: res.data.response,
+          }
         }));
       })
       .catch((error) => pushToast({
@@ -238,7 +249,6 @@ export default function AdminContext({ children }) {
       .catch((error) => cb({ error: error.message }));
   }
   function blockAccount(accountId, cb) { }
-
   function getAttachmentList(cb) {
     return axios
       .get(managerAPI, {
@@ -255,12 +265,15 @@ export default function AdminContext({ children }) {
         setState((o) => ({
           ...o,
           attachments: {
-            data: [
-              {
-                page: 0,
-                records: res.data.response,
-              },
-            ],
+            ...o.attachments,
+            loading: false,
+            data: [{
+              page: 0,
+              records: res.data.response
+            }],
+            // data: [
+            //   ...res.data.response
+            // ],
             currentPage: 0,
             documentCount: res.data.attachmentCount,
             pages: res.data.pages,
@@ -276,8 +289,12 @@ export default function AdminContext({ children }) {
     if (!state.attachments.data.some((item) => item.page === page)) {
       setState((o) => ({
         ...o,
-        loading: true,
+        attachments: {
+          ...o.attachments,
+          loading: true
+        }
       }));
+
       return axios
         .get(managerAPI, {
           headers: {
@@ -290,12 +307,11 @@ export default function AdminContext({ children }) {
           },
         })
         .then((res) => {
-          console.log(res.data);
           setState((o) => ({
             ...o,
-            loading: false,
             attachments: {
               ...o.attachments,
+              loading: false,
               data: [
                 ...o.attachments.data,
                 {
@@ -303,20 +319,85 @@ export default function AdminContext({ children }) {
                   page: page,
                 },
               ],
+              // data: [
+              //   ...o.attachments.data, ...res.data.response
+              // ],
               currentPage: page,
             },
           }));
         })
-        .catch((error) => console.log(error.message));
+        .catch((error) => pushToast({
+          message: error.message,
+          type: toastTypes.ERROR
+        }));
     }
+  }
+  function deleteSingleAttachment(attachmentId, currentPage, cb) {
+    setState(o => {
+      return {
+        ...o,
+        attachments: {
+          ...o.attachments,
+          // data: o.attachments.data.filter(attachment => attachment._id !== attachmentId)
+          data: o.attachments.data.map(attachment => {
+            if (attachment.page === currentPage) {
+              return {
+                ...attachment,
+                records: attachment.records.filter(attachment => attachment._id !== attachmentId)
+              }
+            }
+            return attachment;
+          })
+        }
+      }
+    });
+    return axios.delete(managerAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "attachment",
+        attachmentid: attachmentId
+      }
+    }).then(res => {
+      pushToast({
+        message: 'Deleted Attachment Successfully!',
+        type: toastTypes.SUCCESS
+      })
+    }).catch(error => pushToast({
+      message: error.message,
+      type: toastTypes.ERROR
+    }))
   }
   function assignMemberToWorkspace() { }
   function assignRoleToAccount() { }
+  async function downloadSingleAttachment(attachmentId) {
+    return axios.get(`${host}/api/v1/download`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: 'singleattachment',
+        attachmentid: attachmentId
+      },
+    }).then(res => {
+      console.log(res.data);
+      const link = document.createElement('a');
+      link.href = res.data.response;
+
+      // Append to html link element page
+      document.body.appendChild(link);
+
+      // Start download
+      link.click();
+
+      // Clean up and remove the link
+      link.parentNode.removeChild(link);
+    }).catch(err => pushToast({ message: err.message, type: toastTypes.ERROR }));
+  }
   return (
     <AdminContextAPI.Provider
       value={{
-        // accounts: accounts,
-        // roles: roles,
         ...state,
         createNewAccount,
         editUsername,
@@ -324,6 +405,8 @@ export default function AdminContext({ children }) {
         editPassword,
         editRole,
         getAttachmentByPage,
+        deleteSingleAttachment,
+        downloadSingleAttachment
       }}
     >
       {children}

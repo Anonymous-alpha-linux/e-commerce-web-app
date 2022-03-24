@@ -1,8 +1,11 @@
 import React from 'react'
 
 import { ContainerComponent, Text } from '../components'
+import { useWorkspaceContext } from '../redux'
 
 export default function DashboardOverview() {
+    const { totalWorkspace } = useWorkspaceContext();
+    console.log(useWorkspaceContext());
     return (
         <ContainerComponent >
             <ContainerComponent.GridThreeColumns style={{ color: 'white', justifyContent: 'center', width: '100%', minWidth: '360px', fontSize: '12px' }}>
@@ -15,7 +18,7 @@ export default function DashboardOverview() {
                         borderRadius: '20px'
                     }}>
                         <Text.CenterLine>
-                            50
+                            {totalWorkspace}
                         </Text.CenterLine>
                         <Text.CenterLine>
                             Total WKS

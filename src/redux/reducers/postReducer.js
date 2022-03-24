@@ -628,7 +628,7 @@ const postReducer = (state, action) => {
               "comments",
               (comment) => {
                 if (comment._id === action.commentId) {
-                  return actionHandler.pushItem("replies", action.payload, {
+                  return actionHandler.unshiftItem("replies", action.payload, {
                     ...comment,
                     reply: comment.reply + 1,
                   });

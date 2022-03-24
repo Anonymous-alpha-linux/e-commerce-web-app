@@ -32,7 +32,7 @@ export default function Crud() {
     console.log(id);
     handleDelete(id);
   }
-  function handleDelete(commentId) {
+  function handleDelete(categoryId) {
     return axios
       .delete(API, {
         headers: {
@@ -40,12 +40,12 @@ export default function Crud() {
         },
         params: {
           view: `category`,
-          commentid: commentId,
+          categoryid: categoryId,
         },
       })
       .then((res) => {
         // setNewRecord(res.data.response);
-        removeCategory(commentId);
+        removeCategory(categoryId);
       })
       .catch((error) => console.log(error.message));
   }
@@ -85,21 +85,21 @@ export default function Crud() {
           <tbody>
             {searchInput !== ""
               ? filteredResults.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))
+                <CategoryData
+                  key={index}
+                  data={category}
+                  index={index}
+                  deleteCate={deleteCate}
+                />
+              ))
               : dataRecords.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))}
+                <CategoryData
+                  key={index}
+                  data={category}
+                  index={index}
+                  deleteCate={deleteCate}
+                />
+              ))}
             {!categories?.length && (
               <tr>
                 <td>
