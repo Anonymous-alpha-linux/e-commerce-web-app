@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { toastTypes } from "../fixtures";
 import styles from "./styles/ToastMessage.module.css";
 import { useAuthorizationContext } from "../redux";
@@ -7,17 +7,17 @@ export default function ToastMessage({
   message,
   timeout,
   type = toastTypes.WARNING,
-  onError,
-  onSuccess,
 }) {
+  const { setError, setMessage, setInfo } = useAuthorizationContext();
   const toastRef = useRef();
   useEffect(() => {
     // ToastRef.current.style.opacity = 1;
     // const LoaderBar = ToastRef.current.lastElementChild.children[0];
     toastRef.current.style.width = "0%";
     const timeoutVal = setTimeout(() => {
-      onSuccess("");
-      onError("");
+      setError("");
+      setMessage("");
+      setInfo("");
     }, timeout + 100);
     return () => {
       clearTimeout(timeoutVal);
@@ -25,6 +25,7 @@ export default function ToastMessage({
   }, []);
   return (
     <div className={`${styles.ToastMessage} ${styles[type]}`}>
+      <h3>{type.toUpperCase()}</h3>
       <span>{message}</span>
       <div className={styles.Loader}>
         <div

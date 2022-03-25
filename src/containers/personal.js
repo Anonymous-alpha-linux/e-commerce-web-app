@@ -6,7 +6,6 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function Personal({ personalInfo }) {
     const { user, profile, editProfile } = useAuthorizationContext();
-    console.log(profile);
     const { workspace } = useWorkspaceContext();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);
@@ -291,17 +290,30 @@ export default function Personal({ personalInfo }) {
                                 setIsEdit(false);
                             }}>
                         </Form.Input>
-                        <ButtonComponent style={{ cursor: 'pointer' }}
-                            onClick={() => { document.querySelector('input[type=submit]').click(); }}
-                        >
-                            Save
-                        </ButtonComponent>
+                        <Text.Line>
+                            <Text.MiddleLine>
+                                <ButtonComponent
+                                    style={{ cursor: 'pointer', marginBottom: '20px' }}
+                                    onClick={() => setIsEdit(false)}>
+                                    Cancel
+                                </ButtonComponent>
+                            </Text.MiddleLine>
+                            <Text.MiddleLine>
+                                <ButtonComponent style={{ cursor: 'pointer', marginBottom: '20px' }}
+                                    onClick={() => { document.querySelector('input[type=submit]').click(); }}
+                                >
+                                    Save
+                                </ButtonComponent>
+                            </Text.MiddleLine>
+                        </Text.Line>
                     </>
-                        || <ButtonComponent
-                            style={{ cursor: 'pointer' }}
+                        ||
+                        <ButtonComponent
+                            style={{ cursor: 'pointer', marginBottom: '20px' }}
                             onClick={() => setIsEdit(true)}>
                             Edit
-                        </ButtonComponent>}
+                        </ButtonComponent>
+                    }
                 </Text.RightLine>
             </Form>
         </ContainerComponent.Inner>

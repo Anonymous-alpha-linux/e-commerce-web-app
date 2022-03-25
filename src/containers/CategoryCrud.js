@@ -1,146 +1,267 @@
-import React, { useState, useEffect } from "react";
-import "../containers/styles/_crub.scss";
+import React, { useState, useRef, useEffect } from "react";
 
-let Category = [
-  {
-    id: 1,
-    Title: "Business",
-  },
-  {
-    id: 2,
-    Title: "Art",
-  },
-  {
-    id: 3,
-    Title: "IT",
-  },
-  {
-    id: 4,
-    Title: "English",
-  },
-];
+import Pagination from "./Pagination";
+import { usePostContext } from "../redux";
+import axios from "axios";
+import { mainAPI } from "../config";
 
-function Crud() {
-  const [categories, setCategories] = useState(Category);
+export default function Crud() {
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
+  let PageSize = 8;
+  const { categories, removeCategory } = usePostContext();
   const [modal, setModal] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [dataRecords, setDataRecords] = useState([]);
+  // console.log("re-render crud", categories);
 
-  function deleteUser() { }
-  function onSubmit(data) {
-    return createCetegory(data);
+  useEffect(() => {
+    setDataRecords((e) => {
+      const firstPageIndex = (currentPage - 1) * PageSize;
+      const lastPageIndex = firstPageIndex + PageSize;
+      return categories.slice(firstPageIndex, lastPageIndex);
+    });
+  }, [categories, currentPage]);
+
+  function deleteCate(e, id) {
+    e.preventDefault();
+    console.log(id);
+    handleDelete(id);
   }
-  function createCetegory(data) {
-    return Category.create(data);
+  function handleDelete(commentId) {
+    return axios
+      .delete(API, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: `category`,
+          commentid: commentId,
+        },
+      })
+      .then((res) => {
+        // setNewRecord(res.data.response);
+        removeCategory(commentId);
+      })
+      .catch((error) => console.log(error.message));
   }
-
-  const ModalAddFormCategory = () => {
-    return (
-      <div className="c-modal__container">
-        <form onSubmit={onSubmit}>
-          <div className="form-container">
-            <div className="question-container">
-              <label className="question-label">Category Name</label>
-              <input className="row-input" name="name" type="text" />
-            </div>
-          </div>
-          <div className="form-container">
-            <div className="question-container">
-              <button type="submit" className="submit_category">
-                Add
-              </button>
-              <button
-                className="btn-trans-Cancel"
-                onClick={() => setModal(!modal)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    );
-  };
-  const CrudCategory = () => {
-    return (
-      <div>
-        <h1>Category Crud</h1>
-        <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
-          Create New Category
-        </button>
-        {modal && (
-          <div
-            style={{
-              height: "0px",
-              // transition: "all 2s ease",
-            }}
-          >
-            <ModalAddFormCategory />
-          </div>
-        )}
-        {/* <AnimateComponent Class="btn-rounded-green" name="Create New Category">
-          <ModalAddFormCategory />
-        </AnimateComponent> */}
-        <div
-          style={{
-            marginTop: "100px",
-          }}
-        >
-          <table className="table table-style">
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Title</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories &&
-                categories.map((category) => (
-                  <tr key={category.id}>
-                    <td style={{ textAlign: "center", width: "40%" }}>
-                      {category.id}
-                    </td>
-                    <td style={{ textAlign: "center", width: "40%" }}>
-                      {category.Title}
-                    </td>
-                    <td
-                      style={{
-                        textAlign: "center",
-                        whiteSpace: "nowrap",
-                        width: "120px",
-                      }}
-                    >
-                      <button
-                        onClick={() => deleteUser()}
-                        className="btn-red"
-                        disabled={category.isDeleting}
-                      >
-                        {category.isDeleting ? (
-                          <span></span>
-                        ) : (
-                          <span>Delete</span>
-                        )}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              {categories && !categories.length && (
-                <tr>
-                  <td>
-                    <div>No Category to Display</div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div>
-      <CrudCategory />
+    <div className="categoryCRUD__root">
+      <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
+        Create New Category
+      </button>
+      {modal && (
+        <div style={{ height: "0px" }}>
+          <ModalAddFormCategory setModal={setModal} modal={modal} />
+        </div>
+      )}
+
+      <div className="table__container">
+        <table className="table table-style">
+          <thead>
+            <tr>
+              <th scope="col" style={{ textAlign: "center", width: "40%" }}>
+                ID
+              </th>
+              <th scope="col" style={{ textAlign: "center", width: "40%" }}>
+                Title
+              </th>
+              <th>
+                <SearchCategory
+                  categories={categories}
+                  searchInput={searchInput}
+                  setSearchInput={setSearchInput}
+                  setFilteredResults={setFilteredResults}
+                  currentTableData={categories}
+                  filteredResults={filteredResults}
+                />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {searchInput !== ""
+              ? filteredResults.map((category, index) => (
+                  <CategoryData
+                    key={index}
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
+                ))
+              : dataRecords.map((category, index) => (
+                  <CategoryData
+                    key={index}
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
+                ))}
+            {!categories?.length && (
+              <tr>
+                <td>
+                  <h2>No Category</h2>
+                </td>
+                <td>
+                  <h2>Empty</h2>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+        <Pagination
+          className="pagination-bar"
+          currentPage={currentPage}
+          totalCount={categories.length}
+          pageSize={PageSize}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
+      </div>
     </div>
   );
 }
 
-export default Crud;
+function ModalAddFormCategory({ setModal, modal }) {
+  const [categoryAdd, setCategoryAdd] = useState({
+    categoryName: "",
+  });
+  const [API, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
+  const { getNewCategory } = usePostContext();
+  const getNewCategoryRef = useRef(getNewCategory);
+  useEffect(() => {
+    getNewCategoryRef.current = getNewCategory;
+  }, [getNewCategory]);
+
+  async function HandleNameInput(e) {
+    setCategoryAdd({ ...categoryAdd, [e.target.name]: e.target.value });
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    CreateCategory();
+  }
+  function CreateCategory() {
+    return axios
+      .post(API, categoryAdd, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "category",
+        },
+      })
+      .then((res) => {
+        getNewCategory(res.data.response);
+        setModal(false);
+      })
+      .catch((error) => console.log(error.message));
+  }
+
+  return (
+    <div className="c-modal__container">
+      <form>
+        <div className="form-container">
+          <div className="question-container">
+            <label className="question-label">Category Name</label>
+            <input
+              className="row-input"
+              type="text"
+              name="categoryName"
+              onChange={HandleNameInput}
+              value={categoryAdd.categoryName}
+            />
+          </div>
+        </div>
+        <div className="form-container">
+          <div className="question-container">
+            <button
+              type="submit"
+              className="submit_category"
+              onClick={onSubmit}
+            >
+              Add
+            </button>
+            <button
+              className="btn-trans-Cancel"
+              onClick={() => setModal(!modal)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+function CategoryData({ data, deleteCate, index }) {
+  return (
+    <tr key={index}>
+      <td style={{ textAlign: "center", width: "40%" }}>
+        {index + 1}
+        {/* {parseInt(data._id, 8)} */}
+        {/* {data._id} */}
+      </td>
+      <td style={{ textAlign: "center", width: "40%" }}>{data.name}</td>
+      <td
+        style={{
+          textAlign: "center",
+          whiteSpace: "nowrap",
+          width: "120px",
+        }}
+      >
+        <button onClick={(e) => deleteCate(e, data._id)} className="btn-red">
+          {data._id === "" ? <span></span> : <span>Delete</span>}
+        </button>
+      </td>
+    </tr>
+  );
+}
+function SearchCategory({
+  categories,
+  currentTableData,
+  searchInput,
+  setSearchInput,
+  filteredResults,
+  setFilteredResults,
+}) {
+  const searchFunction = useRef(setFilteredResults);
+  useEffect(() => {
+    searchFunction.current = setFilteredResults;
+  }, [setFilteredResults]);
+  async function inputHandler(e) {
+    setSearchInput(e.target.value);
+    HandleSearchItems();
+  }
+  const HandleSearchItems = () => {
+    if (searchInput !== "") {
+      const filteredData = currentTableData.filter((item) => {
+        return (
+          // item.name.toLowerCase().indexOf(searchInput.toLowerCase()) !== -1
+          item.name.toLowerCase().includes(searchInput.toLowerCase())
+        );
+      });
+      searchFunction.current(filteredData);
+      // console.log(filteredResults, "Filer");
+    } else {
+      searchFunction.current(categories);
+      // console.log(categories, "Cate");
+    }
+  };
+
+  return (
+    <input
+      className="search-textbox"
+      type="text"
+      value={searchInput}
+      placeholder="Search..."
+      onChange={inputHandler}
+    />
+  );
+}

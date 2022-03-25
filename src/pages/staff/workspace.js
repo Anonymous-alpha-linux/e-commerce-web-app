@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { ContainerComponent, List } from "../../components";
+import React, { useRef, useEffect } from "react";
+import { ButtonComponent, ContainerComponent, List } from "../../components";
 import {
   Filter,
   LazyLoading,
@@ -12,14 +12,17 @@ import { toastTypes } from "../../fixtures";
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
+  useNotifyContext,
   usePostContext,
   useWorkspaceContext,
 } from "../../redux";
 
 export default function Workspace() {
-  const { user, socket, error, setError } = useAuthorizationContext();
+  const { user } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
+  const { sendMessageToSpecificPerson } = useNotifyContext();
+
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
@@ -45,12 +48,12 @@ export default function Workspace() {
       ></Filter>
       <LazyLoading loader={loadNextPosts}>
         <List className="workspace__postList" ref={listRef}>
-          {posts.map((post) => {
+          {posts.map((post, index) => {
             const {
               _id,
               postAuthor,
               content,
-              attachment,
+              attachments,
               like,
               dislike,
               likedAccounts,
@@ -72,7 +75,7 @@ export default function Workspace() {
 
             let postBody = {
               content,
-              attachment: attachment.map((attach) => {
+              attachment: attachments.map((attach) => {
                 const { _id, fileType, online_url, filePath, fileFormat } =
                   attach;
                 return {
@@ -94,13 +97,12 @@ export default function Workspace() {
               comments,
             };
             return (
-              <List.Item key={post._id} id={post._id}>
+              <List.Item key={`${post._id}-${index}`} id={post._id}>
                 <PostContainer
                   postId={_id}
                   postHeader={postHeader}
                   postBody={postBody}
                   postFooter={postFooter}
-                  removeIdea={() => removeIdea(_id)}
                 ></PostContainer>
               </List.Item>
             );

@@ -5,22 +5,31 @@ import {
   Text,
   Preview,
   Dropdown,
-  ButtonComponent,
 } from "../components";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-
+import { FaThumbsUp, FaThumbsDown, FaRegEdit, FaEraser } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
+import { HiDownload } from "react-icons/hi";
 import { Comment, DropDownButton, GridPreview } from ".";
-import { useAuthorizationContext, usePostContext } from "../redux";
-import { Link } from "react-router-dom";
+import {
+  useAuthorizationContext,
+  useNotifyContext,
+  usePostContext,
+} from "../redux";
+import { Link, useNavigate } from "react-router-dom";
+import { roles } from "../fixtures";
+import axios from "axios";
+import { mainAPI } from "../config";
+// import { notifyData, socketTargets } from "../fixtures";
 
-export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
-  // const openComment = useRef(false);
+export default function Post({ postHeader, postBody, postFooter }) {
+  const interactTypes = {
+    NO: "no rate",
+    LIKE: "like",
+    DISLIKE: "dislike",
+  };
   const { user } = useAuthorizationContext();
-  const { interactPost, getPostComments, getFile, getGzipFile } =
-    usePostContext();
-  // const date = `${new Date(postHeader.date).getHours()}:${new Date(postHeader.date).getMinutes()}`;
-
+  const { interactPost, getPostComments, deleteSinglePost } = usePostContext();
+  const { sendNotification } = useNotifyContext();
   const isFirstRender = useRef(true);
   const interactRef = useRef(interactPost);
   const getComment = useRef(getPostComments);
@@ -30,9 +39,10 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     liked: postFooter.isLiked,
     disliked: postFooter.isDisliked,
   });
+  const [type, setType] = useState(interactTypes.NO);
+  let navigate = useNavigate();
 
   const checkedHandler = async (e) => {
-    const isChecked = e.target.checked;
     if (e.target.name === "like") {
       setInteract({
         ...interact,
@@ -48,43 +58,72 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
       });
     }
   };
-  const downloadZIPFile = async (e) => {
-    console.log(postBody);
-    return Promise.all(
-      postBody.attachment.map((attach) => {
-        return new Promise((resolve, reject) => {
-          getFile(attach, (file) => {
-            console.log(file);
-            resolve(file);
-          }).catch((error) => {
-            reject(error);
-          });
-        });
+  const downloadHandler = async (e) => {
+    return axios
+      .get(`${mainAPI.LOCALHOST_HOST}/api/v1/download`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          postid: postHeader.id,
+        },
       })
-    ).then((files) => {
-      console.log(files);
-      return getGzipFile(files);
-    });
+      .then((res) => {
+        const link = document.createElement("a");
+        link.href = res.data.response;
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      })
+      .catch((err) => console.log(err.message));
   };
+  // const downloadZIPFile = async (e) => {
+  //   console.log(postBody);
+  //   return Promise.all(
+  //     postBody.attachment.map((attach) => {
+  //       return new Promise((resolve, reject) => {
+  //         getFile(attach, (file) => {
+  //           console.log(file);
+  //           resolve(file);
+  //         }).catch((error) => {
+  //           reject(error);
+  //         });
+  //       });
+  //     })
+  //   ).then((files) => {
+  //     console.log(files);
+  //     return getGzipFile(files);
+  //   });
+  // };
   const parseTime = (time) => {
-    const secondAgo =
-      new Date(Date.now()).getSeconds() - new Date(time).getSeconds();
-    const minuteAgo =
-      new Date(Date.now()).getMinutes() - new Date(time).getMinutes();
-    const hourAgo = new Date(Date.now()).getHours() - new Date(time).getHours();
-    const dateAgo = new Date(Date.now()).getDate() - new Date(time).getDate();
-    if (dateAgo < 1) {
-      if (hourAgo < 24) return hourAgo + " hours ago";
-      if (minuteAgo < 60) return minuteAgo + " minutes ago";
-      if (secondAgo < 60) return secondAgo + " seconds ago";
+    const now = new Date(Date.now());
+    const end = new Date(time);
+    const diff = new Date(now.getTime() - end.getTime());
+
+    if (diff.getUTCDate() - 1 === 0) {
+      if (diff.getUTCHours() > 1) return diff.getUTCHours() + " hours ago";
+      if (diff.getUTCMinutes() > 1)
+        return diff.getUTCMinutes() + " minutes ago";
+      return diff.getUTCSeconds() + " seconds ago";
     }
-    if (dateAgo < 2) return dateAgo + " days ago";
+    if (diff.getUTCDate() < 30) return diff.getUTCDate() + " days ago";
     return `${new Date(time).toLocaleString("en-us", { dateStyle: "full" })}`;
   };
 
   React.useEffect(() => {
+    getComment.current = getPostComments;
+  }, [getPostComments]);
+  React.useEffect(() => {
     if (!isFirstRender.current) {
-      interactRef.current(postHeader.id, "rate", interact, () => {});
+      interactPost(postHeader.id, type, interact, (commentId) => {
+        // console.log(commentId);
+      });
     }
   }, [interact]);
   React.useEffect(() => {
@@ -98,7 +137,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
     <ContainerComponent.Section
       className="post__section"
       style={{
-        padding: "20px",
+        padding: "10px 20px",
       }}
     >
       <ContainerComponent.Pane className="post__header">
@@ -132,39 +171,60 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
             >
               {parseTime(postHeader.date)}
             </Text.Date>
-            {/* <Text>
-                            <IoEarth />
-                        </Text> */}
           </ContainerComponent.Flex>
         </ContainerComponent.InlineGroup>
-        {user.accountId === postHeader.postAuthor && (
+        {(user.accountId === postHeader.postAuthor ||
+          [roles.QA_COORDINATOR, roles.QA_MANAGER].includes(user.role)) && (
           <Text.RightLine>
             <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
+              {postHeader.postAuthor === user.accountId && (
+                <Dropdown.Item>
+                  <Link to={`/portal/idea/${postHeader.id}`}>
+                    <Text.Line>
+                      <Text.MiddleLine>
+                        <Icon>
+                          <FaRegEdit></FaRegEdit>
+                        </Icon>
+                      </Text.MiddleLine>
+                      <Text.MiddleLine>Edit</Text.MiddleLine>
+                    </Text.Line>
+                  </Link>
+                </Dropdown.Item>
+              )}
               <Dropdown.Item>
-                <Link to={`/portal/idea/${postHeader.id}`}>
-                  <Text>Edit</Text>
-                </Link>
+                <Text.Line onClick={() => deleteSinglePost(postHeader.id)}>
+                  <Text.MiddleLine>
+                    <Icon>
+                      <FaEraser></FaEraser>
+                    </Icon>
+                  </Text.MiddleLine>
+                  <Text.MiddleLine>Delete</Text.MiddleLine>
+                </Text.Line>
               </Dropdown.Item>
-              <Dropdown.Item>
-                <Text onClick={removeIdea}>Delete</Text>
-              </Dropdown.Item>
+              {user.role === roles.QA_MANAGER && (
+                <Dropdown.Item>
+                  <Text.Line onClick={downloadHandler}>
+                    <Text.MiddleLine>
+                      <Icon>
+                        <HiDownload></HiDownload>
+                      </Icon>
+                    </Text.MiddleLine>
+                    <Text.MiddleLine>Download</Text.MiddleLine>
+                  </Text.Line>
+                </Dropdown.Item>
+              )}
             </DropDownButton>
           </Text.RightLine>
         )}
       </ContainerComponent.Pane>
+
       <ContainerComponent.Pane className="post__body">
         <Text.Paragraph>{postBody.content}</Text.Paragraph>
-        {postBody.attachment.length && (
+        {!!postBody.attachment.length && (
           <GridPreview files={postBody.attachment}></GridPreview>
         )}
-
-        {/* Button Download */}
-        <ButtonComponent onClick={downloadZIPFile}>
-          Download ZIP Files
-        </ButtonComponent>
-        {/* Button Download*/}
       </ContainerComponent.Pane>
-      {/* {Like, Dislike} */}
+
       <ContainerComponent.Pane
         className="post__footer"
         style={{
@@ -185,6 +245,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
               ></input>
               <Icon.CircleIcon
                 onClick={() => {
+                  setType(interactTypes.LIKE);
                   document.getElementById(`like ${postHeader.id}`).click();
                 }}
                 style={{
@@ -221,6 +282,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
               <Text.CenterLine>
                 <Icon.CircleIcon
                   onClick={() => {
+                    setType(interactTypes.DISLIKE);
                     document.getElementById(`dislike ${postHeader.id}`).click();
                   }}
                   style={{
@@ -248,7 +310,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
           <ContainerComponent.Item
             onClick={() => {
               if (!openComment) {
-                getComment.current(postHeader.id, () => {
+                getComment.current(postHeader.id, (res) => {
                   setOpenComment(true);
                 });
               } else {
@@ -264,6 +326,7 @@ export default function Post({ postHeader, postBody, postFooter, removeIdea }) {
       </ContainerComponent.Pane>
       {openComment && (
         <Comment
+          postAuthor={postHeader.postAuthor}
           postId={postHeader.id}
           commentLogs={postFooter.comments}
         ></Comment>

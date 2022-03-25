@@ -14,3 +14,4 @@ export { default as Accordion } from "./accordion";
 export { default as Dropdown } from "./dropdown";
 export { default as BarChart } from "./barchart";
 export { default as AnimateComponent } from "./animate";
+export { default as LogoIcon } from "./logo";

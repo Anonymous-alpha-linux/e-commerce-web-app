@@ -13,16 +13,13 @@ import {
   ContainerComponent,
   Icon,
   Text,
-  Dropdown,
 } from "../components";
-import { NotificationContainer } from "../containers";
-import { navigator as navigators, navData, QAManagerOps } from "../fixtures";
-import { useAuthorizationContext } from "../redux";
+import { navigator as navigators, navData } from "../fixtures";
+import { useAuthorizationContext, useNotifyContext } from "../redux";
 
 export default function Navigation() {
   const [screenColumn, setScreenColumn] = useState(2);
   const [openNavigator, setOpenNavigator] = useState(false);
-  const [dropdown, setDropdown] = useState(false);
   const navigate = useNavigate();
 
   const responsiveHandler = () => {
@@ -110,23 +107,6 @@ export default function Navigation() {
                     </ContainerComponent.Item>
                   );
                 })}
-
-                {/* <ContainerComponent.Item
-                  onClick={() => setDropdown((prev) => !prev)}
-                >
-                  {"QA Manager feature"}
-                  {dropdown && (
-                    <Dropdown.Content style={{ top: "30px", left: "0px" }}>
-                      {QAManagerOps.map((option) => {
-                        return (
-                          <Dropdown.Item>
-                            <Link to={option.link}>{option.label}</Link>
-                          </Dropdown.Item>
-                        );
-                      })}
-                    </Dropdown.Content>
-                  )}
-                </ContainerComponent.Item> */}
               </ContainerComponent.Flex>
             </ContainerComponent.MiddleInner>
           </ContainerComponent.Item>
@@ -141,13 +121,11 @@ export default function Navigation() {
       {openNavigator && (
         <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
       )}
-      {/* {openMessage && <MessageContainer></MessageContainer>} */}
     </ContainerComponent>
   );
 }
 
 const Navigator = ({ closeNavigator }) => {
-  const [dropdown, setDropdown] = useState(false);
   return (
     <ContainerComponent
       className="navigator__container"
@@ -165,34 +143,6 @@ const Navigator = ({ closeNavigator }) => {
       <ContainerComponent.BackDrop
         onClick={closeNavigator}
       ></ContainerComponent.BackDrop>
-
-      {/* {dropdown && (
-        <ContainerComponent.Flex
-          style={{
-            position: "absolute",
-            width: "100%",
-            top: "-50px",
-            margin: "-10px",
-            padding: "5px",
-            gap: "5px",
-          }}
-        >
-          {QAManagerOps.map((option) => {
-            return (
-              <ButtonComponent
-                style={{ backgroundColor: "rgb(48, 45, 45)", flex: 1 }}
-              >
-                <ContainerComponent.MiddleInner>
-                  <Link to={option.link} style={{ color: "#fff" }}>
-                    {option.label}
-                  </Link>
-                </ContainerComponent.MiddleInner>
-              </ButtonComponent>
-            );
-          })}
-        </ContainerComponent.Flex>
-      )} */}
-
       <ContainerComponent.GridThreeColumns>
         {navigators.map((navigate, index) => (
           <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
@@ -216,68 +166,65 @@ const Navigator = ({ closeNavigator }) => {
             </Link>
           </ContainerComponent.Item>
         ))}
-
-        {/* <ContainerComponent.Item
-          onClick={() => {
-            setDropdown((prev) => !prev);
-          }}
-        >
-          <ContainerComponent.MiddleInner>
-            <Icon.CircleIcon></Icon.CircleIcon>
-            <Icon.Label
-              style={{
-                fontWeight: "bold",
-                textTransform: "capitalize",
-              }}
-            >
-              {"QA Manager features"}
-            </Icon.Label>
-          </ContainerComponent.MiddleInner>
-        </ContainerComponent.Item> */}
       </ContainerComponent.GridThreeColumns>
     </ContainerComponent>
   );
 };
 
-const AuthStatus = React.memo(
-  ({ screenColumn, openNotify, openNavigator, setOpenNotify, openMessage }) => {
-    const { user, logout } = useAuthorizationContext();
+const AuthStatus = React.memo(function AuthStatus({
+  screenColumn,
+  openNavigator,
+}) {
+  const { user, logout } = useAuthorizationContext();
+  const { notify } = useNotifyContext();
+  const [isNew, setIsNew] = useState(false);
 
-    if (!user.isLoggedIn) {
-      return (
-        <div
-          style={{
-            textAlign: "right",
-          }}
-        >
-          <Link to={"/login"} onClick={logout}>
-            Login
-          </Link>
-        </div>
-      );
+  useEffect(() => {
+    if (notify.newNodes.length > 0) {
+      setIsNew(true);
     }
+  }, [notify.newNodes.length]);
 
+  function turnOffBadge(e) {
+    setIsNew(false);
+  }
+
+  if (!user.isLoggedIn) {
     return (
-      <ContainerComponent.Flex
+      <div
         style={{
-          justifyContent: "flex-end",
-          flexWrap: "nowrap",
+          textAlign: "right",
         }}
       >
-        <ContainerComponent.Item>
-          <Icon.CircleIcon>
-            <Link to="/portal/message">
-              <AiOutlineMessage></AiOutlineMessage>
-            </Link>
-          </Icon.CircleIcon>
-        </ContainerComponent.Item>
-        <ContainerComponent.Item>
-          <Icon.CircleIcon>
-            <Link to="/portal/notification">
-              <IoNotificationsOutline></IoNotificationsOutline>
-            </Link>
-          </Icon.CircleIcon>
-          {/* {screenColumn < 3 &&
+        <Link to={"/login"} onClick={logout}>
+          Login
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <ContainerComponent.Flex
+      style={{
+        justifyContent: "flex-end",
+        flexWrap: "nowrap",
+      }}
+    >
+      {/* <ContainerComponent.Item>
+        <Icon.CircleIcon>
+          <Link to="/portal/message">
+            <AiOutlineMessage></AiOutlineMessage>
+          </Link>
+        </Icon.CircleIcon>
+      </ContainerComponent.Item> */}
+      <ContainerComponent.Item>
+        <Icon.CircleIcon onClick={turnOffBadge}>
+          <Link to="/portal/notification">
+            <IoNotificationsOutline></IoNotificationsOutline>
+          </Link>
+        </Icon.CircleIcon>
+        {isNew && <Icon.Badge></Icon.Badge>}
+        {/* {screenColumn < 3 &&
                     ||
                     <AnimateComponent
                         className="fixed__container"
@@ -292,27 +239,26 @@ const AuthStatus = React.memo(
                         <NotificationContainer></NotificationContainer>
                     </AnimateComponent>
                 } */}
-        </ContainerComponent.Item>
-        <ContainerComponent.Item>
-          {(screenColumn < 3 && (
-            <Icon.CircleIcon onClick={openNavigator}>
-              <BsList></BsList>
-            </Icon.CircleIcon>
-          )) || (
-            <Text.MiddleLine style={{ verticalAlign: "text-bottom" }}>
-              <Link
-                to={"/"}
-                style={{
-                  color: "#fff",
-                }}
-                onClick={logout}
-              >
-                <ButtonComponent>Logout</ButtonComponent>
-              </Link>
-            </Text.MiddleLine>
-          )}
-        </ContainerComponent.Item>
-      </ContainerComponent.Flex>
-    );
-  }
-);
+      </ContainerComponent.Item>
+      <ContainerComponent.Item>
+        {(screenColumn < 3 && (
+          <Icon.CircleIcon onClick={openNavigator}>
+            <BsList></BsList>
+          </Icon.CircleIcon>
+        )) || (
+          <Text.MiddleLine style={{ verticalAlign: "text-bottom" }}>
+            <Link
+              to={"/"}
+              style={{
+                color: "#fff",
+              }}
+              onClick={logout}
+            >
+              <ButtonComponent>Logout</ButtonComponent>
+            </Link>
+          </Text.MiddleLine>
+        )}
+      </ContainerComponent.Item>
+    </ContainerComponent.Flex>
+  );
+});

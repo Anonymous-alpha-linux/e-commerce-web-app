@@ -5,7 +5,6 @@ import React, {
   useState,
   useEffect,
   useReducer,
-  useCallback,
 } from "react";
 import { mainAPI } from "../../config";
 import { Loading } from "../../pages";
@@ -25,22 +24,33 @@ export default function AuthenticationContext({ children }) {
       : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
 
   const [message, setMessage] = useState("");
+  const [info, setInfo] = useState("");
   const [error, setError] = useState("");
+  const [toastList, setToastList] = useState([]);
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
   useEffect(() => {
-    try {
-      onLoadUser(() => {
-        getProfile();
-      });
-    } catch (error) {
-      setError(error.message);
-    }
+    onLoadUser(() => {
+      getProfile();
+    });
     return () => {
       cancelTokenSource.cancel();
     };
   }, []);
+  useEffect(() => {
+    if (error || message || info)
+      setToastList([
+        ...toastList,
+        {
+          message: error || message || "",
+          type:
+            (error && toastTypes.ERROR) ||
+            (message && toastTypes.SUCCESS) ||
+            (info && toastTypes.INFO),
+        },
+      ]);
+  }, [error, message, info]);
   const onLoadUser = (cb) => {
     return axios
       .get(authAPI, {
@@ -54,17 +64,16 @@ export default function AuthenticationContext({ children }) {
           type: actions.AUTHENTICATE_ACTION,
           payload: response.data,
         });
+
         let socket = io(host);
-        socket.auth = { accessToken: response.data.accessToken };
-        return setSocket(socket);
-      })
-      .then((success) => {
-        cb();
+        socket.auth = { accessToken: localStorage.getItem("accessToken") };
+        setSocket(socket);
       })
       .catch((error) => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
         });
+        setInfo("Login to system");
       });
   };
   function login(data) {
@@ -78,15 +87,13 @@ export default function AuthenticationContext({ children }) {
       })
       .then((res) => {
         localStorage.setItem("accessToken", res.data.accessToken);
-        setMessage("Login successfully!");
         return onLoadUser();
       })
-      .catch((error) => {
+      .catch((error) =>
         setUser({
           type: actions.AUTHENTICATE_FAILED,
-        });
-        setError("Login Failed");
-      });
+        })
+      );
   }
   // const register = async (data) => {
   //   const registerApi = mainAPI.CLOUD_API_REGISTER;
@@ -179,19 +186,17 @@ export default function AuthenticationContext({ children }) {
         editProfile,
         setError,
         setMessage,
-        setUser,
+        setInfo,
       }}
     >
       {children}
-      {(error || message) && (
-        <Toast
-          message={message || error}
-          timeout={2000}
-          type={message ? toastTypes.SUCCESS : toastTypes.ERROR}
-          onError={setError}
-          onSuccess={setMessage}
-        ></Toast>
-      )}
+      {/* {toastList.length && <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px'
+      }}>
+        {toastList.map((toast, index) => <Toast message={toast.message} timeout={3000} key={index + 1} type={toast.type}></Toast>)}
+      </div>} */}
     </AuthenticationContextAPI.Provider>
   );
 }

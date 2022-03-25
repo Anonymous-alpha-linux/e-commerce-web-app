@@ -4,4 +4,4 @@ export { default as navData } from "./nav-links";
 export { default as notifyData } from "./notify";
 export { default as socketTargets } from "./socketTarget";
 export { default as toastTypes } from "./toast";
-export { default as QAManagerOps } from "./QAManagerOps";
+export { default as sidebarData } from "./sidebar";

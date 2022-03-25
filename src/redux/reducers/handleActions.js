@@ -3,12 +3,10 @@ export default class ActionHandler {
         this.state = state;
         this.action = action;
     }
-
     getListItem(field, data, otherEntries) {
         return {
-            ...this.state,
+            ...otherEntries,
             [field]: data,
-            ...otherEntries
         };
     }
     filterListItem(field, data, otherEntries) {
@@ -30,24 +28,31 @@ export default class ActionHandler {
     }
     unshiftItem(field, data, otherEntries) {
         return {
-            ...this.state,
-            [field]: data.length ? [...data, ...this.state[field]] : this.state[field],
-            ...otherEntries
+            ...otherEntries,
+            [field]: data.length ? [...data, ...otherEntries[field]] : otherEntries[field],
         };
     };
-    updateItem(field, data, prediction, otherEntries) {
+    pushItem(field, data, otherEntries) {
         return {
-            ...this.state,
-            [field]: this.state[field].map(item => {
-                if (prediction(item)) {
-                    return {
-                        ...item,
-                        ...data.data
-                    };
-                }
-                return item;
-            }),
-            ...otherEntries
+            ...otherEntries,
+            [field]: data.length ? (otherEntries[field] && [...otherEntries[field], ...data] || data) : otherEntries[field] ? otherEntries[field] : [],
         };
+    };
+    removeItem(updateField, callback, otherEntries) {
+        return {
+            ...otherEntries,
+            [updateField]: otherEntries[updateField].map(item => {
+                return callback(item);
+            }).filter(item => item)
+        }
     }
+    updateItem(updateField, callback, otherEntries = {}) {
+        // Inside otherEntries including in the initial state
+        return {
+            ...otherEntries,
+            [updateField]: (typeof callback === 'function') ? otherEntries[updateField].map(item => {
+                return callback(item);
+            }) : callback,
+        };
+    };
 }

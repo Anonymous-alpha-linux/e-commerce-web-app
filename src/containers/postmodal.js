@@ -8,18 +8,23 @@ import {
   Text,
 } from "../components";
 import { ConditionContainer, UploadForm } from ".";
-import { useAuthorizationContext, usePostContext } from "../redux";
-import { mainAPI } from "../config";
+import {
+  useAuthorizationContext,
+  useNotifyContext,
+  usePostContext,
+} from "../redux";
+import { notifyData, socketTargets } from "../fixtures";
+
+import { Loading } from "../pages";
+import useValidate from "../hooks/useValidate";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa";
 import TagInput from "./tagsinput";
-import { Loading } from "../pages";
+import axios from "axios";
 
-export default function PostModal(
-  {
-    // setOpenModal
-  }
-) {
+export default function PostModal() {
+  const navigate = useNavigate();
+
   const [input, setInput] = useState({
     content: "",
     private: false,
@@ -32,58 +37,63 @@ export default function PostModal(
   const [error, setError] = useState("");
   const [openCondition, setOpenCondition] = useState(false);
 
-  const privateChecked = useRef(null);
-  const checkedCondition = useRef();
-  const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useAuthorizationContext();
-  const {
-    posts,
-    categories,
-    postLoading,
-    categoryLoading,
-    getFile,
-    postIdea,
-    setShowUpdate,
-  } = usePostContext();
-
-  const { REACT_APP_ENVIRONMENT } = process.env;
-  const [staffURL, host] =
-    REACT_APP_ENVIRONMENT === "development"
-      ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
-      : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+  const { sendNotification } = useNotifyContext();
+  const { posts, categories, getFile, postIdea, getSinglePost } =
+    usePostContext();
+  const privateChecked = useRef(null);
+  const mountedRef = useRef(false);
+  const checkedCondition = useRef(false);
+  const getFileRef = useRef(getFile);
+  const cancelTokenSource = axios.CancelToken.source();
+  // const [staffURL, host] = process.env.REACT_APP_ENVIRONMENT === "development" ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
 
   const isOverflowFile = (currentFileList, fileSize) => {
     const currentSize = currentFileList.reduce((prev, file) => {
       return prev + file.size / 1024;
     }, 0);
-
-    return currentSize + fileSize > 50000;
+    return currentSize + fileSize > 5120;
   };
   const editHandler = (e) => {
     e.preventDefault();
+    setLoading(true);
     postIdea(
       input,
-      (res) => {
+      (postId) => {
+        setLoading(false);
         navigate("/");
       },
       {
         isEdit: true,
-        id: id,
+        postId: id,
       }
     );
   };
   const submitHandler = (e) => {
     e.preventDefault();
     setLoading(true);
-    if (checkedCondition.current.checked) {
-      postIdea(input, (res) => {
+    try {
+      // 1. Validate the input
+      const valContent = new useValidate(input.content);
+      const check = valContent.isEmpty().input;
+      if (!input.categories.length) throw new Error("Please select a category");
+      if (!checkedCondition.current.checked) {
+        throw new Error("Please checked our terms and condition");
+      }
+      // 2. Post a new idea
+      postIdea(input, (postId) => {
         setLoading(false);
-        setShowUpdate((o) => !o);
+        sendNotification(
+          notifyData.CREATE_POST,
+          `/#${postId}`,
+          socketTargets.WITHOUT_BROADCAST
+        );
         navigate("/");
       });
-    } else {
-      setError("Please checked our terms and condition");
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
     }
   };
   const inputHandler = (e) => {
@@ -126,171 +136,200 @@ export default function PostModal(
   };
 
   useEffect(() => {
-    if (id && posts.length) {
-      const { attachment, category, content, hideAuthor } = posts.find(
-        (post) => post._id === id
-      );
-      Promise.all(
-        attachment.map((attach) => {
-          return getFile(attach, (file) => {
-            setInput({
+    mountedRef.current = true;
+    setLoading(true);
+    if (id) {
+      // Stage 1
+      Promise.resolve({
+        then: function (resolve, reject) {
+          try {
+            getSinglePost(id, (post) => {
+              resolve(post);
+            });
+          } catch (error) {
+            reject(error.message);
+          }
+        },
+      })
+        .then((post) => {
+          return Promise.all([
+            post,
+            ...post.attachments.map((attach) => {
+              return new Promise((resolve, reject) => {
+                getFileRef
+                  .current(attach, (file) => {
+                    resolve(file);
+                  })
+                  .catch((error) => reject(error));
+              });
+            }),
+          ]);
+        })
+        .then((data) => {
+          const [post, ...files] = data;
+          const { content, hideAuthor, categories } = post;
+          if (mountedRef.current) {
+            setInput((input) => ({
               ...input,
               content: content,
               private: hideAuthor,
-              categories: category.map((single) => single._id),
-              files: [...input.files, file],
-            });
-          });
-        })
-      )
-        .then((f) => {
-          setLoading(false);
+              categories: categories.map((single) => single._id),
+              files: files,
+            }));
+            setLoading(false);
+          }
         })
         .catch((error) => {
-          console.log(error.message);
-          setError(error.message);
-          setLoading(false);
+          if (mountedRef.current) {
+            setLoading(false);
+            setError(error.message);
+          }
         });
-    } else setLoading(false);
+    } else {
+      setLoading(false);
+    }
+    return () => {
+      mountedRef.current = false;
+      cancelTokenSource.cancel();
+    };
   }, [posts]);
-
-  if (loading) return <Loading></Loading>;
-
+  useEffect(() => {
+    getFileRef.current = getFile;
+  }, [getFile]);
   return (
-    <>
-      <ContainerComponent.Section className="postModal__container">
-        <Form
-          encType="multipart/form-data"
-          method={"POST"}
-          onSubmit={(e) => {
-            if (id) editHandler(e);
-            else submitHandler(e);
-          }}
-          className="postModal__form"
-        >
-          <Text.Line className="postModal__header">
-            <Text.MiddleLine
-              onClick={() => {
-                // setOpenModal(modal => !modal);
-                navigate("/");
-              }}
-            >
-              <Text.MiddleLine>
-                <Icon style={{ display: "inline" }}>
-                  <FaChevronLeft></FaChevronLeft>
-                </Icon>
-              </Text.MiddleLine>
-              <Text.Middle
-                style={{
-                  verticalAlign: "text-top",
-                  textIndent: "10px",
-                }}
-              >
-                Back
-              </Text.Middle>
-            </Text.MiddleLine>
-            <Text.RightLine
-              style={{
-                width: "80%",
-                display: "inline-block",
-              }}
-            >
-              <Text.Title
-                style={{
-                  textAlign: "right",
-                }}
-              >
-                Post Modal
-              </Text.Title>
-            </Text.RightLine>
-          </Text.Line>
-          <Text.Line style={{ margin: "15px 0" }}>
-            <Text.MiddleLine>
-              <Text.Label className="postModal__label">Author name:</Text.Label>
-            </Text.MiddleLine>
-            <Text.MiddleLine>
-              <Text.Bold>
-                {!input.private ? user.account : "Anonymous"}
-              </Text.Bold>
-            </Text.MiddleLine>
-            <Text.RightLine>
-              <ButtonComponent.Toggle
-                onText="Hide"
-                offText="Show"
-                id="private"
-                name="private"
-                value={input.private}
-                onChange={checkedHandler}
-                ref={privateChecked}
-              ></ButtonComponent.Toggle>
-            </Text.RightLine>
-          </Text.Line>
-          <Form.TextArea
-            id="content"
-            name="content"
-            onChange={inputHandler}
-            value={input.content}
-            style={{
-              width: "100%",
-              height: "100px",
-            }}
-          ></Form.TextArea>
-          <Text.Line className="postModal__category">
-            <TagInput
-              itemList={categories}
-              formField={input.categories}
-              setFormField={setInput}
-            ></TagInput>
-          </Text.Line>
-          <ContainerComponent.Pane
-            className="upload__input"
-            style={{
-              padding: "10px 0",
+    <ContainerComponent.Section className="postModal__container">
+      <Form
+        encType="multipart/form-data"
+        method={"POST"}
+        onSubmit={(e) => {
+          if (id) {
+            editHandler(e);
+          } else {
+            submitHandler(e);
+          }
+        }}
+        className="postModal__form"
+      >
+        <Text.Line className="postModal__header">
+          <Text.MiddleLine
+            onClick={() => {
+              // setOpenModal(modal => !modal);
+              navigate("/");
             }}
           >
-            <UploadForm
-              files={input.files}
-              eliminateFile={eliminateFile}
-              setFiles={pushInputHandler}
-            ></UploadForm>
-          </ContainerComponent.Pane>
-          <Text.Line className="postModal__conditional">
             <Text.MiddleLine>
-              <Form.Checkbox
-                id="condition"
-                name="condition"
-                onChange={checkedHandler}
-                ref={checkedCondition}
-              ></Form.Checkbox>
+              <Icon style={{ display: "inline" }}>
+                <FaChevronLeft></FaChevronLeft>
+              </Icon>
             </Text.MiddleLine>
-            <Text.MiddleLine>
-              <Text.Paragraph
-                onClick={() => setOpenCondition(true)}
-                style={{
-                  color: "blue",
-                  margin: "0",
-                }}
-              >
-                Condition and Term
-              </Text.Paragraph>
-            </Text.MiddleLine>
-          </Text.Line>
-          {message && (
-            <MessageBox.TextMessage>{message}</MessageBox.TextMessage>
-          )}
-          {error && <MessageBox.TextMessage>{error}</MessageBox.TextMessage>}
-          {/* {id && <Form.Input type='hidden'
+            <Text.Middle
+              style={{
+                verticalAlign: "middle",
+                textIndent: "12px",
+              }}
+            >
+              Back
+            </Text.Middle>
+          </Text.MiddleLine>
+          <Text.RightLine
+            style={{
+              width: "80%",
+              display: "inline-block",
+            }}
+          >
+            <Text.Title
+              style={{
+                textAlign: "right",
+              }}
+            >
+              Post Modal
+            </Text.Title>
+          </Text.RightLine>
+        </Text.Line>
+        <Text.Line style={{ margin: "15px 0" }}>
+          <Text.MiddleLine>
+            <Text.Label className="postModal__label">Author name:</Text.Label>
+          </Text.MiddleLine>
+          <Text.MiddleLine>
+            <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
+          </Text.MiddleLine>
+          <Text.RightLine>
+            <ButtonComponent.Toggle
+              onText="Hide"
+              offText="Show"
+              id="private"
+              name="private"
+              value={input.private}
+              onChange={checkedHandler}
+              ref={privateChecked}
+            ></ButtonComponent.Toggle>
+          </Text.RightLine>
+        </Text.Line>
+        <Form.TextArea
+          id="content"
+          name="content"
+          onChange={inputHandler}
+          value={input.content}
+          style={{
+            width: "100%",
+            height: "100px",
+          }}
+        ></Form.TextArea>
+        <Text.Line className="postModal__category">
+          <TagInput
+            itemList={categories}
+            formField={input.categories}
+            setFormField={setInput}
+          ></TagInput>
+        </Text.Line>
+        <ContainerComponent.Pane
+          className="upload__input"
+          style={{
+            padding: "10px 0",
+          }}
+        >
+          <UploadForm
+            files={input.files}
+            eliminateFile={eliminateFile}
+            setFiles={pushInputHandler}
+          ></UploadForm>
+        </ContainerComponent.Pane>
+        <Text.Line className="postModal__conditional">
+          <Text.MiddleLine>
+            <Form.Checkbox
+              id="condition"
+              name="condition"
+              onChange={checkedHandler}
+              ref={checkedCondition}
+            ></Form.Checkbox>
+          </Text.MiddleLine>
+          <Text.MiddleLine>
+            <Text.Paragraph
+              onClick={() => setOpenCondition(true)}
+              style={{
+                color: "blue",
+                margin: "0",
+              }}
+            >
+              Condition and Term
+            </Text.Paragraph>
+          </Text.MiddleLine>
+        </Text.Line>
+
+        {openCondition && (
+          <ConditionContainer
+            closeCondition={() => setOpenCondition(false)}
+          ></ConditionContainer>
+        )}
+        {message && <MessageBox.TextMessage>{message}</MessageBox.TextMessage>}
+        {error && <MessageBox.TextMessage>{error}</MessageBox.TextMessage>}
+        {/* {id && <Form.Input type='hidden'
                 name="id"
                 id="id"
                 value={id}></Form.Input>} */}
-          <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
-        </Form>
-      </ContainerComponent.Section>
-      {openCondition && (
-        <ConditionContainer
-          closeCondition={() => setOpenCondition(false)}
-        ></ConditionContainer>
-      )}
-    </>
+        <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
+      </Form>
+      {loading && <Loading></Loading>}
+    </ContainerComponent.Section>
   );
 }

@@ -12,7 +12,6 @@ export default function Filter({ forwardedRef, ...props }) {
   // const { filterPost } = usePostContext();
   const { loader, selectOptions } = props;
   const selectHandler = (e) => {
-    console.log("filter");
     const filterValue = Number(e.target.value);
     loader(filterValue);
   };
