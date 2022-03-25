@@ -28,16 +28,14 @@ export default function AuthenticationContext({ children }) {
   const cancelTokenSource = axios.CancelToken.source();
 
   useEffect(() => {
-    onLoadUser(() => {
-      getProfile();
+    onLoadUser((accountId) => {
+      getProfile(accountId);
     });
     return () => {
       cancelTokenSource.cancel();
     };
   }, []);
-  useEffect(() => {
-    console.log(toastList);
-  }, [toastList]);
+
   const onLoadUser = (cb) => {
     return axios
       .get(authAPI, {
@@ -58,7 +56,9 @@ export default function AuthenticationContext({ children }) {
           pushToast({
             message: 'Get User successfully',
             type: toastTypes.SUCCESS
-          })
+          });
+
+          cb(response.data.accountId);
         }
         else {
           throw new Error("Get data Failed!");
@@ -135,7 +135,7 @@ export default function AuthenticationContext({ children }) {
         });
       })
   }
-  function getProfile() {
+  function getProfile(accountId) {
     return axios
       .get(authAPI, {
         cancelToken: cancelTokenSource.token,
@@ -144,11 +144,11 @@ export default function AuthenticationContext({ children }) {
         },
         params: {
           view: "profile",
-          accountid: user.accountId,
+          accountid: accountId,
         },
       })
       .then((res) => {
-        return setUser({
+        setUser({
           type: actions.GET_PROFILE,
           payload: res.data.response,
         });

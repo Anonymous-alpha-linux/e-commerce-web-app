@@ -34,46 +34,21 @@ export default function Personal({ personalInfo }) {
         return editProfile(input);
     }
 
-    return <ContainerComponent
-        className="personal"
-        style={{
-            padding: '10px'
-        }}>
+    return <ContainerComponent className="personal" style={{ padding: '10px' }}>
         <ContainerComponent.Inner>
-            <ContainerComponent.Pane style={{
-                position: 'relative',
-            }}>
+            <ContainerComponent.Pane style={{ position: 'relative', }}>
                 <Text.CenterLine style={{ position: 'relative', zIndex: 1, height: '27.5px' }}>
                     <Icon.CircleIcon className="personal__avatar">
-                        <Icon.Image src={`${user.profileImage}`} alt={`Avatar`} style={{
-                            objectFit: 'fill',
-                        }}></Icon.Image>
+                        <Icon.Image src={`${user.profileImage}`} alt={`Avatar`} style={{ objectFit: 'fill', }}></Icon.Image>
                     </Icon.CircleIcon>
-                    <Text.CenterLine style={{
-                        paddingTop: '10px'
-                    }}>
+                    <Text.CenterLine style={{ paddingTop: '10px' }}>
                         <Text.Title>{user.account}</Text.Title>
-                        <Text.Subtitle style={{
-                            textTransform: 'capitalize',
-                            opacity: 0.5,
-                            fontWeight: 500
-                        }}>{user.role}</Text.Subtitle>
+                        <Text.Subtitle style={{ textTransform: 'capitalize', opacity: 0.5, fontWeight: 500 }}>{user.role}</Text.Subtitle>
                     </Text.CenterLine>
                 </Text.CenterLine>
-                <Text.Line style={{
-                    width: '100%',
-                    height: '141px',
-                    borderRadius: '10px',
-                    boxShadow: '1px 1px 5px 2px black',
-                    position: 'relative',
-                    bottom: 0,
-                    background: '#fff',
-                    border: '1px solid #163d3c',
-                }}></Text.Line>
+                <Text.Line style={{ width: '100%', height: '141px', borderRadius: '10px', boxShadow: '1px 1px 5px 2px black', position: 'relative', bottom: 0, background: '#fff', border: '1px solid #163d3c', }}></Text.Line>
             </ContainerComponent.Pane>
-            <ContainerComponent.Pane style={{
-                padding: '10px 0 0 0'
-            }}>
+            <ContainerComponent.Pane style={{ padding: '10px 0 0 0' }}>
                 <ContainerComponent.GridThreeColumns>
                     <ContainerComponent.Item>
                         <ButtonComponent>

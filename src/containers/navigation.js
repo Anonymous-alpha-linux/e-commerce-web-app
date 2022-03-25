@@ -112,18 +112,7 @@ const Navigator = ({ closeNavigator }) => {
       <ContainerComponent.BackDrop
         onClick={closeNavigator}
       ></ContainerComponent.BackDrop>
-      <ContainerComponent
-        className="navigator__container"
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          zIndex: 10,
-          borderRadius: "20px 20px 0 0",
-          background: "#333",
-          color: "#fff",
-          padding: "10px",
-        }}>
+      <ContainerComponent className="navigator__container" style={{ position: "fixed", bottom: 0, left: 0, zIndex: 10, borderRadius: "20px 20px 0 0", background: "#333", color: "#fff", padding: "10px" }}>
         <ContainerComponent.GridThreeColumns style={{ zIndex: 10 }}>
           {navigators.map((navigate, index) => (
             <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>

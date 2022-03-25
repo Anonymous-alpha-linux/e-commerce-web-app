@@ -74,6 +74,15 @@ const postReducer = (state, action) => {
         )
       );
       return singlePost;
+    case actions.RATE_POST:
+      return actionHandler.updateItem("myPosts", post => {
+        console.log(post);
+        if (post._id === action.postId) return { ...post, ...action.payload };
+        return post;
+      }, actionHandler.updateItem("posts", post => {
+        if (post._id === action.postId) return { ...post, ...action.payload }
+        return post
+      }, state));
     case actions.LIKE_POST:
       return actionHandler.updateItem(
         "myPosts",
@@ -90,8 +99,8 @@ const postReducer = (state, action) => {
                     post.dislikedAccounts.filter(
                       (acc) => acc === action.userId
                     );
-                  } else
-                    post.likedAccounts.filter((acc) => acc !== action.userId);
+                  }
+                  return post.likedAccounts.filter((acc) => acc !== action.userId);
                 },
                 post
               )

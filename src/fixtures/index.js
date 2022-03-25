@@ -6,3 +6,4 @@ export { default as socketTargets } from "./socketTarget";
 export { default as toastTypes } from "./toast";
 export { default as sidebarData } from './sidebar';
 export { default as media } from './media';
+export { default as validateTypes } from './validateTypes';

@@ -297,11 +297,21 @@ export default function AdminContext({ children }) {
             })
           },
         }));
+        pushToast({
+          message: 'Edit role successfully',
+          type: toastTypes.SUCCESS
+        });
         cb({
           message: "Edit Role successfully",
         });
       })
-      .catch((error) => cb({ error: error.message }));
+      .catch((error) => {
+        pushToast({
+          message: 'Edit role Failed',
+          type: toastTypes.ERROR
+        });
+        cb({ error: error.message })
+      });
   }
   function blockAccount(accountId, cb) { }
   function getAttachmentList(cb) {

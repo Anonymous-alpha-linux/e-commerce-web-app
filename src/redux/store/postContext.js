@@ -66,6 +66,7 @@ export default React.memo(function PostContext({ children }) {
     categoryReducer,
     initialCategories
   );
+
   const [showUpdate, setShowUpdate] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -90,6 +91,7 @@ export default React.memo(function PostContext({ children }) {
     receiveRealTimeDisLike();
     receiveRealtimeCommentReply();
   }, [socket]);
+
   // 1. Post for workspace
   function getPosts() {
     setPost({
@@ -337,36 +339,26 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data.response);
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
       .catch((error) => setError(error.message));
   }
-  function likePost(isLiked, postId, userId) {
-    let isDisliked = postState;
-    // .dislikedAccounts.includes(user.accountId);
-    if (!isDisliked) {
-      setPost({
-        type: actions.LIKE_POST,
-        postId,
-        userId,
-        isLiked,
-      });
-    } else {
-      setPost({
-        type: actions.LIKE_POST,
-        postId,
-        userId,
-        isLiked,
-      });
-      setPost({
-        type: actions.DISLIKE_POST,
-        postId,
-        userId,
-        isLiked,
-      });
-    }
+  function likePost(input, postId, userId) {
+    setPost({
+      type: actions.LIKE_POST,
+      postId,
+      userId,
+      input
+    });
+  }
+  function dislikePost(input, postId, userId) {
+    setPost({
+      type: actions.DISLIKE_POST,
+      postId,
+      userId,
+      input,
+    });
   }
   function sendRealTimeLike(postId, userId) {
     socket.emit("like post", {
@@ -378,14 +370,6 @@ export default React.memo(function PostContext({ children }) {
     socket.on("like post", (data) => {
       const { postId, userId } = data;
       updateSinglePost(postId);
-    });
-  }
-  function dislikePost(isDisliked, postId, userId) {
-    setPost({
-      type: actions.DISLIKE_POST,
-      postId,
-      userId,
-      isDisliked,
     });
   }
   function sendRealTimeDisLike(postId, userId) {
@@ -437,7 +421,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        return setPost({
+        setPost({
+          type: actions.SET_OFF_LOADING
+        })
+        setPost({
           type: actions.GET_MY_POST,
           payload: res.data.response,
         });
@@ -797,17 +784,26 @@ export default React.memo(function PostContext({ children }) {
 
   // 4. Thump-up, thump-down, comment
   function interactPost(postId, type, input, cb) {
-    const { liked, disliked } = input;
-    likePost(liked, postId, user.accountId);
-    dislikePost(disliked, postId, user.accountId);
     // Set Loading for waiting post
     if (type === "rate") {
+      const { isLiked, isDisliked, like, dislike, likedAccounts, dislikedAccounts } = input;
+      console.log(input);
+      setPost({
+        type: actions.RATE_POST,
+        postId,
+        payload: {
+          like,
+          dislike,
+          likedAccounts,
+          dislikedAccounts
+        }
+      })
       return axios
         .put(
           postAPI,
           {
-            isLiked: input.liked,
-            isDisliked: input.disliked,
+            isLiked: isLiked,
+            isDisliked: isDisliked,
           },
           {
             headers: {
@@ -821,13 +817,16 @@ export default React.memo(function PostContext({ children }) {
           }
         )
         .then((res) => {
-          sendRealTimeLike(liked, postId, user.accountId);
-          sendRealTimeDisLike(disliked, postId, user.accountId);
+          sendRealTimeLike(isLiked, postId, user.accountId);
+          sendRealTimeDisLike(isDisliked, postId, user.accountId);
         })
         .catch((error) => {
           setError(error.message);
         });
     } else if (type === "like") {
+      const { liked, disliked } = input;
+      likePost(liked, postId, user.accountId);
+      dislikePost(disliked, postId, user.accountId);
       return axios
         .put(
           postAPI,
@@ -855,6 +854,9 @@ export default React.memo(function PostContext({ children }) {
           setError(error.message);
         });
     } else if (type === "dislike") {
+      const { liked, disliked } = input;
+      likePost(liked, postId, user.accountId);
+      dislikePost(disliked, postId, user.accountId);
       return axios
         .put(
           postAPI,
@@ -1096,7 +1098,6 @@ export default React.memo(function PostContext({ children }) {
       payload: commentId,
     });
   }
-
   const contextValues = {
     posts: postState.posts,
     myPosts: postState.myPosts,
