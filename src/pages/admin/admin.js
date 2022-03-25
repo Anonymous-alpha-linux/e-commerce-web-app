@@ -1,10 +1,14 @@
-import React from 'react';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { DashboardHeader } from '../../containers';
+import { AdminContext } from '../../redux';
 
 export default function Admin() {
-
-    return <div>
-        <h1>
-            This is Admin page
-        </h1>
-    </div>;
+    return (
+        <AdminContext>
+            <DashboardHeader>
+                <Outlet></Outlet>
+            </DashboardHeader>
+        </AdminContext>
+    );
 }

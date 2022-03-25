@@ -6,10 +6,11 @@ export default function IconComponent({ children, ...restProps }) {
 }
 
 IconComponent.CircleIcon = ({ children, ...props }) => {
-    return <div className="icon__circleIcon" {...props}>
+    return <div {...props} className={`icon__circleIcon ${props.className}`}>
         {children}
     </div>
 }
+
 IconComponent.Label = ({ children, ...props }) => {
     return <p className='icon__label' {...props}>
         {children}
@@ -21,5 +22,5 @@ IconComponent.Avatar = ({ children, ...props }) => {
         {children}
     </div>
 }
-IconComponent.Badge = ({ children, ...props }) => <span class="icon__badge" {...props}>{children}</span>
+IconComponent.Badge = ({ children, ...props }) => <span className="icon__badge" {...props}>{children}</span>
 IconComponent.Image = ({ ...props }) => <img src={props.src} alt={props.alt} className="icon__image" loading='eager'></img>

@@ -1,76 +1,93 @@
-import axios from 'axios';
-import React, { createContext, useContext, useState, useEffect, useReducer, useCallback } from 'react';
-import { mainAPI } from '../../config';
-import { Loading } from '../../pages';
-import { io } from 'socket.io-client';
-import { unstable_batchedUpdates } from 'react-dom'
-import actions from '../reducers/actions';
-import { authReducer, initialAuth } from '../reducers';
+import axios from "axios";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useReducer,
+} from "react";
+import { mainAPI } from "../../config";
+import { Loading } from "../../pages";
+import { io } from "socket.io-client";
+import actions from "../reducers/actions";
+import { authReducer, initialAuth } from "../reducers";
+import { Toast } from "../../containers";
+import { toastTypes } from "../../fixtures";
 
 const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
-  const { REACT_APP_ENVIRONMENT } = process.env;
   const [user, setUser] = useReducer(authReducer, initialAuth);
+  const [authAPI, host] =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST]
+      : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
 
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState("");
+  const [info, setInfo] = useState('');
+  const [error, setError] = useState("");
+  const [toastList, setToastList] = useState([]);
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
-  const authApi = REACT_APP_ENVIRONMENT !== 'development' ? mainAPI.CLOUD_API_AUTH : mainAPI.LOCALHOST_AUTH;
-
   useEffect(() => {
-    try {
-      onLoadUser();
+    onLoadUser(() => {
       getProfile();
-    }
-    catch (error) {
-      setError(error.message);
-    }
+    });
     return () => {
       cancelTokenSource.cancel();
     };
   }, []);
+  useEffect(() => {
+    if (error || message || info)
+      setToastList([...toastList, {
+        message: error || message || '',
+        type: (error && toastTypes.ERROR) || (message && toastTypes.SUCCESS) || (info && toastTypes.INFO)
+      }]);
+  }, [error, message, info]);
+  const onLoadUser = (cb) => {
+    return axios
+      .get(authAPI, {
+        cancelToken: cancelTokenSource.token,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      })
+      .then((response) => {
+        setUser({
+          type: actions.AUTHENTICATE_ACTION,
+          payload: response.data,
+        });
 
-  const getSocket = () => {
-    if (!socket) {
-      throw new Error("Socket cannot be accessible!");
-    }
-    return socket;
-  };
-  const onLoadUser = () => {
-    return axios.get(authApi, {
-      cancelToken: cancelTokenSource.token,
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-      }
-    }).then(response => {
-      setUser({
-        type: actions.AUTHENTICATE_ACTION,
-        payload: response.data,
-      });
-    }).catch(error => {
-      unstable_batchedUpdates(() => {
+        let socket = io(host);
+        socket.auth = { accessToken: localStorage.getItem('accessToken') };
+        setSocket(socket);
+      }).catch(error => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
         });
-        setError(error.message);
-      });
-    })
+        setInfo("Login to system");
+      })
   };
   function login(data) {
-    const loginApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGIN : mainAPI.CLOUD_API_LOGIN;
-    return axios.post(loginApi,
-      data, {
-      cancelToken: cancelTokenSource.token
-    }).then(res => {
-      localStorage.setItem('accessToken', res.data.accessToken);
-      return onLoadUser();
-    }).catch(error => setUser({
-      type: actions.AUTHENTICATE_FAILED,
-    }));
-  };
+    const loginApi =
+      process.env.REACT_APP_ENVIRONMENT === "development"
+        ? mainAPI.LOCALHOST_LOGIN
+        : mainAPI.CLOUD_API_LOGIN;
+    return axios
+      .post(loginApi, data, {
+        cancelToken: cancelTokenSource.token,
+      })
+      .then((res) => {
+        localStorage.setItem("accessToken", res.data.accessToken);
+        return onLoadUser();
+      })
+      .catch((error) =>
+        setUser({
+          type: actions.AUTHENTICATE_FAILED,
+        })
+      );
+  }
   // const register = async (data) => {
   //   const registerApi = mainAPI.CLOUD_API_REGISTER;
   //   // const registerApi = mainAPI.LOCALHOST_REGISTER;
@@ -86,72 +103,97 @@ export default function AuthenticationContext({ children }) {
   //     }));
   // };
   async function logout() {
-    const logoutApi = REACT_APP_ENVIRONMENT === 'development' ? mainAPI.LOCALHOST_LOGOUT : mainAPI.CLOUD_API_LOGOUT;
+    const logoutApi =
+      process.env.REACT_APP_ENVIRONMENT === "development"
+        ? mainAPI.LOCALHOST_LOGOUT
+        : mainAPI.CLOUD_API_LOGOUT;
     return axios
       .get(logoutApi, {
-        cancelToken: cancelTokenSource.token
+        cancelToken: cancelTokenSource.token,
       })
-      .then(res => {
+      .then((res) => {
         localStorage.clear();
         setUser({
           type: actions.LOGOUT_ACTION,
         });
-      }).catch(error => setError(error.message));
+      })
+      .catch((error) => setError(error.message));
   }
   function getProfile() {
-    return axios.get(authApi, {
-      cancelToken: cancelTokenSource.token,
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-      },
-      params: {
-        view: 'profile'
-      }
-    }).then(res => {
-
-      return setUser({
-        type: actions.GET_PROFILE,
-        payload: res.data.response
-      });
-    }).catch(error => setError(error.message));
+    return axios
+      .get(authAPI, {
+        cancelToken: cancelTokenSource.token,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "profile",
+          accountid: user.accountId,
+        },
+      })
+      .then((res) => {
+        return setUser({
+          type: actions.GET_PROFILE,
+          payload: res.data.response,
+        });
+      })
+      .catch((error) => setError(error.message));
   }
   function editProfile(input) {
-
-    return axios.put(authApi, {
-      ...input
-    }, {
-      cancelToken: cancelTokenSource.token,
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-      },
-      params: {
-        view: 'profile'
-      }
-    }).then(res => getProfile()).catch(error => {
-      setError(error.message);
-    })
+    return axios
+      .put(
+        authAPI,
+        {
+          ...input,
+        },
+        {
+          cancelToken: cancelTokenSource.token,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          params: {
+            view: "profile",
+          },
+        }
+      )
+      .then((res) => getProfile())
+      .catch((error) => {
+        setError(error.message);
+      });
   }
 
-  if (user.authLoading) return <Loading className="auth__loading"></Loading>
+  if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (
-    <AuthenticationContextAPI.Provider value={{
-      loading: user.authLoading,
-      user,
-      profile: user.profile,
-      message,
-      error,
-      cancelTokenSource,
-      getSocket,
-      login,
-      logout,
-      editProfile
-    }}>
+    <AuthenticationContextAPI.Provider
+      value={{
+        loading: user.authLoading,
+        user,
+        profile: user.profile,
+        message,
+        error,
+        socket,
+        cancelTokenSource,
+        login,
+        logout,
+        editProfile,
+        setError,
+        setMessage,
+        setInfo
+      }}
+    >
       {children}
+      {/* {toastList.length && <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px'
+      }}>
+        {toastList.map((toast, index) => <Toast message={toast.message} timeout={3000} key={index + 1} type={toast.type}></Toast>)}
+      </div>} */}
     </AuthenticationContextAPI.Provider>
   );
 }
 
 export const useAuthorizationContext = () => {
   return useContext(AuthenticationContextAPI);
-}
+};

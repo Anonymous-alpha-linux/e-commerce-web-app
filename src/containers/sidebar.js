@@ -1,116 +1,263 @@
-import React from 'react'
-import { ContainerComponent, Form, Icon, Preview,Text } from '../components'
-import { FaHome, FaPenSquare, FaSignOutAlt} from 'react-icons/fa';
-import { MdOutlineWork} from 'react-icons/md';
-import { AiFillRightCircle, AiFillPieChart} from 'react-icons/ai';
-import { GrDocumentText} from 'react-icons/gr'
-import { useState } from 'react';
-import { RiAccountCircleFill} from 'react-icons/ri'
-export default function MenuContainer() {
-    const [switchToggle,setSwitchToggle] = useState(false);
-    const ToggleSwitch = () => {
-        switchToggle ? setSwitchToggle(false) : setSwitchToggle(true) 
-    }
-  return (
-    <ContainerComponent.Toggle style={{width: "375px",height:"100vh",background:"white"}}>
-        <ContainerComponent.Inner style={{position:"absolute"}}></ContainerComponent.Inner>
-        <ContainerComponent.Inner>
-            <ContainerComponent.Flex style={{justifyContent:"center",alignItems:"center",padding:"25px"}}>
-                  <Preview.Images 
-                  image={"https://tinyurl.com/vwcvkbhv"}
-                  style={{
-                      width:"70px",
-                      height: "70px",
-                      borderRadius:"50%"
-                  }}
-                  >
-                </Preview.Images>
-            </ContainerComponent.Flex>
-            <ContainerComponent.Flex>
-                <ContainerComponent.Item style={{width:"100%",padding:"20px",display:"flex",alignItems:"center",position:"relative"}}>
-                    <Icon style={{marginLeft:"20px"}}>
-                        <FaHome style={{ fontSize: "30px" }}></FaHome>
+import React, { useState, useEffect } from "react";
+
+import { ButtonComponent, ContainerComponent, Icon, Preview, Text } from '../components'
+import { MdOutlineWork } from 'react-icons/md';
+import { AiFillCaretDown, AiFillRightCircle } from 'react-icons/ai';
+import { TiPlus } from 'react-icons/ti';
+import { GrStackOverflow } from "react-icons/gr";
+import { GoSignOut } from 'react-icons/go';
+
+import { Link, Navigate } from "react-router-dom";
+import { sidebarData } from "../fixtures";
+import { useAuthorizationContext, useWorkspaceContext } from "../redux";
+import { AddFromWorkspace } from ".";
+
+export default function Sidebar({ closeSidebar }) {
+  const [switchToggle, setSwitchToggle] = useState(false);
+  const [modalWS, setModalWS] = useState(false);
+  const { workspaces } = useWorkspaceContext();
+  const { user } = useAuthorizationContext()
+  const ToggleSwitch = () => {
+    switchToggle ? setSwitchToggle(false) : setSwitchToggle(true);
+  };
+  return (<ContainerComponent.Section
+  // className="sidebar__root"
+  >
+    <ContainerComponent.Toggle className="sidebar__inner">
+      <ContainerComponent.Inner>
+        <ContainerComponent.Flex style={{ justifyContent: "center", alignItems: "center", padding: "5px", }}>
+          <Preview.Images
+            image={"https://us.123rf.com/450wm/triken/triken1608/triken160800029/61320775-male-avatar-profile-picture-default-user-avatar-guest-avatar-simply-human-head-vector-illustration-i.jpg?ver=6"}
+            style={{
+              width: "70px",
+              height: "70px",
+              borderRadius: "50%",
+            }}
+          ></Preview.Images>
+        </ContainerComponent.Flex>
+        <Text.CenterLine>
+          <Text> {user.account}</Text>
+        </Text.CenterLine>
+        <ContainerComponent.Flex>
+          {sidebarData.map((item, index) =>
+            <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{ width: "100%", padding: "20px", position: "relative" }}>
+              <Link to={item.link}>
+                <Text.Line>
+                  <Text.MiddleLine style={{ width: '20%' }}>
+                    <Icon style={{ fontSize: '30px' }}>
+                      {item.icon}
                     </Icon>
-                    <Text.Title style={{left:"50%",transform:"translateX(-50%)",position:"absolute"}}>
-                        DashBoard
+                  </Text.MiddleLine>
+                  <Text.MiddleLine style={{ width: '80%', paddingLeft: '2rem' }}>
+                    <Text.Title>
+                      {item.title}
                     </Text.Title>
-                </ContainerComponent.Item>
-                <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center", position: "relative" }}>
-                    <Icon style={{ marginLeft: "20px" }}>
-                        <AiFillPieChart style={{ fontSize: "30px" }}></AiFillPieChart>
-                    </Icon>
-                    <Text.Title style={{ left: "50%", transform: "translateX(-50%)", position: "absolute" }}>
-                        Chart
-                    </Text.Title>
-                </ContainerComponent.Item>
-                <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center", position: "relative" }}>
-                    <Icon style={{ marginLeft: "20px", fontSize: "35px" }}>
-                        <GrDocumentText style={{ fontSize: "30px" }}></GrDocumentText>
-                    </Icon>
-                    <Text.Title style={{ left: "50%", transform: "translateX(-50%)", position: "absolute" }}>
-                        Document
-                    </Text.Title>
-                </ContainerComponent.Item>
-                <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center", position: "relative" }}>
-                    <Icon style={{ marginLeft: "20px" }}>
-                          <FaPenSquare style={{ fontSize: "30px" }}></FaPenSquare>
-                    </Icon>
-                    <Text.Title style={{ left: "50%", transform: "translateX(-50%)", position: "absolute" }}>
-                        Post
-                    </Text.Title>
-                </ContainerComponent.Item>
-                <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center", position: "relative" }}>
-                    <Icon style={{ marginLeft: "20px" }}>
-                        <RiAccountCircleFill style={{ fontSize: "30px" }}></RiAccountCircleFill>
-                    </Icon>
-                    <Text.Title style={{ left: "50%", transform: "translateX(-50%)", position: "absolute" }}>
-                        Account
-                    </Text.Title>
-                </ContainerComponent.Item>
-                {/* <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center", position: "relative" }}>
-                    <Icon style={{ marginLeft: "20px" }}>
-                        <FaSignOutAlt style={{ fontSize: "30px" }}></FaSignOutAlt>
-                    </Icon>
-                    <Text.Title style={{ left: "50%", transform: "translateX(-50%)", position: "absolute" }}>
-                        Log out
-                    </Text.Title>
-                </ContainerComponent.Item> */}
-                <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center", position: "relative" }}>
-                    <Icon style={{ marginLeft: "20px" }}>
-                        <MdOutlineWork style={{fontSize:"35px"}}></MdOutlineWork>
-                    </Icon>
-                    <Text.Title style={{ left: "50%", transform: "translateX(-50%)", position: "absolute" }}>
-                        Workspace
-                    </Text.Title>
-                    <Icon  
-                    style={{position:"absolute",right:"5%",fontSize:"25px"}} 
-                    onClick = {ToggleSwitch}
-                    >
-                        <AiFillRightCircle></AiFillRightCircle>
-                    </Icon>
-                </ContainerComponent.Item>
-                <ContainerComponent.Toggle 
-                className={switchToggle ? "show" : "hide"}
-                style={{margin:"0 auto"}}>
-                    <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center",gap:"20px" }}>
-                        <Icon style={{ marginLeft: "20px" }}>
-                            <MdOutlineWork></MdOutlineWork>
-                        </Icon>
-                        <Text.Title>
-                            Workspace 1
-                        </Text.Title>
-                    </ContainerComponent.Item>   
-                    <ContainerComponent.Item style={{ width: "100%", padding: "20px", display: "flex", alignItems: "center",gap:"20px"}}>
-                        <Icon style={{ marginLeft: "20px" }}>
-                            <MdOutlineWork></MdOutlineWork>
-                        </Icon>
-                        <Text.Title>
-                            Workspace 2
-                        </Text.Title>
-                    </ContainerComponent.Item>
-                </ContainerComponent.Toggle>
-            </ContainerComponent.Flex>
-        </ContainerComponent.Inner>
+                  </Text.MiddleLine>
+                </Text.Line>
+              </Link>
+            </ContainerComponent.Item>
+          )}
+          <ContainerComponent.Item style={{ width: "100%", padding: "20px", position: "relative" }}>
+            <Text.Line>
+              <Text.MiddleLine style={{ width: '20%' }}>
+                <Icon style={{ fontSize: '30px' }}>
+                  <MdOutlineWork></MdOutlineWork>
+                </Icon>
+              </Text.MiddleLine>
+              <Text.MiddleLine style={{ width: '80%', paddingLeft: '2rem' }}>
+                <Text.Title>
+                  Workspace
+                </Text.Title>
+              </Text.MiddleLine>
+              <Text.RightLine>
+                <Icon
+                  style={{ position: "absolute", right: "5%", fontSize: "25px" }}
+                  onClick={ToggleSwitch}
+                >
+                  <AiFillRightCircle></AiFillRightCircle>
+                </Icon>
+              </Text.RightLine>
+            </Text.Line>
+          </ContainerComponent.Item>
+          <ContainerComponent.Toggle
+            className={switchToggle ? "show" : "hide"}
+            style={{ margin: "0 auto" }}>
+          </ContainerComponent.Toggle>
+        </ContainerComponent.Flex>
+        <ContainerComponent.Toggle className={switchToggle ? "show" : "hide"} style={{ margin: "0 auto" }}>
+          <ContainerComponent.Item style={{ width: "100%", padding: 20, paddingTop: 25, boxShadow: '2px 0 5px #000', display: "flex", alignItems: "center", gap: "20px", position: "relative" }} onClick={() => setModalWS(!modalWS)}>
+            <Icon style={{ transform: "translateX(-50%)", fontSize: "33px", position: "absolute" }}>
+              <TiPlus></TiPlus>
+            </Icon>
+            <Text.Title style={{ right: "50%", transform: "translateX(50%)", position: "absolute" }}>
+              Add Workspace
+            </Text.Title>
+          </ContainerComponent.Item>
+          <ContainerComponent.Item style={{ maxHeight: '260px', overflowY: 'scroll' }}>
+            {
+              workspaces && workspaces.map((item, index) => <ContainerComponent.Item key={index + 1} >
+                <ContainerComponent.Inner style={{ margin: "0" }}>
+                </ContainerComponent.Inner>
+                <EditToggle item={item} clickLoader={closeSidebar}></EditToggle>
+              </ContainerComponent.Item>
+              )
+            }
+          </ContainerComponent.Item>
+        </ContainerComponent.Toggle>
+      </ContainerComponent.Inner>
+      <ContainerComponent.Pane className="logout__button" style={{ bottom: 0, width: '100%', padding: '20px' }}>
+        <Link to="/logout">
+          <Text.Line>
+            <Text.MiddleLine style={{ width: '20%' }}>
+              <Icon style={{ fontSize: '30px' }}>
+                <GoSignOut></GoSignOut>
+              </Icon>
+            </Text.MiddleLine>
+            <Text.MiddleLine style={{ width: '80%' }}>
+              <Text.Title>
+                Logout
+              </Text.Title>
+            </Text.MiddleLine>
+          </Text.Line>
+        </Link>
+      </ContainerComponent.Pane>
     </ContainerComponent.Toggle>
+    {modalWS && (
+      <>
+        <ContainerComponent.BackDrop style={{ zIndex: 2 }}>
+        </ContainerComponent.BackDrop>
+        <div style={{ height: "0px", zIndex: '10', position: 'fixed', top: '20%', left: '50%', transform: 'translate(-50%,-50%)' }}>
+          <AddFromWorkspace setModal={setModalWS} modal={modalWS} />
+        </div>
+      </>
+    )}
+  </ContainerComponent.Section>
+  );
+}
+
+const EditToggle = ({ item, clickLoader }) => {
+  const [switchToggleChild, setSwitchToggleChild] = useState(false);
+  const [editToggle, setEditToggle] = useState(false);
+
+  return (
+    <>
+      <ContainerComponent.Item className="c-modal__container" style={{ width: "100%", padding: "10px" }}>
+        <ContainerComponent.Flex style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text.MiddleLine>
+            <Icon style={{ fontSize: "25px" }}>
+              <GrStackOverflow></GrStackOverflow>
+            </Icon>
+          </Text.MiddleLine>
+          <Text.MiddleLine>
+            <ContainerComponent.Pane>
+              <Text.Title style={{ textAlign: "center" }}>
+                {item.workTitle}
+              </Text.Title>
+              <TimespanChild></TimespanChild>
+            </ContainerComponent.Pane>
+          </Text.MiddleLine>
+          <Text.MiddleLine>
+            <Icon
+              style={{ fontSize: "20px" }}
+            >
+              <AiFillCaretDown key={item.id} onClick={() => setEditToggle(!editToggle)}></AiFillCaretDown>
+            </Icon>
+          </Text.MiddleLine>
+        </ContainerComponent.Flex>
+        <Text.Line style={{ width: '100%' }}>
+          {editToggle &&
+            <ContainerComponent.Toggle className={switchToggleChild ? "opera" : "empty"} style={{ display: "flex", justifyContent: "center", position: 'absolute', border: '1px solid', borderRadius: '10px', right: 0, padding: '20px', zIndex: 3, background: '#fff' }}>
+              <ContainerComponent.Flex style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "15px" }}>
+                <ButtonComponent>
+                  <Link to={`/management/staff/${item._id}`} style={{ color: '#fff' }} onClick={clickLoader}>
+                    <Text.Line>
+                      Assign QA Coordinator
+                    </Text.Line>
+                  </Link>
+                </ButtonComponent>
+                <ButtonComponent>
+                  <Link to={`/management/member/${item._id}`} style={{ color: '#fff' }} onClick={clickLoader}>
+                    <Text.Line>
+                      Add Member
+                    </Text.Line>
+                  </Link>
+                </ButtonComponent>
+                <ButtonComponent style={{ width: "177px", textAlign: "center" }}>
+                  Edit Time/Title
+                </ButtonComponent>
+              </ContainerComponent.Flex>
+            </ContainerComponent.Toggle>}
+        </Text.Line>
+      </ContainerComponent.Item>
+    </>
   )
+}
+
+function TimespanChild({
+  startTime = Date.now(),
+  expireTime,
+}) {
+  const startDate = new Date(startTime);
+  const expireDate = new Date(expireTime);
+  const [counterTimer, setCounterTimer] = useState({
+    days: expireDate.getDate() - startDate.getDate(),
+    hours: 23 - startDate.getHours(),
+    minutes: 59 - startDate.getMinutes(),
+    seconds: 59 - startDate.getSeconds()
+  });
+
+  useEffect(() => {
+    let timeout = setTimeout(() => {
+
+      setCounterTimer({
+        days: expireDate.getDate() - startDate.getDate(),
+        hours: 23 - startDate.getHours(),
+        minutes: 59 - startDate.getMinutes(),
+        seconds: 59 - startDate.getSeconds(),
+      });
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    }
+  }, [counterTimer]);
+
+  return <ContainerComponent.Section
+
+    className="timespan__container"
+  >
+    <ContainerComponent.Inner
+      style={{
+        margin: '0 auto',
+        textAlign: 'center',
+      }}
+    >
+      <ContainerComponent.Flex
+        style={{
+          // alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <ContainerComponent.Item style={{ fontSize: "13px", padding: "5px 0" }} >
+          <ButtonComponent style={{ padding: "5px 15px" }}>{`${counterTimer.hours < 10 && '0' || ''}${counterTimer.hours}`} </ButtonComponent>
+        </ContainerComponent.Item>
+
+        <ContainerComponent.Item >
+          <Text>:</Text>
+        </ContainerComponent.Item>
+
+        <ContainerComponent.Item style={{ fontSize: "13px", padding: "5px 0" }}>
+          <ButtonComponent style={{ padding: "5px 10px" }}>{`${counterTimer.minutes < 10 && '0' || ''}${counterTimer.minutes}`}</ButtonComponent>
+        </ContainerComponent.Item>
+
+        <ContainerComponent.Item>
+          <Text>:</Text>
+        </ContainerComponent.Item>
+
+        <ContainerComponent.Item style={{ fontSize: "13px", padding: "5px 0" }}>
+          <ButtonComponent style={{ padding: "5px 10px" }}>{`${counterTimer.seconds < 10 && '0' || ''}${counterTimer.seconds}`}</ButtonComponent>
+        </ContainerComponent.Item>
+      </ContainerComponent.Flex>
+    </ContainerComponent.Inner>
+  </ContainerComponent.Section>
 }

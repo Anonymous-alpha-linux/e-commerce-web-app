@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
@@ -9,14 +9,15 @@ export default function Personal({ personalInfo }) {
     const { workspace } = useWorkspaceContext();
     const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);
+
     const [input, setInput] = useState({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        address: profile.address,
-        phone: profile.phone,
-        introduction: profile?.introduction,
-        gender: profile.gender || 'male',
-        age: profile.age || 0,
+        firstName: profile?.firstName || '',
+        lastName: profile?.lastName || '',
+        address: profile?.address || '',
+        phone: profile?.phone || '',
+        introduction: profile?.introduction || '',
+        gender: profile?.gender || 'male',
+        age: profile?.age || 0,
         birth: ''
     });
     const location = useLocation();
@@ -32,10 +33,6 @@ export default function Personal({ personalInfo }) {
         e.preventDefault();
         return editProfile(input);
     }
-
-    // useEffect(() => {
-    //     console.log(input);
-    // }, [input]);
 
     return <ContainerComponent
         className="personal"
@@ -179,7 +176,7 @@ export default function Personal({ personalInfo }) {
                     <Form.Input style={{
                         textAlign: 'right',
                     }}
-                        name="lastName"
+                        name="phone"
                         onChange={inputHandler}
                         value={input.phone}
                         disabled={!isEdit}></Form.Input>
@@ -284,18 +281,39 @@ export default function Personal({ personalInfo }) {
                         }}></Form.Input>
                 </ContainerComponent.Pane>
                 <Text.RightLine>
-                    {isEdit && <Form.Input
-                        type='submit'
-                        onClick={(e) => {
-                            submitHandler(e);
-                            setIsEdit(false);
-                        }}>
-                        Save
-                    </Form.Input>
-                        || <ButtonComponent
+                    {isEdit && <>
+                        <Form.Input
+                            type='submit'
+                            style={{ display: 'none' }}
+                            onClick={(e) => {
+                                submitHandler(e);
+                                setIsEdit(false);
+                            }}>
+                        </Form.Input>
+                        <Text.Line>
+                            <Text.MiddleLine>
+                                <ButtonComponent
+                                    style={{ cursor: 'pointer', marginBottom: '20px' }}
+                                    onClick={() => setIsEdit(false)}>
+                                    Cancel
+                                </ButtonComponent>
+                            </Text.MiddleLine>
+                            <Text.MiddleLine>
+                                <ButtonComponent style={{ cursor: 'pointer', marginBottom: '20px' }}
+                                    onClick={() => { document.querySelector('input[type=submit]').click(); }}
+                                >
+                                    Save
+                                </ButtonComponent>
+                            </Text.MiddleLine>
+                        </Text.Line>
+                    </>
+                        ||
+                        <ButtonComponent
+                            style={{ cursor: 'pointer', marginBottom: '20px' }}
                             onClick={() => setIsEdit(true)}>
                             Edit
-                        </ButtonComponent>}
+                        </ButtonComponent>
+                    }
                 </Text.RightLine>
             </Form>
         </ContainerComponent.Inner>
