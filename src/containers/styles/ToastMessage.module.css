@@ -10,6 +10,7 @@
   transition: opacity 0.5s ease-in;
   opacity: 1;
   z-index: 10;
+  animation: fadeOn 300ms, fadeOff 300ms var(--timeout);
 }
 
 .ToastMessage.info .Bar {
@@ -58,6 +59,26 @@
   .ToastMessage {
     bottom: 20px;
     right: 20px;
+  }
+}
+
+@keyframes fadeOn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOff {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
   }
 }
 

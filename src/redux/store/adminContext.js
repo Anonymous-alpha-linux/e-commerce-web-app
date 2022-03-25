@@ -35,6 +35,9 @@ export default function AdminContext({ children }) {
     roles: [],
     errors: [],
     messages: [],
+    totalWorkspace: 0,
+    totalPost: 0,
+    totalUser: 0,
     loading: true,
   });
   const { pushToast } = useAuthorizationContext();
@@ -48,6 +51,7 @@ export default function AdminContext({ children }) {
       : mainAPI.CLOUD_API_MANAGER;
 
   useEffect(() => {
+    getDashBoardOverview();
     getAccountList();
     getRoleList();
     getAttachmentList();
@@ -109,7 +113,7 @@ export default function AdminContext({ children }) {
         const account = res.data.response;
         setState((oldState) => ({
           ...oldState,
-          accounts: [...oldState.accounts, account],
+          accounts: { ...oldState, data: [...oldState.accounts.data, account] },
         }));
         cb({
           message: "successfully, Add New User",
@@ -144,11 +148,14 @@ export default function AdminContext({ children }) {
       .then((res) => {
         setState((o) => ({
           ...o,
-          accounts: o.accounts.map((account) => {
-            if (account._id === accountId)
-              return { ...account, username: username };
-            return account;
-          }),
+          accounts: {
+            ...o.accounts,
+            data: o.accounts.data.map((account) => {
+              if (account._id === accountId)
+                return { ...account, username: username };
+              return account;
+            })
+          },
         }));
         cb({
           message: "Edit username successfully",
@@ -177,13 +184,16 @@ export default function AdminContext({ children }) {
       .then((res) => {
         setState((o) => ({
           ...o,
-          accounts: o.accounts.map((account) => {
-            if (account._id === accountId) return { ...account, email: email };
-            return account;
-          }),
+          accounts: {
+            ...o.accounts, data: o.accounts.data.map((account) => {
+              if (account._id === accountId) return { ...account, email: email };
+              return account;
+            })
+          },
         }));
-        cb({
+        pushToast({
           message: "Edit Email successfully",
+          type: toastTypes.SUCCESS
         });
       })
       .catch((error) => cb(error.message));
@@ -207,7 +217,6 @@ export default function AdminContext({ children }) {
         }
       )
       .then((res) => {
-        //  console.log(res.data.response);
         setState((o) => ({
           ...o,
           messages: [...o.messages, "Changed password successfully"],
@@ -239,14 +248,17 @@ export default function AdminContext({ children }) {
       .then((res) => {
         setState((o) => ({
           ...o,
-          accounts: o.accounts.map((account) => {
-            if (account._id === accountId)
-              return {
-                ...account,
-                ...res.data.response,
-              };
-            return account;
-          }),
+          accounts: {
+            ...o.accounts,
+            data: o.accounts.data.map((account) => {
+              if (account._id === accountId)
+                return {
+                  ...account,
+                  ...res.data.response,
+                };
+              return account;
+            })
+          },
         }));
         cb({
           message: "Edit Role successfully",
@@ -254,7 +266,7 @@ export default function AdminContext({ children }) {
       })
       .catch((error) => cb({ error: error.message }));
   }
-  function blockAccount(accountId, cb) {}
+  function blockAccount(accountId, cb) { }
   function getAttachmentList(cb) {
     return axios
       .get(managerAPI, {
@@ -329,13 +341,6 @@ export default function AdminContext({ children }) {
                 currentPage: page,
                 fetchedPage: [...o.attachments.fetchedPage, page],
                 data: newData
-                // data: [
-                //   ...o.attachments.data,
-                //   {
-                //     records: res.data.response,
-                //     page: page,
-                //   },
-                // ],
               },
             })
           });
@@ -353,15 +358,6 @@ export default function AdminContext({ children }) {
         attachments: {
           ...o.attachments,
           data: o.attachments.data.filter(attachment => attachment._id !== attachmentId),
-          // data: o.attachments.data.map(attachment => {
-          //   if (attachment.page === currentPage) {
-          //     return {
-          //       ...attachment,
-          //       records: attachment.records.filter(attachment => attachment._id !== attachmentId)
-          //     }
-          //   }
-          //   return attachment;
-          // })
         }
       }
     });
@@ -407,6 +403,37 @@ export default function AdminContext({ children }) {
       // Clean up and remove the link
       link.parentNode.removeChild(link);
     }).catch(err => pushToast({ message: err.message, type: toastTypes.ERROR }));
+  }
+  async function getDashBoardOverview() {
+    return axios.get(managerAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: 'overview'
+      }
+    }).then(res => {
+      console.log(res.data);
+      setState(o => ({
+        ...o,
+        totalWorkspace: res.data.totalWorkspace,
+        totalPost: res.data.totalPost,
+        totalUser: res.data.totalUser
+      }));
+    }).catch(error => pushToast({
+      message: error.message,
+      type: toastTypes.ERROR
+    }))
+  }
+  async function getTopPost() {
+    return axios.get(managerAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: 'overview'
+      }
+    })
   }
   return (
     <AdminContextAPI.Provider

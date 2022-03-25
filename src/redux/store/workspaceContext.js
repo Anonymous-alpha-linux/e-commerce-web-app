@@ -43,13 +43,15 @@ export default React.memo(function WorkspaceContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data);
-        setWorkspace({
-          type: actions.GET_WORKSPACE_LIST,
-          payload: res.data.response,
-          others: { totalWorkspace: res.data.totalWorkspace }
-        });
-        onLoadWorkspace();
+        if (res.status > 199 && res.status <= 299) {
+          setWorkspace({
+            type: actions.GET_WORKSPACE_LIST,
+            payload: res.data.response,
+            others: { totalWorkspace: res.data.totalWorkspace }
+          });
+          onLoadWorkspace();
+        }
+        else throw new Error(res.data);
       })
       .catch((error) => {
         setWorkspace({

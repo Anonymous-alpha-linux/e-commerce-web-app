@@ -11,7 +11,6 @@ export default function QAManager() {
       <DashboardHeader>
         <Outlet></Outlet>
       </DashboardHeader>
-      {/* {modal && <div className="modal">{modal}</div>} */}
     </AdminContext>
   );
 }

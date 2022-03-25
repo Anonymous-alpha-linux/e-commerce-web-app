@@ -44,14 +44,22 @@ export default function AuthenticationContext({ children }) {
         },
       })
       .then((response) => {
-        setUser({
-          type: actions.AUTHENTICATE_ACTION,
-          payload: response.data,
-        });
-
-        let socket = io(host);
-        socket.auth = { accessToken: localStorage.getItem('accessToken') };
-        setSocket(socket);
+        if (response.status > 199 && response.status <= 299) {
+          setUser({
+            type: actions.AUTHENTICATE_ACTION,
+            payload: response.data,
+          });
+          let socket = io(host);
+          socket.auth = { accessToken: localStorage.getItem('accessToken') };
+          setSocket(socket);
+          pushToast({
+            message: 'Get User successfully',
+            type: toastTypes.SUCCESS
+          })
+        }
+        else {
+          throw new Error("Get data Failed!");
+        }
       }).catch(error => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,

@@ -33,7 +33,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
     <>
       <ContainerComponent.Section
         forwardRef={forwardRef}
-        // className="sidebar__root
+      // className="sidebar__root
       >
         <ContainerComponent.Toggle className="sidebar__inner">
           <ContainerComponent.Inner>
@@ -60,15 +60,11 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
             </Text.CenterLine>
             <ContainerComponent.Flex>
               {sidebarData.map((item, index) => (
-                <ContainerComponent.Item
-                  className="sidebar__links"
-                  key={index + 1}
-                  style={{
-                    width: "100%",
-                    padding: "20px",
-                    position: "relative",
-                  }}
-                >
+                <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{
+                  width: "100%",
+                  padding: "20px",
+                  position: "relative",
+                }}>
                   <Link to={item.link}>
                     <Text.Line>
                       <Text.MiddleLine style={{ width: "20%" }}>
@@ -113,10 +109,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
               </ContainerComponent.Item>
             </ContainerComponent.Flex>
 
-            <ContainerComponent.Toggle
-              className={switchToggle ? "show" : "hide"}
-              style={{ margin: "0 auto" }}
-            >
+            {switchToggle && <ContainerComponent.Toggle style={{ margin: "0 auto" }}>
               <ContainerComponent.Item
                 style={{
                   width: "100%",
@@ -161,13 +154,11 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                     ></EditToggle>
                   ))}
               </ContainerComponent.Item>
-            </ContainerComponent.Toggle>
+            </ContainerComponent.Toggle>}
+
           </ContainerComponent.Inner>
 
-          <ContainerComponent.Pane
-            className="logout__button"
-            style={{ bottom: 0, width: "100%", padding: "20px" }}
-          >
+          <ContainerComponent.Pane className="logout__button sidebar__links" style={{ width: "100%", padding: "20px", position: "relative", }}>
             <Link to="/logout">
               <Text.Line>
                 <Text.MiddleLine style={{ width: "20%" }}>
@@ -175,7 +166,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                     <GoSignOut></GoSignOut>
                   </Icon>
                 </Text.MiddleLine>
-                <Text.MiddleLine style={{ width: "80%" }}>
+                <Text.MiddleLine style={{ width: "80%", paddingLeft: "2rem" }}>
                   <Text.Title>Logout</Text.Title>
                 </Text.MiddleLine>
               </Text.Line>
@@ -334,9 +325,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           <ContainerComponent.Item
             style={{ fontSize: "13px", padding: "5px 0" }}
           >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${
-              (counterTimer.minutes < 10 && "0") || ""
-            }${counterTimer.minutes}`}</ButtonComponent>
+            <ButtonComponent style={{ padding: "5px 10px" }}>{`${(counterTimer.minutes < 10 && "0") || ""
+              }${counterTimer.minutes}`}</ButtonComponent>
           </ContainerComponent.Item>
 
           <ContainerComponent.Item>
@@ -346,9 +336,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           <ContainerComponent.Item
             style={{ fontSize: "13px", padding: "5px 0" }}
           >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${
-              (counterTimer.seconds < 10 && "0") || ""
-            }${counterTimer.seconds}`}</ButtonComponent>
+            <ButtonComponent style={{ padding: "5px 10px" }}>{`${(counterTimer.seconds < 10 && "0") || ""
+              }${counterTimer.seconds}`}</ButtonComponent>
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
       </ContainerComponent.Inner>

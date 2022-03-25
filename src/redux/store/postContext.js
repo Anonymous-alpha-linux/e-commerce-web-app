@@ -42,7 +42,7 @@ const categoryReducer = (state, action) => {
     case actions.ADD_CATEGORY:
       return {
         ...state,
-        categories: [...state.categories, action.payload],
+        categories: [action.payload, ...state.categories],
       };
     case actions.REMOVE_CATEGORY:
       return {
@@ -1057,7 +1057,7 @@ export default React.memo(function PostContext({ children }) {
       .then((data) => cb(data))
       .catch((error) => setError(error.message));
   }
-  function getGzipFile() {}
+  function getGzipFile() { }
   async function downloadHandler(attachmentId) {
     return axios
       .get(`${host}/api/v1/download`, {
@@ -1132,7 +1132,7 @@ export default React.memo(function PostContext({ children }) {
     removeCategory,
   };
 
-  if (postState.postLoading && categoryState.categoryLoading)
+  if (postState.postLoading)
     return <Loading className="post__loading"></Loading>;
 
   return (

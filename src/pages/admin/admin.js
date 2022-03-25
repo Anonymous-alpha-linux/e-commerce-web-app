@@ -9,7 +9,6 @@ export default function Admin() {
       <DashboardHeader>
         <Outlet></Outlet>
       </DashboardHeader>
-      {/* <div className="modal"></div> */}
     </AdminContext>
   );
 }

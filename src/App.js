@@ -99,9 +99,11 @@ function App() {
                     element={<CategoryManagement></CategoryManagement>}
                   />
                   <Route
-                    path="/management/member/:id"
-                    element={<ListMember></ListMember>}
-                  />
+                    path="/management/member"
+                    element={<AccountCrud></AccountCrud>}
+                  >
+                    <Route path=":id" element={<ListMember></ListMember>} />
+                  </Route>
                   <Route
                     path="/management/staff/:id"
                     element={<StaffCRUD></StaffCRUD>}

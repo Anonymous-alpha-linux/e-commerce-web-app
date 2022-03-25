@@ -19,7 +19,7 @@ export default function AccountCrud() {
       : [mainAPI.LOCALHOST_ADMIN, mainAPI.CLOUD_HOST];
   let PageSize = 8;
   const { accounts: { data, loading } } = useAdminContext();
-  // console.log(accounts);
+  console.log(data);
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
@@ -28,6 +28,7 @@ export default function AccountCrud() {
 
   useEffect(() => {
     setDataRecords((e) => {
+      console.log(data);
       const firstPageIndex = (currentPage - 1) * PageSize;
       const lastPageIndex = firstPageIndex + PageSize;
       return data.slice(firstPageIndex, lastPageIndex);
@@ -115,7 +116,7 @@ export default function AccountCrud() {
   );
 }
 
-function AccFromEdit({ modalEdit, setModalEdit, data }) {
+function AccFormEdit({ modalEdit, setModalEdit, data }) {
   const {
     roles: ROLES,
     editUsername,
@@ -350,11 +351,11 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
             className="btn-trans-Cancel"
             onClick={() => setModalEdit(!modalEdit)}
           >
-            <stong>Exit</stong>
+            <strong>Exit</strong>
           </button>
         </div>
       </div>
-      {(error || message) && (
+      {/* {(error || message) && (
         <Toast
           error={error}
           message={message}
@@ -362,7 +363,7 @@ function AccFromEdit({ modalEdit, setModalEdit, data }) {
           setMessage={setMessage}
           timeout={3000}
         ></Toast>
-      )}
+      )} */}
     </>
   );
 }
@@ -630,7 +631,7 @@ function AccountData({ data, index }) {
         {modalEdit && (
           <div className="MadalBackDrop">
             <div className="MobalCenter">
-              <AccFromEdit
+              <AccFormEdit
                 setModalEdit={setModalEdit}
                 modalEdit={modalEdit}
                 data={data}

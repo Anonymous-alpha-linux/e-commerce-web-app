@@ -1,31 +1,10 @@
-// import React, { useState } from 'react'
-
-// function Responsive({ children, ...props }) {
-//     const [device, setDevice] = useState();
-//     React.useEffect(() => {
-//         window.addEventListener('resize', (e) => {
-//             console.log(window.innerHeight);
-//         })
-//         return () => {
-//             window.removeEventListener('resize');
-//         };
-//     }, []);
-//     return (
-//         <div className='responsive__hook'>
-//             {children}
-//         </div>
-//     )
-// }
-
-// export default Responsive;
-
-
 import { useState, useLayoutEffect, useRef } from "react";
+import { media } from '../fixtures';
 
 const initialValue = (min, max) =>
-    (window.innerWidth >= max && "pc") ||
-    (window.innerWidth >= min && "tablet") ||
-    "phone";
+    (window.innerWidth >= max && media.PC) ||
+    (window.innerWidth >= min && media.TABLET) ||
+    media.MOBILE;
 
 export default function useMedia(min = 768, max = 1023) {
     const [device, setDevice] = useState(() => initialValue(min, max));
@@ -35,14 +14,13 @@ export default function useMedia(min = 768, max = 1023) {
         matchMediaRef.current = window.matchMedia(
             `(min-width:${min}px) and (max-width:${max}px)`
         );
-
         const handleSetDevice = () => {
             setDevice(() => {
                 if (matchMediaRef.current.matches) return `tablet`;
                 else if (!matchMediaRef.current.matches && window.innerWidth <= min - 1)
-                    return `mobile`;
+                    return media.MOBILE;
                 else if (!matchMediaRef.current.matches && window.innerWidth >= max + 1)
-                    return `pc`;
+                    return media.PC;
             });
         };
 

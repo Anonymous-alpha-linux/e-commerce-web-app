@@ -53,46 +53,28 @@ Chart.register(
   Tooltip
 );
 
-export default function BarChart() {
-  const barData = {
-    labels: ["October", "November", "December"],
+export default function BarChart({ data }) {
+
+  let barData = {
+    labels: ["October", "November", "December", "January", "February", "March", "April"],
     datasets: [
       {
-        data: [10, 20, 50],
-        label: "Data1",
+        data: [10, 20, 50, 10, 20, 50, 10, 20, 50, 10, 20, 50, 10, 20, 50, 10, 20, 50],
+        label: "Post",
         borderColor: "black",
-        backgroundColor: "red",
+        backgroundColor: ["#33EFAB", "#40916C"],
         fill: true
-      },
-      {
-        data: [40, 70, 55],
-        label: "Data2",
-        borderColor: "black",
-        backgroundColor: "blue",
-        fill: true
-      },
-      {
-        data: [12, 30, 10],
-        label: "Data3",
-        borderColor: "black",
-        backgroundColor: "green",
-        fill: true
-      },
-      {
-        data: [82, 40, 35],
-        label: "Data4",
-        borderColor: "black",
-        backgroundColor: "purple",
-        fill: true
-      },
+      }
     ]
   }
+
   return (
     <Bar
       type="bar"
       width={'100%'}
-      height={100}
+      height={'100%'}
       options={{
+        responsive: true,
         title: {
           display: true,
           text: "Test Data",

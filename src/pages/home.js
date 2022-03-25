@@ -12,30 +12,26 @@ import {
 export default function Home() {
   const { user, toastList, pushToast, pullToast } = useAuthorizationContext();
   const location = useLocation();
-  React.useEffect(() => {
-    pushToast({
-      message: "start toast at home",
-      type: toastTypes.SUCCESS
-    })
-  }, []);
+
   if (!user.isLoggedIn) {
     return <Navigate to="/login" state={{ from: location }} replace></Navigate>;
   }
-
   return (
     <WorkspaceContext>
       <PostContext>
-        <ContainerComponent.Flex style={{
-          // position: 'fixed',
-          // right: 0,
-          // bottom: 0,
-          padding: '10px'
+        {!!toastList.length && <ContainerComponent.Flex style={{
+          position: 'fixed',
+          bottom: '0',
+          right: '10px',
+          zIndex: 100,
+          padding: '10px',
+          flexDirection: 'column',
+          gap: '10px'
         }}>
-          {!!toastList.length && toastList.map((toast, index) => {
-            console.log(toast);
-            <Toast key={index + 1} message={toast.message} type={toast.type} timeout={3000} pullItem={pullToast} />
+          {toastList.map((toast, index) => {
+            return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={3000} pullItem={pullToast} />
           })}
-        </ContainerComponent.Flex>
+        </ContainerComponent.Flex>}
         <Outlet></Outlet>
       </PostContext>
     </WorkspaceContext>
