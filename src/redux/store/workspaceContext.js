@@ -10,12 +10,13 @@ import { mainAPI } from "../../config";
 import { useAuthorizationContext } from ".";
 import { Loading } from "../../pages";
 import { initialWorkspacePage, workspaceReducer, reduxActions as actions, } from "../reducers";
+import { toastTypes } from "../../fixtures";
 
 const WorkspaceContextAPI = createContext();
 
 export default React.memo(function WorkspaceContext({ children }) {
   const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
-  const { user } = useAuthorizationContext();
+  const { user, pushToast } = useAuthorizationContext();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const cancelTokenSource = axios.CancelToken.source();
@@ -49,6 +50,10 @@ export default React.memo(function WorkspaceContext({ children }) {
             payload: res.data.response,
             others: { totalWorkspace: res.data.totalWorkspace }
           });
+          pushToast({
+            message: 'get workspace list successfully!',
+            type: toastTypes.SUCCESS
+          })
           onLoadWorkspace();
         }
         else throw new Error(res.data);

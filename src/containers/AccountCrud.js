@@ -19,7 +19,6 @@ export default function AccountCrud() {
       : [mainAPI.LOCALHOST_ADMIN, mainAPI.CLOUD_HOST];
   let PageSize = 8;
   const { accounts: { data, loading } } = useAdminContext();
-  console.log(data);
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
@@ -28,7 +27,6 @@ export default function AccountCrud() {
 
   useEffect(() => {
     setDataRecords((e) => {
-      console.log(data);
       const firstPageIndex = (currentPage - 1) * PageSize;
       const lastPageIndex = firstPageIndex + PageSize;
       return data.slice(firstPageIndex, lastPageIndex);
@@ -161,11 +159,9 @@ function AccFormEdit({ modalEdit, setModalEdit, data }) {
       </>
     );
   };
-
   async function handleNameInput(e) {
     setInput({ ...input, [e.target.name]: e.target.value });
   }
-
   async function onSubmitName(e) {
     e.preventDefault();
     editUsername(input.username, data._id, ({ message, error }) => {
@@ -391,7 +387,6 @@ function ModalAddFormAccount({ setModal, modal }) {
     e.preventDefault();
     setConfirmShown(!confirmShown);
   };
-
   const IconTaggle = ({ Action, Condition }) => {
     return (
       <>
@@ -581,7 +576,6 @@ function AccountData({ data, index }) {
 
   function blockAccount(e, id) {
     e.preventDefault();
-    console.log(id);
     // setBlockacc(!block);
   }
   return (
@@ -675,10 +669,9 @@ function SearchAccount({
         );
       });
       searchFunction.current(filteredData);
-      // console.log(filteredResults, "Filer");
+
     } else {
       searchFunction.current(accounts);
-      // console.log(accounts, "Cate");
     }
   };
 
@@ -694,7 +687,6 @@ function SearchAccount({
 }
 
 function DetailAcc({ setModalDetail, data }) {
-  // console.log(data);
   const pic =
     "https://cdn.dribbble.com/users/1577045/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png?compress=1&resize=400x300";
   return (

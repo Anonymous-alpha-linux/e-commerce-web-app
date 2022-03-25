@@ -10,7 +10,7 @@ import {
 } from "../redux";
 
 export default function Home() {
-  const { user, toastList, pushToast, pullToast } = useAuthorizationContext();
+  const { user, toastList, pullToast } = useAuthorizationContext();
   const location = useLocation();
 
   if (!user.isLoggedIn) {
@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <WorkspaceContext>
       <PostContext>
-        {!!toastList.length && <ContainerComponent.Flex style={{
+        <ContainerComponent.Flex style={{
           position: 'fixed',
           bottom: '0',
           right: '10px',
@@ -31,7 +31,7 @@ export default function Home() {
           {toastList.map((toast, index) => {
             return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={3000} pullItem={pullToast} />
           })}
-        </ContainerComponent.Flex>}
+        </ContainerComponent.Flex>
         <Outlet></Outlet>
       </PostContext>
     </WorkspaceContext>

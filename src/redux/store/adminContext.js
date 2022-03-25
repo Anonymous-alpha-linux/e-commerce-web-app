@@ -110,20 +110,31 @@ export default function AdminContext({ children }) {
         role,
       })
       .then((res) => {
-        const account = res.data.response;
-        setState((oldState) => ({
-          ...oldState,
-          accounts: { ...oldState, data: [...oldState.accounts.data, account] },
-        }));
-        cb({
-          message: "successfully, Add New User",
-        });
+        if (res.status > 199 && res.status < 300) {
+          const account = res.data.response;
+          setState((oldState) => ({
+            ...oldState,
+            accounts: { ...oldState, data: [...oldState.accounts.data, account] },
+          }));
+          pushToast({
+            message: 'Add new user successfully',
+            type: toastTypes.SUCCESS
+          })
+          cb({
+            message: "Successfully, Add New User",
+          });
+        }
+        else throw new Error("Failed!");
       })
       .catch((error) => {
         setState((o) => ({
           ...o,
           errors: [...o.errors, error.message],
         }));
+        pushToast({
+          message: 'Add user failed!',
+          type: toastTypes.ERROR
+        })
         cb({ error: error.message });
       });
   }
@@ -146,22 +157,35 @@ export default function AdminContext({ children }) {
         }
       )
       .then((res) => {
-        setState((o) => ({
-          ...o,
-          accounts: {
-            ...o.accounts,
-            data: o.accounts.data.map((account) => {
-              if (account._id === accountId)
-                return { ...account, username: username };
-              return account;
-            })
-          },
-        }));
-        cb({
-          message: "Edit username successfully",
-        });
+        if (res.status > 199 && res.status <= 299) {
+          setState((o) => ({
+            ...o,
+            accounts: {
+              ...o.accounts,
+              data: o.accounts.data.map((account) => {
+                if (account._id === accountId)
+                  return { ...account, username: username };
+                return account;
+              })
+            },
+          }));
+          pushToast({
+            message: 'Update username successfully',
+            type: toastTypes.SUCCESS
+          })
+          cb({
+            message: "Edit username successfully",
+          });
+        }
+        else throw new Error("Update failed");
       })
-      .catch((error) => cb({ error: error.message }));
+      .catch((error) => {
+        pushToast({
+          message: "Cannot edit now !",
+          type: toastTypes.ERROR
+        })
+        cb({ error: error.message });
+      });
   }
   function editEmail(email, accountId, cb) {
     return axios
@@ -196,7 +220,13 @@ export default function AdminContext({ children }) {
           type: toastTypes.SUCCESS
         });
       })
-      .catch((error) => cb(error.message));
+      .catch((error) => {
+        pushToast({
+          message: "Cannot edit now !",
+          type: toastTypes.ERROR
+        })
+        cb(error.message);
+      });
   }
   function editPassword(password, accountId, cb) {
     return axios
@@ -217,13 +247,20 @@ export default function AdminContext({ children }) {
         }
       )
       .then((res) => {
-        setState((o) => ({
-          ...o,
-          messages: [...o.messages, "Changed password successfully"],
-        }));
-        cb({
-          message: "Edit Email successfully",
-        });
+        if (res.status > 199 && res.status <= 299) {
+          setState((o) => ({
+            ...o,
+            messages: [...o.messages, "Changed password successfully"],
+          }));
+          pushToast({
+            message: "Edit Password Successfully!",
+            type: toastTypes.SUCCESS
+          });
+          cb({
+            message: "Edit Email successfully",
+          });
+        }
+        else throw new Error("Edit password failed!");
       })
       .catch((error) => pushToast({ message: error.message, type: toastTypes.ERROR }));
   }

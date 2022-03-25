@@ -35,6 +35,9 @@ export default function AuthenticationContext({ children }) {
       cancelTokenSource.cancel();
     };
   }, []);
+  useEffect(() => {
+    console.log(toastList);
+  }, [toastList]);
   const onLoadUser = (cb) => {
     return axios
       .get(authAPI, {
