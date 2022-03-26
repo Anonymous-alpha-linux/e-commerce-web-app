@@ -127,7 +127,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
           </ContainerComponent.Flex>
         </ContainerComponent.InlineGroup>
         {(user.accountId === postHeader.postAuthor || [roles.QA_COORDINATOR, roles.QA_MANAGER].includes(user.role)) && <Text.RightLine>
-          <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
+          <DropDownButton position="right" component={<IoIosArrowDown></IoIosArrowDown>}>
             {postHeader.postAuthor === user.accountId &&
               <Dropdown.Item>
                 <Link to={`/portal/idea/${postHeader.id}`}>

@@ -19,10 +19,6 @@ export default function Timespan({
         let timeout = setTimeout(() => {
             let time = new Date(expireDate.getTime() - startDate.getTime());
             setCounterTimer({
-                // days: expireDate.getDate() - startDate.getDate(),
-                // hours: 23 - startDate.getHours(),
-                // minutes: 59 - startDate.getMinutes(),
-                // seconds: 59 - startDate.getSeconds(),
                 days: time.getUTCDate(),
                 hours: time.getUTCHours(),
                 minutes: time.getUTCMinutes(),

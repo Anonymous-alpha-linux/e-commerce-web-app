@@ -32,7 +32,7 @@ export default function NotificationContext({ children }) {
 
     useEffect(() => {
         loadNotifications();
-    }, [showUpdate]);
+    }, [user, showUpdate]);
 
     function loadNotifications() {
         return axios.get(notifyAPI, {

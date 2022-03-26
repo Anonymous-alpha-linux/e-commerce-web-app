@@ -28,7 +28,7 @@ export default React.memo(function WorkspaceContext({ children }) {
       localStorage.setItem("workspace", 0);
     }
     onLoadWorkspaceList();
-  }, []);
+  }, [user]);
 
 
   function onLoadWorkspaceList() {
@@ -125,32 +125,44 @@ export default React.memo(function WorkspaceContext({ children }) {
       )
       .catch((error) => setError(error.message));
   }
-  function selectWorkspaceIndex(page) {
-    localStorage.setItem("workspace", page);
-    setWorkspace({
-      type: actions.SELECT_PAGE,
-      page: page,
-    });
-  }
+  // function selectWorkspace(workspaceId, cb) {
+  //   return axios.put(workspaceAPI, {
+  //     workspaceid: workspaceId
+  //   }, {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //     },
+  //     params: {
+  //       view: "accountWorkspace"
+  //     },
+  //   }).then(res => {
+  //     setWorkspace({
+  //       type: actions.GET_WORKSPACE,
+  //       payload: res.data.response
+  //     });
+  //   }).catch(err => {
+
+  //   })
+  // }
   function createWorkspace(workspace) {
     setWorkspace({
       type: actions.CREATE_WORKSPACE,
       payload: workspace,
     });
   }
-  function getWorkspaceForManager() {
-    return axios.get(mainAPI.LOCALHOST_MANAGER, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: "workspace",
-      }
-    }).then(res => setWorkspace({
-      type: actions.GET_MANAGER_WORKSPACE,
-      payload: res.data.response
-    }))
-  }
+  // function getWorkspaceForManager() {
+  //   return axios.get(mainAPI.LOCALHOST_MANAGER, {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //     },
+  //     params: {
+  //       view: "workspace",
+  //     }
+  //   }).then(res => setWorkspace({
+  //     type: actions.GET_MANAGER_WORKSPACE,
+  //     payload: res.data.response
+  //   }))
+  // }
   const contextValue = {
     ...workspaceState,
     workspace: workspaceState.workspace,

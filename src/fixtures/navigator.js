@@ -23,6 +23,7 @@ const navigators = [
         icon: <FaUsers></FaUsers>,
         label: 'workspace',
         // link: 'workspace',
+        trigger: true,
     },
     {
         icon: <FaUserTie></FaUserTie>,

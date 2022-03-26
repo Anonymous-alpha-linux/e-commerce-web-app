@@ -4,7 +4,6 @@ import React, {
   useState,
   useEffect,
   useReducer,
-  useRef,
 } from "react";
 import axios from "axios";
 import { mainAPI } from "../../config";
@@ -12,8 +11,9 @@ import actions from "../reducers/actions";
 import { useAuthorizationContext } from ".";
 import { Loading } from "../../pages";
 import { postReducer, initialPostPage } from "../reducers";
-import { notifyData, socketTargets } from "../../fixtures";
+import { notifyData, socketTargets, toastTypes } from "../../fixtures";
 import { useNotifyContext } from "..";
+import { useWorkspaceContext } from "./workspaceContext";
 const PostContextAPI = createContext();
 
 const categoryReducer = (state, action) => {
@@ -71,7 +71,8 @@ export default React.memo(function PostContext({ children }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   // Global states getter
-  const { user, socket } = useAuthorizationContext();
+  const { user, socket, pushToast } = useAuthorizationContext();
+  const { workspace } = useWorkspaceContext();
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
@@ -84,7 +85,7 @@ export default React.memo(function PostContext({ children }) {
     return () => {
       cancelTokenSource.cancel();
     };
-  }, [user]);
+  }, [workspace]);
   useEffect(() => {
     receiveRealtimeComment();
     receiveRealTimeLike();
@@ -93,10 +94,33 @@ export default React.memo(function PostContext({ children }) {
   }, [socket]);
 
   // 1. Post for workspace
-  function getPosts() {
-    setPost({
-      type: actions.SET_LOADING,
+  function getAllPost() {
+    return axios.get(postAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "allpost",
+      },
+    }).then(res => {
+      pushToast({
+        message: 'Get all post successfully',
+        type: toastTypes.SUCCESS
+      });
+      setPost({
+
+      });
+    }).catch(error => {
+      pushToast({
+        message: 'Get all post successfully',
+        type: toastTypes.SUCCESS
+      });
     });
+  }
+  function getPosts() {
+    // setPost({
+    //   type: actions.SET_LOADING,
+    // });
     return axios
       .get(postAPI, {
         headers: {
@@ -110,9 +134,9 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        setPost({
-          type: actions.SET_OFF_LOADING,
-        });
+        // setPost({
+        //   type: actions.SET_OFF_LOADING,
+        // });
         return setPost({
           type: actions.GET_POST_LIST,
           payload: res.data.response,
@@ -126,9 +150,9 @@ export default React.memo(function PostContext({ children }) {
       });
   }
   function filterPost(filter) {
-    setPost({
-      type: actions.SET_LOADING,
-    });
+    // setPost({
+    //   type: actions.SET_LOADING,
+    // });
     return axios
       .get(postAPI, {
         headers: {
@@ -148,11 +172,10 @@ export default React.memo(function PostContext({ children }) {
           filter: filter,
         });
       })
-      .then((success) => { })
       .catch((error) => {
-        setPost({
-          type: actions.SET_OFF_LOADING,
-        });
+        // setPost({
+        //   type: actions.SET_OFF_LOADING,
+        // });
         setError(error.message);
       });
   }
@@ -404,10 +427,7 @@ export default React.memo(function PostContext({ children }) {
     });
   }
   // 2. Posts for profile
-  function getOwnPosts(cb) {
-    setPost({
-      type: actions.SET_LOADING,
-    });
+  function getOwnPosts() {
     return axios
       .get(postAPI, {
         headers: {
@@ -422,15 +442,9 @@ export default React.memo(function PostContext({ children }) {
       })
       .then((res) => {
         setPost({
-          type: actions.SET_OFF_LOADING
-        })
-        setPost({
           type: actions.GET_MY_POST,
           payload: res.data.response,
         });
-      })
-      .then((success) => {
-        cb();
       })
       .catch((error) => {
         setPost({
