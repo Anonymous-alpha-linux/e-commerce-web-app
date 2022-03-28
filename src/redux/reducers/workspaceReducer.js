@@ -37,10 +37,10 @@ export default function workspaceReducer(state, action) {
         workspaces: [...state.workspaces, action.payload],
       };
     case actions.ASSIGN_HOST_TO_WORKSPACE:
-      return {
-        ...state,
-        workspaces: actionHandler.updateItem('manager', action.payload)
-      }
+      return actionHandler.updateItem("workspaces", workspace => {
+        if (workspace._id === action.workspaceId) return action.payload;
+        return workspace;
+      }, state);
     default:
       return state;
   }

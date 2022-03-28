@@ -14,7 +14,6 @@ import { postReducer, initialPostPage } from "../reducers";
 import { notifyData, socketTargets, toastTypes } from "../../fixtures";
 import { useNotifyContext } from "..";
 import { useWorkspaceContext } from "./workspaceContext";
-
 const PostContextAPI = createContext();
 
 const categoryReducer = (state, action) => {
@@ -61,7 +60,6 @@ const initialCategories = {
   categoryLoading: true,
 };
 export default React.memo(function PostContext({ children }) {
-  const {pushToast} = useAuthorizationContext();
   // Component states
   const [postState, setPost] = useReducer(postReducer, initialPostPage);
   const [categoryState, setCategory] = useReducer(
@@ -112,26 +110,19 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Get Post Successful",
-          type: toastTypes.SUCCESS
-        });
-        setPost({
-          type: actions.SET_OFF_LOADING,
-        });
+        // setPost({
+        //   type: actions.SET_OFF_LOADING,
+        // });
         return setPost({
           type: actions.GET_POST_LIST,
           payload: res.data.response,
         });
       })
-      .catch(() => {
+      .catch((error) => {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        pushToast({
-          message: "Get Post Failed",
-          type: toastTypes.ERROR
-        });
+        setError(error.message);
       });
   }
   function filterPost(filter) {
@@ -158,13 +149,10 @@ export default React.memo(function PostContext({ children }) {
         });
       })
       .catch((error) => {
-        setPost({
-          type: actions.SET_OFF_LOADING,
-        });
-        pushToast({
-          message: "Filter Failed",
-          type: toastTypes.ERROR
-        });
+        // setPost({
+        //   type: actions.SET_OFF_LOADING,
+        // });
+        setError(error.message);
       });
   }
   function loadNextPosts(cb) {
@@ -223,20 +211,13 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Create Post Successful",
-          type: toastTypes.SUCCESS
-        });
         setPost({
           type: actions.PUSH_IDEA,
           payload: [res.data.response],
         });
       })
-      .catch(() => {
-        pushToast({
-          message: "Create Post Failed",
-          type: toastTypes.ERROR
-        });
+      .catch((error) => {
+        setError(error.message);
       });
   }
   function updateSinglePost(postId, cb) {
@@ -251,21 +232,14 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Update Post Successful",
-          type: toastTypes.SUCCESS
-        });
         setPost({
           type: actions.UPDATE_SINGLE_POST,
           payload: res.data.response,
           postId: postId,
         });
       })
-      .catch(() => {
-        pushToast({
-          message: "Update Post Failed",
-          type: toastTypes.ERROR
-        });
+      .catch((error) => {
+        setError(error.message);
       });
   }
   function deleteSinglePost(postId, cb) {
@@ -280,10 +254,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Delete Post Successful",
-          type: toastTypes.SUCCESS
-        });
         setPost({
           type: actions.REMOVE_SINGLE_POST,
           postId: postId,
@@ -291,10 +261,7 @@ export default React.memo(function PostContext({ children }) {
         cb(postId);
       })
       .catch((error) => {
-        pushToast({
-          message: "Delete Post Failed",
-          type: toastTypes.ERROR
-        });
+        setError(error.message);
       });
   }
   function postIdea(input, cb, options = null) {
@@ -332,18 +299,12 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Post Idea Successful",
-          type: toastTypes.SUCCESS
-        });
         createSinglePost(res.data.response[0]._id, cb);
         cb(res.data.response[0]._id);
       })
-      .catch(() => {
-        pushToast({
-          message: "Post Idea Failed",
-          type: toastTypes.ERROR
-        });
+      .catch((err) => {
+        cb(error);
+        setError(err.message);
       });
   }
   function editIdea(input, formData, cb, options) {
@@ -377,19 +338,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Edit Idea Successful",
-          type: toastTypes.SUCCESS
-        });
-        console.log(res.data.response);
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
-      .catch(() => {
-        pushToast({
-          message: "Edit Idea Failed",
-          type: toastTypes.ERROR
-        }); });
+      .catch((error) => setError(error.message));
   }
   function likePost(input, postId, userId) {
     setPost({
@@ -464,10 +416,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Get Post Successful",
-          type: toastTypes.SUCCESS
-        });
         setPost({
           type: actions.GET_MY_POST,
           payload: res.data.response,
@@ -477,10 +425,7 @@ export default React.memo(function PostContext({ children }) {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        pushToast({
-          message: "Get Post Failed",
-          type: toastTypes.ERROR
-        });
+        setError(error.message);
       });
   }
   function filterMyPost(filter) {
@@ -497,24 +442,17 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Filter Successful",
-          type: toastTypes.SUCCESS
-        });
         return setPost({
           type: actions.FILTER_MY_POST,
           payload: res.data.response,
           filter: filter,
         });
       })
-      .catch(() => {
+      .catch((error) => {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        pushToast({
-          message: "Filter Failed",
-          type: toastTypes.ERROR
-        });
+        setError(error.message);
       });
   }
   function loadMyNextPosts(cb) {

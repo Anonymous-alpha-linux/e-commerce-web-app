@@ -113,7 +113,8 @@ function MostCategory() {
       {
         data: mostCategories.map(c => c.count),
         borderColor: "black",
-        backgroundColor: ['rgb(255, 99, 132)',
+        backgroundColor: [
+          'rgb(255, 99, 132)',
           'rgb(75, 192, 192)',
           'rgb(255, 205, 86)',
           'rgb(201, 203, 207)',
