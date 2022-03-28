@@ -14,11 +14,11 @@ export default function DropDown({ children, forwardRef, ...props }) {
 DropDown.DropBtn = ({ children, ...props }) => {
     return <span className="dropdown__dropbtn"
         {...props}>
-        {props.component}
+        {children}
     </span>
 }
 DropDown.Content = ({ children, ...props }) => {
-    return <div className="dropdown__content">
+    return <div className="dropdown__content" {...props}>
         {children}
     </div>
 }

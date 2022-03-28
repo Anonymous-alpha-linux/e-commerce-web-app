@@ -8,7 +8,6 @@ import axios from 'axios';
 export default function MyPost() {
     const { user } = useAuthorizationContext();
     const { myPosts, getOwnPosts, loadMyNextPosts, filterMyPost, removeIdea } = usePostContext();
-    const [loading, setLoading] = useState(true);
     const mountedRef = React.useRef(false);
     const listRef = React.useRef();
     // const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
@@ -17,9 +16,7 @@ export default function MyPost() {
     React.useEffect(() => {
         mountedRef.current = true;
         if (mountedRef.current) {
-            getOwnPosts(() => {
-                setLoading(false);
-            });
+            getOwnPosts();
         }
         return () => {
             mountedRef.current = false;
@@ -27,7 +24,6 @@ export default function MyPost() {
         };
     }, []);
 
-    if (loading) return <Loading></Loading>
     return (<ContainerComponent className="workspace" id="workspace">
         <PostForm></PostForm>
         <Filter loader={filterMyPost} selectOptions={[

@@ -5,7 +5,6 @@ import {
   ProtectedPage,
   Register,
   ForgetPassword,
-  Nav,
   Staff,
   QACoordinator,
   AdminSidebar,
@@ -48,7 +47,7 @@ function App() {
   return (
     <NotifyContext>
       <BrowserRouter>
-        {user.role === roles.STAFF && <Nav></Nav>}
+        {/* {user.role === roles.STAFF && } */}
         <Routes>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>

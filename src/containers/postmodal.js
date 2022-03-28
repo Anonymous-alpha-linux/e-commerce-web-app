@@ -22,6 +22,7 @@ export default function PostModal() {
     const navigate = useNavigate();
 
     const [input, setInput] = useState({
+        title: '',
         content: "",
         private: false,
         condition: false,
@@ -156,10 +157,11 @@ export default function PostModal() {
                     })])
             }).then(data => {
                 const [post, ...files] = data;
-                const { content, hideAuthor, categories } = post;
+                const { title, content, hideAuthor, categories } = post;
                 if (mountedRef.current) {
                     setInput(input => ({
                         ...input,
+                        title: title,
                         content: content,
                         private: hideAuthor,
                         categories: categories.map((single) => single._id),
@@ -249,6 +251,7 @@ export default function PostModal() {
                         ></ButtonComponent.Toggle>
                     </Text.RightLine>
                 </Text.Line>
+                <Form.Input id="title" name="title" onChange={inputHandler} value={input.title} placeholder="Your post title" style={{ margin: '10px 0' }}></Form.Input>
                 <Form.TextArea
                     id="content"
                     name="content"

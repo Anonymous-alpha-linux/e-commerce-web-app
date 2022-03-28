@@ -26,6 +26,7 @@ import {
   Title,
   Tooltip
 } from 'chart.js';
+import { usePostContext } from '../../redux';
 
 Chart.register(
   ArcElement,
@@ -55,7 +56,10 @@ Chart.register(
 
 export default function BarChart({ data }) {
 
+  const { posts } = usePostContext();
+  console.log(posts);
   let barData = {
+    id: "1",
     labels: ["October", "November", "December", "January", "February", "March", "April"],
     datasets: [
       {
@@ -69,16 +73,16 @@ export default function BarChart({ data }) {
   }
 
   return (
-    <Bar
-      type="bar"
+    <Bar type="bar"
       width={'100%'}
       height={'100%'}
       options={{
         responsive: true,
-        title: {
-          display: true,
-          text: "Test Data",
-          fontSize: 30
+        plugins: {
+          title: {
+            display: true,
+            text: 'Top 3 most favorite post author'
+          },
         },
         legend: {
           display: true,

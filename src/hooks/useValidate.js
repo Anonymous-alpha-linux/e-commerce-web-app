@@ -1,3 +1,5 @@
+import { validateTypes } from "../fixtures";
+
 export default class useValidate {
   constructor(
     string,
@@ -10,17 +12,13 @@ export default class useValidate {
     this.config = config;
   }
 
-  isEmail() {
-    if (
-      !/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-        this.input
-      )
-    )
-      throw new Error("not an Email");
+  isEmail(message = "Not Email") {
+    if (!/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.input))
+      throw new Error(message);
     return this;
   }
-  isEmpty() {
-    if (!this.input.length) throw new Error("please fill in empty input");
+  isEmpty(message = "please fill in empty input") {
+    if (!this.input.length) throw new Error(message);
     return this;
   }
   isNumber() {

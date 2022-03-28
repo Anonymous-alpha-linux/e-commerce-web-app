@@ -7,8 +7,8 @@ export default function useMessage() {
     }
     function pullNotify() {
         setMessage(message => {
-            return message.slice(0, message.length - 1);
-        })
+            return message.slice(1, message.length - 1);
+        });
     }
     return [message, pushNotify, pullNotify];
 }

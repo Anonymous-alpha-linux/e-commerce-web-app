@@ -11,7 +11,7 @@ function Interaction({ like, dislike, likedAccounts, dislikedAccounts, entity, i
         ...entity,
     });
     const interactLoaderRef = useRef(interactLoader);
-    // const isFirstRender = useRef(true);
+
     const checkedHandler = async (e) => {
         if (e.target.name === "like") {
             setInteract({
@@ -38,17 +38,29 @@ function Interaction({ like, dislike, likedAccounts, dislikedAccounts, entity, i
             })
         }
     };
+    // const likeHandler = () => {
+    //     interactLoader.current(postHeader.id, 'rate', {
+    //         like: !isLiked ? like + 1 : like - 1,
+    //         dislike: isDisliked ? dislike - 1 : dislike,
+    //         likedAccounts: !isLiked ? [...likedAccounts, user.accountId] : likedAccounts.filter(acc => acc !== user.accountId),
+    //         dislikedAccounts: isDisliked ? dislikedAccounts.filter(acc => acc !== user.accountId) : dislikedAccounts,
+    //         isLiked: !isLiked,
+    //         isDisliked: false,
+    //     });
+    // }
+    // const dislikeHandler = () => {
+    //     interactLoader.current(postHeader.id, 'rate', {
+    //         like: isLiked ? like - 1 : like,
+    //         dislike: !isDisliked ? dislike + 1 : dislike - 1,
+    //         likedAccounts: isLiked ? likedAccounts.filter(acc => acc !== user.accountId) : likedAccounts,
+    //         dislikedAccounts: !isDisliked ? [...dislikedAccounts, user.accountId] : dislikedAccounts.filter(acc => acc !== user.accountId),
+    //         isLiked: false,
+    //         isDisliked: !isDisliked,
+    //     });
+    // }
     useEffect(() => {
         interactLoaderRef.current = interactLoader;
     }, [interactLoader]);
-    // useEffect(() => {
-    //     isFirstRender.current = false;
-    // }, []);
-    // useEffect(() => {
-    //     if (!isFirstRender.current) {
-    //         interactLoaderRef.current(interact);
-    //     }
-    // }, [interact]);
     return (
         <Text.Line className="interacts">
             <Text.MiddleLine className="like">

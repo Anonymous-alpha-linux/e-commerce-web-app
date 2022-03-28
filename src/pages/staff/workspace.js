@@ -112,5 +112,5 @@ console.log(post);
         </List>
       </LazyLoading>
     </ContainerComponent>
-  );
+  )
 }

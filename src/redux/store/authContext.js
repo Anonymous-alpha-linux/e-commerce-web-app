@@ -22,29 +22,29 @@ export default function AuthenticationContext({ children }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
+  const staffAPI = process.env.REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
 
   const [toastList, pushToast, pullToast] = useMessage()
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
   useEffect(() => {
-    onLoadUser(() => {
-      getProfile();
-    });
+    onLoadUser();
     return () => {
       cancelTokenSource.cancel();
     };
   }, []);
-  useEffect(() => {
-    console.log(toastList);
-  }, [toastList]);
+
   const onLoadUser = (cb) => {
+    setUser({
+      type: actions.SET_LOADING
+    })
     return axios
       .get(authAPI, {
         cancelToken: cancelTokenSource.token,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+        }
       })
       .then((response) => {
         if (response.status > 199 && response.status <= 299) {
@@ -58,7 +58,9 @@ export default function AuthenticationContext({ children }) {
           pushToast({
             message: 'Get User successfully',
             type: toastTypes.SUCCESS
-          })
+          });
+          getProfile(response.data.accountId);
+          cb(response.data.accountId);
         }
         else {
           throw new Error("Get data Failed!");
@@ -135,7 +137,7 @@ export default function AuthenticationContext({ children }) {
         });
       })
   }
-  function getProfile() {
+  function getProfile(accountId) {
     return axios
       .get(authAPI, {
         cancelToken: cancelTokenSource.token,
@@ -144,11 +146,11 @@ export default function AuthenticationContext({ children }) {
         },
         params: {
           view: "profile",
-          accountid: user.accountId,
+          accountid: accountId,
         },
       })
       .then((res) => {
-        return setUser({
+        setUser({
           type: actions.GET_PROFILE,
           payload: res.data.response,
         });
@@ -190,7 +192,30 @@ export default function AuthenticationContext({ children }) {
         })
       });
   }
-
+  function editCurrentWorkspace(workspaceId) {
+    return axios.put(staffAPI, {
+      workspaceid: workspaceId
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "accountworkspace"
+      }
+    }).then(res => {
+      onLoadUser();
+      pushToast({
+        message: "Update Workspace successfully",
+        type: toastTypes.SUCCESS
+      })
+    }).catch(err => {
+      pushToast({
+        message: err.message,
+        type: toastTypes.ERROR,
+        timeout: 10000,
+      });
+    })
+  }
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (<>
@@ -207,6 +232,7 @@ export default function AuthenticationContext({ children }) {
         login,
         logout,
         editProfile,
+        editCurrentWorkspace,
       }}
     >
       {children}

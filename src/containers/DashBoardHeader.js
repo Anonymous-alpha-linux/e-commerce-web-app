@@ -23,19 +23,8 @@ function DashBoardHeader({ children }) {
 
   return (
     <ContainerComponent className="manager_root">
-      <ContainerComponent
-        className="manager__header"
-        style={{
-          padding: "10px 25px",
-          position: "sticky",
-          top: 0,
-          left: 0,
-          zIndex: 10,
-        }}
-      >
-        <ContainerComponent.Flex
-          style={{ justifyContent: "space-between", alignItems: "center" }}
-        >
+      <ContainerComponent className="manager__header" style={{ padding: "10px 25px", position: "sticky", top: 0, left: 0, zIndex: 10, }}>
+        <ContainerComponent.Flex style={{ justifyContent: "space-between", alignItems: "center" }}>
           <ContainerComponent.Item>
             <Icon
               onClick={() => toggleSidebar()}

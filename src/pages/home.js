@@ -8,13 +8,14 @@ import {
   PostContext,
   WorkspaceContext,
 } from "../redux";
+import Loading from "./loading";
 
 export default function Home() {
-  const { user, toastList, pullToast } = useAuthorizationContext();
+  const { user, loading: authLoading, toastList, pullToast } = useAuthorizationContext();
   const location = useLocation();
-
+  if (authLoading) return <Loading></Loading>
   if (!user.isLoggedIn) {
-    return <Navigate to="/login" state={{ from: location }} replace></Navigate>;
+    return <Navigate to="/login" state={{ from: location }} replace></Navigate>
   }
   return (
     <WorkspaceContext>
@@ -29,11 +30,11 @@ export default function Home() {
           gap: '10px'
         }}>
           {toastList.map((toast, index) => {
-            return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={3000} pullItem={pullToast} />
+            return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={toast.timeout || 3000} pullItem={pullToast} />
           })}
         </ContainerComponent.Flex>
         <Outlet></Outlet>
       </PostContext>
     </WorkspaceContext>
-  );
+  )
 }
