@@ -163,6 +163,33 @@ export default React.memo(function WorkspaceContext({ children }) {
   //     payload: res.data.response
   //   }))
   // }
+  function assignCoordinatorToWorkspace(workspaceId, accountId) {
+    return axios.put(workspaceAPI, {
+      accountid: accountId
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "assign_workspace_manager",
+        workspaceid: workspaceId,
+      }
+    }).then(res => {
+      if (res.status > 199 && res.status <= 299) {
+        setWorkspace({
+          type: actions.ASSIGN_HOST_TO_WORKSPACE,
+          payload: res.data.response
+        });
+      }
+      else throw new Error(res.data.error);
+    }).catch(err => pushToast({
+      message: err.message,
+      type: toastTypes.ERROR
+    }))
+  }
+  function assignMemberToWorkspace() { }
+  function assignRoleToAccount() { }
+
   const contextValue = {
     ...workspaceState,
     workspace: workspaceState.workspace,
@@ -170,6 +197,9 @@ export default React.memo(function WorkspaceContext({ children }) {
     loading: workspaceState.workspaceLoading,
     createWorkspace,
     getWorkspaceMembers,
+    assignCoordinatorToWorkspace,
+    assignMemberToWorkspace,
+    assignRoleToAccount,
   };
   if (workspaceState.workspaceLoading)
     return <Loading className="workspace__loading"></Loading>;

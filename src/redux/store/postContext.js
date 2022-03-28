@@ -66,7 +66,6 @@ export default React.memo(function PostContext({ children }) {
     categoryReducer,
     initialCategories
   );
-
   const [showUpdate, setShowUpdate] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -94,29 +93,6 @@ export default React.memo(function PostContext({ children }) {
   }, [socket]);
 
   // 1. Post for workspace
-  function getAllPost() {
-    return axios.get(postAPI, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: "allpost",
-      },
-    }).then(res => {
-      pushToast({
-        message: 'Get all post successfully',
-        type: toastTypes.SUCCESS
-      });
-      setPost({
-
-      });
-    }).catch(error => {
-      pushToast({
-        message: 'Get all post successfully',
-        type: toastTypes.SUCCESS
-      });
-    });
-  }
   function getPosts() {
     // setPost({
     //   type: actions.SET_LOADING,
@@ -407,7 +383,6 @@ export default React.memo(function PostContext({ children }) {
       updateSinglePost(postId);
     });
   }
-
   function likeComment(isLiked, postId, userId, commentId) {
     setPost({
       type: actions.LIKE_COMMENT,

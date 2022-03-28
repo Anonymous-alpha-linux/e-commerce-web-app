@@ -51,3 +51,6 @@ Text.Link = ({ children, ...props }) => <a className='text__link' {...props}>{ch
 Text.AbsoluteMiddle = ({ children, ...props }) => {
   return <span className='text__absoluteMiddle' {...props}>{children}</span>
 }
+Text.NoWrapText = function ({ children, ...props }) {
+  return <span className="text__nowrap" {...props}>{children}</span>
+}

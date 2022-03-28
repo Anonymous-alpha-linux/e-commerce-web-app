@@ -1,30 +1,25 @@
 import React, { useEffect } from "react";
-import {
-    ContainerComponent,
-    Form,
-    Icon,
-    Message,
-    Text,
-
-} from "../../components";
 import { FaSearch, FaFilter } from "react-icons/fa";
 import { TiUserDelete } from "react-icons/ti";
 import { Link, useParams } from "react-router-dom";
+
 import { useAdminContext, useWorkspaceContext } from "../../redux";
+import { ContainerComponent, Form, Icon, Message, Text, } from "../../components";
 
 export default function MemberList() {
-    const { accounts } = useAdminContext();
+    const { accounts: { data } } = useAdminContext();
     const { workspaces, getWorkspaceMembers } = useWorkspaceContext();
     const { id } = useParams();
 
-    const [member, setMember] = React.useState(accounts);
+    const [member, setMember] = React.useState(data);
     const [searchOutput, setOutput] = React.useState([]);
     const [input, setInput] = React.useState('');
 
     useEffect(() => {
         getWorkspaceMembers(id);
     }, []);
-    function searchMember(input) { setOutput(accounts.filter(person => person.username.toLowerCase().includes(input.toLowerCase()))) }
+
+    function searchMember(input) { setOutput(data.filter(person => person.username.toLowerCase().includes(input.toLowerCase()))) }
     function inputHandler(e) {
         setInput(e.target.value);
         searchMember(e.target.value);

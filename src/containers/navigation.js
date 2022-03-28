@@ -10,7 +10,7 @@ import { GrStackOverflow } from 'react-icons/gr';
 import logo from '../assets/Logoidea2.jpg';
 
 import { ButtonComponent, ContainerComponent, Dropdown, Icon, Text } from "../components";
-import { navigator as navigators, navData } from '../fixtures';
+import { navigator as navigators, navData, roles } from '../fixtures';
 import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
 import DropdownButton from "./dropDownButton";
 import { useModal } from "../hooks";
@@ -298,7 +298,8 @@ const WorkspaceList = () => {
         background: `${disabled ? '#f2f3f4' : "rgb(22, 61, 60)"}`,
         color: `${disabled ? '#000' : "#fff"}`,
       })
-      return <ContainerComponent.Item className="workspaceList__item" key={index + 1} onClick={() => {
+      return <ContainerComponent.Item className="workspaceList__item" key={index + 1} onClick={(e) => {
+        e.stopPropagation();
         if (!disabled) {
           selectHandler(item._id);
         }
@@ -309,6 +310,7 @@ const WorkspaceList = () => {
               <GrStackOverflow></GrStackOverflow>
             </Icon>
           </Text.MiddleLine>
+
           <Text.MiddleLine>
             <ContainerComponent.Pane>
               <Text.Title style={{ textAlign: "center" }}>
@@ -316,6 +318,17 @@ const WorkspaceList = () => {
               </Text.Title>
               <TimespanChild expireTime={item.expireTime}></TimespanChild>
             </ContainerComponent.Pane>
+          </Text.MiddleLine>
+
+          <Text.MiddleLine>
+            {user.role !== roles.STAFF && <DropdownButton position="left" component={<ContainerComponent.Pane>
+              <Icon>
+                <AiFillCaretDown></AiFillCaretDown>
+              </Icon>
+            </ContainerComponent.Pane>}>
+              <ToolPanel></ToolPanel>
+            </DropdownButton>
+            }
           </Text.MiddleLine>
         </ContainerComponent.Flex>
       </ContainerComponent.Item>
@@ -390,4 +403,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       </ContainerComponent.Inner>
     </ContainerComponent.Section>
   );
+}
+function ToolPanel() {
+  return <ButtonComponent>Add new staff</ButtonComponent>
 }

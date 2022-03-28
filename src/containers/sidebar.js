@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
-import {
-  AnimateComponent,
-  ButtonComponent,
-  ContainerComponent,
-  Icon,
-  Preview,
-  Text,
-} from "../components";
 import { MdOutlineWork } from "react-icons/md";
 import { AiFillCaretDown, AiFillRightCircle } from "react-icons/ai";
 import { TiPlus } from "react-icons/ti";
 import { GrStackOverflow } from "react-icons/gr";
 import { GoSignOut } from "react-icons/go";
 
-import { Link, Navigate } from "react-router-dom";
-import { sidebarData } from "../fixtures";
+
+import { ButtonComponent, ContainerComponent, Icon, Preview, Text, } from "../components";
+import { UserAll } from '../pages';
+import { sidebarData, media } from "../fixtures";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import { AddFromWorkspace } from ".";
-import { useModal } from "../hooks";
+import { useModal, useMedia } from "../hooks";
 import Modal from "./modal";
+import DropdownButton from "./dropDownButton";
+
 
 export default function Sidebar({ closeSidebar, forwardRef }) {
   // const [switchToggle, setSwitchToggle] = useState(false);
@@ -59,8 +56,8 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
               <Text> {user.account}</Text>
             </Text.CenterLine>
             <ContainerComponent.Flex>
-              {sidebarData.map((item, index) => (
-                <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{
+              {sidebarData.map((item, index) => {
+                return item.authorized.indexOf(user.role) > -1 && <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{
                   width: "100%",
                   padding: "20px",
                   position: "relative",
@@ -77,8 +74,8 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                       </Text.MiddleLine>
                     </Text.Line>
                   </Link>
-                </ContainerComponent.Item>
-              ))}
+                </ContainerComponent.Item> || <ContainerComponent.Item key={index + 1}></ContainerComponent.Item>
+              })}
               <ContainerComponent.Item
                 style={{ width: "100%", padding: "20px", position: "relative" }}
               >
@@ -182,18 +179,13 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
 }
 
 const EditToggle = ({ item, clickLoader }) => {
-  const [switchToggleChild, setSwitchToggleChild] = useState(false);
-  const [editToggle, setEditToggle] = useState(false);
-
+  const [modal, toggleModal] = useModal();
+  const device = useMedia(480, 1080);
   return (
     <>
-      <ContainerComponent.Item
-        style={{ width: "100%", padding: "10px", minWidth: "230px" }}
-      >
-        <ContainerComponent.Flex
-          style={{ alignItems: "center", justifyContent: "space-between" }}
-        >
-          <Text.MiddleLine>
+      <ContainerComponent.Item style={{ width: "100%", padding: "10px", minWidth: "230px" }}>
+        <ContainerComponent.Flex style={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Text.MiddleLine >
             <Icon style={{ fontSize: "25px" }}>
               <GrStackOverflow></GrStackOverflow>
             </Icon>
@@ -207,66 +199,51 @@ const EditToggle = ({ item, clickLoader }) => {
             </ContainerComponent.Pane>
           </Text.MiddleLine>
           <Text.MiddleLine>
-            <Icon style={{ fontSize: "20px" }}>
-              <AiFillCaretDown
-                key={item.id}
-                onClick={() => setEditToggle(!editToggle)}
-              ></AiFillCaretDown>
-            </Icon>
+            <DropdownButton position="right" component={<Icon style={{ fontSize: "20px" }}>
+              <AiFillCaretDown></AiFillCaretDown>
+            </Icon>}>
+
+              {device === media.MOBILE && <ButtonComponent>
+                <Link to={`/management/workspace/${item._id}`} style={{ color: "#fff", }} onClick={clickLoader}>
+                  <Text.Line>
+                    <Text.NoWrapText>
+                      Assign QA Coordinator
+                    </Text.NoWrapText>
+                  </Text.Line>
+                </Link>
+              </ButtonComponent> || <ButtonComponent onClick={toggleModal}>
+                  <Text.Line>
+                    <Text.NoWrapText>
+                      Assign QA Coordinator
+                    </Text.NoWrapText>
+                  </Text.Line>
+                </ButtonComponent>
+              }
+
+              <ButtonComponent>
+                <Link to={`/management/member/${item._id}`} style={{ color: "#fff" }} onClick={clickLoader}>
+                  <Text.Line>
+                    <Text.NoWrapText>
+                      Add Member
+                    </Text.NoWrapText>
+                  </Text.Line>
+                </Link>
+              </ButtonComponent>
+              <ButtonComponent>
+                <Text.Line>
+                  <Text.NoWrapText>
+                    Edit Time/Title
+                  </Text.NoWrapText>
+                </Text.Line>
+              </ButtonComponent>
+            </DropdownButton>
           </Text.MiddleLine>
         </ContainerComponent.Flex>
-        <Text.Line style={{ width: "100%" }}>
-          {editToggle && (
-            <ContainerComponent.Toggle
-              className={switchToggleChild ? "opera" : "empty"}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                position: "absolute",
-                border: "1px solid",
-                borderRadius: "10px",
-                right: 0,
-                padding: "20px",
-                zIndex: 3,
-                background: "#fff",
-              }}
-            >
-              <ContainerComponent.Flex
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  gap: "15px",
-                }}
-              >
-                <ButtonComponent>
-                  <Link
-                    to={`/management/staff/${item._id}`}
-                    style={{ color: "#fff" }}
-                    onClick={clickLoader}
-                  >
-                    <Text.Line>Assign QA Coordinator</Text.Line>
-                  </Link>
-                </ButtonComponent>
-                <ButtonComponent>
-                  <Link
-                    to={`/management/member/${item._id}`}
-                    style={{ color: "#fff" }}
-                    onClick={clickLoader}
-                  >
-                    <Text.Line>Add Member</Text.Line>
-                  </Link>
-                </ButtonComponent>
-                <ButtonComponent
-                  style={{ width: "177px", textAlign: "center" }}
-                >
-                  Edit Time/Title
-                </ButtonComponent>
-              </ContainerComponent.Flex>
-            </ContainerComponent.Toggle>
-          )}
-        </Text.Line>
       </ContainerComponent.Item>
+
+      <Modal style={{ background: '#fff', maxWidth: '420px', borderRadius: '10px', overflow: 'hidden' }} isShowing={modal} toggle={toggleModal}>
+        <UserAll workspaceId={item._id}></UserAll>
+      </Modal>
     </>
   );
 };
