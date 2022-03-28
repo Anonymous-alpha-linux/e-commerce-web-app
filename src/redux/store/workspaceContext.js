@@ -48,7 +48,42 @@ export default React.memo(function WorkspaceContext({ children }) {
           setWorkspace({
             type: actions.GET_WORKSPACE_LIST,
             payload: res.data.response,
-            others: { totalWorkspace: res.data.totalWorkspace }
+            others: { totalWorkspace: res.data.totalWorkspace, loadMore: res.data.response.length === workspaceState.count }
+          });
+          pushToast({
+            message: 'get workspace list successfully!',
+            type: toastTypes.SUCCESS
+          })
+          onLoadWorkspace();
+        }
+        else throw new Error(res.data);
+      })
+      .catch((error) => {
+        setWorkspace({
+          type: actions.SET_LOADING,
+          loading: false,
+        });
+        setError(error.message);
+      });
+  }
+  function loadMoreWorkspaceList() {
+    return axios
+      .get(workspaceAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "workspace",
+          page: workspaceState.page + 1,
+          count: workspaceState.count,
+        },
+      })
+      .then((res) => {
+        if (res.status > 199 && res.status <= 299) {
+          setWorkspace({
+            type: actions.LOAD_MORE_WORKSPACE,
+            payload: res.data.response,
+            others: { totalWorkspace: res.data.totalWorkspace, page: workspaceState.page + 1, loadMore: res.data.response.length === workspaceState.count }
           });
           pushToast({
             message: 'get workspace list successfully!',
@@ -107,7 +142,7 @@ export default React.memo(function WorkspaceContext({ children }) {
       })
       .catch((error) => setError(error.message));
   }
-  function getWorkspaceMembers(workspaceId) {
+  function getWorkspaceMembers(workspaceId, cb) {
     return axios
       .get(workspaceAPI, {
         headers: {
@@ -118,12 +153,21 @@ export default React.memo(function WorkspaceContext({ children }) {
           workspaceid: workspaceId,
         },
       })
-      .then((res) =>
-        setWorkspace({
-          type: actions.GET_WORKSPACE,
-        })
-      )
-      .catch((error) => setError(error.message));
+      .then((res) => {
+        // setWorkspace({
+        //   type: actions.GET_WORKSPACE_MEMBERS,
+        //   workspaceId: workspaceId,
+        //   payload: res.data.response
+        // });
+        pushToast({
+          message: 'get workspace member list successfully',
+          type: toastTypes.SUCCESS
+        });
+        cb(res.data.response);
+      })
+      .catch((error) => {
+        pushToast({ error: error.message, type: toastTypes.ERROR });
+      });
   }
   // function selectWorkspace(workspaceId, cb) {
   //   return axios.put(workspaceAPI, {
@@ -150,6 +194,9 @@ export default React.memo(function WorkspaceContext({ children }) {
       payload: workspace,
     });
   }
+  function editWorkspace(workspaceId){
+    
+  }
   // function getWorkspaceForManager() {
   //   return axios.get(mainAPI.LOCALHOST_MANAGER, {
   //     headers: {
@@ -163,7 +210,7 @@ export default React.memo(function WorkspaceContext({ children }) {
   //     payload: res.data.response
   //   }))
   // }
-  function assignCoordinatorToWorkspace(workspaceId, accountId) {
+  function assignCoordinatorToWorkspace(workspaceId, accountId, cb) {
     return axios.put(workspaceAPI, {
       accountid: accountId
     }, {
@@ -178,16 +225,92 @@ export default React.memo(function WorkspaceContext({ children }) {
       if (res.status > 199 && res.status <= 299) {
         setWorkspace({
           type: actions.ASSIGN_HOST_TO_WORKSPACE,
-          payload: res.data.response
+          payload: res.data.response,
+          workspaceId
         });
+        pushToast({
+          message: 'Assign successfully',
+          type: toastTypes.SUCCESS
+        });
+        cb();
       }
       else throw new Error(res.data.error);
-    }).catch(err => pushToast({
-      message: err.message,
-      type: toastTypes.ERROR
-    }))
+    }).catch(err => {
+      pushToast({
+        message: err.message,
+        type: toastTypes.ERROR
+      });
+      cb();
+    })
   }
-  function assignMemberToWorkspace() { }
+  function assignMemberToWorkspace(workspaceId, accountId, cb) {
+    return axios.put(workspaceAPI, {
+      accountid: accountId
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "assign_workspace_member",
+        workspaceid: workspaceId,
+      }
+    }).then(res => {
+      if (res.status > 199 && res.status <= 299) {
+        setWorkspace({
+          type: actions.ASSIGN_MEMBER_TO_WORKSPACE,
+          payload: res.data.response,
+          workspaceId,
+          accountId
+        });
+        pushToast({
+          message: 'Assign member successfully',
+          type: toastTypes.SUCCESS
+        });
+        cb();
+      }
+      else throw new Error(res.data.error);
+    }).catch(err => {
+      pushToast({
+        message: err.message,
+        type: toastTypes.ERROR
+      });
+      cb();
+    });
+  }
+  function unassignMemberToWorkspace(workspaceId, accountId, cb) {
+    return axios.put(workspaceAPI, {
+      accountid: accountId
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "unassign_workspace_member",
+        workspaceid: workspaceId,
+      }
+    }).then(res => {
+      if (res.status > 199 && res.status <= 299) {
+        setWorkspace({
+          type: actions.UNASSIGN_MEMBER_FROM_WORKSPACE,
+          payload: res.data.response,
+          workspaceId,
+          accountId
+        });
+        pushToast({
+          message: 'Unassigned member successfully',
+          type: toastTypes.SUCCESS
+        });
+        cb();
+      }
+      else throw new Error(res.data.error);
+    }).catch(err => {
+      pushToast({
+        message: err.message,
+        type: toastTypes.ERROR
+      });
+      cb();
+    });
+  }
   function assignRoleToAccount() { }
 
   const contextValue = {
@@ -200,6 +323,8 @@ export default React.memo(function WorkspaceContext({ children }) {
     assignCoordinatorToWorkspace,
     assignMemberToWorkspace,
     assignRoleToAccount,
+    unassignMemberToWorkspace,
+    loadMoreWorkspaceList
   };
   if (workspaceState.workspaceLoading)
     return <Loading className="workspace__loading"></Loading>;

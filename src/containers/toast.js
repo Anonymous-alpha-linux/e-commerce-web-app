@@ -13,17 +13,19 @@ export default function ToastMessage({
   pullItem
 }) {
   const toastRef = useRef();
+  const [isExpired, setExpired] = useState(false);
   useEffect(() => {
     toastRef.current.style.width = "0%";
     const timeoutVal = setTimeout(() => {
-      pullItem();
+      setExpired(true);
+      pullItem(message);
     }, timeout + 100);
     return () => {
       clearTimeout(timeoutVal);
     };
   }, []);
 
-  return <div className={`${styles.ToastMessage} ${styles[type]}`}>
+  return !isExpired ? <div className={`${styles.ToastMessage} ${styles[type]}`}>
     <h5 style={{
       color: `${type === toastTypes.ERROR ? "red" : "green"}`,
       textTransform: "uppercase",
@@ -40,5 +42,5 @@ export default function ToastMessage({
         style={{ "--timeout": `${timeout / 1000}s` }}
       ></div>
     </div>
-  </div>;
+  </div> : null
 }

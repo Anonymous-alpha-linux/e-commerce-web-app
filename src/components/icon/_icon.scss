@@ -37,4 +37,20 @@
       background: red;
       color: white;
    }
+   &__spinner {
+      position: relative;
+      animation: spinner 300ms infinite;
+      display: inline-block;
+      min-width: 20px;
+      min-height: 20px;
+   }
+}
+
+@keyframes spinner {
+   from {
+      transform: rotate(0);
+   }
+   to {
+      transform: rotate(360deg);
+   }
 }

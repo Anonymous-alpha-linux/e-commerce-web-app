@@ -87,10 +87,12 @@ function App() {
                   <Route path="/workspace" element={<Workspace></Workspace>} />
                   <Route path="/management/attachment" element={<AttachmentCrub></AttachmentCrub>} />
                   <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
-                  <Route path="/management/member" element={<AccountCrud></AccountCrud>}>
+                  <Route path="/management/workspace_member">
                     <Route path=":id" element={<ListMember></ListMember>} />
                   </Route>
-                  <Route path="/management/workspace/:id" element={<UserAll></UserAll>} />
+                  <Route path="/management/workspace">
+                    <Route path=":id" element={<UserAll></UserAll>} />
+                  </Route>
                   <Route path="profile" element={<Profile></Profile>}>
                     <Route path="personal" element={<Personal></Personal>} />
                     <Route

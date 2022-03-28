@@ -63,7 +63,7 @@ export default function AuthenticationContext({ children }) {
           cb(response.data.accountId);
         }
         else {
-          throw new Error("Get data Failed!");
+          throw new Error("Get user data Failed!");
         }
       }).catch(error => {
         setUser({
@@ -181,10 +181,11 @@ export default function AuthenticationContext({ children }) {
       )
       .then((res) => {
         pushToast({
-          message:"Edit Profile Successful",
-          type : toastTypes.SUCCESS
+          message: "Edit Profile Successful",
+          type: toastTypes.SUCCESS
         })
-        getProfile()})
+        getProfile()
+      })
       .catch((error) => {
         pushToast({
           message: "Edit Profile Failed",

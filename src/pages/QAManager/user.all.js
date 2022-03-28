@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom';
 
-import { MdGroup } from "react-icons/md";
+import { MdGroup, MdDone } from "react-icons/md";
 import { AiOutlineLeft } from "react-icons/ai";
 import { FaSearch } from 'react-icons/fa';
+import { ImSpinner6 } from 'react-icons/im';
 
-import { ContainerComponent, Form, Icon, Text, Message } from '../../components'
-import { useAdminContext, useWorkspaceContext } from '../../redux';
-import { roles } from '../../fixtures';
+import { ContainerComponent, Form, Icon, Text, Message, ButtonComponent } from '../../components'
+import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from '../../redux';
+import { roles, toastTypes } from '../../fixtures';
 
 function UserAll({ filter = roles.STAFF, workspaceId }) {
     const { accounts: { data } } = useAdminContext();
-    const { workspaces } = useWorkspaceContext();
-
     const { id } = useParams();
     let workspaceid = id || workspaceId;
 
@@ -89,18 +88,30 @@ function UserAll({ filter = roles.STAFF, workspaceId }) {
             </ContainerComponent.Item>
 
             <ContainerComponent.Pane>
-                <MemberListData dataList={state.outputs} workspaceId={workspaceId}></MemberListData>
+                <MemberListData dataList={state.outputs} workspaceId={workspaceid}></MemberListData>
             </ContainerComponent.Pane>
         </ContainerComponent.Inner>
     </ContainerComponent>
 }
-
 function MemberListData({ dataList, workspaceId }) {
+    const { pushToast } = useAuthorizationContext();
+    const { workspaces } = useWorkspaceContext();
 
-    const { assignCoordinatorToWorkspace } = useWorkspaceContext();
-    function assignHandler(accountId) {
-        assignCoordinatorToWorkspace(workspaceId, accountId);
-    }
+    const [blockAssign, setBlockAssign] = useState(null);
+
+    useEffect(() => {
+        Promise.resolve(workspaces.find(w => w._id === workspaceId))
+            .then(workspace => {
+                if (!workspace) throw new Error('Not find the match of workspace');
+                setBlockAssign(workspace.manager);
+            }).catch(error => {
+                pushToast({
+                    message: error.message,
+                    type: toastTypes.ERROR
+                });
+            });
+    }, []);
+
     return !!dataList.length && dataList.map((item) => {
         return (
             <ContainerComponent.Item key={item._id} style={{ padding: 0 }}>
@@ -111,31 +122,54 @@ function MemberListData({ dataList, workspaceId }) {
                         background: 'white',
                         width: '100%'
                     }}>
-                    <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
-                        <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
-                            <ContainerComponent.Item
-                                style={{
-                                    padding: "0",
-                                    height: "fit-content",
-                                }}>
-                                <Icon.CircleIcon>
-                                    <Icon.Image src={item.profileImage}></Icon.Image>
-                                </Icon.CircleIcon>
-                            </ContainerComponent.Item>
-                            <ContainerComponent.Item>
-                                <Text.Subtitle style={{ textAlign: "start", margin: 0, padding: "0" }}>{item.username}</Text.Subtitle>
-                            </ContainerComponent.Item>
-                        </ContainerComponent.Pane>
-                        <ContainerComponent.Flex style={{ justifyContent: "center", alignItems: "center" }}>
-                            <Form.Button onClick={() => assignHandler(item._id)} style={{ background: 'rgb(0 255 95)', color: '#fff', padding: '5px 10px ', borderRadius: '10px' }}>Assign</Form.Button>
-                        </ContainerComponent.Flex>
-                    </ContainerComponent.Inner>
+                    <MemberItem data={item} workspaceId={workspaceId} blockAssignState={[blockAssign, setBlockAssign]}></MemberItem>
                 </ContainerComponent.Inner>
             </ContainerComponent.Item>
         )
     }) || <ContainerComponent.Item>
             <Text.CenterLine>There're no match records</Text.CenterLine>
         </ContainerComponent.Item>
+}
+function MemberItem({ data, workspaceId, blockAssignState }) {
+    const { assignCoordinatorToWorkspace } = useWorkspaceContext();
+    const [loading, setLoading] = useState(false);
+    const [blockAssign, setBlockAssign] = blockAssignState;
+
+
+    function assignHandler(accountId) {
+        setLoading(true);
+        assignCoordinatorToWorkspace(workspaceId, accountId, () => {
+            setLoading(false);
+            setBlockAssign(accountId);
+        });
+    }
+    return <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
+        <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
+            <ContainerComponent.Item
+                style={{
+                    padding: "0",
+                    height: "fit-content",
+                }}>
+                <Icon.CircleIcon>
+                    <Icon.Image src={data.profileImage}></Icon.Image>
+                </Icon.CircleIcon>
+            </ContainerComponent.Item>
+            <ContainerComponent.Item>
+                <Text.Subtitle style={{ textAlign: "start", margin: 0, padding: "0" }}>{data.username}</Text.Subtitle>
+            </ContainerComponent.Item>
+        </ContainerComponent.Pane>
+        <ContainerComponent.Flex style={{ justifyContent: "center", alignItems: "center" }}>
+            {
+                blockAssign === data._id && <Icon.CircleIcon style={{ background: '' }}><MdDone></MdDone></Icon.CircleIcon> ||
+                <Form.Button onClick={() => assignHandler(data._id)} style={{ background: 'rgb(0 255 95)', color: '#fff', padding: '5px 10px ', borderRadius: '10px', width: '100px' }}>
+                    {loading ? <Icon.Spinner style={{ width: '120px' }}>
+                        <ImSpinner6></ImSpinner6>
+                    </Icon.Spinner>
+                        : 'Assign'}
+                </Form.Button>
+            }
+        </ContainerComponent.Flex>
+    </ContainerComponent.Inner>
 }
 
 export default UserAll;

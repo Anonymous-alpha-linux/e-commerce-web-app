@@ -1,42 +1,67 @@
-import React, { useEffect } from "react";
-import { FaSearch, FaFilter } from "react-icons/fa";
-import { TiUserDelete } from "react-icons/ti";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { useAdminContext, useWorkspaceContext } from "../../redux";
+import { MdDone, MdRemove } from 'react-icons/md';
+import { FaSearch, FaFilter } from "react-icons/fa";
+import { ImSpinner6 } from 'react-icons/im';
+import { TiUserDelete } from "react-icons/ti";
+
+import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from "../../redux";
 import { ContainerComponent, Form, Icon, Message, Text, } from "../../components";
+import { toastTypes, roles } from "../../fixtures";
 
-export default function MemberList() {
-    const { accounts: { data } } = useAdminContext();
+export default function MemberList({ workspaceId }) {
     const { workspaces, getWorkspaceMembers } = useWorkspaceContext();
+    const { accounts: { data } } = useAdminContext();
     const { id } = useParams();
-
-    const [member, setMember] = React.useState(data);
-    const [searchOutput, setOutput] = React.useState([]);
+    let workspaceid = id || workspaceId;
+    const [state, setState] = useState({
+        members: [],
+        outputs: []
+    });
     const [input, setInput] = React.useState('');
-
     useEffect(() => {
-        getWorkspaceMembers(id);
-    }, []);
-
-    function searchMember(input) { setOutput(data.filter(person => person.username.toLowerCase().includes(input.toLowerCase()))) }
+        getWorkspaceMembers(workspaceid, members => {
+            setState({
+                members: members,
+                outputs: data,
+            });
+        });
+    }, [data, workspaceid]);
     function inputHandler(e) {
         setInput(e.target.value);
         searchMember(e.target.value);
+    }
+    function searchMember(input) {
+        setState(oldState => ({
+            ...oldState,
+            outputs: data.filter(person => person.username.toLowerCase().includes(input.toLowerCase()))
+        }));
+    }
+    function addMember(accountId) {
+        setState(oldState => ({
+            ...oldState,
+            members: [...oldState.members, { _id: accountId }]
+        }));
+    }
+    function removeMember(accountId) {
+        setState(oldState => ({
+            ...oldState,
+            members: oldState.members.filter(member => member._id !== accountId)
+        }));
     }
 
     return (
         <ContainerComponent style={{ background: "#ffff", color: "black", width: "100%", maxWidth: '690px', margin: '0 auto' }}>
             <ContainerComponent.Pane className="list-member__header">
-                <ContainerComponent.Item
-                    style={{
-                        display: 'flex',
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
+                <ContainerComponent.Item style={{
+                    display: 'flex',
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
                 >
-                    <Text.Title style={{ margin: '10px' }}>ListMember</Text.Title>
-                    <Link to="/">
+                    <Text.Title style={{ margin: '10px', fontSize: '1rem' }}>List of Member - <Text style={{ fontSize: '1rem', textTransform: 'uppercase' }}>{workspaces.find(w => { return w._id === workspaceid })?.workTitle}</Text></Text.Title>
+                    {/* <Link to="/addMemebr">
                         <Text.Line style={{ display: "block", backgroundColor: "silver", padding: "5px", borderRadius: "10px", position: 'absolute', right: '0%', transform: 'translate(-10%,-50%)' }}>
                             <Text.MiddleLine>
                                 <Icon>
@@ -49,7 +74,7 @@ export default function MemberList() {
                                 </Text.Subtitle>
                             </Text.MiddleLine>
                         </Text.Line>
-                    </Link>
+                    </Link> */}
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
@@ -87,54 +112,107 @@ export default function MemberList() {
             </ContainerComponent.Pane>
 
             <ContainerComponent.Pane className="list-member__body">
-                {searchOutput.length && searchOutput.map((item) => {
-                    return (
-                        <ContainerComponent.Flex style={{ justifyContent: "space-between" }}>
-                            <ContainerComponent.Item>
-                                <Text.MiddleLine>
-                                    <Icon.CircleIcon >
-                                        <Icon.Image src={item.profileImage}></Icon.Image>
-                                    </Icon.CircleIcon>
-                                </Text.MiddleLine>
-                                <Text.MiddleLine>
-                                    <Text.Subtitle style={{ textAlign: "start", margin: 0, textIndent: '12px' }}>
-                                        {item.username}
-                                    </Text.Subtitle>
-                                </Text.MiddleLine>
-                            </ContainerComponent.Item>
-                            <ContainerComponent.Item style={{ padding: '10px' }}>
-                                <Icon onClick={(e) => setMember((prev) => prev.filter((i) => i._id !== item._id))}>
-                                    <TiUserDelete ></TiUserDelete>
-                                </Icon>
-                            </ContainerComponent.Item>
-                        </ContainerComponent.Flex>
-                    )
-                }) ||
-                    member.map((item) => {
-                        return (
-                            <ContainerComponent.Flex key={item._id} style={{ justifyContent: "space-between" }}>
-                                <ContainerComponent.Item>
-                                    <Text.MiddleLine>
-                                        <Icon.CircleIcon >
-                                            <Icon.Image src={item.profileImage}></Icon.Image>
-                                        </Icon.CircleIcon>
-                                    </Text.MiddleLine>
-                                    <Text.MiddleLine>
-                                        <Text.Subtitle style={{ textAlign: "start", margin: 0, textIndent: '12px' }}>
-                                            {item.username}
-                                        </Text.Subtitle>
-                                    </Text.MiddleLine>
-                                </ContainerComponent.Item>
-                                <ContainerComponent.Item style={{ padding: '10px' }}>
-                                    <Icon onClick={(e) => setMember((prev) => prev.filter((i) => i._id !== item._id))}>
-                                        <TiUserDelete ></TiUserDelete>
-                                    </Icon>
-                                </ContainerComponent.Item>
-                            </ContainerComponent.Flex>
-                        )
-                    })}
-                {!member.length && <Text.CenterLine>No member</Text.CenterLine>}
+                <MemberListData dataList={state.outputs} memberList={state.members} workspaceId={workspaceid} addMember={addMember} removeMember={removeMember}></MemberListData>
             </ContainerComponent.Pane>
         </ContainerComponent>
     )
+}
+function MemberListData({ dataList, memberList, workspaceId, addMember, removeMember }) {
+    return !!dataList.length
+        &&
+        dataList.map((item) => {
+            return (
+                <ContainerComponent.Item key={item._id} style={{ padding: 0 }}>
+                    <ContainerComponent.Inner
+                        style={{
+                            color: "black",
+                            padding: "0 10px 0",
+                            background: 'white',
+                            width: '100%'
+                        }}>
+                        <MemberItem data={item} workspaceId={workspaceId} memberList={memberList} addMember={addMember} removeMember={removeMember}></MemberItem>
+                    </ContainerComponent.Inner>
+                </ContainerComponent.Item>
+            )
+        })
+        ||
+        <ContainerComponent.Item>
+            <Text.CenterLine>There're no match records</Text.CenterLine>
+        </ContainerComponent.Item>
+}
+function MemberItem({ data, workspaceId, memberList, addMember, removeMember }) {
+    return memberList.map(member => member._id).includes(data._id) && <JoinedMember data={data} workspaceId={workspaceId} removeMember={removeMember}></JoinedMember> || <UnjoinedMember data={data} workspaceId={workspaceId} addMember={addMember}></UnjoinedMember>
+}
+function JoinedMember({ data, workspaceId, removeMember }) {
+    const { unassignMemberToWorkspace } = useWorkspaceContext();
+    const [loading, setLoading] = useState(false);
+
+    function unassignHandler(accountId) {
+        setLoading(true);
+        unassignMemberToWorkspace(workspaceId, accountId, () => {
+            setLoading(false);
+            removeMember(accountId);
+        });
+    }
+    return <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
+        <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
+            <ContainerComponent.Item
+                style={{
+                    padding: "0",
+                    height: "fit-content",
+                }}>
+                <Icon.CircleIcon>
+                    <Icon.Image src={data.profileImage}></Icon.Image>
+                </Icon.CircleIcon>
+            </ContainerComponent.Item>
+            <ContainerComponent.Item>
+                <Text.Subtitle style={{ textAlign: "start", margin: 0, padding: "0" }}>{data.username}</Text.Subtitle>
+            </ContainerComponent.Item>
+        </ContainerComponent.Pane>
+        <ContainerComponent.Flex style={{ justifyContent: "center", alignItems: "center" }}>
+            {loading ? <Icon.Spinner style={{ width: '120px' }}>
+                <ImSpinner6></ImSpinner6>
+            </Icon.Spinner>
+                : <Icon.CircleIcon style={{ background: '#000', color: "#fff" }} onClick={() => unassignHandler(data._id)}>
+                    <MdRemove></MdRemove>
+                </Icon.CircleIcon>}
+        </ContainerComponent.Flex>
+    </ContainerComponent.Inner>
+}
+function UnjoinedMember({ data, workspaceId, addMember }) {
+    const { assignMemberToWorkspace } = useWorkspaceContext();
+    const [loading, setLoading] = useState(false);
+
+    function assignHandler(accountId) {
+        setLoading(true);
+        assignMemberToWorkspace(workspaceId, accountId, () => {
+            setLoading(false);
+            addMember(accountId);
+        });
+    }
+
+    return <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
+        <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
+            <ContainerComponent.Item
+                style={{
+                    padding: "0",
+                    height: "fit-content",
+                }}>
+                <Icon.CircleIcon>
+                    <Icon.Image src={data.profileImage}></Icon.Image>
+                </Icon.CircleIcon>
+            </ContainerComponent.Item>
+            <ContainerComponent.Item>
+                <Text.Subtitle style={{ textAlign: "start", margin: 0, padding: "0" }}>{data.username}</Text.Subtitle>
+            </ContainerComponent.Item>
+        </ContainerComponent.Pane>
+        <ContainerComponent.Flex style={{ justifyContent: "center", alignItems: "center" }}>
+            <Form.Button onClick={() => assignHandler(data._id)} style={{ background: 'rgb(0 255 95)', color: '#fff', padding: '5px 10px ', borderRadius: '10px', width: '100px' }}>
+                {loading ? <Icon.Spinner style={{ width: '120px' }}>
+                    <ImSpinner6></ImSpinner6>
+                </Icon.Spinner>
+                    : 'Assign'}
+            </Form.Button>
+        </ContainerComponent.Flex>
+    </ContainerComponent.Inner>
 }

@@ -9,13 +9,14 @@ import { GoSignOut } from "react-icons/go";
 
 
 import { ButtonComponent, ContainerComponent, Icon, Preview, Text, } from "../components";
-import { UserAll } from '../pages';
+import { UserAll, ListMember } from '../pages';
 import { sidebarData, media } from "../fixtures";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import { AddFromWorkspace } from ".";
 import { useModal, useMedia } from "../hooks";
 import Modal from "./modal";
 import DropdownButton from "./dropDownButton";
+import TriggerLoading from "./triggerLoading";
 
 
 export default function Sidebar({ closeSidebar, forwardRef }) {
@@ -23,7 +24,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
   // const [modalWS, setModalWS] = useState(false);
   const [modalWS, setModalWS] = useModal(false);
   const [switchToggle, setSwitchToggle] = useModal(false);
-  const { workspaces } = useWorkspaceContext();
+  const { workspaces, loadMore, loadMoreWorkspaceList } = useWorkspaceContext();
   const { user } = useAuthorizationContext();
 
   return (
@@ -52,9 +53,11 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                 }}
               ></Preview.Images>
             </ContainerComponent.Flex>
+
             <Text.CenterLine>
               <Text> {user.account}</Text>
             </Text.CenterLine>
+            {/* sidebar links */}
             <ContainerComponent.Flex>
               {sidebarData.map((item, index) => {
                 return item.authorized.indexOf(user.role) > -1 && <ContainerComponent.Item className="sidebar__links" key={index + 1} style={{
@@ -63,7 +66,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                   position: "relative",
                 }}>
                   <Link to={item.link}>
-                    <Text.Line>
+                    <Text.Line onClick={closeSidebar}>
                       <Text.MiddleLine style={{ width: "20%" }}>
                         <Icon style={{ fontSize: "30px" }}>{item.icon}</Icon>
                       </Text.MiddleLine>
@@ -139,20 +142,19 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                   Add Workspace
                 </Text.Title>
               </ContainerComponent.Item>
-              <ContainerComponent.Item
-                style={{ maxHeight: "260px", overflowY: "scroll" }}
-              >
-                {workspaces &&
-                  workspaces.map((item, index) => (
+              {/* workspaceData */}
+              <ContainerComponent.Item style={{ maxHeight: "260px", overflowY: "scroll" }}>
+                <TriggerLoading loadMore={loadMore} loader={loadMoreWorkspaceList}>
+                  {workspaces && workspaces.map((item, index) => (
                     <EditToggle
                       item={item}
                       key={index + 1}
                       clickLoader={closeSidebar}
                     ></EditToggle>
                   ))}
+                </TriggerLoading>
               </ContainerComponent.Item>
             </ContainerComponent.Toggle>}
-
           </ContainerComponent.Inner>
 
           <ContainerComponent.Pane className="logout__button sidebar__links" style={{ width: "100%", padding: "20px", position: "relative", }}>
@@ -180,6 +182,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
 
 const EditToggle = ({ item, clickLoader }) => {
   const [modal, toggleModal] = useModal();
+  const [memberModal, toggleMemberModal] = useModal();
   const device = useMedia(480, 1080);
   return (
     <>
@@ -220,15 +223,22 @@ const EditToggle = ({ item, clickLoader }) => {
                 </ButtonComponent>
               }
 
-              <ButtonComponent>
-                <Link to={`/management/member/${item._id}`} style={{ color: "#fff" }} onClick={clickLoader}>
+              {device === media.MOBILE && <ButtonComponent>
+                <Link to={`/management/workspace_member/${item._id}`} style={{ color: "#fff" }} onClick={clickLoader}>
                   <Text.Line>
                     <Text.NoWrapText>
                       Add Member
                     </Text.NoWrapText>
                   </Text.Line>
                 </Link>
-              </ButtonComponent>
+              </ButtonComponent> || <ButtonComponent onClick={toggleMemberModal}>
+                  <Text.Line>
+                    <Text.NoWrapText>
+                      Add Member
+                    </Text.NoWrapText>
+                  </Text.Line>
+                </ButtonComponent>}
+
               <ButtonComponent>
                 <Text.Line>
                   <Text.NoWrapText>
@@ -243,6 +253,9 @@ const EditToggle = ({ item, clickLoader }) => {
 
       <Modal style={{ background: '#fff', maxWidth: '420px', borderRadius: '10px', overflow: 'hidden' }} isShowing={modal} toggle={toggleModal}>
         <UserAll workspaceId={item._id}></UserAll>
+      </Modal>
+      <Modal style={{ background: '#fff', maxWidth: '420px', borderRadius: '10px', overflow: 'hidden' }} isShowing={memberModal} toggle={toggleMemberModal}>
+        <ListMember workspaceId={item._id}></ListMember>
       </Modal>
     </>
   );

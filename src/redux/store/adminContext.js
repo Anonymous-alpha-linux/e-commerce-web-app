@@ -81,6 +81,7 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
+        console.log(res.data);
         setState((o) => ({
           ...o,
           accounts: {
@@ -89,13 +90,19 @@ export default function AdminContext({ children }) {
             data: res.data.response,
           }
         }));
+        if (typeof cb === 'function') {
+          cb(res.data.response);
+        }
       })
-      .catch((error) =>
+      .catch((error) => {
         pushToast({
           message: error.message,
           type: toastTypes.ERROR,
-        })
-      );
+        });
+        if (typeof cb === 'function') {
+          cb([]);
+        }
+      });
   }
   function getRoleList(cb) {
     return axios
@@ -196,11 +203,15 @@ export default function AdminContext({ children }) {
               },
             })
           });
+          cb(res.data.response);
         })
-        .catch((error) => pushToast({
-          message: error.message,
-          type: toastTypes.ERROR
-        }));
+        .catch((error) => {
+          cb([]);
+          pushToast({
+            message: error.message,
+            type: toastTypes.ERROR
+          });
+        });
     }
   }
   async function getDashBoardOverview() {
@@ -482,7 +493,7 @@ export default function AdminContext({ children }) {
       });
   }
   function blockAccount(accountId, cb) { }
-  function deleteSingleAttachment(attachmentId, currentPage, cb) {
+  function deleteSingleAttachment(attachmentId, cb) {
     setState(o => {
       return {
         ...o,
@@ -504,11 +515,15 @@ export default function AdminContext({ children }) {
       pushToast({
         message: 'Deleted Attachment Successfully!',
         type: toastTypes.SUCCESS
-      })
-    }).catch(error => pushToast({
-      message: error.message,
-      type: toastTypes.ERROR
-    }))
+      });
+      cb({ message: 'get successfully' });
+    }).catch(error => {
+      pushToast({
+        message: error.message,
+        type: toastTypes.ERROR
+      });
+      cb({ error: 'get failed!' });
+    });
   }
   async function downloadSingleAttachment(attachmentId) {
     return axios.get(`${host}/api/v1/download`, {
@@ -534,19 +549,20 @@ export default function AdminContext({ children }) {
     }).catch(err => pushToast({ message: err.message, type: toastTypes.ERROR }));
   }
 
+  const contextValues = {
+    ...state,
+    createNewAccount,
+    editUsername,
+    editEmail,
+    editPassword,
+    editRole,
+    getAttachmentByPage,
+    deleteSingleAttachment,
+    downloadSingleAttachment
+  }
   return (
     <AdminContextAPI.Provider
-      value={{
-        ...state,
-        createNewAccount,
-        editUsername,
-        editEmail,
-        editPassword,
-        editRole,
-        getAttachmentByPage,
-        deleteSingleAttachment,
-        downloadSingleAttachment
-      }}
+      value={contextValues}
     >
       {children}
     </AdminContextAPI.Provider>
