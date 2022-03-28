@@ -94,12 +94,16 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Get Role List Successful",
+          type: toastTypes.SUCCESS
+        });
         setState((o) => ({
           ...o,
           roles: res.data.response,
         }));
       })
-      .catch((error) => pushToast({ message: error.message, type: toastTypes.ERROR }));
+      .catch(() => pushToast({ message: "Get Role List Failed", type: toastTypes.ERROR }));
   }
   function createNewAccount(username, email, password, role, cb) {
     return axios
