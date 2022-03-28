@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { ContainerComponent, Form } from '../components'
+import { ContainerComponent, Form,Text,Icon } from '../components'
 import { useAuthorizationContext } from '../redux';
+import {FaUserAlt} from 'react-icons/fa'
 
 function Register() {
     const { user, register } = useAuthorizationContext();
@@ -37,56 +38,62 @@ function Register() {
     }
 
     return <>
-        <ContainerComponent.Hero>
-        </ContainerComponent.Hero>
-        <ContainerComponent.BackDrop></ContainerComponent.BackDrop>
-        <ContainerComponent.Hero>
-        </ContainerComponent.Hero>
-        <Form method={'POST'}
-            onSubmit={submitHandler}
-            style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%,-50%)',
-                zIndex: '1',
-            }}
-        >
-            <Form.Logo image=""></Form.Logo>
-            <Form.Container>
-                <Form.Title children='Register or Get out!'></Form.Title>
-                <Form.Input placeholder="Username"
-                    type='text'
-                    name="username"
-                    onChange={inputHandler}
-                    value={input.name}></Form.Input>
-                <Form.Input placeholder="Email"
-                    type='text'
-                    name="email"
-                    onChange={inputHandler}
-                    value={input.name}></Form.Input>
-                <Form.Input placeholder="Password"
-                    type='password'
-                    name="password"
-                    onChange={inputHandler}></Form.Input>
-                <Form.Input placeholder="Confirm Your Password"
-                    type='password'
-                    name="repeat-password"
-                    onChange={inputHandler}></Form.Input>
-                <Form.Button onClick={submitHandler}
-                    style={{
-                        background: 'black',
-                        color: '#fff'
-                    }}>register</Form.Button>
-                <Form.Button
-                    href={'/login'}
-                    style={{
-                        background: '#f2f2f2'
-                    }}
-                >back to login</Form.Button>
-                {error && <p>{error}</p>}
-            </Form.Container>
-        </Form>
+        <ContainerComponent>
+            <ContainerComponent.Flex className="signIn">
+                <ContainerComponent.Inner className="signIn__green">
+                    <Text.Title className={"signIn__text"}>WELCOME !</Text.Title>
+                </ContainerComponent.Inner>
+                <ContainerComponent.Inner className="signIn__content">
+                    <Form method={'POST'}
+                        onSubmit={submitHandler}
+                        className="signIn__form"
+                    >
+                        <Form.Container className="signIn__formContainer" style={{ display:"flex",flexDirection:"column", gap: "30px" }}>
+                            <ContainerComponent.Pane>
+                                <Icon className={"signIn__icon2"}>
+                                    <FaUserAlt style={{transform:"translate(-50%,-150%)"}}></FaUserAlt>
+                                </Icon>
+                                <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "20px" }}>Register Đê</Text.Title>
+                            </ContainerComponent.Pane>
+                            <Form.Input 
+                                className={"signIn__input"}
+                                placeholder="Username"
+                                type='text'
+                                name="username"
+                                onChange={inputHandler}
+                                value={input.name}></Form.Input>
+                            <Form.Input 
+                                className={"signIn__input"}
+                                placeholder="Email"
+                                type='text'
+                                name="email"
+                                onChange={inputHandler}
+                                value={input.name}></Form.Input>
+                            <Form.Input 
+                                className={"signIn__input"}
+                                placeholder="Password"
+                                type='password'
+                                name="password"
+                                onChange={inputHandler}></Form.Input>
+                            <Form.Input 
+                                className={"signIn__input"}
+                                placeholder="Confirm Your Password"
+                                type='password'
+                                name="repeat-password"
+                                onChange={inputHandler}></Form.Input>
+                            <ContainerComponent.Flex style={{flexDirection:"column",gap:"20px"}}>
+                                <Form.Button className="signIn__button" onClick={submitHandler}>Register</Form.Button>
+                                <Form.Button
+                                    href={'/login'}
+                                    className="signIn__button"
+                                >Back to Login</Form.Button>
+                                {error && <Form.Message style={{ textAlign: "center", color: "red" }}>{error}</Form.Message>}
+                            </ContainerComponent.Flex>
+                        </Form.Container>
+                    </Form>
+                </ContainerComponent.Inner>
+            </ContainerComponent.Flex>
+        </ContainerComponent>
     </>
 }
 

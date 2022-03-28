@@ -157,9 +157,9 @@ export default function AuthenticationContext({ children }) {
       })
       .catch((error) => {
         pushToast({
-          message: error.message,
+          message: "Get Profile Failed",
           type: toastTypes.ERROR
-        })
+        });
       });
   }
   function editProfile(input) {
@@ -179,10 +179,15 @@ export default function AuthenticationContext({ children }) {
           },
         }
       )
-      .then((res) => getProfile())
+      .then((res) => {
+        pushToast({
+          message:"Edit Profile Successful",
+          type : toastTypes.SUCCESS
+        })
+        getProfile()})
       .catch((error) => {
         pushToast({
-          message: error.message,
+          message: "Edit Profile Failed",
           type: toastTypes.ERROR
         })
       });
