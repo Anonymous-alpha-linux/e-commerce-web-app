@@ -26,7 +26,9 @@ import {
 } from "./pages";
 
 import {
+  AccountCrud,
   AddGroupContainer,
+  AttachmentCrub,
   DashboardHeader,
   ManagerInfo,
   MessageContainer,
@@ -68,13 +70,21 @@ function App() {
                   }
                 >
                   <Route index element={<AdminDashBoard></AdminDashBoard>} />
+                  <Route path="/management/attachment" element={<AttachmentCrub></AttachmentCrub>} />
+                  <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
+                  <Route path="/management/member" element={<AccountCrud></AccountCrud>} />
                 </Route>
               )) ||
               // 2. QA manager
               (user.role === roles.QA_MANAGER && (
-                <Route path="" element={<ProtectedPage authorized={[roles.QA_MANAGER]}>
-                  <QAManager></QAManager>
-                </ProtectedPage>}>
+                <Route
+                  path=""
+                  element={
+                    <ProtectedPage authorized={[roles.QA_MANAGER]}>
+                      <QAManager></QAManager>
+                    </ProtectedPage>
+                  }
+                >
                   {/* <Route index element={<Workspace></Workspace>} /> */}
                   <Route
                     index
@@ -89,9 +99,11 @@ function App() {
                     element={<CategoryManagement></CategoryManagement>}
                   />
                   <Route
-                    path="/management/member/:id"
-                    element={<ListMember></ListMember>}
-                  />
+                    path="/management/member"
+                    element={<AccountCrud></AccountCrud>}
+                  >
+                    <Route path=":id" element={<ListMember></ListMember>} />
+                  </Route>
                   <Route
                     path="/management/staff/:id"
                     element={<StaffCRUD></StaffCRUD>}

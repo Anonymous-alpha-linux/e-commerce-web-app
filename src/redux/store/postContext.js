@@ -12,8 +12,8 @@ import actions from "../reducers/actions";
 import { useAuthorizationContext } from ".";
 import { Loading } from "../../pages";
 import { postReducer, initialPostPage } from "../reducers";
-import { notifyData, socketTargets } from "../../fixtures";
-import { useNotifyContext } from "..";
+import { notifyData, socketTargets, toastTypes } from "../../fixtures";
+
 const PostContextAPI = createContext();
 
 const categoryReducer = (state, action) => {
@@ -40,10 +40,9 @@ const categoryReducer = (state, action) => {
         isUpdated: true,
       };
     case actions.ADD_CATEGORY:
-
       return {
         ...state,
-        categories: [...state.categories, action.payload],
+        categories: [action.payload, ...state.categories],
       };
     case actions.REMOVE_CATEGORY:
       return {
@@ -61,6 +60,7 @@ const initialCategories = {
   categoryLoading: true,
 };
 export default React.memo(function PostContext({ children }) {
+  const {pushToast} = useAuthorizationContext();
   // Component states
   const [postState, setPost] = useReducer(postReducer, initialPostPage);
   const [categoryState, setCategory] = useReducer(
@@ -109,6 +109,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Get Post Successful",
+          type: toastTypes.SUCCESS
+        });
         setPost({
           type: actions.SET_OFF_LOADING,
         });
@@ -117,11 +121,14 @@ export default React.memo(function PostContext({ children }) {
           payload: res.data.response,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        setError(error.message);
+        pushToast({
+          message: "Get Post Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function filterPost(filter) {
@@ -152,7 +159,10 @@ export default React.memo(function PostContext({ children }) {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        setError(error.message);
+        pushToast({
+          message: "Filter Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function loadNextPosts(cb) {
@@ -211,13 +221,20 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Create Post Successful",
+          type: toastTypes.SUCCESS
+        });
         setPost({
           type: actions.PUSH_IDEA,
           payload: [res.data.response],
         });
       })
-      .catch((error) => {
-        setError(error.message);
+      .catch(() => {
+        pushToast({
+          message: "Create Post Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function updateSinglePost(postId, cb) {
@@ -232,14 +249,21 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Update Post Successful",
+          type: toastTypes.SUCCESS
+        });
         setPost({
           type: actions.UPDATE_SINGLE_POST,
           payload: res.data.response,
           postId: postId,
         });
       })
-      .catch((error) => {
-        setError(error.message);
+      .catch(() => {
+        pushToast({
+          message: "Update Post Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function deleteSinglePost(postId, cb) {
@@ -254,6 +278,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Delete Post Successful",
+          type: toastTypes.SUCCESS
+        });
         setPost({
           type: actions.REMOVE_SINGLE_POST,
           postId: postId,
@@ -261,7 +289,10 @@ export default React.memo(function PostContext({ children }) {
         cb(postId);
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: "Delete Post Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function postIdea(input, cb, options = null) {
@@ -299,12 +330,18 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Post Idea Successful",
+          type: toastTypes.SUCCESS
+        });
         createSinglePost(res.data.response[0]._id, cb);
         cb(res.data.response[0]._id);
       })
-      .catch((err) => {
-        cb(error);
-        setError(err.message);
+      .catch(() => {
+        pushToast({
+          message: "Post Idea Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function editIdea(input, formData, cb, options) {
@@ -338,11 +375,19 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Edit Idea Successful",
+          type: toastTypes.SUCCESS
+        });
         console.log(res.data.response);
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
-      .catch((error) => setError(error.message));
+      .catch(() => {
+        pushToast({
+          message: "Edit Idea Failed",
+          type: toastTypes.ERROR
+        }); });
   }
   function likePost(isLiked, postId, userId) {
     let isDisliked = postState;
@@ -438,6 +483,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Get Post Successful",
+          type: toastTypes.SUCCESS
+        });
         return setPost({
           type: actions.GET_MY_POST,
           payload: res.data.response,
@@ -446,11 +495,14 @@ export default React.memo(function PostContext({ children }) {
       .then((success) => {
         cb();
       })
-      .catch((error) => {
+      .catch(() => {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        setError(error.message);
+        pushToast({
+          message: "Get Post Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function filterMyPost(filter) {
@@ -467,17 +519,24 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Filter Successful",
+          type: toastTypes.SUCCESS
+        });
         return setPost({
           type: actions.FILTER_MY_POST,
           payload: res.data.response,
           filter: filter,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        setError(error.message);
+        pushToast({
+          message: "Filter Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function loadMyNextPosts(cb) {
@@ -713,7 +772,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-
         setPost({
           type: actions.LOAD_MORE_COMMENT_REPLIES,
           payload: res.data.response,
@@ -757,7 +815,7 @@ export default React.memo(function PostContext({ children }) {
           payload: res.data.response,
           postId: postId,
           commentId: commentId,
-          replyId: replyId
+          replyId: replyId,
         });
       })
       .then((success) => {
@@ -782,7 +840,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-
         setPost({
           type: actions.ADD_COMMENT_REPLY,
           payload: [res.data.response],
@@ -797,8 +854,12 @@ export default React.memo(function PostContext({ children }) {
         setError(error.message);
       });
   }
+
   // 4. Thump-up, thump-down, comment
   function interactPost(postId, type, input, cb) {
+    const { liked, disliked } = input;
+    likePost(liked, postId, user.accountId);
+    dislikePost(disliked, postId, user.accountId);
     // Set Loading for waiting post
     if (type === "rate") {
       return axios
@@ -820,12 +881,8 @@ export default React.memo(function PostContext({ children }) {
           }
         )
         .then((res) => {
-          const { liked, disliked } = input;
-          likePost(liked, postId, user.accountId);
-          dislikePost(disliked, postId, user.accountId);
           sendRealTimeLike(liked, postId, user.accountId);
           sendRealTimeDisLike(disliked, postId, user.accountId);
-          // updateSinglePost(postId);
         })
         .catch((error) => {
           setError(error.message);
@@ -957,7 +1014,7 @@ export default React.memo(function PostContext({ children }) {
         )
         .then((res) => {
           const replyId = res.data.response._id;
-          addCommentReply(postId, input.commentid, replyId, () => { });
+          addCommentReply(postId, input.commentid, replyId);
           const data = { postId, commentId: input.commentid, replyId };
           sendRealtimeCommentReply(postId, data.commentId, replyId);
           cb(data);
@@ -1061,6 +1118,31 @@ export default React.memo(function PostContext({ children }) {
       .catch((error) => setError(error.message));
   }
   function getGzipFile() { }
+  async function downloadHandler(attachmentId) {
+    return axios
+      .get(`${host}/api/v1/download`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          attachmentid: attachmentId,
+        },
+      })
+      .then((res) => {
+        const link = document.createElement("a");
+        link.href = res.data.response;
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      })
+      .catch((err) => console.log(err.message));
+  }
   // 9. Category
   function getNewCategory(data) {
     setCategory({
@@ -1099,6 +1181,7 @@ export default React.memo(function PostContext({ children }) {
     filterMyPost,
     interactPost,
     getGzipFile,
+    downloadHandler,
     getOwnPosts,
     getPostComments,
     loadNextComments,
@@ -1109,7 +1192,7 @@ export default React.memo(function PostContext({ children }) {
     removeCategory,
   };
 
-  if (postState.postLoading && categoryState.categoryLoading)
+  if (postState.postLoading)
     return <Loading className="post__loading"></Loading>;
 
   return (

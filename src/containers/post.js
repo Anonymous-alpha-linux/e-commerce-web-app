@@ -20,6 +20,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
   const { user } = useAuthorizationContext();
   const { interactPost, getPostComments, deleteSinglePost } = usePostContext();
   const { sendNotification } = useNotifyContext();
+
   const isFirstRender = useRef(true);
   const interactRef = useRef(interactPost);
   const getComment = useRef(getPostComments);
@@ -27,7 +28,6 @@ export default function Post({ postHeader, postBody, postFooter }) {
   const [openComment, setOpenComment] = useState(false);
   const [interact, setInteract] = useState({ liked: postFooter.isLiked, disliked: postFooter.isDisliked });
   const [type, setType] = useState(interactTypes.NO);
-  let navigate = useNavigate();
 
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
@@ -51,6 +51,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       params: {
+        view: 'post',
         postid: postHeader.id
       },
     }).then(res => {
@@ -67,24 +68,6 @@ export default function Post({ postHeader, postBody, postFooter }) {
       link.parentNode.removeChild(link);
     }).catch(err => console.log(err.message));
   }
-  // const downloadZIPFile = async (e) => {
-  //   console.log(postBody);
-  //   return Promise.all(
-  //     postBody.attachment.map((attach) => {
-  //       return new Promise((resolve, reject) => {
-  //         getFile(attach, (file) => {
-  //           console.log(file);
-  //           resolve(file);
-  //         }).catch((error) => {
-  //           reject(error);
-  //         });
-  //       });
-  //     })
-  //   ).then((files) => {
-  //     console.log(files);
-  //     return getGzipFile(files);
-  //   });
-  // };
   const parseTime = (time) => {
     const now = new Date(Date.now());
     const end = new Date(time);

@@ -38,7 +38,7 @@ export default function SinglePost() {
                 </ContainerComponent.Pane>
         </ContainerComponent.Item>
         {/* <ContainerComponent.Item>
-      
+          
         </ContainerComponent.Item> */}
     </ContainerComponent.Flex>
   )

@@ -11,8 +11,8 @@ import { Loading } from "../../pages";
 import { io } from "socket.io-client";
 import actions from "../reducers/actions";
 import { authReducer, initialAuth } from "../reducers";
-import { Toast } from "../../containers";
 import { toastTypes } from "../../fixtures";
+import { useMessage } from "../../hooks";
 
 const AuthenticationContextAPI = createContext();
 
@@ -23,10 +23,7 @@ export default function AuthenticationContext({ children }) {
       ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
 
-  const [message, setMessage] = useState("");
-  const [info, setInfo] = useState('');
-  const [error, setError] = useState("");
-  const [toastList, setToastList] = useState([]);
+  const [toastList, pushToast, pullToast] = useMessage()
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
@@ -39,12 +36,8 @@ export default function AuthenticationContext({ children }) {
     };
   }, []);
   useEffect(() => {
-    if (error || message || info)
-      setToastList([...toastList, {
-        message: error || message || '',
-        type: (error && toastTypes.ERROR) || (message && toastTypes.SUCCESS) || (info && toastTypes.INFO)
-      }]);
-  }, [error, message, info]);
+    console.log(toastList);
+  }, [toastList]);
   const onLoadUser = (cb) => {
     return axios
       .get(authAPI, {
@@ -54,19 +47,30 @@ export default function AuthenticationContext({ children }) {
         },
       })
       .then((response) => {
-        setUser({
-          type: actions.AUTHENTICATE_ACTION,
-          payload: response.data,
-        });
-
-        let socket = io(host);
-        socket.auth = { accessToken: localStorage.getItem('accessToken') };
-        setSocket(socket);
+        if (response.status > 199 && response.status <= 299) {
+          setUser({
+            type: actions.AUTHENTICATE_ACTION,
+            payload: response.data,
+          });
+          let socket = io(host);
+          socket.auth = { accessToken: localStorage.getItem('accessToken') };
+          setSocket(socket);
+          pushToast({
+            message: 'Get User successfully',
+            type: toastTypes.SUCCESS
+          })
+        }
+        else {
+          throw new Error("Get data Failed!");
+        }
       }).catch(error => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
         });
-        setInfo("Login to system");
+        pushToast({
+          message: "Login to system",
+          type: toastTypes.INFO
+        });
       })
   };
   function login(data) {
@@ -80,13 +84,21 @@ export default function AuthenticationContext({ children }) {
       })
       .then((res) => {
         localStorage.setItem("accessToken", res.data.accessToken);
+        pushToast({
+          messge: "Login successfully",
+          type: toastTypes.SUCCESS
+        })
         return onLoadUser();
       })
-      .catch((error) =>
+      .catch((error) => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
-        })
-      );
+        });
+        pushToast({
+          message: "Login to system",
+          type: toastTypes.INFO
+        });
+      });
   }
   // const register = async (data) => {
   //   const registerApi = mainAPI.CLOUD_API_REGISTER;
@@ -117,7 +129,11 @@ export default function AuthenticationContext({ children }) {
           type: actions.LOGOUT_ACTION,
         });
       })
-      .catch((error) => setError(error.message));
+      .catch((error) => {
+        pushToast({
+          message: error.message,
+        });
+      })
   }
   function getProfile() {
     return axios
@@ -137,7 +153,12 @@ export default function AuthenticationContext({ children }) {
           payload: res.data.response,
         });
       })
-      .catch((error) => setError(error.message));
+      .catch((error) => {
+        pushToast({
+          message: "Get Profile Failed",
+          type: toastTypes.ERROR
+        });
+      });
   }
   function editProfile(input) {
     return axios
@@ -156,41 +177,41 @@ export default function AuthenticationContext({ children }) {
           },
         }
       )
-      .then((res) => getProfile())
+      .then((res) => {
+        pushToast({
+          message:"Edit Profile Successful",
+          type : toastTypes.SUCCESS
+        })
+        getProfile()})
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: "Edit Profile Failed",
+          type: toastTypes.ERROR
+        })
       });
   }
 
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
-  return (
+  return (<>
     <AuthenticationContextAPI.Provider
       value={{
         loading: user.authLoading,
         user,
         profile: user.profile,
-        message,
-        error,
         socket,
         cancelTokenSource,
+        toastList,
+        pushToast,
+        pullToast,
         login,
         logout,
         editProfile,
-        setError,
-        setMessage,
-        setInfo
       }}
     >
       {children}
-      {/* {toastList.length && <div style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px'
-      }}>
-        {toastList.map((toast, index) => <Toast message={toast.message} timeout={3000} key={index + 1} type={toast.type}></Toast>)}
-      </div>} */}
     </AuthenticationContextAPI.Provider>
+  </>
   );
 }
 

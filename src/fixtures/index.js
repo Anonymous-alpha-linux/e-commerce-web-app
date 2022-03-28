@@ -5,3 +5,4 @@ export { default as notifyData } from "./notify";
 export { default as socketTargets } from "./socketTarget";
 export { default as toastTypes } from "./toast";
 export { default as sidebarData } from './sidebar';
+export { default as media } from './media';

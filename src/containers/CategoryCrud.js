@@ -4,6 +4,7 @@ import Pagination from "./Pagination";
 import { usePostContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
+import Loader from "./loader";
 
 export default function Crud() {
   const [API, host] =
@@ -11,7 +12,7 @@ export default function Crud() {
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
   let PageSize = 8;
-  const { categories, removeCategory } = usePostContext();
+  const { categories, removeCategory, categoryLoading } = usePostContext();
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
@@ -32,7 +33,7 @@ export default function Crud() {
     console.log(id);
     handleDelete(id);
   }
-  function handleDelete(commentId) {
+  function handleDelete(categoryId) {
     return axios
       .delete(API, {
         headers: {
@@ -40,12 +41,12 @@ export default function Crud() {
         },
         params: {
           view: `category`,
-          commentid: commentId,
+          categoryid: categoryId,
         },
       })
       .then((res) => {
         // setNewRecord(res.data.response);
-        removeCategory(commentId);
+        removeCategory(categoryId);
       })
       .catch((error) => console.log(error.message));
   }
@@ -83,24 +84,24 @@ export default function Crud() {
             </tr>
           </thead>
           <tbody>
-            {searchInput !== ""
+            {(categoryLoading && <tr><td colSpan={3}><Loader></Loader></td></tr>) || searchInput !== ""
               ? filteredResults.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))
+                <CategoryData
+                  key={index}
+                  data={category}
+                  index={index}
+                  deleteCate={deleteCate}
+                />
+              ))
               : dataRecords.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))}
-            {!categories?.length && (
+                <CategoryData
+                  key={index}
+                  data={category}
+                  index={index}
+                  deleteCate={deleteCate}
+                />
+              ))}
+            {/* {!categories?.length && (
               <tr>
                 <td>
                   <h2>No Category</h2>
@@ -109,7 +110,7 @@ export default function Crud() {
                   <h2>Empty</h2>
                 </td>
               </tr>
-            )}
+            )} */}
           </tbody>
         </table>
 
@@ -124,7 +125,6 @@ export default function Crud() {
     </div>
   );
 }
-
 function ModalAddFormCategory({ setModal, modal }) {
   const [categoryAdd, setCategoryAdd] = useState({
     categoryName: "",
@@ -133,16 +133,14 @@ function ModalAddFormCategory({ setModal, modal }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
-  const { getNewCategory } = usePostContext();
+  const { getNewCategory, categoryLoading } = usePostContext();
   const getNewCategoryRef = useRef(getNewCategory);
   useEffect(() => {
     getNewCategoryRef.current = getNewCategory;
   }, [getNewCategory]);
-
   async function HandleNameInput(e) {
     setCategoryAdd({ ...categoryAdd, [e.target.name]: e.target.value });
   }
-
   async function onSubmit(e) {
     e.preventDefault();
     CreateCategory();
@@ -163,7 +161,6 @@ function ModalAddFormCategory({ setModal, modal }) {
       })
       .catch((error) => console.log(error.message));
   }
-
   return (
     <div className="c-modal__container">
       <form>
@@ -205,8 +202,6 @@ function CategoryData({ data, deleteCate, index }) {
     <tr key={index}>
       <td style={{ textAlign: "center", width: "40%" }}>
         {index + 1}
-        {/* {parseInt(data._id, 8)} */}
-        {/* {data._id} */}
       </td>
       <td style={{ textAlign: "center", width: "40%" }}>{data.name}</td>
       <td
