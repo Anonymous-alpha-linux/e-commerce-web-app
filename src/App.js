@@ -5,7 +5,6 @@ import {
   ProtectedPage,
   Register,
   ForgetPassword,
-  Nav,
   Staff,
   QACoordinator,
   AdminSidebar,
@@ -26,7 +25,9 @@ import {
 } from "./pages";
 
 import {
+  AccountCrud,
   AddGroupContainer,
+  AttachmentCrub,
   DashboardHeader,
   ManagerInfo,
   MessageContainer,
@@ -46,7 +47,7 @@ function App() {
   return (
     <NotifyContext>
       <BrowserRouter>
-        {user.role === roles.STAFF && <Nav></Nav>}
+        {/* {user.role === roles.STAFF && } */}
         <Routes>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
@@ -68,6 +69,18 @@ function App() {
                   }
                 >
                   <Route index element={<AdminDashBoard></AdminDashBoard>} />
+                  <Route
+                    path="/management/attachment"
+                    element={<AttachmentCrub></AttachmentCrub>}
+                  />
+                  <Route
+                    path="/management/category"
+                    element={<CategoryManagement></CategoryManagement>}
+                  />
+                  <Route
+                    path="/management/member"
+                    element={<AccountCrud></AccountCrud>}
+                  />
                 </Route>
               )) ||
                 // 2. QA manager
@@ -95,10 +108,12 @@ function App() {
                     />
                     <Route
                       path="/management/member"
-                      element={<ListMember></ListMember>}
-                    />
+                      element={<AccountCrud></AccountCrud>}
+                    >
+                      <Route path=":id" element={<ListMember></ListMember>} />
+                    </Route>
                     <Route
-                      path="/management/staff"
+                      path="/management/staff/:id"
                       element={<StaffCRUD></StaffCRUD>}
                     />
                     <Route path="profile" element={<Profile></Profile>}>

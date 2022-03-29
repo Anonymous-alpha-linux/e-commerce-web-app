@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import { ContainerComponent, Form, Icon, Text, Message } from '../../components'
-import { AiOutlineLeft } from "react-icons/ai";
+import { Link, useParams } from 'react-router-dom';
+
 import { MdGroup } from "react-icons/md";
-import { useAdminContext, useAuthorizationContext } from '../../redux';
-import { roles } from '../../fixtures';
-import { Link } from 'react-router-dom';
+import { AiOutlineLeft } from "react-icons/ai";
 import { FaSearch } from 'react-icons/fa';
+
+import { ContainerComponent, Form, Icon, Text, Message } from '../../components'
+import { useAdminContext, useWorkspaceContext } from '../../redux';
+import { roles } from '../../fixtures';
 
 function StaffManagement({ filter = roles.STAFF }) {
     const { accounts } = useAdminContext();
+    const { getWorkspaceMembers } = useWorkspaceContext();
     const [member, setMember] = useState(accounts);
     const [searchOuput, setOutput] = React.useState([]);
     const [input, setInput] = React.useState('');
+    const { id } = useParams();
 
+    // useEffect(() => {
+    //     getWorkspaceMembers(id);
+    // }, []);
     useEffect(() => {
         setMember(accounts.filter(member => member.role.roleName === filter));
     }, [filter, accounts]);

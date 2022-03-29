@@ -22,41 +22,59 @@ import { mainAPI } from "../config";
 // import { notifyData, socketTargets } from "../fixtures";
 
 export default function Post({ postHeader, postBody, postFooter }) {
-  const interactTypes = {
-    NO: "no rate",
-    LIKE: "like",
-    DISLIKE: "dislike",
-  };
   const { user } = useAuthorizationContext();
   const { interactPost, getPostComments, deleteSinglePost } = usePostContext();
+  const {
+    like,
+    dislike,
+    isLiked,
+    isDisliked,
+    likedAccounts,
+    dislikedAccounts,
+  } = postFooter;
+
   const { sendNotification } = useNotifyContext();
   const isFirstRender = useRef(true);
   const interactRef = useRef(interactPost);
   const getComment = useRef(getPostComments);
 
   const [openComment, setOpenComment] = useState(false);
-  const [interact, setInteract] = useState({
-    liked: postFooter.isLiked,
-    disliked: postFooter.isDisliked,
-  });
-  const [type, setType] = useState(interactTypes.NO);
-  let navigate = useNavigate();
 
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
-      setInteract({
-        ...interact,
-        liked: !interact.liked,
-        disliked: interact.disliked && false,
-      });
+      likeHandler();
+    } else if (e.target.name === "dislike") {
+      dislikeHandler();
     }
-    if (e.target.name === "dislike") {
-      setInteract({
-        ...interact,
-        disliked: !interact.disliked,
-        liked: interact.liked && false,
-      });
-    }
+    // interactRef.current(postHeader.id, 'rate', { like: !isLiked ? like + 1 : like - 1, dislike: !isDisliked ? dislike + 1 : dislike - 1, likedAccounts: [...likedAccounts, user.accountId], dislikedAccounts: [...dislikedAccounts, user.accountId], isDisliked: !isDisliked, isLiked: !isLiked });
+  };
+  const likeHandler = () => {
+    interactRef.current(postHeader.id, "rate", {
+      like: !isLiked ? like + 1 : like - 1,
+      dislike: isDisliked ? dislike - 1 : dislike,
+      likedAccounts: !isLiked
+        ? [...likedAccounts, user.accountId]
+        : likedAccounts.filter((acc) => acc !== user.accountId),
+      dislikedAccounts: isDisliked
+        ? dislikedAccounts.filter((acc) => acc !== user.accountId)
+        : dislikedAccounts,
+      isLiked: !isLiked,
+      isDisliked: false,
+    });
+  };
+  const dislikeHandler = () => {
+    interactRef.current(postHeader.id, "rate", {
+      like: isLiked ? like - 1 : like,
+      dislike: !isDisliked ? dislike + 1 : dislike - 1,
+      likedAccounts: isLiked
+        ? likedAccounts.filter((acc) => acc !== user.accountId)
+        : likedAccounts,
+      dislikedAccounts: !isDisliked
+        ? [...dislikedAccounts, user.accountId]
+        : dislikedAccounts.filter((acc) => acc !== user.accountId),
+      isLiked: false,
+      isDisliked: !isDisliked,
+    });
   };
   const downloadHandler = async (e) => {
     return axios
@@ -65,6 +83,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         params: {
+          view: "post",
           postid: postHeader.id,
         },
       })
@@ -83,24 +102,6 @@ export default function Post({ postHeader, postBody, postFooter }) {
       })
       .catch((err) => console.log(err.message));
   };
-  // const downloadZIPFile = async (e) => {
-  //   console.log(postBody);
-  //   return Promise.all(
-  //     postBody.attachment.map((attach) => {
-  //       return new Promise((resolve, reject) => {
-  //         getFile(attach, (file) => {
-  //           console.log(file);
-  //           resolve(file);
-  //         }).catch((error) => {
-  //           reject(error);
-  //         });
-  //       });
-  //     })
-  //   ).then((files) => {
-  //     console.log(files);
-  //     return getGzipFile(files);
-  //   });
-  // };
   const parseTime = (time) => {
     const now = new Date(Date.now());
     const end = new Date(time);
@@ -119,13 +120,6 @@ export default function Post({ postHeader, postBody, postFooter }) {
   React.useEffect(() => {
     getComment.current = getPostComments;
   }, [getPostComments]);
-  React.useEffect(() => {
-    if (!isFirstRender.current) {
-      interactPost(postHeader.id, type, interact, (commentId) => {
-        // console.log(commentId);
-      });
-    }
-  }, [interact]);
   React.useEffect(() => {
     isFirstRender.current = false;
   }, []);
@@ -176,7 +170,10 @@ export default function Post({ postHeader, postBody, postFooter }) {
         {(user.accountId === postHeader.postAuthor ||
           [roles.QA_COORDINATOR, roles.QA_MANAGER].includes(user.role)) && (
           <Text.RightLine>
-            <DropDownButton component={<IoIosArrowDown></IoIosArrowDown>}>
+            <DropDownButton
+              position="right"
+              component={<IoIosArrowDown></IoIosArrowDown>}
+            >
               {postHeader.postAuthor === user.accountId && (
                 <Dropdown.Item>
                   <Link to={`/portal/idea/${postHeader.id}`}>
@@ -227,10 +224,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
 
       <ContainerComponent.Pane
         className="post__footer"
-        style={{
-          background: "#EEF5EB",
-          boxShadow: "1px 1px .5px solid #000",
-        }}
+        style={{ background: "#EEF5EB", boxShadow: "1px 1px .5px solid #000" }}
       >
         <ContainerComponent.GridThreeColumns>
           <ContainerComponent.Item>
@@ -239,13 +233,12 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 type="checkbox"
                 name="like"
                 id={`like ${postHeader.id}`}
-                value={interact.liked}
+                value={isLiked}
                 onChange={checkedHandler}
                 style={{ display: "none" }}
               ></input>
               <Icon.CircleIcon
                 onClick={() => {
-                  setType(interactTypes.LIKE);
                   document.getElementById(`like ${postHeader.id}`).click();
                 }}
                 style={{
@@ -258,7 +251,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
                   stroke="#000"
                   strokeWidth={20}
                   style={{
-                    fill: `${interact.liked ? "blue" : "transparent"}`,
+                    fill: `${isLiked ? "blue" : "transparent"}`,
                     position: "absolute",
                     top: "50%",
                     transform: "translate(-50%,-50%)",
@@ -266,23 +259,23 @@ export default function Post({ postHeader, postBody, postFooter }) {
                   }}
                 />
               </Icon.CircleIcon>
-              {postFooter.like}
+              {like}
             </Text.MiddleLine>
           </ContainerComponent.Item>
+
           <ContainerComponent.Item>
             <Text.MiddleLine>
               <input
                 type="checkbox"
                 name="dislike"
                 id={`dislike ${postHeader.id}`}
-                value={interact.disliked}
+                value={isDisliked}
                 onChange={checkedHandler}
                 style={{ display: "none" }}
               ></input>
               <Text.CenterLine>
                 <Icon.CircleIcon
                   onClick={() => {
-                    setType(interactTypes.DISLIKE);
                     document.getElementById(`dislike ${postHeader.id}`).click();
                   }}
                   style={{
@@ -295,7 +288,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
                     stroke="#000"
                     strokeWidth={20}
                     style={{
-                      fill: `${interact.disliked ? "blue" : "transparent"}`,
+                      fill: `${isDisliked ? "blue" : "transparent"}`,
                       position: "absolute",
                       top: "50%",
                       transform: "translate(-50%,-50%)",
@@ -303,10 +296,11 @@ export default function Post({ postHeader, postBody, postFooter }) {
                     }}
                   />
                 </Icon.CircleIcon>
-                {postFooter.dislike}
+                {dislike}
               </Text.CenterLine>
             </Text.MiddleLine>
           </ContainerComponent.Item>
+
           <ContainerComponent.Item
             onClick={() => {
               if (!openComment) {

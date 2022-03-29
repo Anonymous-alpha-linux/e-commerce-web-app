@@ -4,7 +4,6 @@ import React, {
   useState,
   useEffect,
   useReducer,
-  useRef,
 } from "react";
 import axios from "axios";
 import { mainAPI } from "../../config";
@@ -12,8 +11,9 @@ import actions from "../reducers/actions";
 import { useAuthorizationContext } from ".";
 import { Loading } from "../../pages";
 import { postReducer, initialPostPage } from "../reducers";
-import { notifyData, socketTargets } from "../../fixtures";
+import { notifyData, socketTargets, toastTypes } from "../../fixtures";
 import { useNotifyContext } from "..";
+import { useWorkspaceContext } from "./workspaceContext";
 const PostContextAPI = createContext();
 
 const categoryReducer = (state, action) => {
@@ -42,7 +42,7 @@ const categoryReducer = (state, action) => {
     case actions.ADD_CATEGORY:
       return {
         ...state,
-        categories: [...state.categories, action.payload],
+        categories: [action.payload, ...state.categories],
       };
     case actions.REMOVE_CATEGORY:
       return {
@@ -66,11 +66,13 @@ export default React.memo(function PostContext({ children }) {
     categoryReducer,
     initialCategories
   );
+
   const [showUpdate, setShowUpdate] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   // Global states getter
-  const { user, socket } = useAuthorizationContext();
+  const { user, socket, pushToast } = useAuthorizationContext();
+  const { workspace } = useWorkspaceContext();
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
@@ -83,18 +85,43 @@ export default React.memo(function PostContext({ children }) {
     return () => {
       cancelTokenSource.cancel();
     };
-  }, [user]);
+  }, [workspace]);
   useEffect(() => {
     receiveRealtimeComment();
     receiveRealTimeLike();
     receiveRealTimeDisLike();
     receiveRealtimeCommentReply();
   }, [socket]);
+
   // 1. Post for workspace
+  function getAllPost() {
+    return axios
+      .get(postAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "allpost",
+        },
+      })
+      .then((res) => {
+        pushToast({
+          message: "Get all post successfully",
+          type: toastTypes.SUCCESS,
+        });
+        setPost({});
+      })
+      .catch((error) => {
+        pushToast({
+          message: "Get all post successfully",
+          type: toastTypes.SUCCESS,
+        });
+      });
+  }
   function getPosts() {
-    setPost({
-      type: actions.SET_LOADING,
-    });
+    // setPost({
+    //   type: actions.SET_LOADING,
+    // });
     return axios
       .get(postAPI, {
         headers: {
@@ -108,9 +135,9 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        setPost({
-          type: actions.SET_OFF_LOADING,
-        });
+        // setPost({
+        //   type: actions.SET_OFF_LOADING,
+        // });
         return setPost({
           type: actions.GET_POST_LIST,
           payload: res.data.response,
@@ -124,9 +151,9 @@ export default React.memo(function PostContext({ children }) {
       });
   }
   function filterPost(filter) {
-    setPost({
-      type: actions.SET_LOADING,
-    });
+    // setPost({
+    //   type: actions.SET_LOADING,
+    // });
     return axios
       .get(postAPI, {
         headers: {
@@ -146,11 +173,10 @@ export default React.memo(function PostContext({ children }) {
           filter: filter,
         });
       })
-      .then((success) => {})
       .catch((error) => {
-        setPost({
-          type: actions.SET_OFF_LOADING,
-        });
+        // setPost({
+        //   type: actions.SET_OFF_LOADING,
+        // });
         setError(error.message);
       });
   }
@@ -337,36 +363,26 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data.response);
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
       .catch((error) => setError(error.message));
   }
-  function likePost(isLiked, postId, userId) {
-    let isDisliked = postState;
-    // .dislikedAccounts.includes(user.accountId);
-    if (!isDisliked) {
-      setPost({
-        type: actions.LIKE_POST,
-        postId,
-        userId,
-        isLiked,
-      });
-    } else {
-      setPost({
-        type: actions.LIKE_POST,
-        postId,
-        userId,
-        isLiked,
-      });
-      setPost({
-        type: actions.DISLIKE_POST,
-        postId,
-        userId,
-        isLiked,
-      });
-    }
+  function likePost(input, postId, userId) {
+    setPost({
+      type: actions.LIKE_POST,
+      postId,
+      userId,
+      input,
+    });
+  }
+  function dislikePost(input, postId, userId) {
+    setPost({
+      type: actions.DISLIKE_POST,
+      postId,
+      userId,
+      input,
+    });
   }
   function sendRealTimeLike(postId, userId) {
     socket.emit("like post", {
@@ -378,14 +394,6 @@ export default React.memo(function PostContext({ children }) {
     socket.on("like post", (data) => {
       const { postId, userId } = data;
       updateSinglePost(postId);
-    });
-  }
-  function dislikePost(isDisliked, postId, userId) {
-    setPost({
-      type: actions.DISLIKE_POST,
-      postId,
-      userId,
-      isDisliked,
     });
   }
   function sendRealTimeDisLike(postId, userId) {
@@ -420,10 +428,7 @@ export default React.memo(function PostContext({ children }) {
     });
   }
   // 2. Posts for profile
-  function getOwnPosts(cb) {
-    setPost({
-      type: actions.SET_LOADING,
-    });
+  function getOwnPosts() {
     return axios
       .get(postAPI, {
         headers: {
@@ -437,13 +442,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        return setPost({
+        setPost({
           type: actions.GET_MY_POST,
           payload: res.data.response,
         });
-      })
-      .then((success) => {
-        cb();
       })
       .catch((error) => {
         setPost({
@@ -794,16 +796,36 @@ export default React.memo(function PostContext({ children }) {
         setError(error.message);
       });
   }
+
   // 4. Thump-up, thump-down, comment
   function interactPost(postId, type, input, cb) {
     // Set Loading for waiting post
     if (type === "rate") {
+      const {
+        isLiked,
+        isDisliked,
+        like,
+        dislike,
+        likedAccounts,
+        dislikedAccounts,
+      } = input;
+      console.log(input);
+      setPost({
+        type: actions.RATE_POST,
+        postId,
+        payload: {
+          like,
+          dislike,
+          likedAccounts,
+          dislikedAccounts,
+        },
+      });
       return axios
         .put(
           postAPI,
           {
-            isLiked: input.liked,
-            isDisliked: input.disliked,
+            isLiked: isLiked,
+            isDisliked: isDisliked,
           },
           {
             headers: {
@@ -817,17 +839,16 @@ export default React.memo(function PostContext({ children }) {
           }
         )
         .then((res) => {
-          const { liked, disliked } = input;
-          likePost(liked, postId, user.accountId);
-          dislikePost(disliked, postId, user.accountId);
-          sendRealTimeLike(liked, postId, user.accountId);
-          sendRealTimeDisLike(disliked, postId, user.accountId);
-          // updateSinglePost(postId);
+          sendRealTimeLike(isLiked, postId, user.accountId);
+          sendRealTimeDisLike(isDisliked, postId, user.accountId);
         })
         .catch((error) => {
           setError(error.message);
         });
     } else if (type === "like") {
+      const { liked, disliked } = input;
+      likePost(liked, postId, user.accountId);
+      dislikePost(disliked, postId, user.accountId);
       return axios
         .put(
           postAPI,
@@ -855,6 +876,9 @@ export default React.memo(function PostContext({ children }) {
           setError(error.message);
         });
     } else if (type === "dislike") {
+      const { liked, disliked } = input;
+      likePost(liked, postId, user.accountId);
+      dislikePost(disliked, postId, user.accountId);
       return axios
         .put(
           postAPI,
@@ -954,7 +978,7 @@ export default React.memo(function PostContext({ children }) {
         )
         .then((res) => {
           const replyId = res.data.response._id;
-          addCommentReply(postId, input.commentid, replyId, () => {});
+          addCommentReply(postId, input.commentid, replyId);
           const data = { postId, commentId: input.commentid, replyId };
           sendRealtimeCommentReply(postId, data.commentId, replyId);
           cb(data);
@@ -1058,6 +1082,31 @@ export default React.memo(function PostContext({ children }) {
       .catch((error) => setError(error.message));
   }
   function getGzipFile() {}
+  async function downloadHandler(attachmentId) {
+    return axios
+      .get(`${host}/api/v1/download`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          attachmentid: attachmentId,
+        },
+      })
+      .then((res) => {
+        const link = document.createElement("a");
+        link.href = res.data.response;
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      })
+      .catch((err) => console.log(err.message));
+  }
   // 9. Category
   function getNewCategory(data) {
     setCategory({
@@ -1071,7 +1120,6 @@ export default React.memo(function PostContext({ children }) {
       payload: commentId,
     });
   }
-
   const contextValues = {
     posts: postState.posts,
     myPosts: postState.myPosts,
@@ -1096,6 +1144,7 @@ export default React.memo(function PostContext({ children }) {
     filterMyPost,
     interactPost,
     getGzipFile,
+    downloadHandler,
     getOwnPosts,
     getPostComments,
     loadNextComments,
@@ -1106,7 +1155,7 @@ export default React.memo(function PostContext({ children }) {
     removeCategory,
   };
 
-  if (postState.postLoading && categoryState.categoryLoading)
+  if (postState.postLoading)
     return <Loading className="post__loading"></Loading>;
 
   return (

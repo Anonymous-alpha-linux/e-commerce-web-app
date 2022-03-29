@@ -29,6 +29,9 @@ body {
 
 #root {
   height: 100vh;
+  position: relative;
+  max-width: 1550px;
+  margin: 0 auto;
 }
 
 img {

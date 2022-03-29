@@ -9,38 +9,27 @@ import axios from "axios";
 import { mainAPI } from "../../config";
 import { useAuthorizationContext } from ".";
 import { Loading } from "../../pages";
-import {
-  initialWorkspacePage,
-  workspaceReducer,
-  reduxActions as actions,
-} from "../reducers";
+import { initialWorkspacePage, workspaceReducer, reduxActions as actions, } from "../reducers";
+import { toastTypes } from "../../fixtures";
 
 const WorkspaceContextAPI = createContext();
 
 export default React.memo(function WorkspaceContext({ children }) {
-  const [workspaceState, setWorkspace] = useReducer(
-    workspaceReducer,
-    initialWorkspacePage
-  );
-  const { user } = useAuthorizationContext();
+  const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
+  const { user, pushToast } = useAuthorizationContext();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const cancelTokenSource = axios.CancelToken.source();
   const { REACT_APP_ENVIRONMENT } = process.env;
-  const workspaceAPI =
-    REACT_APP_ENVIRONMENT === "development"
-      ? mainAPI.LOCALHOST_STAFF
-      : mainAPI.CLOUD_API_STAFF;
+  const workspaceAPI = REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
 
   useEffect(() => {
     if (!workspaceState.page) {
       localStorage.setItem("workspace", 0);
     }
     onLoadWorkspaceList();
-  }, []);
-  useEffect(() => {
-    // onLoadWorkspace(workspaceState.workspaces[index]._id);
-  }, [workspaceState.workspaces]);
+  }, [user]);
+
 
   function onLoadWorkspaceList() {
     return axios
@@ -50,16 +39,24 @@ export default React.memo(function WorkspaceContext({ children }) {
         },
         params: {
           view: "workspace",
+          page: 0,
+          count: 2,
         },
       })
       .then((res) => {
-        const index = Number(localStorage.getItem("workspace")) || 0;
-
-        setWorkspace({
-          type: actions.GET_WORKSPACE_LIST,
-          payload: res.data.response,
-        });
-        onLoadWorkspace(res.data.response[index]);
+        if (res.status > 199 && res.status <= 299) {
+          setWorkspace({
+            type: actions.GET_WORKSPACE_LIST,
+            payload: res.data.response,
+            others: { totalWorkspace: res.data.totalWorkspace }
+          });
+          pushToast({
+            message: 'get workspace list successfully!',
+            type: toastTypes.SUCCESS
+          })
+          onLoadWorkspace();
+        }
+        else throw new Error(res.data);
       })
       .catch((error) => {
         setWorkspace({
@@ -69,12 +66,23 @@ export default React.memo(function WorkspaceContext({ children }) {
         setError(error.message);
       });
   }
-  function onLoadWorkspace(workspace) {
-    onLoadManagerInfo(workspace.manager);
-    setWorkspace({
-      type: actions.GET_WORKSPACE,
-      payload: workspace,
-    });
+  function onLoadWorkspace() {
+    return axios.get(workspaceAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "myworkspace",
+      }
+    }).then(res => {
+      setWorkspace({
+        type: actions.GET_WORKSPACE,
+        payload: res.data.response
+      })
+      onLoadManagerInfo(res.data.response.manger);
+    }).catch(err => {
+      setError(err.message);
+    })
   }
   function onLoadManagerInfo(managerId) {
     return axios
@@ -99,24 +107,69 @@ export default React.memo(function WorkspaceContext({ children }) {
       })
       .catch((error) => setError(error.message));
   }
-  function selectWorkspaceIndex(page) {
-    localStorage.setItem("workspace", page);
-    setWorkspace({
-      type: actions.SELECT_PAGE,
-      page: page,
-    });
+  function getWorkspaceMembers(workspaceId) {
+    return axios
+      .get(workspaceAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "member",
+          workspaceid: workspaceId,
+        },
+      })
+      .then((res) =>
+        setWorkspace({
+          type: actions.GET_WORKSPACE,
+        })
+      )
+      .catch((error) => setError(error.message));
   }
+  // function selectWorkspace(workspaceId, cb) {
+  //   return axios.put(workspaceAPI, {
+  //     workspaceid: workspaceId
+  //   }, {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //     },
+  //     params: {
+  //       view: "accountWorkspace"
+  //     },
+  //   }).then(res => {
+  //     setWorkspace({
+  //       type: actions.GET_WORKSPACE,
+  //       payload: res.data.response
+  //     });
+  //   }).catch(err => {
+
+  //   })
+  // }
   function createWorkspace(workspace) {
     setWorkspace({
       type: actions.CREATE_WORKSPACE,
       payload: workspace,
     });
   }
+  // function getWorkspaceForManager() {
+  //   return axios.get(mainAPI.LOCALHOST_MANAGER, {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //     },
+  //     params: {
+  //       view: "workspace",
+  //     }
+  //   }).then(res => setWorkspace({
+  //     type: actions.GET_MANAGER_WORKSPACE,
+  //     payload: res.data.response
+  //   }))
+  // }
   const contextValue = {
+    ...workspaceState,
     workspace: workspaceState.workspace,
     workspaces: workspaceState.workspaces,
     loading: workspaceState.workspaceLoading,
     createWorkspace,
+    getWorkspaceMembers,
   };
   if (workspaceState.workspaceLoading)
     return <Loading className="workspace__loading"></Loading>;

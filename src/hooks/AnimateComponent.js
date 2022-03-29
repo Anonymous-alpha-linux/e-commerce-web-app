@@ -18,3 +18,4 @@ export default function Component({ children, ...props }) {
     </>
   );
 }
+

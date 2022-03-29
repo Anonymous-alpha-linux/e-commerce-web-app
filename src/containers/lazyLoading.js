@@ -24,8 +24,8 @@ export default function LazyLoading({ children, ...restProps }) {
         })
     }, {
         root: document,
-        rootMargin: '0px',
-        threshold: 1,
+        rootMargin: '20px',
+        threshold: 0.5,
     }));
 
     // const scrollHandler = (e) => {

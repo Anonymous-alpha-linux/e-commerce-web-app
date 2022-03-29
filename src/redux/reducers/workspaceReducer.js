@@ -5,6 +5,7 @@ export const initialWorkspacePage = {
   workspace: null,
   workspaces: [],
   workspaceLoading: true,
+  workspaceTotal: 0,
   page: localStorage.getItem("workspace"),
 };
 export default function workspaceReducer(state, action) {
@@ -13,7 +14,12 @@ export default function workspaceReducer(state, action) {
     case actions.GET_WORKSPACE:
       return actionHandler.updateItem("workspace", action.payload, state);
     case actions.GET_WORKSPACE_LIST:
-      return actionHandler.updateItem("workspaces", action.payload, state);
+      return actionHandler.updateItem("workspaces", action.payload, { ...state, ...action.others });
+    case actions.GET_WORKSPACE_MEMBER:
+      return actions.updateItem("workspaces", workspace => {
+        if (workspace === action.workspaceId) return actionHandler.getListItem("members", action.payload, workspace);
+        return workspace;
+      }, state)
     case actions.GET_MANAGER:
       return actionHandler.updateItem(
         "workspace",

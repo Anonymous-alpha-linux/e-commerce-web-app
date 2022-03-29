@@ -500,6 +500,11 @@ $fec-button-border-radius-default: 2px !default;
   @include pure-button(#ffffff, #dd514c, 1, 1);
   border-radius: 20px;
 }
+.btn-gray {
+  @include pure-button(#ffffff, #9b807f, 1, 1);
+  border-radius: 20px;
+}
+
 .btn-warning {
   @include pure-button(#ffffff, #df7514, 1, 1);
   border-radius: 20px;

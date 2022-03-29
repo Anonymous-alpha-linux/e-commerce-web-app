@@ -1,59 +1,61 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { VscThreeBars } from "react-icons/vsc";
-import { ContainerComponent, Icon, LogoIcon, Text } from "../components";
+import {
+  AnimateComponent,
+  ContainerComponent,
+  Icon,
+  LogoIcon,
+  Text,
+} from "../components";
+import { useMedia, useModal } from "../hooks";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import Sidebar from "./sidebar";
+import { media } from '../fixtures';
 
 function DashBoardHeader({ children }) {
   const { workspace } = useWorkspaceContext();
   const { user } = useAuthorizationContext();
-  const [openSideBar, setOpenSidebar] = useState(false);
+
+  // const [openSideBar, setOpenSidebar] = useState(false);
+  const [openSideBar, toggleSidebar] = useModal();
+  const sideBarRef = useState(null);
+  const device = useMedia(420, 1080);
+
   return (
-    <>
-      <ContainerComponent
-        className="manager__header"
-        style={{
-          padding: "10px 25px",
-          position: "sticky",
-          top: 0,
-          left: 0,
-          zIndex: 10,
-        }}
-      >
-        <ContainerComponent.Flex
-          style={{ justifyContent: "space-between", alignItems: "center" }}
-        >
+    <ContainerComponent className="manager_root">
+      <ContainerComponent className="manager__header" style={{ padding: "10px 25px", position: "sticky", top: 0, left: 0, zIndex: 10, }}>
+        <ContainerComponent.Flex style={{ justifyContent: "space-between", alignItems: "center" }}>
           <ContainerComponent.Item>
             <Icon
-              onClick={() => setOpenSidebar((e) => !e)}
+              onClick={() => toggleSidebar()}
               style={{ cursor: "pointer" }}
             >
               <VscThreeBars style={{ fontSize: "25px" }}></VscThreeBars>
             </Icon>
           </ContainerComponent.Item>
-
+          {device !== media.MOBILE &&
+            <ContainerComponent.Item>
+              <Text.Title>Welcome to {workspace.workTitle}</Text.Title>
+              <Text.Subtitle style={{ textAlign: "center" }}>
+                Hello, {user.role.toUpperCase()}-{user.account}
+              </Text.Subtitle>
+            </ContainerComponent.Item>
+          }
           <ContainerComponent.Item>
-            <Text.Title>Welcome to {workspace.workTitle}</Text.Title>
-            <Text.Subtitle style={{ textAlign: "center" }}>
-              Hello {user.account}
-            </Text.Subtitle>
+            <LogoIcon></LogoIcon>
           </ContainerComponent.Item>
-
-          <ContainerComponent.Item>
-            {/* <ContainerComponent.Pane style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", width: "60px", height: "60px", background: "black", borderRadius: "50%" }}>
-                            <Text.Title style={{ color: "white" }}>Idea</Text.Title>
-                            <Text.Title style={{ background: "#f79817", width: "35px", textAlign: "center", borderRadius: "20px" }}>Hub</Text.Title>
-                        </ContainerComponent.Pane> */}
-                        <LogoIcon></LogoIcon>
-                    </ContainerComponent.Item>
-                </ContainerComponent.Flex>
-            </ContainerComponent>
-            {openSideBar && <Sidebar closeSidebar={() => setOpenSidebar(false)}></Sidebar>}
-            <ContainerComponent.Section className="sidebar__content">
-                {children}
-            </ContainerComponent.Section>
-        </>
-    )
+        </ContainerComponent.Flex>
+      </ContainerComponent>
+      <ContainerComponent className="manager__body">
+        <AnimateComponent.SlideRight className="sidebar__root" state={openSideBar}>
+          <Sidebar closeSidebar={() => toggleSidebar()}></Sidebar>
+        </AnimateComponent.SlideRight>
+        <ContainerComponent.Section className="sidebar__content">
+          {children}
+        </ContainerComponent.Section>
+      </ContainerComponent>
+    </ContainerComponent>
+  );
 }
 
 export default DashBoardHeader;

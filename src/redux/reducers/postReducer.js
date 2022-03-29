@@ -74,6 +74,24 @@ const postReducer = (state, action) => {
         )
       );
       return singlePost;
+    case actions.RATE_POST:
+      return actionHandler.updateItem(
+        "myPosts",
+        (post) => {
+          console.log(post);
+          if (post._id === action.postId) return { ...post, ...action.payload };
+          return post;
+        },
+        actionHandler.updateItem(
+          "posts",
+          (post) => {
+            if (post._id === action.postId)
+              return { ...post, ...action.payload };
+            return post;
+          },
+          state
+        )
+      );
     case actions.LIKE_POST:
       return actionHandler.updateItem(
         "myPosts",
@@ -90,8 +108,10 @@ const postReducer = (state, action) => {
                     post.dislikedAccounts.filter(
                       (acc) => acc === action.userId
                     );
-                  } else
-                    post.likedAccounts.filter((acc) => acc !== action.userId);
+                  }
+                  return post.likedAccounts.filter(
+                    (acc) => acc !== action.userId
+                  );
                 },
                 post
               )
@@ -657,7 +677,7 @@ const postReducer = (state, action) => {
               "comments",
               (comment) => {
                 if (comment._id === action.commentId) {
-                  return actionHandler.pushItem("replies", action.payload, {
+                  return actionHandler.unshiftItem("replies", action.payload, {
                     ...comment,
                     reply: comment.reply + 1,
                   });
@@ -690,36 +710,6 @@ const postReducer = (state, action) => {
           state
         )
       );
-    // case actions.UPDATE_COMMENT_REPLY:
-    //   return {
-    //     ...state,
-    //     posts: state.posts.map(post => {
-    //       if (post._id === action.postid) {
-    //         return {
-    //           ...post,
-    //           comments: post.comments.map(comment => {
-    //             if (comment._id === action.commentid) {
-    //               return {
-    //                 ...comment,
-    //                 replies: comment.replies.map(reply => {
-    //                   if (reply._id === action.payload._id) {
-    //                     return {
-    //                       ...reply,
-    //                       ...action.payload
-    //                     }
-    //                   }
-    //                   return reply;
-    //                 })
-    //               }
-    //             }
-    //             return comment;
-    //           })
-    //         }
-    //       }
-    //       return post;
-    //     })
-    //   };
-
     case actions.SET_LOADING:
       return {
         ...state,

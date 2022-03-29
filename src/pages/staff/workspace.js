@@ -110,5 +110,5 @@ export default function Workspace() {
         </List>
       </LazyLoading>
     </ContainerComponent>
-  );
+  )
 }
