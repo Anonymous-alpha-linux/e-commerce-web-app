@@ -22,7 +22,6 @@ export default React.memo(function WorkspaceContext({ children }) {
   const cancelTokenSource = axios.CancelToken.source();
   const { REACT_APP_ENVIRONMENT } = process.env;
   const workspaceAPI = REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
-  console.log(workspaceState.workspaces);
   useEffect(() => {
     if (!workspaceState.page) {
       localStorage.setItem("workspace", 0);

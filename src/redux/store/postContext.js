@@ -816,7 +816,6 @@ export default React.memo(function PostContext({ children }) {
     // Set Loading for waiting post
     if (type === "rate") {
       const { isLiked, isDisliked, like, dislike, likedAccounts, dislikedAccounts } = input;
-      console.log(input);
       setPost({
         type: actions.RATE_POST,
         postId,

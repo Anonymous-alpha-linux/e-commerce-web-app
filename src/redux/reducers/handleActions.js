@@ -29,7 +29,7 @@ export default class ActionHandler {
     unshiftItem(field, data, otherEntries) {
         return {
             ...otherEntries,
-            [field]: data.length ? [...data, ...otherEntries[field]] : otherEntries[field],
+            [field]: data.length ? (otherEntries[field] && [...data, ...otherEntries[field]] || data) : otherEntries[field] ? otherEntries[field] : [],
         };
     };
     pushItem(field, data, otherEntries) {

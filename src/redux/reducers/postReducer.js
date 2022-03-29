@@ -76,7 +76,6 @@ const postReducer = (state, action) => {
       return singlePost;
     case actions.RATE_POST:
       return actionHandler.updateItem("myPosts", post => {
-        console.log(post);
         if (post._id === action.postId) return { ...post, ...action.payload };
         return post;
       }, actionHandler.updateItem("posts", post => {
@@ -629,6 +628,7 @@ const postReducer = (state, action) => {
           action.commentId: [String]
           action.payload: [Object]
       */
+      console.log(action);
       return actionHandler.updateItem(
         "posts",
         (post) => {
@@ -670,6 +670,32 @@ const postReducer = (state, action) => {
           state
         )
       );
+
+    // return {
+    //   ...state,
+    //   posts: state.posts.map(post => {
+    //     if (post._id === action.postId) return {
+    //       ...post,
+    //       comments: post.comments.map(comment => {
+    //         let commentReplies = comment.replies || [];
+    //         if (comment._id === action.commentId) return { ...comment, reply: comment.reply + 1, replies: [...action.payload, ...commentReplies] }
+    //         return comment;
+    //       })
+    //     }
+    //     return post;
+    //   }),
+    //   myPosts: state.myPosts.map(post => {
+    //     if (post._id === action.postId) return {
+    //       ...post,
+    //       comments: post.comments.map(comment => {
+    //         let commentReplies = comment.replies || [];
+    //         if (comment._id === action.commentId) return { ...comment, reply: comment.reply + 1, replies: [...action.payload, ...commentReplies] }
+    //         return comment;
+    //       })
+    //     }
+    //     return post;
+    //   }),
+    // }
 
     case actions.SET_LOADING:
       return {
