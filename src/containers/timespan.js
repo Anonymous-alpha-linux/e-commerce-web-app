@@ -5,31 +5,55 @@ import { ButtonComponent } from "../components";
 export default function Timespan({
     startTime = Date.now(),
     expireTime,
+    setBlockWorkspace
 }) {
-    const startDate = new Date(startTime);
-    const expireDate = new Date(expireTime);
+    const startDate = new Date(startTime).getTime();
+    const expireDate = new Date(expireTime).getTime();
+
+    var timeleft = expireDate - startDate;
+    var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+
     const [counterTimer, setCounterTimer] = useState({
-        days: expireDate.getDate() - startDate.getDate(),
-        hours: 23 - startDate.getHours(),
-        minutes: 59 - startDate.getMinutes(),
-        seconds: 59 - startDate.getSeconds()
+        days,
+        hours,
+        minutes,
+        seconds
     });
 
     useEffect(() => {
-        let timeout = setTimeout(() => {
-            let time = new Date(expireDate.getTime() - startDate.getTime());
-            setCounterTimer({
-                days: time.getUTCDate(),
-                hours: time.getUTCHours(),
-                minutes: time.getUTCMinutes(),
-                seconds: time.getUTCSeconds()
-            });
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            var timeleft = expireDate - now;
+            var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+            if (days > 0) {
+                setCounterTimer({
+                    days,
+                    hours,
+                    minutes,
+                    seconds
+                });
+            }
+            else {
+                setBlockWorkspace(true);
+                setCounterTimer({
+                    days: 0,
+                    hours: 0,
+                    minutes: 0,
+                    seconds: 0,
+                });
+            }
         }, 1000);
 
         return () => {
-            clearTimeout(timeout);
+            clearInterval(interval);
         }
-    }, [counterTimer]);
+    }, []);
 
     return <ContainerComponent.Section
         style={{
@@ -44,7 +68,7 @@ export default function Timespan({
             }}
         >
             <Text>Time to close Workspace</Text>
-            <ContainerComponent.Flex
+            {counterTimer.days > 0 && <ContainerComponent.Flex
                 style={{
                     // alignItems: 'center',
                     justifyContent: 'center',
@@ -52,7 +76,7 @@ export default function Timespan({
                 }}
             >
                 <ContainerComponent.Item>
-                    <ButtonComponent>{counterTimer.days} </ButtonComponent>
+                    <ButtonComponent>{counterTimer.days}</ButtonComponent>
                     <Text.Bold>Days</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -61,7 +85,7 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${counterTimer.hours < 10 && '0' || ''}${counterTimer.hours}`} </ButtonComponent>
+                    <ButtonComponent>{`${counterTimer.hours}`} </ButtonComponent>
                     <Text.Bold>Hours</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -70,7 +94,7 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${counterTimer.minutes < 10 && '0' || ''}${counterTimer.minutes}`}</ButtonComponent>
+                    <ButtonComponent>{`${counterTimer.minutes}`}</ButtonComponent>
                     <Text.Bold>Minutes</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -79,10 +103,10 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${counterTimer.seconds < 10 && '0' || ''}${counterTimer.seconds}`}</ButtonComponent>
+                    <ButtonComponent>{`${counterTimer.seconds}`}</ButtonComponent>
                     <Text.Bold>Seconds</Text.Bold>
                 </ContainerComponent.Item>
-            </ContainerComponent.Flex>
+            </ContainerComponent.Flex> || <ContainerComponent.Pane style={{ background: '#333', color: "red", fontWeight: '600' }}>Closed</ContainerComponent.Pane>}
         </ContainerComponent.Inner>
     </ContainerComponent.Section>
 }

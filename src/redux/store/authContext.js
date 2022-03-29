@@ -55,10 +55,6 @@ export default function AuthenticationContext({ children }) {
           let socket = io(host);
           socket.auth = { accessToken: localStorage.getItem('accessToken') };
           setSocket(socket);
-          pushToast({
-            message: 'Get User successfully',
-            type: toastTypes.SUCCESS
-          });
           getProfile(response.data.accountId);
           cb(response.data.accountId);
         }
@@ -70,7 +66,7 @@ export default function AuthenticationContext({ children }) {
           type: actions.AUTHENTICATE_FAILED,
         });
         pushToast({
-          message: "Login to system",
+          message: "Signin successfully to system",
           type: toastTypes.INFO
         });
       })
@@ -89,7 +85,7 @@ export default function AuthenticationContext({ children }) {
         pushToast({
           messge: "Login successfully",
           type: toastTypes.SUCCESS
-        })
+        });
         return onLoadUser();
       })
       .catch((error) => {

@@ -215,9 +215,16 @@ export default React.memo(function PostContext({ children }) {
           type: actions.PUSH_IDEA,
           payload: [res.data.response],
         });
+        pushToast({
+          message: 'Posted successfully',
+          type: toastTypes.SUCCESS
+        });
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: 'Posted failed',
+          type: toastTypes.ERROR
+        });
       });
   }
   function updateSinglePost(postId, cb) {
@@ -237,9 +244,16 @@ export default React.memo(function PostContext({ children }) {
           payload: res.data.response,
           postId: postId,
         });
+        pushToast({
+          message: 'Updated post successfully',
+          type: toastTypes.SUCCESS
+        });
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: 'Updated post failed',
+          type: toastTypes.ERROR
+        });
       });
   }
   function deleteSinglePost(postId, cb) {
@@ -258,10 +272,17 @@ export default React.memo(function PostContext({ children }) {
           type: actions.REMOVE_SINGLE_POST,
           postId: postId,
         });
+        pushToast({
+          message: 'Deleted post successfully',
+          type: toastTypes.SUCCESS
+        });
         cb(postId);
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: 'Deleted post failed',
+          type: toastTypes.ERROR
+        });
       });
   }
   function postIdea(input, cb, options = null) {
@@ -300,11 +321,18 @@ export default React.memo(function PostContext({ children }) {
       })
       .then((res) => {
         createSinglePost(res.data.response[0]._id, cb);
+        pushToast({
+          message: 'Posted successfully',
+          type: toastTypes.SUCCESS
+        });
         cb(res.data.response[0]._id);
       })
       .catch((err) => {
+        pushToast({
+          message: 'Posted failed',
+          type: toastTypes.ERROR
+        });
         cb(error);
-        setError(err.message);
       });
   }
   function editIdea(input, formData, cb, options) {
@@ -341,7 +369,12 @@ export default React.memo(function PostContext({ children }) {
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
-      .catch((error) => setError(error.message));
+      .catch((error) => {
+        pushToast({
+          message: 'Edit Post successfully',
+          type: toastTypes.ERROR
+        });
+      });
   }
   function likePost(input, postId, userId) {
     setPost({
@@ -634,9 +667,16 @@ export default React.memo(function PostContext({ children }) {
           payload: [res.data.response],
           postId: postId,
         });
+        pushToast({
+          message: 'Posted comment',
+          type: toastTypes.SUCCESS
+        });
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: 'Failed to posted comment',
+          type: toastTypes.ERROR
+        });
       });
   }
 

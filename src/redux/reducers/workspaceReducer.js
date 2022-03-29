@@ -60,6 +60,13 @@ export default function workspaceReducer(state, action) {
         if (workspace._id === action.workspaceId) return { ...workspace, memberDetails: action.payload };
         return workspace;
       });
+    case actions.EDIT_WORKSPACE:
+      return actionHandler.updateItem("workspaces", workspace => {
+        if (workspace._id === action.workspaceId) {
+          return { ...workspace, ...action.payload };
+        }
+        return workspace;
+      }, state);
     default:
       return state;
   }

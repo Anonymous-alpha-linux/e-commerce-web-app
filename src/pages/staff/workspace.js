@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   ButtonComponent,
   ContainerComponent,
@@ -23,7 +23,9 @@ export default function Workspace() {
   const { user } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
-  const { sendMessageToSpecificPerson } = useNotifyContext();
+  const { sendMessageToSpecificPerson } = useNotifyContext(true);
+
+  const [blockWorkspace, setBlockWorkspace] = useState(false);
 
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
@@ -33,8 +35,8 @@ export default function Workspace() {
 
   return (
     <ContainerComponent className="workspace" id="workspace">
-      <Timespan expireTime={workspace.expireTime}></Timespan>
-      <PostForm></PostForm>
+      <Timespan expireTime={workspace.expireTime} setBlockWorkspace={setBlockWorkspace}></Timespan>
+      {!blockWorkspace && <PostForm></PostForm>}
       <Filter
         loader={filterPost}
         selectOptions={[
@@ -64,7 +66,7 @@ export default function Workspace() {
               hideAuthor,
               comments,
             } = post;
-console.log(post);
+
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,
@@ -74,7 +76,6 @@ console.log(post);
               date: post.createdAt,
               hideAuthor,
             };
-
             let postBody = {
               content,
               attachment: attachments.map((attach) => {

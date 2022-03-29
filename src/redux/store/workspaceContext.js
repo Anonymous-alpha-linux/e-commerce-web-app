@@ -22,7 +22,7 @@ export default React.memo(function WorkspaceContext({ children }) {
   const cancelTokenSource = axios.CancelToken.source();
   const { REACT_APP_ENVIRONMENT } = process.env;
   const workspaceAPI = REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
-
+  console.log(workspaceState.workspaces);
   useEffect(() => {
     if (!workspaceState.page) {
       localStorage.setItem("workspace", 0);
@@ -50,20 +50,20 @@ export default React.memo(function WorkspaceContext({ children }) {
             payload: res.data.response,
             others: { totalWorkspace: res.data.totalWorkspace, loadMore: res.data.response.length === workspaceState.count }
           });
-          pushToast({
-            message: 'get workspace list successfully!',
-            type: toastTypes.SUCCESS
-          })
           onLoadWorkspace();
         }
-        else throw new Error(res.data);
+        else {
+          pushToast({
+            message: 'Get workspace information failed',
+            type: toastTypes.ERROR
+          });
+        }
       })
       .catch((error) => {
-        setWorkspace({
-          type: actions.SET_LOADING,
-          loading: false,
+        pushToast({
+          message: 'Get workspace information failed',
+          type: toastTypes.ERROR
         });
-        setError(error.message);
       });
   }
   function loadMoreWorkspaceList() {
@@ -85,10 +85,6 @@ export default React.memo(function WorkspaceContext({ children }) {
             payload: res.data.response,
             others: { totalWorkspace: res.data.totalWorkspace, page: workspaceState.page + 1, loadMore: res.data.response.length === workspaceState.count }
           });
-          pushToast({
-            message: 'get workspace list successfully!',
-            type: toastTypes.SUCCESS
-          })
           onLoadWorkspace();
         }
         else throw new Error(res.data);
@@ -142,6 +138,31 @@ export default React.memo(function WorkspaceContext({ children }) {
       })
       .catch((error) => setError(error.message));
   }
+  function updateWorkspaceById(workspaceId) {
+    return axios.get(workspaceAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "workspace",
+        workspaceid: workspaceId,
+      }
+    }).then(res => {
+      pushToast({
+        message: 'Update workspace successfully!',
+        type: toastTypes.SUCCESS
+      });
+      setWorkspace({
+        type: actions.UPDATE_WORKSPACE,
+        payload: res.data.response
+      });
+    }).catch(err => {
+      pushToast({
+        message: 'Update workspace failed',
+        type: toastTypes.ERROR
+      });
+    });
+  }
   function getWorkspaceMembers(workspaceId, cb) {
     return axios
       .get(workspaceAPI, {
@@ -159,10 +180,6 @@ export default React.memo(function WorkspaceContext({ children }) {
         //   workspaceId: workspaceId,
         //   payload: res.data.response
         // });
-        pushToast({
-          message: 'get workspace member list successfully',
-          type: toastTypes.SUCCESS
-        });
         cb(res.data.response);
       })
       .catch((error) => {
@@ -193,9 +210,6 @@ export default React.memo(function WorkspaceContext({ children }) {
       type: actions.CREATE_WORKSPACE,
       payload: workspace,
     });
-  }
-  function editWorkspace(workspaceId){
-    
   }
   // function getWorkspaceForManager() {
   //   return axios.get(mainAPI.LOCALHOST_MANAGER, {
@@ -312,6 +326,43 @@ export default React.memo(function WorkspaceContext({ children }) {
     });
   }
   function assignRoleToAccount() { }
+  function editWorkspace(workspaceId, workTitle, closureTime, eventTime, cb) {
+    return axios.put(workspaceAPI, { workTitle, closureTime, eventTime }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: "workspace",
+        workspaceid: workspaceId,
+      }
+    }).then(res => {
+      if (res.status > 199 && res.status <= 299) {
+        setWorkspace({
+          type: actions.EDIT_WORKSPACE,
+          payload: {
+            workTitle,
+            expireTime: new Date(closureTime),
+            eventTime: new Date(eventTime)
+          },
+          workspaceId
+        });
+        pushToast({
+          message: "Edited workspace successfully",
+          type: toastTypes.SUCCESS,
+        });
+        if (typeof cb !== 'undefined')
+          cb();
+      }
+      else throw new Error(res.data.error);
+    }).catch(err => {
+      pushToast({
+        message: err.message,
+        type: toastTypes.ERROR
+      });
+      if (typeof cb !== 'undefined')
+        cb();
+    });
+  }
 
   const contextValue = {
     ...workspaceState,
@@ -324,7 +375,8 @@ export default React.memo(function WorkspaceContext({ children }) {
     assignMemberToWorkspace,
     assignRoleToAccount,
     unassignMemberToWorkspace,
-    loadMoreWorkspaceList
+    loadMoreWorkspaceList,
+    editWorkspace
   };
   if (workspaceState.workspaceLoading)
     return <Loading className="workspace__loading"></Loading>;

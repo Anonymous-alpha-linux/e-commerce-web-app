@@ -336,34 +336,66 @@ const WorkspaceList = () => {
   </>
 }
 function TimespanChild({ startTime = Date.now(), expireTime }) {
-  const startDate = new Date(startTime);
-  const expireDate = new Date(expireTime);
+  const startDate = new Date(startTime).getTime();
+  const expireDate = new Date(expireTime).getTime();
+
+  var timeleft = expireDate - startDate;
+  var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+
   const [counterTimer, setCounterTimer] = useState({
-    days: expireDate.getDate() - startDate.getDate(),
-    hours: 23 - startDate.getHours(),
-    minutes: 59 - startDate.getMinutes(),
-    seconds: 59 - startDate.getSeconds(),
+    days,
+    hours,
+    minutes,
+    seconds
   });
+  const [blockWorkspace, setBlockWorkspace] = useState(false);
 
   useEffect(() => {
-    let timeout = setTimeout(() => {
-      setCounterTimer({
-        days: expireDate.getDate() - startDate.getDate(),
-        hours: 23 - startDate.getHours(),
-        minutes: 59 - startDate.getMinutes(),
-        seconds: 59 - startDate.getSeconds(),
-      });
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      var timeleft = expireDate - now;
+      var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+      if (days > 0) {
+        setCounterTimer({
+          days,
+          hours,
+          minutes,
+          seconds
+        });
+      }
+      else {
+        setBlockWorkspace(true);
+        setCounterTimer({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        });
+      }
     }, 1000);
 
     return () => {
-      clearTimeout(timeout);
-    };
-  }, [counterTimer]);
+      clearInterval(interval);
+    }
+  }, []);
 
+
+  function convertTo2Digit(number) {
+    return number.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false
+    });
+  }
   return (
     <ContainerComponent.Section className="timespan__container">
       <ContainerComponent.Inner style={{ margin: "0 auto", textAlign: "center" }}>
-        <ContainerComponent.Flex
+        {counterTimer.days > 0 && <ContainerComponent.Flex
           style={{
             // alignItems: 'center',
             justifyContent: "center",
@@ -373,7 +405,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
             style={{ fontSize: "13px", padding: "5px 0" }}
           >
             <ButtonComponent style={{ padding: "5px 15px" }}>
-              {`${(counterTimer.days < 10 && "0") || ""}${counterTimer.days}`}{" "}
+              {`${counterTimer.days}`}
             </ButtonComponent>
           </ContainerComponent.Item>
 
@@ -384,8 +416,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           <ContainerComponent.Item
             style={{ fontSize: "13px", padding: "5px 0" }}
           >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${(counterTimer.hours < 10 && "0") || ""
-              }${counterTimer.hours}`}</ButtonComponent>
+            <ButtonComponent style={{ padding: "5px 10px" }}>{`${convertTo2Digit(counterTimer.hours)}`}</ButtonComponent>
           </ContainerComponent.Item>
 
           <ContainerComponent.Item>
@@ -395,11 +426,20 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           <ContainerComponent.Item
             style={{ fontSize: "13px", padding: "5px 0" }}
           >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${(counterTimer.minutes < 10 && "0") || ""
-              }${counterTimer.minutes}`}</ButtonComponent>
+            <ButtonComponent style={{ padding: "5px 10px" }}>{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
           </ContainerComponent.Item>
 
-        </ContainerComponent.Flex>
+          <ContainerComponent.Item>
+            <Text>:</Text>
+          </ContainerComponent.Item>
+
+          <ContainerComponent.Item
+            style={{ fontSize: "13px", padding: "5px 0" }}
+          >
+            <ButtonComponent style={{ padding: "5px 10px" }}>{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
+          </ContainerComponent.Item>
+
+        </ContainerComponent.Flex> || <ContainerComponent.Pane>Closed</ContainerComponent.Pane>}
       </ContainerComponent.Inner>
     </ContainerComponent.Section>
   );

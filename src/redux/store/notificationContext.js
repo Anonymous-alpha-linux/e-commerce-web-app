@@ -9,7 +9,7 @@ import { useAuthorizationContext } from './authContext';
 const NotificationContextAPI = createContext();
 
 export default function NotificationContext({ children }) {
-    const {pushToast} = useAuthorizationContext();
+    const { pushToast } = useAuthorizationContext();
     const [showUpdate, setShowUpdate] = useState(true);
     const [notify, setNotify] = useReducer(notifyReducer, initialNotify);
     const { user, socket, setError, setMessage } = useAuthorizationContext();
@@ -47,10 +47,6 @@ export default function NotificationContext({ children }) {
             }
         })
             .then(res => {
-                pushToast({
-                    message: 'Successful',
-                    type: toastTypes.SUCCESS
-                })
                 setNotify({
                     type: actions.GET_NOTIFICATIONS,
                     payload: res.data.response
@@ -74,10 +70,6 @@ export default function NotificationContext({ children }) {
                 count: notify.count
             }
         }).then(res => {
-            pushToast({
-                message: 'Successful',
-                type: toastTypes.SUCCESS
-            })
             setNotify({
                 type: actions.PUSH_NOTIFICATION,
                 payload: res.data.response

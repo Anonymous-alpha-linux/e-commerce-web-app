@@ -81,7 +81,6 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setState((o) => ({
           ...o,
           accounts: {
@@ -115,10 +114,6 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Get Role List Successful",
-          type: toastTypes.SUCCESS
-        });
         setState((o) => ({
           ...o,
           roles: res.data.response,
@@ -298,7 +293,7 @@ export default function AdminContext({ children }) {
           pushToast({
             message: 'Add new user successfully',
             type: toastTypes.SUCCESS
-          })
+          });
           cb({
             message: "Successfully, Add New User",
           });
@@ -313,7 +308,7 @@ export default function AdminContext({ children }) {
         pushToast({
           message: 'Add user failed!',
           type: toastTypes.ERROR
-        })
+        });
         cb({ error: error.message });
       });
   }
@@ -351,7 +346,7 @@ export default function AdminContext({ children }) {
           pushToast({
             message: 'Update username successfully',
             type: toastTypes.SUCCESS
-          })
+          });
           cb({
             message: "Edit username successfully",
           });
