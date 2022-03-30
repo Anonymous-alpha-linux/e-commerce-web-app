@@ -11,8 +11,9 @@ export default function DropDown({ children, forwardRef, ...props }) {
         </div>
     )
 }
-DropDown.DropBtn = ({ children, ...props }) => {
+DropDown.DropBtn = ({ children, forwardref, ...props }) => {
     return <span className="dropdown__dropbtn"
+        ref={forwardref}
         {...props}>
         {children}
     </span>

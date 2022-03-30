@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ContainerComponent, Form, Icon,LogoIcon,Text } from "../components";
+import { ContainerComponent, Form, Icon, LogoIcon, Text } from "../components";
 import { useAuthorizationContext } from "../redux";
 import useValidate from "../hooks/useValidate";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
@@ -59,12 +59,12 @@ const Login = () => {
               onSubmit={submitHandler}
             >
               <Form.Container className={"signIn__formContainer"}>
-                <ContainerComponent.Flex style={{flexDirection:"column",gap:"30px"}}>
+                <ContainerComponent.Flex style={{ flexDirection: "column", gap: "30px" }}>
                   <ContainerComponent.Pane>
                     <Icon className={"signIn__icon"}>
                       <FaUserAlt style={{ transform: "translate(-50%,-150%)" }}></FaUserAlt>
                     </Icon>
-                    <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "20px" }}> Fucking Login</Text.Title>
+                    <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "20px" }}>Login</Text.Title>
                   </ContainerComponent.Pane>
                   <Form.Input
                     className={"signIn__input"}
@@ -93,7 +93,7 @@ const Login = () => {
                   ></Form.Input>
                 </ContainerComponent.Flex>
               </Form.Container>
-              {message && <Form.Message style={{textAlign:"center",color:"red"}}>{message}</Form.Message>}
+              {message && <Form.Message style={{ textAlign: "center", color: "red" }}>{message}</Form.Message>}
               {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
             </Form>
           </ContainerComponent.Inner>

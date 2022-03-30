@@ -1,28 +1,42 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
 import { Link, useLocation } from 'react-router-dom';
 
-export default function Personal({ personalInfo }) {
-    const { user, profile, editProfile } = useAuthorizationContext();
+export default function Personal() {
+    const { user, getProfile, editProfile } = useAuthorizationContext();
     const { workspace } = useWorkspaceContext();
-    const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
     const [isEdit, setIsEdit] = useState(false);
-
     const [input, setInput] = useState({
-        firstName: profile?.firstName || '',
-        lastName: profile?.lastName || '',
-        address: profile?.address || '',
-        phone: profile?.phone || '',
-        introduction: profile?.introduction || '',
-        gender: profile?.gender || 'male',
-        age: profile?.age || 0,
+        firstName: '',
+        lastName: '',
+        address: '',
+        phone: '',
+        introduction: '',
+        gender: 'male',
+        age: 0,
         birth: ''
     });
     const location = useLocation();
     const titleRef = useRef();
 
+    useEffect(() => {
+        getProfile(user.accountId, data => {
+            if (!data.error) {
+                setInput({
+                    firstName: data?.firstName || '',
+                    lastName: data?.lastName || '',
+                    address: data?.address || '',
+                    phone: data?.phone || '',
+                    introduction: data?.introduction || '',
+                    gender: data?.gender || 'male',
+                    age: data?.age || 0,
+                    birth: ''
+                });
+            }
+        });
+    }, [user]);
     const inputHandler = (e) => {
         setInput({
             ...input,
@@ -31,7 +45,11 @@ export default function Personal({ personalInfo }) {
     }
     const submitHandler = (e) => {
         e.preventDefault();
-        return editProfile(input);
+        return editProfile(input, data => {
+            if (!data.error) {
+                setInput(o => ({ ...o, ...input, ...data }))
+            }
+        });
     }
 
     return <ContainerComponent className="personal" style={{ padding: '10px' }}>

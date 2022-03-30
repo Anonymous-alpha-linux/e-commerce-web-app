@@ -140,6 +140,7 @@ export default function Navigation() {
 }
 const Navigator = ({ closeNavigator }) => {
   const [openModal, toggleModal] = useModal();
+
   return (
     <>
       <ContainerComponent.BackDrop
@@ -147,7 +148,7 @@ const Navigator = ({ closeNavigator }) => {
       ></ContainerComponent.BackDrop>
       <ContainerComponent className="navigator__container" style={{ position: "fixed", bottom: 0, left: 0, zIndex: 10, borderRadius: "20px 20px 0 0", background: "#333", color: "#fff", padding: "10px" }}>
         <ContainerComponent.GridThreeColumns style={{ zIndex: 10 }}>
-          {navigators.map((navigate, index) => (navigate.trigger ? <ContainerComponent.Item onClick={() => {
+          {navigators.map((navigate, index) => (navigate.trigger ? <ContainerComponent.Item key={index + 1} onClick={() => {
             toggleModal()
           }}>
             <ContainerComponent.MiddleInner>
@@ -303,7 +304,7 @@ const WorkspaceList = () => {
         if (!disabled) {
           selectHandler(item._id);
         }
-      }} style={{ width: "100%", padding: "10px", minWidth: "230px", ...disabledStyled() }}>
+      }} style={{ width: "100%", padding: "10px", minWidth: "280px", ...disabledStyled() }}>
         <ContainerComponent.Flex style={{ alignItems: "center", justifyContent: "space-between" }}>
           <Text.MiddleLine>
             <Icon style={{ fontSize: "25px" }}>

@@ -30,15 +30,12 @@ export default function AuthenticationContext({ children }) {
 
   useEffect(() => {
     onLoadUser();
-    return () => {
-      cancelTokenSource.cancel();
-    };
   }, []);
 
   const onLoadUser = (cb) => {
-    setUser({
-      type: actions.SET_LOADING
-    })
+    // setUser({
+    //   type: actions.SET_LOADING
+    // })
     return axios
       .get(authAPI, {
         cancelToken: cancelTokenSource.token,
@@ -55,7 +52,7 @@ export default function AuthenticationContext({ children }) {
           let socket = io(host);
           socket.auth = { accessToken: localStorage.getItem('accessToken') };
           setSocket(socket);
-          getProfile(response.data.accountId);
+          // getProfile(response.data.accountId);
           cb(response.data.accountId);
         }
         else {
@@ -133,10 +130,9 @@ export default function AuthenticationContext({ children }) {
         });
       })
   }
-  function getProfile(accountId) {
+  function getProfile(accountId, cb) {
     return axios
       .get(authAPI, {
-        cancelToken: cancelTokenSource.token,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -146,27 +142,27 @@ export default function AuthenticationContext({ children }) {
         },
       })
       .then((res) => {
-        setUser({
-          type: actions.GET_PROFILE,
-          payload: res.data.response,
-        });
+        // setUser({
+        //   type: actions.GET_PROFILE,
+        //   payload: res.data.response,
+        // });
+        cb(res.data.response);
       })
       .catch((error) => {
-        pushToast({
-          message: "Get Profile Failed",
-          type: toastTypes.ERROR
-        });
+        if (user.accountId === accountId) {
+          pushToast({
+            message: "You are not fulfill profile",
+            type: toastTypes.WARNING
+          });
+        }
+        cb({ error: 'Get profile failed' });
       });
   }
-  function editProfile(input) {
+  function editProfile(input, cb) {
     return axios
       .put(
-        authAPI,
+        authAPI, input,
         {
-          ...input,
-        },
-        {
-          cancelToken: cancelTokenSource.token,
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
@@ -179,14 +175,15 @@ export default function AuthenticationContext({ children }) {
         pushToast({
           message: "Edit Profile Successful",
           type: toastTypes.SUCCESS
-        })
-        getProfile()
+        });
+        cb(res.data.response);
       })
       .catch((error) => {
         pushToast({
           message: "Edit Profile Failed",
           type: toastTypes.ERROR
-        })
+        });
+        cb({ error: "get profile failed" });
       });
   }
   function editCurrentWorkspace(workspaceId) {
@@ -213,9 +210,12 @@ export default function AuthenticationContext({ children }) {
       });
     })
   }
+  function searchQuery() {
+
+  }
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
-  return (<>
+  return (
     <AuthenticationContextAPI.Provider
       value={{
         loading: user.authLoading,
@@ -230,11 +230,11 @@ export default function AuthenticationContext({ children }) {
         logout,
         editProfile,
         editCurrentWorkspace,
+        getProfile
       }}
     >
       {children}
     </AuthenticationContextAPI.Provider>
-  </>
   );
 }
 

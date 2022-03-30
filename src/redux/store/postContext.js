@@ -228,6 +228,7 @@ export default React.memo(function PostContext({ children }) {
       });
   }
   function updateSinglePost(postId, cb) {
+    console.log(postId);
     return axios
       .get(postAPI, {
         headers: {
@@ -243,10 +244,6 @@ export default React.memo(function PostContext({ children }) {
           type: actions.UPDATE_SINGLE_POST,
           payload: res.data.response,
           postId: postId,
-        });
-        pushToast({
-          message: 'Updated post successfully',
-          type: toastTypes.SUCCESS
         });
       })
       .catch((error) => {
@@ -845,8 +842,12 @@ export default React.memo(function PostContext({ children }) {
           }
         )
         .then((res) => {
-          sendRealTimeLike(isLiked, postId, user.accountId);
-          sendRealTimeDisLike(isDisliked, postId, user.accountId);
+          if (isLiked) {
+            sendRealTimeLike(postId, user.accountId);
+          }
+          if (isDisliked) {
+            sendRealTimeDisLike(postId, user.accountId);
+          }
         })
         .catch((error) => {
           setError(error.message);

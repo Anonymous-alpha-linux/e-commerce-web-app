@@ -10,7 +10,7 @@ import { ContainerComponent, Form, Icon, Text, Message, ButtonComponent } from '
 import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from '../../redux';
 import { roles, toastTypes } from '../../fixtures';
 
-function UserAll({ filter = roles.STAFF, workspaceId }) {
+function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) {
     const { accounts: { data } } = useAdminContext();
     const { id } = useParams();
     let workspaceid = id || workspaceId;
@@ -23,8 +23,8 @@ function UserAll({ filter = roles.STAFF, workspaceId }) {
 
     useEffect(() => {
         setState(oldState => ({
-            members: data.filter(member => member.role.roleName === filter),
-            outputs: data.filter(member => member.role.roleName === filter)
+            members: data.filter(member => filter.includes(member.role.roleName)),
+            outputs: data.filter(member => filter.includes(member.role.roleName))
         }));
     }, [data]);
     function inputHandler(e) {

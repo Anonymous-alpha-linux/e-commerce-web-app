@@ -13,6 +13,7 @@ import Loading from "./loading";
 export default function Home() {
   const { user, loading: authLoading, toastList, pullToast } = useAuthorizationContext();
   const location = useLocation();
+
   if (authLoading) return <Loading></Loading>
   if (!user.isLoggedIn) {
     return <Navigate to="/login" state={{ from: location }} replace></Navigate>
@@ -27,7 +28,8 @@ export default function Home() {
           zIndex: 100,
           padding: '10px',
           flexDirection: 'column',
-          gap: '10px'
+          gap: '10px',
+          maxHeight: '200px'
         }}>
           {toastList.map((toast, index) => {
             return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={toast.timeout || 3000} pullItem={pullToast} />

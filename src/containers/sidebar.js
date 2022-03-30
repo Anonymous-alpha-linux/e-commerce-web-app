@@ -110,37 +110,33 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
               </ContainerComponent.Item>
             </ContainerComponent.Flex>
 
-            {switchToggle && <ContainerComponent.Toggle style={{ margin: "0 auto" }}>
+            {switchToggle && <ContainerComponent.Toggle style={{ margin: "0 auto", padding: '0 10px' }}>
               <ContainerComponent.Item
                 style={{
                   width: "100%",
-                  padding: 20,
-                  paddingTop: 25,
-                  boxShadow: "2px 0 5px #000",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "20px",
+                  padding: '10px',
+                  // boxShadow: "2px 0 5px #000",
                   position: "relative",
                 }}
                 onClick={() => setModalWS(!modalWS)}
               >
-                <Icon style={{
-                  transform: "translateX(-50%)",
-                  fontSize: "33px",
-                  position: "absolute",
-                }}
-                >
-                  <TiPlus></TiPlus>
-                </Icon>
-                <Text.Title
-                  style={{
-                    right: "50%",
-                    transform: "translateX(50%)",
-                    position: "absolute",
+                <Text.MiddleLine>
+                  <Icon style={{
+                    fontSize: "33px",
                   }}
-                >
-                  Add Workspace
-                </Text.Title>
+                  >
+                    <TiPlus></TiPlus>
+                  </Icon>
+                </Text.MiddleLine>
+                <Text.MiddleLine style={{ width: 'calc(100% - 20px)' }}>
+                  <Text.Title
+                    style={{
+                      textAlign: 'center',
+                    }}
+                  >
+                    Add Workspace
+                  </Text.Title>
+                </Text.MiddleLine>
               </ContainerComponent.Item>
               {/* workspaceData */}
               <ContainerComponent.Item style={{ maxHeight: "260px", overflowY: "scroll" }}>
@@ -301,7 +297,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
-      if (days > 0) {
+      if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+        setBlockWorkspace(false);
         setCounterTimer({
           days,
           hours,
@@ -323,7 +320,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
     return () => {
       clearInterval(interval);
     }
-  }, [workspaces]);
+  }, [workspaces])
+
   function convertTo2Digit(number) {
     return number.toLocaleString('en-US', {
       minimumIntegerDigits: 2,
@@ -342,7 +340,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           </Text.CenterLine>
         </ContainerComponent.Inner>
         || <ContainerComponent.Inner style={{ margin: "0 auto", textAlign: "center" }}>
-          {counterTimer.days > 0 ? <ContainerComponent.Flex
+          {!blockWorkspace && <ContainerComponent.Flex
             style={{
               // alignItems: 'center',
               justifyContent: "center",
@@ -386,7 +384,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
               <ButtonComponent style={{ padding: "5px 10px" }}>{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
             </ContainerComponent.Item>
 
-          </ContainerComponent.Flex> :
+          </ContainerComponent.Flex>
+            ||
             <ContainerComponent.Pane style={{ color: 'red', fontWeight: 500, fontSize: '0.8em' }}>Closed</ContainerComponent.Pane>}
         </ContainerComponent.Inner>}
     </ContainerComponent.Section>
@@ -410,6 +409,7 @@ function WorkspaceModal({ workspaceId, workTitle, toggleModal }) {
     setLoading(true);
     editWorkspace(workspaceId, workspaceInfo.workTitle, workspaceInfo.expireTime, workspaceInfo.eventTime, () => {
       setLoading(false);
+      toggleModal();
     });
   }
   return (

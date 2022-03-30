@@ -109,7 +109,7 @@ export default React.memo(function WorkspaceContext({ children }) {
         type: actions.GET_WORKSPACE,
         payload: res.data.response
       })
-      onLoadManagerInfo(res.data.response.manger);
+      // onLoadManagerInfo(res.data.response.manger);
     }).catch(err => {
       setError(err.message);
     })

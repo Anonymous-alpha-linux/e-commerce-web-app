@@ -24,7 +24,7 @@ export default function MemberList({ workspaceId }) {
         getWorkspaceMembers(workspaceid, members => {
             setState({
                 members: members,
-                outputs: data,
+                outputs: data.filter(account => [roles.QA_COORDINATOR, roles.STAFF].includes(account.role.roleName)),
             });
         });
     }, [data, workspaceid]);
@@ -35,7 +35,7 @@ export default function MemberList({ workspaceId }) {
     function searchMember(input) {
         setState(oldState => ({
             ...oldState,
-            outputs: data.filter(person => person.username.toLowerCase().includes(input.toLowerCase()))
+            outputs: data.filter(person => person.username.toLowerCase().includes(input.toLowerCase())).filter(account => [roles.QA_COORDINATOR, roles.STAFF].includes(account.role.roleName))
         }));
     }
     function addMember(accountId) {
