@@ -113,7 +113,7 @@ export default function Timespan({
                     <ButtonComponent>{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
                     <Text.Bold>Seconds</Text.Bold>
                 </ContainerComponent.Item>
-            </ContainerComponent.Flex> || <ContainerComponent.Pane style={{ background: '#333', color: "red", fontWeight: '600' }}>Closed</ContainerComponent.Pane>}
+            </ContainerComponent.Flex> || <ContainerComponent.Pane style={{ color: "red", fontWeight: '600' }}>Closed</ContainerComponent.Pane>}
         </ContainerComponent.Inner>
     </ContainerComponent.Section>
 }

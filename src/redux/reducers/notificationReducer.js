@@ -21,7 +21,7 @@ const notificationReducer = (state, action) => {
            */
         case actions.PUSH_NOTIFICATION:
             console.log(action.payload);
-            return actionHandler.unshiftItem("notifications", action.payload, {
+            return actionHandler.pushItem("notifications", action.payload, {
                 ...state,
                 page: state.page + 1,
                 more: action.payload.length >= state.count

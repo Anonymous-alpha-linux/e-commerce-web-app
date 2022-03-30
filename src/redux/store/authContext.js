@@ -3,7 +3,6 @@ import React, {
   createContext,
   useContext,
   useState,
-  useEffect,
   useReducer,
 } from "react";
 import { mainAPI } from "../../config";
@@ -28,47 +27,44 @@ export default function AuthenticationContext({ children }) {
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
-  useEffect(() => {
+  React.useEffect(() => {
     onLoadUser();
   }, []);
 
   const onLoadUser = (cb) => {
-    // setUser({
-    //   type: actions.SET_LOADING
-    // })
+    console.log("load user");
     return axios
       .get(authAPI, {
-        cancelToken: cancelTokenSource.token,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         }
       })
-      .then((response) => {
-        if (response.status > 199 && response.status <= 299) {
-          setUser({
-            type: actions.AUTHENTICATE_ACTION,
-            payload: response.data,
-          });
-          let socket = io(host);
-          socket.auth = { accessToken: localStorage.getItem('accessToken') };
-          setSocket(socket);
-          // getProfile(response.data.accountId);
+      .then(response => {
+        setUser({
+          type: actions.AUTHENTICATE_ACTION,
+          payload: response.data,
+        });
+        let socket = io(host);
+        socket.auth = { accessToken: localStorage.getItem('accessToken') };
+        setSocket(socket);
+        if (typeof cb !== 'undefined') {
           cb(response.data.accountId);
         }
-        else {
-          throw new Error("Get user data Failed!");
-        }
-      }).catch(error => {
+      })
+      .catch(error => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
         });
         pushToast({
-          message: "Signin successfully to system",
+          message: "Sign-in to system",
           type: toastTypes.INFO
         });
+        if (typeof cb !== 'undefined') {
+          cb({});
+        }
       })
   };
-  function login(data) {
+  function login(data, cb) {
     const loginApi =
       process.env.REACT_APP_ENVIRONMENT === "development"
         ? mainAPI.LOCALHOST_LOGIN
@@ -80,35 +76,35 @@ export default function AuthenticationContext({ children }) {
       .then((res) => {
         localStorage.setItem("accessToken", res.data.accessToken);
         pushToast({
-          messge: "Login successfully",
+          message: "Login successfully",
           type: toastTypes.SUCCESS
         });
-        return onLoadUser();
+        setUser({
+          type: actions.LOGIN_ACTION,
+          payload: res.data
+        });
+        cb();
       })
       .catch((error) => {
-        setUser({
-          type: actions.AUTHENTICATE_FAILED,
-        });
-        pushToast({
-          message: "Login to system",
-          type: toastTypes.INFO
-        });
+        if (error.response.status === 401) {
+          setUser({
+            type: actions.AUTHENTICATE_FAILED,
+          });
+          pushToast({
+            message: error.response.data.error,
+            type: toastTypes.ERROR
+          });
+          cb();
+        }
+        else {
+          pushToast({
+            message: "Please login to system",
+            type: toastTypes.INFO
+          });
+          cb();
+        }
       });
   }
-  // const register = async (data) => {
-  //   const registerApi = mainAPI.CLOUD_API_REGISTER;
-  //   // const registerApi = mainAPI.LOCALHOST_REGISTER;
-  //   return axios.post(registerApi, { ...data }, {
-  //     cancelToken: cancelTokenSource.token
-  //   })
-  //     .then(res => {
-  //       localStorage.setItem('accessToken', res.data.accessToken);
-  //       setUser({ ...res.data });
-  //     }).catch(error => setUser({
-  //       type: actions.ERROR_ACTION,
-  //       error: error.message
-  //     }));
-  // };
   async function logout() {
     const logoutApi =
       process.env.REACT_APP_ENVIRONMENT === "development"
@@ -186,7 +182,7 @@ export default function AuthenticationContext({ children }) {
         cb({ error: "get profile failed" });
       });
   }
-  function editCurrentWorkspace(workspaceId) {
+  function editCurrentWorkspace(workspaceId, cb) {
     return axios.put(staffAPI, {
       workspaceid: workspaceId
     }, {
@@ -197,7 +193,7 @@ export default function AuthenticationContext({ children }) {
         view: "accountworkspace"
       }
     }).then(res => {
-      onLoadUser();
+      onLoadUser(cb);
       pushToast({
         message: "Update Workspace successfully",
         type: toastTypes.SUCCESS
@@ -208,12 +204,13 @@ export default function AuthenticationContext({ children }) {
         type: toastTypes.ERROR,
         timeout: 10000,
       });
+      cb();
     })
   }
   function searchQuery() {
 
   }
-  if (user.authLoading) return <Loading className="auth__loading"></Loading>;
+  // if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (
     <AuthenticationContextAPI.Provider
@@ -226,6 +223,7 @@ export default function AuthenticationContext({ children }) {
         toastList,
         pushToast,
         pullToast,
+        onLoadUser,
         login,
         logout,
         editProfile,

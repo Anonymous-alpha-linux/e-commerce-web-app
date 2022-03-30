@@ -20,7 +20,7 @@ export default function TriggerLoading({ children, loader, loadMore, ...restProp
             {children}
             {loadMore === true &&
                 <Text.Subtitle
-                    style={{ textAlign: "center", width: "100%", margin: "10px 0", cursor: 'pointer' }}
+                    style={{ textAlign: "center", width: "100%", padding: "10px 0", cursor: 'pointer' }}
                     onClick={async () => {
                         await setLoading(true);
                         await loaderRef.current();

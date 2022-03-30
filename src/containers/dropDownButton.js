@@ -1,29 +1,17 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Dropdown } from '../components'
 import DropDown from '../components/dropdown'
 import { useModal } from '../hooks';
 
 export default function DropdownButton({ children, component, position = 'middle', ...props }) {
-    const [openContent, toggleContent] = useModal();
+    // const [openContent, toggleContent] = useModal();
+    const [openContent, setOpenContent] = useState(false);
     const contentRef = useRef(null);
-    useEffect(() => {
-        // const contentElement = document.querySelector(".dropdown__content");
-        if (contentRef.current) {
-            contentRef.current.addEventListener('click', (e) => {
-                console.log(e.target.childNodes);
-            });
-        }
-        return () => {
-            if (contentRef.current) {
-                contentRef.current.removeEventListener('click', () => {
-                });
-            }
-        };
-    }, [contentRef.current]);
+
     return (
-        <Dropdown onMouseLeave={toggleContent}>
+        <Dropdown onMouseLeave={() => setOpenContent(false)}>
             <DropDown.DropBtn
-                onClick={toggleContent}
+                onClick={() => setOpenContent(o => !o)}
             >{component}</DropDown.DropBtn>
             {openContent && <DropDown.Content
                 forwardref={contentRef}

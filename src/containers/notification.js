@@ -11,8 +11,9 @@ export default function NotificationContainer() {
         <Text.Title
             style={{
                 textAlign: 'center',
-                margin: '7px 0',
-                fontSize: '20px'
+                padding: '7px 0',
+                fontSize: '20px',
+                background: '#fff'
             }}
         >Notification</Text.Title>
         <TriggerLoading loadMore={notify.more} loader={loadMoreNotifications}>

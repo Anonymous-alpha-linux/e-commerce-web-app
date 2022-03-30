@@ -3,10 +3,13 @@ import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../compon
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
 import { Link, useLocation } from 'react-router-dom';
+import Modal from './modal';
+import { useModal, useValidate } from '../hooks';
 
 export default function Personal() {
     const { user, getProfile, editProfile } = useAuthorizationContext();
     const { workspace } = useWorkspaceContext();
+    const [error, setError] = useState('');
     const [isEdit, setIsEdit] = useState(false);
     const [input, setInput] = useState({
         firstName: '',
@@ -18,8 +21,10 @@ export default function Personal() {
         age: 0,
         birth: ''
     });
+    const [openWorkspaceModal, toggleWorkspaceModal] = useModal();
     const location = useLocation();
     const titleRef = useRef();
+
 
     useEffect(() => {
         getProfile(user.accountId, data => {
@@ -45,11 +50,35 @@ export default function Personal() {
     }
     const submitHandler = (e) => {
         e.preventDefault();
-        return editProfile(input, data => {
-            if (!data.error) {
-                setInput(o => ({ ...o, ...input, ...data }))
-            }
-        });
+        validateInput(() => {
+            editProfile(input, data => {
+                if (!data.error) {
+                    setInput(o => ({ ...o, ...input, ...data }));
+                    setIsEdit(false);
+                }
+            });
+        })
+    }
+
+    const validateInput = async (cb) => {
+        try {
+            await Object.entries(input).forEach((entry) => {
+                const key = entry[0];
+                const value = entry[1];
+                const validate = new useValidate(value);
+
+                if (key === "firstName") validate.isEmpty("Please input your firstName");
+                else if (key === "lastName") validate.isEmpty("Please input your lastName");
+                else if (key === "address") validate.isEmpty("Please input your address");
+                else if (key === "phone") validate.isPhone("This is not phone");
+                else if (key === 'introduction') validate.isEnoughLength("Your input length is not enough", { length: 10 });
+                else if (key === 'birth') validate.isEmpty("Please select your date of birth").isAge();
+            });
+            cb();
+        } catch (error) {
+            setError(error.message);
+            setTimeout(() => setError(''), 3000);
+        }
     }
 
     return <ContainerComponent className="personal" style={{ padding: '10px' }}>
@@ -85,13 +114,13 @@ export default function Personal() {
                         </Link>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <Link to="/workspace" state={{ from: location }}>
-                            <ButtonComponent>
-                                <Text.Center>
-                                    Workspace
-                                </Text.Center>
-                            </ButtonComponent>
-                        </Link>
+                        <ButtonComponent>
+                            <Text.Center>
+                                Home
+                            </Text.Center>
+                        </ButtonComponent>
+                        <Modal isShowing={openWorkspaceModal} toggle={toggleWorkspaceModal}>
+                        </Modal>
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
@@ -280,7 +309,6 @@ export default function Personal() {
                             style={{ display: 'none' }}
                             onClick={(e) => {
                                 submitHandler(e);
-                                setIsEdit(false);
                             }}>
                         </Form.Input>
                         <Text.Line>
@@ -308,6 +336,7 @@ export default function Personal() {
                         </ButtonComponent>
                     }
                 </Text.RightLine>
+                {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
             </Form>
         </ContainerComponent.Inner>
     </ContainerComponent>
