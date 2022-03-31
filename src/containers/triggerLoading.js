@@ -2,28 +2,28 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Loader } from '.';
 import { Text } from '../components';
 
-export default function TriggerLoading({ children, ...restProps }) {
+export default function TriggerLoading({ children, loader, loadMore, ...restProps }) {
     /* restProps:
         1. loader: [Function]:
         + callback
         2. loadMore: [Boolean]
      */
     const [loading, setLoading] = useState(false);
-    const loader = useRef(restProps.loader);
+    const loaderRef = useRef(loader);
 
     useEffect(() => {
-        loader.current = restProps.loader;
-    }, [restProps.loader])
+        loaderRef.current = loader;
+    }, [loader])
 
     return (
         <>
             {children}
-            {restProps.loadMore === true &&
+            {loadMore === true &&
                 <Text.Subtitle
-                    style={{ textAlign: "center", width: "100%", margin: "10px 0" }}
+                    style={{ textAlign: "center", width: "100%", padding: "10px 0", cursor: 'pointer' }}
                     onClick={async () => {
                         await setLoading(true);
-                        await loader.current();
+                        await loaderRef.current();
                         await setLoading(false);
                     }}>
                     More...

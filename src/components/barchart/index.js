@@ -27,6 +27,7 @@ import {
   Tooltip
 } from 'chart.js';
 
+
 Chart.register(
   ArcElement,
   LineElement,
@@ -52,15 +53,13 @@ Chart.register(
   Title,
   Tooltip
 );
-
-export default function BarChart({ data }) {
-
+export default function BarChart() {
   let barData = {
+    id: "1",
     labels: ["October", "November", "December", "January", "February", "March", "April"],
     datasets: [
       {
         data: [10, 20, 50, 10, 20, 50, 10, 20, 50, 10, 20, 50, 10, 20, 50, 10, 20, 50],
-        label: "Post",
         borderColor: "black",
         backgroundColor: ["#33EFAB", "#40916C"],
         fill: true
@@ -69,22 +68,7 @@ export default function BarChart({ data }) {
   }
 
   return (
-    <Bar
-      type="bar"
-      width={'100%'}
-      height={'100%'}
-      options={{
-        responsive: true,
-        title: {
-          display: true,
-          text: "Test Data",
-          fontSize: 30
-        },
-        legend: {
-          display: true,
-          position: "bottom"
-        }
-      }}
-      data={barData}
-    ></Bar>)
+    <Bar type="bar" width={'100%'} height={'100%'}
+      options={{ responsive: true, plugins: { title: { display: true, text: 'Top 3 most favorite post' } }, legend: { display: true, position: "bottom" } }}
+      data={barData}></Bar>)
 }

@@ -14,6 +14,10 @@ const authReducer = (state, action) => {
                 ...state,
                 authLoading: true
             };
+        case actions.SET_OFF_LOADING:
+            return {
+                ...state, authLoading: false,
+            };
         case actions.AUTHENTICATE_ACTION:
             return {
                 ...state,
@@ -23,6 +27,7 @@ const authReducer = (state, action) => {
         case actions.AUTHENTICATE_FAILED:
             return {
                 ...state,
+                isLoggedIn: false,
                 authLoading: false
             };
         case actions.GET_PROFILE:
@@ -74,6 +79,8 @@ const authReducer = (state, action) => {
                 page: state.page + 1,
                 loadMore: action.payload.length >= 10,
             };
+        // case actions.CHANGE_CURRENT_WORKSPACE:
+        //     return;
         default:
             return state;
     }

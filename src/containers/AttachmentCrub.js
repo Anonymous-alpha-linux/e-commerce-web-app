@@ -3,14 +3,14 @@ import { FaDownload, FaTimes } from "react-icons/fa";
 
 import { useAdminContext } from "../redux";
 import { mainAPI } from "../config";
-import { Icon, Text } from "../components";
+import { ContainerComponent, Icon, Text } from "../components";
 import { Loader } from "../containers";
 import { useModal, usePagination2 } from "../hooks";
 import { SecondPagination } from ".";
 import Modal from "./modal";
 
 
-export default function AttachmentCrub() {
+export default function AttachmentCRUD() {
   const [API, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
@@ -18,8 +18,8 @@ export default function AttachmentCrub() {
 
   const { attachments, getAttachmentByPage, deleteSingleAttachment } = useAdminContext();
   const getAttachmentByPageRef = useRef(getAttachmentByPage);
-  const [searchInput, setSearchInput] = useState("");
 
+  const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [attachRecord, setAttachRecord] = useState();
   const [dataRecords, setDataRecords] = useState([]);
@@ -27,102 +27,121 @@ export default function AttachmentCrub() {
   const [currentPage, changeCurrentPage] = usePagination2(0);
 
   useEffect(() => {
-    if (!attachments.loading) {
-      // setDataRecords(attachments.data.find((item) => item.page === currentPage).records);
-      setDataRecords(attachments.data);
-      setAttachRecord(attachments.data);
-    }
-  }, [attachments.data, attachRecord]);
+    // setDataRecords(attachments.data.find((item) => item.page === currentPage).records);
+    setDataRecords(attachments.data);
+    setAttachRecord(attachments.data);
+  }, [
+    // attachments?.data, 
+    // attachRecord
+  ]);
   useEffect(() => {
-
+    getAttachmentByPageRef.current(currentPage, attachmentList => {
+      setDataRecords(attachmentList);
+    });
   }, [currentPage]);
-
   useEffect(() => {
     getAttachmentByPageRef.current = getAttachmentByPage;
   }, [getAttachmentByPage]);
 
   function deleteAttachment(attachmentId) {
-    deleteSingleAttachment(attachmentId, currentPage);
+    deleteSingleAttachment(attachmentId, (options) => {
+      if (options.message) {
+        console.log("deleted");
+        getAttachmentByPage(currentPage, attachmentList => {
+          setDataRecords(attachmentList);
+        });
+      }
+    });
   }
   return (
     <div className="categoryCRUD__root">
-      <div className="table__container" style={{ overflowX: 'scroll' }}>
-        <table className="table table-style">
-          <thead>
-            <tr>
-              <th scope="col" style={{ textAlign: "center", width: "3%" }}>
-                No
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "15%" }}>
-                File Name
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "5%" }}>
-                Type
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "5%" }}>
-                Size
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                Date
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                <SearchAttachment
-                  Attechment={attachRecord}
-                  searchInput={searchInput}
-                  setSearchInput={setSearchInput}
-                  setFilteredResults={setFilteredResults}
-                  currentTableData={attachRecord}
-                  filteredResults={filteredResults}
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {attachments.loading ? (<tr>
-              <td colSpan={6}>
-                <Text.Line style={{ position: 'relative' }}>
-                  <Loader></Loader>
-                </Text.Line>
-              </td>
-            </tr>) : !attachments.data?.length && (
+      <ContainerComponent.Inner className="categoryCRUD__inner" style={{ width: 'fit-content', margin: '0 auto' }}>
+        <div className="table__container" style={{ overflowX: 'scroll' }}>
+          <table className="table table-style">
+            <thead>
               <tr>
-                <td>
-                  <h2>No Category</h2>
-                </td>
-                <td>
-                  <h2>Empty</h2>
-                </td>
+                <th scope="col" style={{ textAlign: "center", width: "3%" }}>
+                  No
+                </th>
+                <th scope="col" style={{ textAlign: "center", width: "15%" }}>
+                  File Name
+                </th>
+                <th scope="col" style={{ textAlign: "center", width: "5%" }}>
+                  Type
+                </th>
+                <th scope="col" style={{ textAlign: "center", width: "5%" }}>
+                  Size
+                </th>
+                <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                  Date
+                </th>
+                <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                  {/* <SearchAttachment
+                    Attechment={attachRecord}
+                    searchInput={searchInput}
+                    setSearchInput={setSearchInput}
+                    setFilteredResults={setFilteredResults}
+                    currentTableData={attachRecord}
+                    filteredResults={filteredResults}
+                  /> */}
+                </th>
               </tr>
-            ) || searchInput !== ""
-              ? filteredResults.map((attachment, index) => {
-                return (
-                  <AttachmentData
-                    key={index}
-                    data={attachment}
-                    index={index}
-                    deleteAttachment={deleteAttachment}
-                  />
-                )
-              })
-              : dataRecords.slice(currentPage * attachments.count, (currentPage + 1) * attachments.count).map((attachment, index) => {
-                return <AttachmentData
-                  key={index}
-                  data={attachment}
-                  index={index}
-                  deleteAttachment={deleteAttachment}
-                />;
-              })}
-          </tbody>
-        </table>
-      </div>
-      <SecondPagination
-        page={currentPage}
-        firstPage={1}
-        lastPage={attachments.pages}
-        onChangePage={changeCurrentPage}
-        onLoadData={getAttachmentByPageRef.current}
-      ></SecondPagination>
-      {/* <SecondPagination page={currentPage} pages={attachments.pages} changePage={changeCurrentPage}></SecondPagination> */}
+            </thead>
+            <tbody>
+              {attachments.loading ?
+                (<tr>
+                  <td colSpan={6}>
+                    <Text.Line style={{ position: 'relative' }}>
+                      <Loader></Loader>
+                    </Text.Line>
+                  </td>
+                </tr>)
+                :
+                !attachments.data?.length ?
+                  (
+                    <tr>
+                      <td>
+                        <h2>No Category</h2>
+                      </td>
+                      <td>
+                        <h2>Empty</h2>
+                      </td>
+                    </tr>
+                  )
+                  :
+                  searchInput !== "" ?
+                    filteredResults.map((attachment, index) => {
+                      return (
+                        <AttachmentData
+                          key={index}
+                          data={attachment}
+                          index={index}
+                          deleteAttachment={deleteAttachment}
+                        />
+                      )
+                    })
+                    :
+                    dataRecords.map((attachment, index) => {
+                      return <AttachmentData
+                        key={index}
+                        data={attachment}
+                        index={index}
+                        deleteAttachment={deleteAttachment}
+                      />
+                    })
+              }
+            </tbody>
+          </table>
+        </div>
+        <SecondPagination
+          page={currentPage}
+          firstPage={1}
+          lastPage={attachments.pages}
+          onChangePage={changeCurrentPage}
+          onLoadData={getAttachmentByPageRef.current}
+        ></SecondPagination>
+        {/* <SecondPagination page={currentPage} pages={attachments.pages} changePage={changeCurrentPage}></SecondPagination> */}
+      </ContainerComponent.Inner>
     </div>
   );
 }
@@ -235,7 +254,6 @@ function SearchAttachment({
     />
   );
 }
-
 function DetailFile({ setModalDetail, data, bytesToSize, downloadFile }) {
   const pic =
     "https://cdn.lifehack.org/wp-content/uploads/2012/12/come-up-with-ideas.jpg";

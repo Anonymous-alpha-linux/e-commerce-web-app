@@ -1,28 +1,46 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { mainAPI } from '../config';
 import { Link, useLocation } from 'react-router-dom';
+import Modal from './modal';
+import { useModal, useValidate } from '../hooks';
 
-export default function Personal({ personalInfo }) {
-    const { user, profile, editProfile } = useAuthorizationContext();
+export default function Personal() {
+    const { user, getProfile, editProfile } = useAuthorizationContext();
     const { workspace } = useWorkspaceContext();
-    const [postAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+    const [error, setError] = useState('');
     const [isEdit, setIsEdit] = useState(false);
-
     const [input, setInput] = useState({
-        firstName: profile?.firstName || '',
-        lastName: profile?.lastName || '',
-        address: profile?.address || '',
-        phone: profile?.phone || '',
-        introduction: profile?.introduction || '',
-        gender: profile?.gender || 'male',
-        age: profile?.age || 0,
+        firstName: '',
+        lastName: '',
+        address: '',
+        phone: '',
+        introduction: '',
+        gender: 'male',
+        age: 0,
         birth: ''
     });
+    const [openWorkspaceModal, toggleWorkspaceModal] = useModal();
     const location = useLocation();
     const titleRef = useRef();
 
+    useEffect(() => {
+        getProfile(user.accountId, data => {
+            if (!data.error) {
+                setInput({
+                    firstName: data?.firstName || '',
+                    lastName: data?.lastName || '',
+                    address: data?.address || '',
+                    phone: data?.phone || '',
+                    introduction: data?.introduction || '',
+                    gender: data?.gender || 'male',
+                    age: data?.age || 0,
+                    birth: ''
+                });
+            }
+        });
+    }, [user]);
     const inputHandler = (e) => {
         setInput({
             ...input,
@@ -31,49 +49,52 @@ export default function Personal({ personalInfo }) {
     }
     const submitHandler = (e) => {
         e.preventDefault();
-        return editProfile(input);
+        validateInput(() => {
+            editProfile(input, data => {
+                if (!data.error) {
+                    setInput(o => ({ ...o, ...input, ...data }));
+                    setIsEdit(false);
+                }
+            });
+        })
     }
 
-    return <ContainerComponent
-        className="personal"
-        style={{
-            padding: '10px'
-        }}>
+    const validateInput = async (cb) => {
+        try {
+            await Object.entries(input).forEach((entry) => {
+                const key = entry[0];
+                const value = entry[1];
+                const validate = new useValidate(value);
+
+                if (key === "firstName") validate.isEmpty("Please input your firstName");
+                else if (key === "lastName") validate.isEmpty("Please input your lastName");
+                else if (key === "address") validate.isEmpty("Please input your address");
+                else if (key === "phone") validate.isPhone("This is not phone");
+                else if (key === 'introduction') validate.isEnoughLength("Your input length is not enough", { length: 10 });
+                else if (key === 'birth') validate.isEmpty("Please select your date of birth").isAge();
+            });
+            cb();
+        } catch (error) {
+            setError(error.message);
+            setTimeout(() => setError(''), 3000);
+        }
+    }
+
+    return <ContainerComponent className="personal" style={{ padding: '10px' }}>
         <ContainerComponent.Inner>
-            <ContainerComponent.Pane style={{
-                position: 'relative',
-            }}>
+            <ContainerComponent.Pane style={{ position: 'relative', }}>
                 <Text.CenterLine style={{ position: 'relative', zIndex: 1, height: '27.5px' }}>
                     <Icon.CircleIcon className="personal__avatar">
-                        <Icon.Image src={`${user.profileImage}`} alt={`Avatar`} style={{
-                            objectFit: 'fill',
-                        }}></Icon.Image>
+                        <Icon.Image src={`${user.profileImage}`} alt={`Avatar`} style={{ objectFit: 'fill', }}></Icon.Image>
                     </Icon.CircleIcon>
-                    <Text.CenterLine style={{
-                        paddingTop: '10px'
-                    }}>
+                    <Text.CenterLine style={{ paddingTop: '10px' }}>
                         <Text.Title>{user.account}</Text.Title>
-                        <Text.Subtitle style={{
-                            textTransform: 'capitalize',
-                            opacity: 0.5,
-                            fontWeight: 500
-                        }}>{user.role}</Text.Subtitle>
+                        <Text.Subtitle style={{ textTransform: 'capitalize', opacity: 0.5, fontWeight: 500 }}>{user.role}</Text.Subtitle>
                     </Text.CenterLine>
                 </Text.CenterLine>
-                <Text.Line style={{
-                    width: '100%',
-                    height: '141px',
-                    borderRadius: '10px',
-                    boxShadow: '1px 1px 5px 2px black',
-                    position: 'relative',
-                    bottom: 0,
-                    background: '#fff',
-                    border: '1px solid #163d3c',
-                }}></Text.Line>
+                <Text.Line style={{ width: '100%', height: '141px', borderRadius: '10px', boxShadow: '1px 1px 5px 2px black', position: 'relative', bottom: 0, background: '#fff', border: '1px solid #163d3c', }}></Text.Line>
             </ContainerComponent.Pane>
-            <ContainerComponent.Pane style={{
-                padding: '10px 0 0 0'
-            }}>
+            <ContainerComponent.Pane style={{ padding: '10px 0 0 0' }}>
                 <ContainerComponent.GridThreeColumns>
                     <ContainerComponent.Item>
                         <ButtonComponent>
@@ -92,13 +113,13 @@ export default function Personal({ personalInfo }) {
                         </Link>
                     </ContainerComponent.Item>
                     <ContainerComponent.Item>
-                        <Link to="/workspace" state={{ from: location }}>
-                            <ButtonComponent>
-                                <Text.Center>
-                                    Workspace
-                                </Text.Center>
-                            </ButtonComponent>
-                        </Link>
+                        <ButtonComponent>
+                            <Text.Center>
+                                Home
+                            </Text.Center>
+                        </ButtonComponent>
+                        <Modal isShowing={openWorkspaceModal} toggle={toggleWorkspaceModal}>
+                        </Modal>
                     </ContainerComponent.Item>
                 </ContainerComponent.GridThreeColumns>
             </ContainerComponent.Pane>
@@ -287,7 +308,6 @@ export default function Personal({ personalInfo }) {
                             style={{ display: 'none' }}
                             onClick={(e) => {
                                 submitHandler(e);
-                                setIsEdit(false);
                             }}>
                         </Form.Input>
                         <Text.Line>
@@ -315,6 +335,7 @@ export default function Personal({ personalInfo }) {
                         </ButtonComponent>
                     }
                 </Text.RightLine>
+                {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
             </Form>
         </ContainerComponent.Inner>
     </ContainerComponent>

@@ -9,7 +9,7 @@ import { useAuthorizationContext } from './authContext';
 const NotificationContextAPI = createContext();
 
 export default function NotificationContext({ children }) {
-    const {pushToast} = useAuthorizationContext();
+    const { pushToast } = useAuthorizationContext();
     const [showUpdate, setShowUpdate] = useState(true);
     const [notify, setNotify] = useReducer(notifyReducer, initialNotify);
     const { user, socket, setError, setMessage } = useAuthorizationContext();
@@ -30,10 +30,6 @@ export default function NotificationContext({ children }) {
             }
         };
     }, [socket]);
-
-    useEffect(() => {
-        loadNotifications();
-    }, [showUpdate]);
 
     function loadNotifications() {
         return axios.get(notifyAPI, {
@@ -194,6 +190,7 @@ export default function NotificationContext({ children }) {
 
     const contextValues = {
         notify,
+        loadNotifications,
         loadMoreNotifications,
         sendNotification,
         sendCommentToSpecificPerson,

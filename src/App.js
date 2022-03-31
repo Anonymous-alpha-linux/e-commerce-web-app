@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
   Home,
@@ -5,7 +6,6 @@ import {
   ProtectedPage,
   Register,
   ForgetPassword,
-  Nav,
   Staff,
   QACoordinator,
   AdminSidebar,
@@ -21,7 +21,7 @@ import {
   DashboardManager,
   CategoryManagement,
   ListMember,
-  StaffCRUD,
+  UserAll,
   AdminDashBoard,
 } from "./pages";
 
@@ -42,22 +42,25 @@ import roles from "./fixtures/roles";
 import "./scss/main.scss";
 import { MessageBox } from "./components";
 import Signout from "./pages/signout";
+import Layout from "./pages/layout";
 
 function App() {
   const { user } = useAuthorizationContext();
+
   return (
-    <NotifyContext>
-      <BrowserRouter>
-        {user.role === roles.STAFF && <Nav></Nav>}
-        <Routes>
+    <BrowserRouter>
+      {/* {user.role === roles.STAFF && } */}
+      <Routes>
+        <Route element={<Layout></Layout>}>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
           <Route path="logout" element={<Signout></Signout>}></Route>
-          <Route
-            path="reset_password"
+          <Route path="reset_password"
             element={<ForgetPassword></ForgetPassword>}
           ></Route>
-          <Route path="/" element={<Home></Home>}>
+          <Route path="/" element={<ProtectedPage>
+            <Home></Home>
+          </ProtectedPage>}>
             {
               // 1. Admin Role
               (user.role === roles.ADMIN && (
@@ -79,35 +82,21 @@ function App() {
               (user.role === roles.QA_MANAGER && (
                 <Route
                   path=""
-                  element={
-                    <ProtectedPage authorized={[roles.QA_MANAGER]}>
-                      <QAManager></QAManager>
-                    </ProtectedPage>
-                  }
+                  element={<ProtectedPage authorized={[roles.QA_MANAGER]}>
+                    <QAManager></QAManager>
+                  </ProtectedPage>}
                 >
                   {/* <Route index element={<Workspace></Workspace>} /> */}
-                  <Route
-                    index
-                    element={<DashboardManager></DashboardManager>}
-                  />
-                  <Route
-                    path="/workspace"
-                    element={<Workspace></Workspace>}
-                  />
-                  <Route
-                    path="/management/category"
-                    element={<CategoryManagement></CategoryManagement>}
-                  />
-                  <Route
-                    path="/management/member"
-                    element={<AccountCrud></AccountCrud>}
-                  >
+                  <Route index element={<DashboardManager></DashboardManager>} />
+                  <Route path="/workspace" element={<Workspace></Workspace>} />
+                  <Route path="/management/attachment" element={<AttachmentCrub></AttachmentCrub>} />
+                  <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
+                  <Route path="/management/workspace_member">
                     <Route path=":id" element={<ListMember></ListMember>} />
                   </Route>
-                  <Route
-                    path="/management/staff/:id"
-                    element={<StaffCRUD></StaffCRUD>}
-                  />
+                  <Route path="/management/workspace">
+                    <Route path=":id" element={<UserAll></UserAll>} />
+                  </Route>
                   <Route path="profile" element={<Profile></Profile>}>
                     <Route path="personal" element={<Personal></Personal>} />
                     <Route
@@ -154,9 +143,45 @@ function App() {
                   }
                 >
                   <Route index element={<Workspace></Workspace>} />
+                  <Route path="profile" element={<Profile></Profile>}>
+                    <Route path="personal" element={<Personal></Personal>} />
+                    <Route
+                      path="manager"
+                      element={<ManagerInfo></ManagerInfo>}
+                    />
+                  </Route>
+                  <Route path="history" element={<MyPost></MyPost>} />
+                  <Route path="portal/" element={<Portal></Portal>}>
+                    <Route path="idea" element={<PostModal />}></Route>
+                    <Route path="idea/:id" element={<PostModal />}></Route>
+                    <Route
+                      path="notification"
+                      element={
+                        <NotificationContainer></NotificationContainer>
+                      }
+                    />
+                    <Route
+                      path="message"
+                      element={<MessageContainer></MessageContainer>}
+                    >
+                      <Route
+                        path=":id"
+                        element={<MessageBox></MessageBox>}
+                      ></Route>
+                    </Route>
+                    <Route path="search" element={<Searchbar></Searchbar>} />
+                    <Route
+                      path="addgroup"
+                      element={<AddGroupContainer></AddGroupContainer>}
+                    />
+                  </Route>
                   <Route
                     path="/management/category"
                     element={<CategoryManagement></CategoryManagement>}
+                  />
+                  <Route
+                    path="/management/member"
+                    element={<ListMember></ListMember>}
                   />
                 </Route>
               )) ||
@@ -212,13 +237,13 @@ function App() {
               ))
             }
           </Route>
-          <Route
-            path="/*"
-            element={<h1>404 Error: Page Not Found...</h1>}
-          ></Route>
-        </Routes>
-      </BrowserRouter>
-    </NotifyContext>
+        </Route>
+        <Route
+          path="/*"
+          element={<h1>404 Error: Page Not Found...</h1>}
+        ></Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

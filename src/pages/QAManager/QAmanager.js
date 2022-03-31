@@ -4,8 +4,6 @@ import { DashboardHeader } from "../../containers";
 import { AdminContext } from "../../redux";
 
 export default function QAManager() {
-  //   const [modal, setModal] = useState(null);
-  //   const modalElement = useRef(null);
   return (
     <AdminContext>
       <DashboardHeader>

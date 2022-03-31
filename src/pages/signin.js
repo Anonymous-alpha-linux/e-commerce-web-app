@@ -1,45 +1,61 @@
-import React, { useState, useEffect } from "react";
-import { ContainerComponent, Form, Icon,LogoIcon,Text } from "../components";
+import React, { useState, useEffect, useRef } from "react";
+import { ContainerComponent, Form, Icon, LogoIcon, Text } from "../components";
 import { useAuthorizationContext } from "../redux";
 import useValidate from "../hooks/useValidate";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { FaUserAlt } from 'react-icons/fa'
 
 const Login = () => {
   const { login, user } = useAuthorizationContext();
 
-  const [input, setInput] = useState({});
+  const [input, setInput] = useState({
+    email: '',
+    password: ''
+  });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+
+  const firstSubmitRef = useRef(false);
   const location = useLocation();
+  const navigate = useNavigate();
   //toast
   const submitHandler = (e) => {
     e.preventDefault();
+    firstSubmitRef.current = true;
+    validateInput(() => {
+      login(input, () => {
+        console.log('loged');
+        navigate("/");
+      });
+    });
+  };
+  const inputHandler = (e) => {
+    if (firstSubmitRef.current) {
+
+    }
+    setInput((oldInput) => {
+      return {
+        ...oldInput,
+        [e.target.name]: e.target.value,
+      };
+    });
+  }
+  const validateInput = async (cb) => {
     try {
-      Object.entries(input).forEach((entry) => {
+      await Object.entries(input).forEach((entry) => {
         const key = entry[0];
         const value = entry[1];
         const validate = new useValidate(value);
+
         if (key === "email") validate.isEmpty().isEmail();
         else if (key === "password") validate.isEmpty();
       });
-      login(input);
+      cb();
     } catch (error) {
       setError(error.message);
     }
-  };
-  const inputHandler = React.useCallback(
-    (e) => {
-      setInput((oldInput) => {
-        return {
-          ...oldInput,
-          [e.target.name]: e.target.value,
-        };
-      });
-    },
-    [input]
-  );
+  }
 
   if (user.isLoggedIn) {
     return <Navigate to={"/"} state={{ from: location }} replace />;
@@ -59,12 +75,12 @@ const Login = () => {
               onSubmit={submitHandler}
             >
               <Form.Container className={"signIn__formContainer"}>
-                <ContainerComponent.Flex style={{flexDirection:"column",gap:"30px"}}>
+                <ContainerComponent.Flex style={{ flexDirection: "column", gap: "30px" }}>
                   <ContainerComponent.Pane>
                     <Icon className={"signIn__icon"}>
                       <FaUserAlt style={{ transform: "translate(-50%,-150%)" }}></FaUserAlt>
                     </Icon>
-                    <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "20px" }}> Fucking Login</Text.Title>
+                    <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "20px" }}>Login</Text.Title>
                   </ContainerComponent.Pane>
                   <Form.Input
                     className={"signIn__input"}
@@ -93,7 +109,7 @@ const Login = () => {
                   ></Form.Input>
                 </ContainerComponent.Flex>
               </Form.Container>
-              {message && <Form.Message style={{textAlign:"center",color:"red"}}>{message}</Form.Message>}
+              {message && <Form.Message style={{ textAlign: "center", color: "green" }}>{message}</Form.Message>}
               {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
             </Form>
           </ContainerComponent.Inner>

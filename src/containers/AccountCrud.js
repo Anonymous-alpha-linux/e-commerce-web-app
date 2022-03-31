@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
-import { useAdminContext } from "../redux";
+import { useAdminContext, useAuthorizationContext } from "../redux";
 import { mainAPI } from "../config";
 import useValidate from "../hooks/useValidate";
 import { Icon, Text } from "../components";
@@ -113,7 +113,6 @@ export default function AccountCrud() {
     </div>
   );
 }
-
 function AccFormEdit({ modalEdit, setModalEdit, data }) {
   const {
     roles: ROLES,
@@ -183,7 +182,6 @@ function AccFormEdit({ modalEdit, setModalEdit, data }) {
       else setMessage(message);
     });
   }
-
   async function onSubmitPassword(e) {
     e.preventDefault();
     try {
@@ -199,171 +197,158 @@ function AccFormEdit({ modalEdit, setModalEdit, data }) {
     }
   }
   return (
-    <>
-      <div className="c-modal__containerAccount">
-        <div className="form-container">
-          <div className="question-container">
+    <div className="c-modal__containerAccount">
+      <div className="form-container">
+        <div className="question-container">
+          <div className="row" style={{ textAlign: "left" }}>
+            <div className="col-1">
+              <form>
+                <h4 className="question-label">User Name</h4>
+                <input
+                  style={{ width: "100%", maxWidth: "160px" }}
+                  className="row-input"
+                  type="text"
+                  name="username"
+                  placeholder="New user name"
+                  onChange={handleNameInput}
+                  value={input.username}
+                />
+                <button
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitName}
+                >
+                  Edit name
+                </button>
+              </form>
+            </div>
+            <div className="col-1">
+              <form>
+                <h4 className="question-label">Email</h4>
+                <input
+                  className="row-input"
+                  style={{ width: "100%", maxWidth: "140px" }}
+                  type="text"
+                  placeholder="New Email"
+                  name="email"
+                  onChange={handleNameInput}
+                  value={input.email}
+                />
+                <button
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitEmail}
+                >
+                  Edit email
+                </button>
+              </form>
+            </div>
+          </div>
+          <form>
             <div className="row" style={{ textAlign: "left" }}>
-              <div className="col-1">
-                <form>
-                  <h4 className="question-label">User Name</h4>
-                  <input
-                    style={{ width: "100%", maxWidth: "160px" }}
-                    className="row-input"
-                    type="text"
-                    name="username"
-                    placeholder="New user name"
-                    onChange={handleNameInput}
-                    value={input.username}
-                  />
-                  <button
-                    type="submit"
-                    className="submit_edit"
-                    onClick={onSubmitName}
-                  >
-                    Edit name
-                  </button>
-                </form>
+              <div className="col-2">
+                <label className="question-label">New Password</label>
+                <input
+                  className="row-input"
+                  type={!passwordShown ? "password" : "text"}
+                  placeholder="new Password"
+                  name="password"
+                  onChange={handleNameInput}
+                  value={input.password}
+                  autoComplete="new-password"
+                />
+                <button
+                  style={{
+                    width: "100px",
+                  }}
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitPassword}
+                >
+                  Edit pass
+                </button>
               </div>
-              <div className="col-1">
-                <form>
-                  <h4 className="question-label">Email</h4>
-                  <input
-                    className="row-input"
-                    style={{ width: "100%", maxWidth: "140px" }}
-                    type="text"
-                    placeholder="New Email"
-                    name="email"
-                    onChange={handleNameInput}
-                    value={input.email}
-                  />
-                  <button
-                    type="submit"
-                    className="submit_edit"
-                    onClick={onSubmitEmail}
-                  >
-                    Edit email
-                  </button>
-                </form>
+              <div className="col-iconPass">
+                <IconTaggle
+                  Action={togglePassword}
+                  Condition={passwordShown}
+                />
+              </div>
+              <div className="col-2">
+                <label className="question-label">Confirm</label>
+                <input
+                  className="row-input"
+                  type={!confirmShown ? "password" : "text"}
+                  placeholder="New Pass Again"
+                  name="newpassword"
+                  onChange={handleNameInput}
+                  value={input.newpassword}
+                />
+              </div>
+              <div className="col-iconPass">
+                <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
               </div>
             </div>
-            <form>
-              <div className="row" style={{ textAlign: "left" }}>
-                <div className="col-2">
-                  <label className="question-label">New Password</label>
-                  <input
-                    className="row-input"
-                    type={!passwordShown ? "password" : "text"}
-                    placeholder="new Password"
-                    name="password"
-                    onChange={handleNameInput}
-                    value={input.password}
-                    autoComplete="new-password"
-                  />
-                  <button
-                    style={{
-                      width: "100px",
-                    }}
-                    type="submit"
-                    className="submit_edit"
-                    onClick={onSubmitPassword}
-                  >
-                    Edit pass
-                  </button>
-                </div>
-                <div className="col-iconPass">
-                  <IconTaggle
-                    Action={togglePassword}
-                    Condition={passwordShown}
-                  />
-                </div>
-                <div className="col-2">
-                  <label className="question-label">Confirm</label>
-                  <input
-                    className="row-input"
-                    type={!confirmShown ? "password" : "text"}
-                    placeholder="New Pass Again"
-                    name="newpassword"
-                    onChange={handleNameInput}
-                    value={input.newpassword}
-                  />
-                </div>
-                <div className="col-iconPass">
-                  <IconTaggle Action={toggleConfirm} Condition={confirmShown} />
-                </div>
-              </div>
-              {error && (
-                <p
-                  style={{
-                    color: "red",
-                    fontWeight: "900",
-                  }}
+            {error && (
+              <p
+                style={{
+                  color: "red",
+                  fontWeight: "900",
+                }}
+              >
+                {error}
+              </p>
+            )}
+          </form>
+          <form>
+            <div className="row" style={{ textAlign: "left" }}>
+              <div className="col-1">
+                <label className="question-label">Select Role</label>
+                <select
+                  style={{ width: "100%", maxWidth: "200px" }}
+                  className="row-input"
+                  type="select"
+                  name="role"
+                  onChange={handleNameInput}
+                  defaultValue={input.role}
                 >
-                  {error}
-                </p>
-              )}
-            </form>
-            <form>
-              <div className="row" style={{ textAlign: "left" }}>
-                <div className="col-1">
-                  <label className="question-label">Select Role</label>
-                  <select
-                    style={{ width: "100%", maxWidth: "200px" }}
-                    className="row-input"
-                    type="select"
-                    name="role"
-                    onChange={handleNameInput}
-                    defaultValue={input.role}
-                  >
-                    {ROLES.filter(
-                      (role) => ![roles.ADMIN].includes(role.roleName)
-                    ).map((role) => (
-                      <option key={role._id} value={role._id}>
-                        {role.roleName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-2">
-                  <button
-                    style={{
-                      width: "100px",
-                      marginTop: "60px",
-                    }}
-                    type="submit"
-                    className="submit_edit"
-                    onClick={onSubmitRole}
-                  >
-                    Edit role
-                  </button>
-                </div>
+                  {ROLES.filter(
+                    (role) => ![roles.ADMIN].includes(role.roleName)
+                  ).map((role) => (
+                    <option key={role._id} value={role._id}>
+                      {role.roleName}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </form>
-          </div>
-        </div>
-        <div className="row" style={{ justifyContent: "right" }}>
-          <button
-            style={{ textAlign: "left", fontWeight: "bold" }}
-            className="btn-trans-Cancel"
-            onClick={() => setModalEdit(!modalEdit)}
-          >
-            <strong>Exit</strong>
-          </button>
+              <div className="col-2">
+                <button
+                  style={{
+                    width: "100px",
+                    marginTop: "60px",
+                  }}
+                  type="submit"
+                  className="submit_edit"
+                  onClick={onSubmitRole}
+                >
+                  Edit role
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
-      {/* {(error || message) && (
-        <Toast
-          error={error}
-          message={message}
-          setError={setError}
-          setMessage={setMessage}
-          timeout={3000}
-        ></Toast>
-      )} */}
-    </>
+      <div className="row" style={{ justifyContent: "right" }}>
+        <button
+          style={{ textAlign: "left", fontWeight: "bold" }}
+          className="btn-trans-Cancel"
+          onClick={() => setModalEdit()}>
+          <strong>Exit</strong>
+        </button>
+      </div>
+    </div>
   );
 }
-
 function ModalAddFormAccount({ setModal, modal }) {
   const { roles, createNewAccount } = useAdminContext();
 
@@ -570,10 +555,11 @@ function ModalAddFormAccount({ setModal, modal }) {
   );
 }
 function AccountData({ data, index }) {
-  const [modalEdit, setModalEdit] = useState(false);
+  const { user } = useAuthorizationContext();
+  // const [modalEdit, setModalEdit] = useState(false);
+  const [showModalEdit, toggleModalEdit] = useModal();
+  const [showModalDetail, toggleModalDetail] = useModal();
   const [block, setBlockacc] = useState(false);
-  const [showModalDetail, toggleModalDetail] = useModal(false);
-
   function blockAccount(e, id) {
     e.preventDefault();
     // setBlockacc(!block);
@@ -595,34 +581,26 @@ function AccountData({ data, index }) {
       <td style={{ textAlign: "center", width: "10%" }}>
         {data.role.roleName}
       </td>
-      <td
-        style={{
-          textAlign: "center",
-          whiteSpace: "nowrap",
-          width: "10%",
-        }}
-      >
+      <td style={{ textAlign: "center", whiteSpace: "nowrap", width: "10%", }} >
         <button
           onClick={toggleModalDetail}
           className="btn-blue"
         >
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>
-
         <Modal isShowing={showModalDetail} toggle={toggleModalDetail}>
           <DetailAcc
             setModalDetail={toggleModalDetail}
-            data={data}
-          />
+            data={data} />
         </Modal>
-
-        <button
-          onClick={() => setModalEdit(!modalEdit)}
-          className="btn-warning"
-        >
-          {data._id === "" ? <span></span> : <span>Edit</span>}
-        </button>
-        {modalEdit && (
+        {data._id !== user.accountId &&
+          <button
+            onClick={toggleModalEdit}
+            className="btn-warning"
+          >
+            <span>Edit</span>
+          </button>}
+        {/* {modalEdit && (
           <div className="MadalBackDrop">
             <div className="MobalCenter">
               <AccFormEdit
@@ -632,13 +610,21 @@ function AccountData({ data, index }) {
               />
             </div>
           </div>
-        )}
-        <button
-          onClick={(e) => blockAccount(e, data._id)}
-          className={block ? "btn-gray" : "btn-red"}
-        >
-          {block ? <span>Unblock</span> : <span>Block</span>}
-        </button>
+        )} */}
+        <Modal isShowing={showModalEdit} toggle={toggleModalEdit}>
+          <AccFormEdit
+            setModalEdit={toggleModalEdit}
+            data={data}
+          />
+        </Modal>
+        {(user.accountId !== data._id || user.role !== roles.ADMIN) &&
+          <button
+            onClick={(e) => blockAccount(e, data._id)}
+            className={block ? "btn-gray" : "btn-red"}
+          >
+            {block ? <span>Unblock</span> : <span>Block</span>}
+          </button>
+        }
       </td>
     </tr>
   );
@@ -685,7 +671,6 @@ function SearchAccount({
     />
   );
 }
-
 function DetailAcc({ setModalDetail, data }) {
   const pic =
     "https://cdn.dribbble.com/users/1577045/screenshots/4914645/media/028d394ffb00cb7a4b2ef9915a384fd9.png?compress=1&resize=400x300";

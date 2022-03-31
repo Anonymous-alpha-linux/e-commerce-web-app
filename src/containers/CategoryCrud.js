@@ -5,6 +5,7 @@ import { usePostContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
 import Loader from "./loader";
+import { ContainerComponent } from "../components";
 
 export default function Crud() {
   const [API, host] =
@@ -52,56 +53,57 @@ export default function Crud() {
   }
   return (
     <div className="categoryCRUD__root">
-      <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
-        Create New Category
-      </button>
-      {modal && (
-        <div style={{ height: "0px" }}>
-          <ModalAddFormCategory setModal={setModal} modal={modal} />
-        </div>
-      )}
+      <ContainerComponent.Inner className="categoryCRUD__inner" style={{ width: 'fit-content', margin: '0 auto' }}>
+        <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
+          Create New Category
+        </button>
+        {modal && (
+          <div style={{ height: "0px" }}>
+            <ModalAddFormCategory setModal={setModal} modal={modal} />
+          </div>
+        )}
 
-      <div className="table__container">
-        <table className="table table-style">
-          <thead>
-            <tr>
-              <th scope="col" style={{ textAlign: "center", width: "40%" }}>
-                ID
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "40%" }}>
-                Title
-              </th>
-              <th>
-                <SearchCategory
-                  categories={categories}
-                  searchInput={searchInput}
-                  setSearchInput={setSearchInput}
-                  setFilteredResults={setFilteredResults}
-                  currentTableData={categories}
-                  filteredResults={filteredResults}
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {(categoryLoading && <tr><td colSpan={3}><Loader></Loader></td></tr>) || searchInput !== ""
-              ? filteredResults.map((category, index) => (
-                <CategoryData
-                  key={index}
-                  data={category}
-                  index={index}
-                  deleteCate={deleteCate}
-                />
-              ))
-              : dataRecords.map((category, index) => (
-                <CategoryData
-                  key={index}
-                  data={category}
-                  index={index}
-                  deleteCate={deleteCate}
-                />
-              ))}
-            {/* {!categories?.length && (
+        <div className="table__container">
+          <table className="table table-style">
+            <thead>
+              <tr>
+                <th scope="col" style={{ textAlign: "center", width: "40%" }}>
+                  ID
+                </th>
+                <th scope="col" style={{ textAlign: "center", width: "40%" }}>
+                  Title
+                </th>
+                <th>
+                  <SearchCategory
+                    categories={categories}
+                    searchInput={searchInput}
+                    setSearchInput={setSearchInput}
+                    setFilteredResults={setFilteredResults}
+                    currentTableData={categories}
+                    filteredResults={filteredResults}
+                  />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {(categoryLoading && <tr><td colSpan={3}><Loader></Loader></td></tr>) || searchInput !== ""
+                ? filteredResults.map((category, index) => (
+                  <CategoryData
+                    key={index}
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
+                ))
+                : dataRecords.map((category, index) => (
+                  <CategoryData
+                    key={index}
+                    data={category}
+                    index={index}
+                    deleteCate={deleteCate}
+                  />
+                ))}
+              {/* {!categories?.length && (
               <tr>
                 <td>
                   <h2>No Category</h2>
@@ -111,17 +113,18 @@ export default function Crud() {
                 </td>
               </tr>
             )} */}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
 
-        <Pagination
-          className="pagination-bar"
-          currentPage={currentPage}
-          totalCount={categories.length}
-          pageSize={PageSize}
-          onPageChange={(page) => setCurrentPage(page)}
-        />
-      </div>
+          <Pagination
+            className="pagination-bar"
+            currentPage={currentPage}
+            totalCount={categories.length}
+            pageSize={PageSize}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      </ContainerComponent.Inner>
     </div>
   );
 }

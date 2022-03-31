@@ -11,14 +11,15 @@ export default function DropDown({ children, forwardRef, ...props }) {
         </div>
     )
 }
-DropDown.DropBtn = ({ children, ...props }) => {
+DropDown.DropBtn = ({ children, forwardref, ...props }) => {
     return <span className="dropdown__dropbtn"
+        ref={forwardref}
         {...props}>
-        {props.component}
+        {children}
     </span>
 }
 DropDown.Content = ({ children, ...props }) => {
-    return <div className="dropdown__content">
+    return <div className="dropdown__content" {...props}>
         {children}
     </div>
 }

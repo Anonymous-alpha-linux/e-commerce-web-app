@@ -6,20 +6,24 @@ export const initialWorkspacePage = {
   workspaces: [],
   workspaceLoading: true,
   workspaceTotal: 0,
-  page: localStorage.getItem("workspace"),
+  page: 0,
+  count: 2,
+  loadMore: false,
 };
 export default function workspaceReducer(state, action) {
   const actionHandler = new ActionHandler(state, action);
   switch (action.type) {
     case actions.GET_WORKSPACE:
-      return actionHandler.updateItem("workspace", action.payload, state);
+      return actionHandler.updateItem("workspace", action.payload, { ...state, workspaceLoading: false });
     case actions.GET_WORKSPACE_LIST:
       return actionHandler.updateItem("workspaces", action.payload, { ...state, ...action.others });
+    case actions.LOAD_MORE_WORKSPACE:
+      return actionHandler.pushItem("workspaces", action.payload, { ...state, ...action.others });
     case actions.GET_WORKSPACE_MEMBER:
       return actions.updateItem("workspaces", workspace => {
         if (workspace === action.workspaceId) return actionHandler.getListItem("members", action.payload, workspace);
         return workspace;
-      }, state)
+      }, state);
     case actions.GET_MANAGER:
       return actionHandler.updateItem(
         "workspace",
@@ -36,6 +40,33 @@ export default function workspaceReducer(state, action) {
         ...state,
         workspaces: [...state.workspaces, action.payload],
       };
+    case actions.ASSIGN_HOST_TO_WORKSPACE:
+      return actionHandler.updateItem("workspaces", workspace => {
+        if (workspace._id === action.workspaceId) return { ...workspace, ...action.payload };
+        return workspace;
+      }, state);
+    case actions.ASSIGN_MEMBER_TO_WORKSPACE:
+      return actionHandler.updateItem("workspaces", workspace => {
+        if (workspace._id === action.workspaceId) return { ...workspace, ...action.payload };
+        return workspace;
+      }, state);
+    case actions.UNASSIGN_MEMBER_FROM_WORKSPACE:
+      return actionHandler.updateItem("workspaces", workspace => {
+        if (workspace._id === action.workspaceId) return { ...workspace, ...action.payload };
+        return workspace;
+      }, state);
+    case actions.GET_WORKSPACE_MEMBERS:
+      return actionHandler.updateItem("workspaces", workspace => {
+        if (workspace._id === action.workspaceId) return { ...workspace, memberDetails: action.payload };
+        return workspace;
+      });
+    case actions.EDIT_WORKSPACE:
+      return actionHandler.updateItem("workspaces", workspace => {
+        if (workspace._id === action.workspaceId) {
+          return { ...workspace, ...action.payload };
+        }
+        return workspace;
+      }, state);
     default:
       return state;
   }
