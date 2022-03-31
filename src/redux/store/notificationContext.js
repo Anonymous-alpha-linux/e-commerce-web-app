@@ -31,10 +31,6 @@ export default function NotificationContext({ children }) {
         };
     }, [socket]);
 
-    useEffect(() => {
-        loadNotifications();
-    }, [user, showUpdate]);
-
     function loadNotifications() {
         return axios.get(notifyAPI, {
             headers: {
@@ -186,6 +182,7 @@ export default function NotificationContext({ children }) {
 
     const contextValues = {
         notify,
+        loadNotifications,
         loadMoreNotifications,
         sendNotification,
         sendCommentToSpecificPerson,

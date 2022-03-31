@@ -17,6 +17,7 @@ const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
   const [user, setUser] = useReducer(authReducer, initialAuth);
+  // const [loading, setLoading] = useState(false);
   const [authAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST]
@@ -32,7 +33,6 @@ export default function AuthenticationContext({ children }) {
   }, []);
 
   const onLoadUser = (cb) => {
-    console.log("load user");
     return axios
       .get(authAPI, {
         headers: {
@@ -71,18 +71,22 @@ export default function AuthenticationContext({ children }) {
         : mainAPI.CLOUD_API_LOGIN;
     return axios
       .post(loginApi, data, {
-        cancelToken: cancelTokenSource.token,
       })
-      .then((res) => {
-        localStorage.setItem("accessToken", res.data.accessToken);
+      .then(async (res) => {
+        await localStorage.setItem("accessToken", res.data.accessToken);
+
         pushToast({
           message: "Login successfully",
           type: toastTypes.SUCCESS
         });
+
         setUser({
           type: actions.LOGIN_ACTION,
           payload: res.data
         });
+
+        onLoadUser();
+
         cb();
       })
       .catch((error) => {
@@ -210,7 +214,7 @@ export default function AuthenticationContext({ children }) {
   function searchQuery() {
 
   }
-  // if (user.authLoading) return <Loading className="auth__loading"></Loading>;
+  if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (
     <AuthenticationContextAPI.Provider

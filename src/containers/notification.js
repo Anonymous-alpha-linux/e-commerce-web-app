@@ -1,11 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ContainerComponent, Icon, Text } from '../components';
-import { useNotifyContext } from '../redux';
+import { useAuthorizationContext, useNotifyContext } from '../redux';
 import TriggerLoading from './triggerLoading';
 
 export default function NotificationContainer() {
-    const { notify, loadMoreNotifications } = useNotifyContext();
+    const { user } = useAuthorizationContext();
+    const { notify, loadMoreNotifications, loadNotifications } = useNotifyContext();
+
+    React.useEffect(() => {
+        loadNotifications();
+    }, [user]);
 
     return <ContainerComponent className="notification__container">
         <Text.Title

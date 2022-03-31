@@ -25,7 +25,6 @@ export default function Personal() {
     const location = useLocation();
     const titleRef = useRef();
 
-
     useEffect(() => {
         getProfile(user.accountId, data => {
             if (!data.error) {
