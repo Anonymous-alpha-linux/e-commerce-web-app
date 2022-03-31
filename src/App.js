@@ -20,7 +20,7 @@ import {
   DashboardManager,
   CategoryManagement,
   ListMember,
-  StaffCRUD,
+  UserAll,
   AdminDashBoard,
 } from "./pages";
 
@@ -103,19 +103,19 @@ function App() {
                       element={<Workspace></Workspace>}
                     />
                     <Route
+                      path="/management/attachment"
+                      element={<AttachmentCrub></AttachmentCrub>}
+                    />
+                    <Route
                       path="/management/category"
                       element={<CategoryManagement></CategoryManagement>}
                     />
-                    <Route
-                      path="/management/member"
-                      element={<AccountCrud></AccountCrud>}
-                    >
+                    <Route path="/management/workspace_member">
                       <Route path=":id" element={<ListMember></ListMember>} />
                     </Route>
-                    <Route
-                      path="/management/staff/:id"
-                      element={<StaffCRUD></StaffCRUD>}
-                    />
+                    <Route path="/management/workspace">
+                      <Route path=":id" element={<UserAll></UserAll>} />
+                    </Route>
                     <Route path="profile" element={<Profile></Profile>}>
                       <Route path="personal" element={<Personal></Personal>} />
                       <Route
@@ -162,9 +162,45 @@ function App() {
                     }
                   >
                     <Route index element={<Workspace></Workspace>} />
+                    <Route path="profile" element={<Profile></Profile>}>
+                      <Route path="personal" element={<Personal></Personal>} />
+                      <Route
+                        path="manager"
+                        element={<ManagerInfo></ManagerInfo>}
+                      />
+                    </Route>
+                    <Route path="history" element={<MyPost></MyPost>} />
+                    <Route path="portal/" element={<Portal></Portal>}>
+                      <Route path="idea" element={<PostModal />}></Route>
+                      <Route path="idea/:id" element={<PostModal />}></Route>
+                      <Route
+                        path="notification"
+                        element={
+                          <NotificationContainer></NotificationContainer>
+                        }
+                      />
+                      <Route
+                        path="message"
+                        element={<MessageContainer></MessageContainer>}
+                      >
+                        <Route
+                          path=":id"
+                          element={<MessageBox></MessageBox>}
+                        ></Route>
+                      </Route>
+                      <Route path="search" element={<Searchbar></Searchbar>} />
+                      <Route
+                        path="addgroup"
+                        element={<AddGroupContainer></AddGroupContainer>}
+                      />
+                    </Route>
                     <Route
                       path="/management/category"
                       element={<CategoryManagement></CategoryManagement>}
+                    />
+                    <Route
+                      path="/management/member"
+                      element={<ListMember></ListMember>}
                     />
                   </Route>
                 )) ||

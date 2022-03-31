@@ -9,21 +9,23 @@ export default function Comment({ postAuthor, postId, commentLogs }) {
   const { posts, loadNextComments, filterPostComment } = usePostContext();
   const filterRef = useRef(filterPostComment);
   const calcRemainingEventTime = (time) => {
-    const date = new Date(time);
-    const now = new Date(Date.now());
-    if (Math.floor(date.getFullYear() - now.getFullYear())) {
-      return Math.floor(date.getFullYear() - now.getFullYear()) + " years";
-    } else if (Math.floor(date.getMonth() - now.getMonth())) {
-      return Math.floor(date.getMonth() - now.getMonth()) + " months";
-    } else if (Math.floor(date.getDate() - now.getDate())) {
-      return Math.floor(date.getDate() - now.getDate()) + " days";
-    } else if (Math.floor(date.getHours() - now.getHours())) {
-      return Math.floor(date.getHours() - now.getHours()) + " hours";
-    } else if (date.getMinutes() - now.getMinutes()) {
-      return date.getMinutes() - now.getMinutes() + " minutes";
-    } else if (date.getMinutes() - now.getMinutes()) {
-      return date.getMinutes() - now.getMinutes() + " seconds";
-    }
+    const date = new Date(new Date().setDate(30)).getTime();
+    const now = new Date().getTime();
+
+    const timeleft = date - now;
+
+    // var years = Math.floor(timeleft / (1000 * 60));
+    // var months = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+    var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+    // if (years) return years + " years";
+    // if (months) return months + " months";
+    if (days) return days + " days";
+    if (hours) return hours + " hours";
+    if (minutes) return minutes + " minutes";
+    if (seconds) return seconds + " seconds";
     return "Closed";
   };
   const filterComment = (e) => {
@@ -287,9 +289,9 @@ Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, 
         <Form method="POST" style={{ width: "100%", padding: "2px 0 0 30px", margin: "0" }} onSubmit={submitHandler}>
           <Form.Input ref={forwardedRef} name="content" style={{ width: "calc(100% - 30px)" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
           ></Form.Input>
-          <input type="submit" style={{ display: "none" }}></input>
+          <input type="submit" style={{ display: "none" }} onSubmit={submitHandler}></input>
           <Text.MiddleLine>
-            <Icon.CircleIcon>
+            <Icon.CircleIcon onClick={submitHandler}>
               <Form.Input component={<FiSend />}></Form.Input>
             </Icon.CircleIcon>
           </Text.MiddleLine>
@@ -428,7 +430,6 @@ Comment.TabReplyInput = function TabReplyInput({ forwardedRef, preReply = "", cl
   const { user } = useAuthorizationContext();
   const { interactPost } = usePostContext();
   const { sendNotification } = useNotifyContext();
-  console.log(hideAuthor);
   const [input, setInput] = useState({
     pre: hideAuthor ? "Anonymous" : preReply,
     content: hideAuthor ? '@Anonymous' : preReply ? `@${preReply}` : "",

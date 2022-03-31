@@ -20,7 +20,7 @@ import {
   Icon,
   Text,
 } from "../components";
-import { navigator as navigators, navData } from "../fixtures";
+import { navigator as navigators, navData, roles } from "../fixtures";
 import {
   useAuthorizationContext,
   useNotifyContext,
@@ -377,7 +377,8 @@ const WorkspaceList = () => {
             <ContainerComponent.Item
               className="workspaceList__item"
               key={index + 1}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (!disabled) {
                   selectHandler(item._id);
                 }
@@ -400,6 +401,7 @@ const WorkspaceList = () => {
                     <GrStackOverflow></GrStackOverflow>
                   </Icon>
                 </Text.MiddleLine>
+
                 <Text.MiddleLine>
                   <ContainerComponent.Pane>
                     <Text.Title style={{ textAlign: "center" }}>
@@ -407,6 +409,23 @@ const WorkspaceList = () => {
                     </Text.Title>
                     <TimespanChild expireTime={item.expireTime}></TimespanChild>
                   </ContainerComponent.Pane>
+                </Text.MiddleLine>
+
+                <Text.MiddleLine>
+                  {user.role !== roles.STAFF && (
+                    <DropdownButton
+                      position="left"
+                      component={
+                        <ContainerComponent.Pane>
+                          <Icon>
+                            <AiFillCaretDown></AiFillCaretDown>
+                          </Icon>
+                        </ContainerComponent.Pane>
+                      }
+                    >
+                      <ToolPanel></ToolPanel>
+                    </DropdownButton>
+                  )}
                 </Text.MiddleLine>
               </ContainerComponent.Flex>
             </ContainerComponent.Item>
@@ -416,74 +435,123 @@ const WorkspaceList = () => {
   );
 };
 function TimespanChild({ startTime = Date.now(), expireTime }) {
-  const startDate = new Date(startTime);
-  const expireDate = new Date(expireTime);
+  const startDate = new Date(startTime).getTime();
+  const expireDate = new Date(expireTime).getTime();
+
+  var timeleft = expireDate - startDate;
+  var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+
   const [counterTimer, setCounterTimer] = useState({
-    days: expireDate.getDate() - startDate.getDate(),
-    hours: 23 - startDate.getHours(),
-    minutes: 59 - startDate.getMinutes(),
-    seconds: 59 - startDate.getSeconds(),
+    days,
+    hours,
+    minutes,
+    seconds,
   });
+  const [blockWorkspace, setBlockWorkspace] = useState(false);
 
   useEffect(() => {
-    let timeout = setTimeout(() => {
-      setCounterTimer({
-        days: expireDate.getDate() - startDate.getDate(),
-        hours: 23 - startDate.getHours(),
-        minutes: 59 - startDate.getMinutes(),
-        seconds: 59 - startDate.getSeconds(),
-      });
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      var timeleft = expireDate - now;
+      var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+      var hours = Math.floor(
+        (timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+      if (days > 0) {
+        setCounterTimer({
+          days,
+          hours,
+          minutes,
+          seconds,
+        });
+      } else {
+        setBlockWorkspace(true);
+        setCounterTimer({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        });
+      }
     }, 1000);
 
     return () => {
-      clearTimeout(timeout);
+      clearInterval(interval);
     };
-  }, [counterTimer]);
+  }, []);
 
+  function convertTo2Digit(number) {
+    return number.toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    });
+  }
   return (
     <ContainerComponent.Section className="timespan__container">
       <ContainerComponent.Inner
         style={{ margin: "0 auto", textAlign: "center" }}
       >
-        <ContainerComponent.Flex
-          style={{
-            // alignItems: 'center',
-            justifyContent: "center",
-          }}
-        >
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
+        {(counterTimer.days > 0 && (
+          <ContainerComponent.Flex
+            style={{
+              // alignItems: 'center',
+              justifyContent: "center",
+            }}
           >
-            <ButtonComponent style={{ padding: "5px 15px" }}>
-              {`${(counterTimer.days < 10 && "0") || ""}${counterTimer.days}`}{" "}
-            </ButtonComponent>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent style={{ padding: "5px 15px" }}>
+                {`${counterTimer.days}`}
+              </ButtonComponent>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item>
-            <Text>:</Text>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item>
+              <Text>:</Text>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${
-              (counterTimer.hours < 10 && "0") || ""
-            }${counterTimer.hours}`}</ButtonComponent>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent
+                style={{ padding: "5px 10px" }}
+              >{`${convertTo2Digit(counterTimer.hours)}`}</ButtonComponent>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item>
-            <Text>:</Text>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item>
+              <Text>:</Text>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${
-              (counterTimer.minutes < 10 && "0") || ""
-            }${counterTimer.minutes}`}</ButtonComponent>
-          </ContainerComponent.Item>
-        </ContainerComponent.Flex>
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent
+                style={{ padding: "5px 10px" }}
+              >{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
+            </ContainerComponent.Item>
+
+            <ContainerComponent.Item>
+              <Text>:</Text>
+            </ContainerComponent.Item>
+
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent
+                style={{ padding: "5px 10px" }}
+              >{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
+            </ContainerComponent.Item>
+          </ContainerComponent.Flex>
+        )) || <ContainerComponent.Pane>Closed</ContainerComponent.Pane>}
       </ContainerComponent.Inner>
     </ContainerComponent.Section>
   );
+}
+function ToolPanel() {
+  return <ButtonComponent>Add new staff</ButtonComponent>;
 }

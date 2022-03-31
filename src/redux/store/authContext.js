@@ -57,14 +57,10 @@ export default function AuthenticationContext({ children }) {
           let socket = io(host);
           socket.auth = { accessToken: localStorage.getItem("accessToken") };
           setSocket(socket);
-          pushToast({
-            message: "Get User successfully",
-            type: toastTypes.SUCCESS,
-          });
           getProfile(response.data.accountId);
           cb(response.data.accountId);
         } else {
-          throw new Error("Get data Failed!");
+          throw new Error("Get user data Failed!");
         }
       })
       .catch((error) => {
@@ -72,7 +68,7 @@ export default function AuthenticationContext({ children }) {
           type: actions.AUTHENTICATE_FAILED,
         });
         pushToast({
-          message: "Login to system",
+          message: "Signin successfully to system",
           type: toastTypes.INFO,
         });
       });
@@ -159,7 +155,7 @@ export default function AuthenticationContext({ children }) {
       })
       .catch((error) => {
         pushToast({
-          message: error.message,
+          message: "Get Profile Failed",
           type: toastTypes.ERROR,
         });
       });
@@ -181,10 +177,16 @@ export default function AuthenticationContext({ children }) {
           },
         }
       )
-      .then((res) => getProfile())
+      .then((res) => {
+        pushToast({
+          message: "Edit Profile Successful",
+          type: toastTypes.SUCCESS,
+        });
+        getProfile();
+      })
       .catch((error) => {
         pushToast({
-          message: error.message,
+          message: "Edit Profile Failed",
           type: toastTypes.ERROR,
         });
       });

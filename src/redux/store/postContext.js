@@ -66,7 +66,6 @@ export default React.memo(function PostContext({ children }) {
     categoryReducer,
     initialCategories
   );
-
   const [showUpdate, setShowUpdate] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -94,30 +93,6 @@ export default React.memo(function PostContext({ children }) {
   }, [socket]);
 
   // 1. Post for workspace
-  function getAllPost() {
-    return axios
-      .get(postAPI, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        params: {
-          view: "allpost",
-        },
-      })
-      .then((res) => {
-        pushToast({
-          message: "Get all post successfully",
-          type: toastTypes.SUCCESS,
-        });
-        setPost({});
-      })
-      .catch((error) => {
-        pushToast({
-          message: "Get all post successfully",
-          type: toastTypes.SUCCESS,
-        });
-      });
-  }
   function getPosts() {
     // setPost({
     //   type: actions.SET_LOADING,
@@ -240,9 +215,16 @@ export default React.memo(function PostContext({ children }) {
           type: actions.PUSH_IDEA,
           payload: [res.data.response],
         });
+        pushToast({
+          message: "Posted successfully",
+          type: toastTypes.SUCCESS,
+        });
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: "Posted failed",
+          type: toastTypes.ERROR,
+        });
       });
   }
   function updateSinglePost(postId, cb) {
@@ -262,9 +244,16 @@ export default React.memo(function PostContext({ children }) {
           payload: res.data.response,
           postId: postId,
         });
+        pushToast({
+          message: "Updated post successfully",
+          type: toastTypes.SUCCESS,
+        });
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: "Updated post failed",
+          type: toastTypes.ERROR,
+        });
       });
   }
   function deleteSinglePost(postId, cb) {
@@ -283,10 +272,17 @@ export default React.memo(function PostContext({ children }) {
           type: actions.REMOVE_SINGLE_POST,
           postId: postId,
         });
+        pushToast({
+          message: "Deleted post successfully",
+          type: toastTypes.SUCCESS,
+        });
         cb(postId);
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: "Deleted post failed",
+          type: toastTypes.ERROR,
+        });
       });
   }
   function postIdea(input, cb, options = null) {
@@ -325,11 +321,18 @@ export default React.memo(function PostContext({ children }) {
       })
       .then((res) => {
         createSinglePost(res.data.response[0]._id, cb);
+        pushToast({
+          message: "Posted successfully",
+          type: toastTypes.SUCCESS,
+        });
         cb(res.data.response[0]._id);
       })
       .catch((err) => {
+        pushToast({
+          message: "Posted failed",
+          type: toastTypes.ERROR,
+        });
         cb(error);
-        setError(err.message);
       });
   }
   function editIdea(input, formData, cb, options) {
@@ -366,7 +369,12 @@ export default React.memo(function PostContext({ children }) {
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
-      .catch((error) => setError(error.message));
+      .catch((error) => {
+        pushToast({
+          message: "Edit Post successfully",
+          type: toastTypes.ERROR,
+        });
+      });
   }
   function likePost(input, postId, userId) {
     setPost({
@@ -408,7 +416,6 @@ export default React.memo(function PostContext({ children }) {
       updateSinglePost(postId);
     });
   }
-
   function likeComment(isLiked, postId, userId, commentId) {
     setPost({
       type: actions.LIKE_COMMENT,
@@ -660,9 +667,16 @@ export default React.memo(function PostContext({ children }) {
           payload: [res.data.response],
           postId: postId,
         });
+        pushToast({
+          message: "Posted comment",
+          type: toastTypes.SUCCESS,
+        });
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          message: "Failed to posted comment",
+          type: toastTypes.ERROR,
+        });
       });
   }
 
@@ -809,7 +823,6 @@ export default React.memo(function PostContext({ children }) {
         likedAccounts,
         dislikedAccounts,
       } = input;
-      console.log(input);
       setPost({
         type: actions.RATE_POST,
         postId,

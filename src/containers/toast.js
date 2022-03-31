@@ -13,17 +13,19 @@ export default function ToastMessage({
   pullItem,
 }) {
   const toastRef = useRef();
+  const [isExpired, setExpired] = useState(false);
   useEffect(() => {
     toastRef.current.style.width = "0%";
     const timeoutVal = setTimeout(() => {
-      pullItem();
+      setExpired(true);
+      pullItem(message);
     }, timeout + 100);
     return () => {
       clearTimeout(timeoutVal);
     };
   }, []);
 
-  return (
+  return !isExpired ? (
     <div className={`${styles.ToastMessage} ${styles[type]}`}>
       <h5
         style={{
@@ -43,5 +45,5 @@ export default function ToastMessage({
         ></div>
       </div>
     </div>
-  );
+  ) : null;
 }

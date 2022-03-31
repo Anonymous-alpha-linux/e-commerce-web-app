@@ -40,7 +40,6 @@ function Pagination({
               key={index + 1}
               onClick={() => {
                 onSelected(index);
-                onLoadData(index);
               }}
               style={{
                 color: `${page === index ? "blue" : "#000"}`,

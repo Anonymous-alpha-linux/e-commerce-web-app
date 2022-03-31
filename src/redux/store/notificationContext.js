@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
 import { mainAPI } from '../../config';
-import { notifyData, socketTargets } from '../../fixtures';
+import { notifyData, socketTargets, toastTypes } from '../../fixtures';
 import actions from '../reducers/actions';
 import { notifyReducer, initialNotify } from '../reducers';
 import { useAuthorizationContext } from './authContext';
@@ -9,6 +9,7 @@ import { useAuthorizationContext } from './authContext';
 const NotificationContextAPI = createContext();
 
 export default function NotificationContext({ children }) {
+    const { pushToast } = useAuthorizationContext();
     const [showUpdate, setShowUpdate] = useState(true);
     const [notify, setNotify] = useReducer(notifyReducer, initialNotify);
     const { user, socket, setError, setMessage } = useAuthorizationContext();
@@ -51,8 +52,11 @@ export default function NotificationContext({ children }) {
                     payload: res.data.response
                 });
             })
-            .catch(e => {
-                setError(e.message);
+            .catch(() => {
+                pushToast({
+                    message: 'Loading Notifications Failed',
+                    type: toastTypes.ERROR
+                })
             });
     }
     function loadMoreNotifications() {
@@ -70,7 +74,10 @@ export default function NotificationContext({ children }) {
                 type: actions.PUSH_NOTIFICATION,
                 payload: res.data.response
             })
-        }).catch(error => setError(error.messge));
+        }).catch(() => pushToast({
+            message: 'Loading Notifications Failed',
+            type: toastTypes.ERROR
+        }));
     }
     function getSession() {
         socket.on('session', sessionId => {

@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+import { MdOutlineWork } from "react-icons/md";
+import { AiFillCaretDown, AiFillRightCircle } from "react-icons/ai";
+import { TiPlus } from "react-icons/ti";
+import { GrStackOverflow } from "react-icons/gr";
+import { GoSignOut } from "react-icons/go";
+import { ImSpinner6 } from "react-icons/im";
 
 import {
-  AnimateComponent,
   ButtonComponent,
   ContainerComponent,
   Icon,
   Preview,
   Text,
 } from "../components";
-import { MdOutlineWork } from "react-icons/md";
-import { AiFillCaretDown, AiFillRightCircle } from "react-icons/ai";
-import { TiPlus } from "react-icons/ti";
-import { GrStackOverflow } from "react-icons/gr";
-import { GoSignOut } from "react-icons/go";
-
-import { Link, Navigate } from "react-router-dom";
-import { sidebarData } from "../fixtures";
+import { UserAll, ListMember } from "../pages";
+import { sidebarData, media } from "../fixtures";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import { AddFromWorkspace } from ".";
-import { useModal } from "../hooks";
+import { useModal, useMedia } from "../hooks";
 import Modal from "./modal";
+import DropdownButton from "./dropDownButton";
+import TriggerLoading from "./triggerLoading";
 
 export default function Sidebar({ closeSidebar, forwardRef }) {
   // const [switchToggle, setSwitchToggle] = useState(false);
   // const [modalWS, setModalWS] = useState(false);
   const [modalWS, setModalWS] = useModal(false);
   const [switchToggle, setSwitchToggle] = useModal(false);
-  const { workspaces } = useWorkspaceContext();
+  const { workspaces, loadMore, loadMoreWorkspaceList } = useWorkspaceContext();
   const { user } = useAuthorizationContext();
 
   return (
@@ -55,34 +58,46 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                 }}
               ></Preview.Images>
             </ContainerComponent.Flex>
+
             <Text.CenterLine>
               <Text> {user.account}</Text>
             </Text.CenterLine>
+            {/* sidebar links */}
             <ContainerComponent.Flex>
-              {sidebarData.map((item, index) => (
-                <ContainerComponent.Item
-                  className="sidebar__links"
-                  key={index + 1}
-                  style={{
-                    width: "100%",
-                    padding: "20px",
-                    position: "relative",
-                  }}
-                >
-                  <Link to={item.link}>
-                    <Text.Line>
-                      <Text.MiddleLine style={{ width: "20%" }}>
-                        <Icon style={{ fontSize: "30px" }}>{item.icon}</Icon>
-                      </Text.MiddleLine>
-                      <Text.MiddleLine
-                        style={{ width: "80%", paddingLeft: "2rem" }}
-                      >
-                        <Text.Title>{item.title}</Text.Title>
-                      </Text.MiddleLine>
-                    </Text.Line>
-                  </Link>
-                </ContainerComponent.Item>
-              ))}
+              {sidebarData.map((item, index) => {
+                return (
+                  (item.authorized.indexOf(user.role) > -1 && (
+                    <ContainerComponent.Item
+                      className="sidebar__links"
+                      key={index + 1}
+                      style={{
+                        width: "100%",
+                        padding: "20px",
+                        position: "relative",
+                      }}
+                    >
+                      <Link to={item.link}>
+                        <Text.Line onClick={closeSidebar}>
+                          <Text.MiddleLine style={{ width: "20%" }}>
+                            <Icon style={{ fontSize: "30px" }}>
+                              {item.icon}
+                            </Icon>
+                          </Text.MiddleLine>
+                          <Text.MiddleLine
+                            style={{ width: "80%", paddingLeft: "2rem" }}
+                          >
+                            <Text.Title>{item.title}</Text.Title>
+                          </Text.MiddleLine>
+                        </Text.Line>
+                      </Link>
+                    </ContainerComponent.Item>
+                  )) || (
+                    <ContainerComponent.Item
+                      key={index + 1}
+                    ></ContainerComponent.Item>
+                  )
+                );
+              })}
               <ContainerComponent.Item
                 style={{ width: "100%", padding: "20px", position: "relative" }}
               >
@@ -147,17 +162,23 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                     Add Workspace
                   </Text.Title>
                 </ContainerComponent.Item>
+                {/* workspaceData */}
                 <ContainerComponent.Item
                   style={{ maxHeight: "260px", overflowY: "scroll" }}
                 >
-                  {workspaces &&
-                    workspaces.map((item, index) => (
-                      <EditToggle
-                        item={item}
-                        key={index + 1}
-                        clickLoader={closeSidebar}
-                      ></EditToggle>
-                    ))}
+                  <TriggerLoading
+                    loadMore={loadMore}
+                    loader={loadMoreWorkspaceList}
+                  >
+                    {workspaces &&
+                      workspaces.map((item, index) => (
+                        <EditToggle
+                          item={item}
+                          key={index + 1}
+                          clickLoader={closeSidebar}
+                        ></EditToggle>
+                      ))}
+                  </TriggerLoading>
                 </ContainerComponent.Item>
               </ContainerComponent.Toggle>
             )}
@@ -188,11 +209,11 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
     </>
   );
 }
-
 const EditToggle = ({ item, clickLoader }) => {
-  const [switchToggleChild, setSwitchToggleChild] = useState(false);
-  const [editToggle, setEditToggle] = useState(false);
-
+  const [modal, toggleModal] = useModal();
+  const [memberModal, toggleMemberModal] = useModal();
+  const [workspaceModal, toggleWorkspaceModal] = useModal();
+  const device = useMedia(480, 1080);
   return (
     <>
       <ContainerComponent.Item
@@ -206,151 +227,349 @@ const EditToggle = ({ item, clickLoader }) => {
               <GrStackOverflow></GrStackOverflow>
             </Icon>
           </Text.MiddleLine>
+
           <Text.MiddleLine>
             <ContainerComponent.Pane>
-              <Text.Title style={{ textAlign: "center" }}>
+              <Text.Title
+                style={{ textAlign: "center", textTransform: "capitalize" }}
+              >
                 {item.workTitle}
               </Text.Title>
-              <TimespanChild></TimespanChild>
+              <TimespanChild expireTime={item.expireTime}></TimespanChild>
             </ContainerComponent.Pane>
           </Text.MiddleLine>
+
           <Text.MiddleLine>
-            <Icon style={{ fontSize: "20px" }}>
-              <AiFillCaretDown
-                key={item.id}
-                onClick={() => setEditToggle(!editToggle)}
-              ></AiFillCaretDown>
-            </Icon>
+            <DropdownButton
+              position="right"
+              component={
+                <Icon style={{ fontSize: "20px" }}>
+                  <AiFillCaretDown></AiFillCaretDown>
+                </Icon>
+              }
+            >
+              {(device === media.MOBILE && (
+                <ButtonComponent>
+                  <Link
+                    to={`/management/workspace/${item._id}`}
+                    style={{ color: "#fff" }}
+                    onClick={clickLoader}
+                  >
+                    <Text.Line>
+                      <Text.NoWrapText>Assign QA Coordinator</Text.NoWrapText>
+                    </Text.Line>
+                  </Link>
+                </ButtonComponent>
+              )) || (
+                <ButtonComponent onClick={toggleModal}>
+                  <Text.Line>
+                    <Text.NoWrapText>Assign QA Coordinator</Text.NoWrapText>
+                  </Text.Line>
+                </ButtonComponent>
+              )}
+
+              {(device === media.MOBILE && (
+                <ButtonComponent>
+                  <Link
+                    to={`/management/workspace_member/${item._id}`}
+                    style={{ color: "#fff" }}
+                    onClick={clickLoader}
+                  >
+                    <Text.Line>
+                      <Text.NoWrapText>Add Member</Text.NoWrapText>
+                    </Text.Line>
+                  </Link>
+                </ButtonComponent>
+              )) || (
+                <ButtonComponent onClick={toggleMemberModal}>
+                  <Text.Line>
+                    <Text.NoWrapText>Add Member</Text.NoWrapText>
+                  </Text.Line>
+                </ButtonComponent>
+              )}
+
+              {(device === media.MOBILE && (
+                <ButtonComponent>
+                  <Text.Line>
+                    <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
+                  </Text.Line>
+                </ButtonComponent>
+              )) || (
+                <ButtonComponent onClick={toggleWorkspaceModal}>
+                  <Text.Line>
+                    <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
+                  </Text.Line>
+                </ButtonComponent>
+              )}
+            </DropdownButton>
           </Text.MiddleLine>
         </ContainerComponent.Flex>
-        <Text.Line style={{ width: "100%" }}>
-          {editToggle && (
-            <ContainerComponent.Toggle
-              className={switchToggleChild ? "opera" : "empty"}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                position: "absolute",
-                border: "1px solid",
-                borderRadius: "10px",
-                right: 0,
-                padding: "20px",
-                zIndex: 3,
-                background: "#fff",
-              }}
-            >
-              <ContainerComponent.Flex
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  gap: "15px",
-                }}
-              >
-                <ButtonComponent>
-                  <Link
-                    to={`/management/staff/${item._id}`}
-                    style={{ color: "#fff" }}
-                    onClick={clickLoader}
-                  >
-                    <Text.Line>Assign QA Coordinator</Text.Line>
-                  </Link>
-                </ButtonComponent>
-                <ButtonComponent>
-                  <Link
-                    to={`/management/member/${item._id}`}
-                    style={{ color: "#fff" }}
-                    onClick={clickLoader}
-                  >
-                    <Text.Line>Add Member</Text.Line>
-                  </Link>
-                </ButtonComponent>
-                <ButtonComponent
-                  style={{ width: "177px", textAlign: "center" }}
-                >
-                  Edit Time/Title
-                </ButtonComponent>
-              </ContainerComponent.Flex>
-            </ContainerComponent.Toggle>
-          )}
-        </Text.Line>
       </ContainerComponent.Item>
+
+      <Modal
+        style={{
+          background: "#fff",
+          maxWidth: "420px",
+          borderRadius: "10px",
+          overflow: "hidden",
+        }}
+        isShowing={modal}
+        toggle={toggleModal}
+      >
+        <UserAll workspaceId={item._id}></UserAll>
+      </Modal>
+      <Modal
+        style={{
+          background: "#fff",
+          maxWidth: "420px",
+          borderRadius: "10px",
+          overflow: "hidden",
+        }}
+        isShowing={memberModal}
+        toggle={toggleMemberModal}
+      >
+        <ListMember workspaceId={item._id}></ListMember>
+      </Modal>
+      <Modal
+        style={{
+          background: "transparent",
+          maxWidth: "420px",
+          borderRadius: "10px",
+          overflow: "hidden",
+        }}
+        isShowing={workspaceModal}
+        toggle={toggleWorkspaceModal}
+      >
+        <WorkspaceModal
+          workspaceId={item._id}
+          toggleModal={toggleWorkspaceModal}
+          workTitle={item.workTitle}
+        ></WorkspaceModal>
+      </Modal>
     </>
   );
 };
-
 function TimespanChild({ startTime = Date.now(), expireTime }) {
-  const startDate = new Date(startTime);
-  const expireDate = new Date(expireTime);
+  const { workspaces } = useWorkspaceContext();
+  const startDate = new Date(startTime).getTime();
+  const expireDate = new Date(expireTime).getTime();
+  const [loading, setLoading] = useState(false);
+
+  var timeleft = expireDate - startDate;
+  var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+
   const [counterTimer, setCounterTimer] = useState({
-    days: expireDate.getDate() - startDate.getDate(),
-    hours: 23 - startDate.getHours(),
-    minutes: 59 - startDate.getMinutes(),
-    seconds: 59 - startDate.getSeconds(),
+    days,
+    hours,
+    minutes,
+    seconds,
   });
+  const [blockWorkspace, setBlockWorkspace] = useState(false);
 
   useEffect(() => {
-    let timeout = setTimeout(() => {
-      setCounterTimer({
-        days: expireDate.getDate() - startDate.getDate(),
-        hours: 23 - startDate.getHours(),
-        minutes: 59 - startDate.getMinutes(),
-        seconds: 59 - startDate.getSeconds(),
-      });
+    setLoading(true);
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      var timeleft = expireDate - now;
+      var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+      var hours = Math.floor(
+        (timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+      if (days > 0) {
+        setCounterTimer({
+          days,
+          hours,
+          minutes,
+          seconds,
+        });
+      } else {
+        setBlockWorkspace(true);
+        setCounterTimer({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+        });
+      }
     }, 1000);
-
+    setLoading(false);
     return () => {
-      clearTimeout(timeout);
+      clearInterval(interval);
     };
-  }, [counterTimer]);
+  }, [workspaces]);
+  function convertTo2Digit(number) {
+    return number.toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    });
+  }
 
   return (
     <ContainerComponent.Section className="timespan__container">
-      <ContainerComponent.Inner
-        style={{
-          margin: "0 auto",
-          textAlign: "center",
-        }}
-      >
-        <ContainerComponent.Flex
-          style={{
-            // alignItems: 'center',
-            justifyContent: "center",
-          }}
+      {(loading && (
+        <ContainerComponent.Inner
+          style={{ margin: "0 auto", textAlign: "center" }}
         >
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 15px" }}>
-              {`${(counterTimer.hours < 10 && "0") || ""}${counterTimer.hours}`}{" "}
-            </ButtonComponent>
-          </ContainerComponent.Item>
+          <Text.CenterLine>
+            <Icon.Spinner style={{ fontSize: "400px" }}>
+              <ImSpinner6></ImSpinner6>
+            </Icon.Spinner>
+          </Text.CenterLine>
+        </ContainerComponent.Inner>
+      )) || (
+        <ContainerComponent.Inner
+          style={{ margin: "0 auto", textAlign: "center" }}
+        >
+          {counterTimer.days > 0 ? (
+            <ContainerComponent.Flex
+              style={{
+                // alignItems: 'center',
+                justifyContent: "center",
+              }}
+            >
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent style={{ padding: "5px 15px" }}>
+                  {`${counterTimer.days}`}
+                </ButtonComponent>
+              </ContainerComponent.Item>
 
-          <ContainerComponent.Item>
-            <Text>:</Text>
-          </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                <Text>:</Text>
+              </ContainerComponent.Item>
 
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${
-              (counterTimer.minutes < 10 && "0") || ""
-            }${counterTimer.minutes}`}</ButtonComponent>
-          </ContainerComponent.Item>
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent
+                  style={{ padding: "5px 10px" }}
+                >{`${convertTo2Digit(counterTimer.hours)}`}</ButtonComponent>
+              </ContainerComponent.Item>
 
-          <ContainerComponent.Item>
-            <Text>:</Text>
-          </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                <Text>:</Text>
+              </ContainerComponent.Item>
 
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${
-              (counterTimer.seconds < 10 && "0") || ""
-            }${counterTimer.seconds}`}</ButtonComponent>
-          </ContainerComponent.Item>
-        </ContainerComponent.Flex>
-      </ContainerComponent.Inner>
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent
+                  style={{ padding: "5px 10px" }}
+                >{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
+              </ContainerComponent.Item>
+
+              <ContainerComponent.Item>
+                <Text>:</Text>
+              </ContainerComponent.Item>
+
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent
+                  style={{ padding: "5px 10px" }}
+                >{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
+              </ContainerComponent.Item>
+            </ContainerComponent.Flex>
+          ) : (
+            <ContainerComponent.Pane
+              style={{ color: "red", fontWeight: 500, fontSize: "0.8em" }}
+            >
+              Closed
+            </ContainerComponent.Pane>
+          )}
+        </ContainerComponent.Inner>
+      )}
     </ContainerComponent.Section>
+  );
+}
+function WorkspaceModal({ workspaceId, workTitle, toggleModal }) {
+  const [workspaceInfo, setWorkspaceInfo] = useState({
+    workTitle: workTitle,
+    eventTime: Date.now(),
+    expireTime: Date.now(),
+  });
+  const [loading, setLoading] = useState(false);
+
+  const { editWorkspace } = useWorkspaceContext();
+
+  async function HandleWSInput(e) {
+    setWorkspaceInfo({ ...workspaceInfo, [e.target.name]: e.target.value });
+  }
+  async function onSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    editWorkspace(
+      workspaceId,
+      workspaceInfo.workTitle,
+      workspaceInfo.expireTime,
+      workspaceInfo.eventTime,
+      () => {
+        setLoading(false);
+      }
+    );
+  }
+  return (
+    <div className="c-modal__container">
+      {(loading && (
+        <Text.CenterLine>
+          <Icon.Spinner style={{ fontSize: "400px" }}>
+            <ImSpinner6></ImSpinner6>
+          </Icon.Spinner>
+        </Text.CenterLine>
+      )) || (
+        <form onSubmit={onSubmit}>
+          <div className="form-container">
+            <div className="question-container">
+              <label className="question-label">Workspace Title</label>
+              <input
+                className="row-input"
+                type="text"
+                name="workTitle"
+                onChange={HandleWSInput}
+                value={workspaceInfo.workTitle}
+              />
+            </div>
+            <div className="question-container">
+              <label className="question-label">
+                Close Event(comment, etc.)
+              </label>
+              <input
+                className="row-input"
+                type="date"
+                name="eventTime"
+                onChange={HandleWSInput}
+                // value={workspaceInfo.eventTime}
+              />
+            </div>
+            <div className="question-container">
+              <label className="question-label">Closure Date</label>
+              <input
+                className="row-input"
+                type="date"
+                name="expireTime"
+                onChange={HandleWSInput}
+                // value={workspaceInfo.expireTime}
+              />
+            </div>
+          </div>
+          <div className="form-container">
+            <div className="question-container">
+              <button type="submit" className="submit_category">
+                Add
+              </button>
+              <button className="btn-trans-Cancel" onClick={toggleModal}>
+                Close
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+    </div>
   );
 }

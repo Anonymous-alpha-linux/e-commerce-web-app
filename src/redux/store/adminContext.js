@@ -35,11 +35,17 @@ export default function AdminContext({ children }) {
     roles: [],
     errors: [],
     messages: [],
+    statistics: {
+      mostLikePosts: [],
+      mostLikeUser: [],
+      mostCategories: []
+    },
     totalWorkspace: 0,
     totalPost: 0,
     totalUser: 0,
     loading: true,
   });
+
   const { pushToast } = useAuthorizationContext();
   const [adminAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
@@ -49,13 +55,21 @@ export default function AdminContext({ children }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? mainAPI.LOCALHOST_MANAGER
       : mainAPI.CLOUD_API_MANAGER;
+  const staffAPI =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? mainAPI.LOCALHOST_STAFF
+      : mainAPI.CLOUD_API_STAFF;
 
   useEffect(() => {
     getDashBoardOverview();
     getAccountList();
     getRoleList();
     getAttachmentList();
+    getMostLikePosts();
+    getMostCategory();
   }, []);
+
+
   function getAccountList(cb) {
     return axios
       .get(adminAPI, {
@@ -75,13 +89,19 @@ export default function AdminContext({ children }) {
             data: res.data.response,
           }
         }));
+        if (typeof cb === 'function') {
+          cb(res.data.response);
+        }
       })
-      .catch((error) =>
+      .catch((error) => {
         pushToast({
           message: error.message,
           type: toastTypes.ERROR,
-        })
-      );
+        });
+        if (typeof cb === 'function') {
+          cb([]);
+        }
+      });
   }
   function getRoleList(cb) {
     return axios
@@ -99,7 +119,161 @@ export default function AdminContext({ children }) {
           roles: res.data.response,
         }));
       })
-      .catch((error) => pushToast({ message: error.message, type: toastTypes.ERROR }));
+      .catch(() => pushToast({ message: "Get Role List Failed", type: toastTypes.ERROR }));
+  }
+  function getAttachmentList(cb) {
+    return axios
+      .get(managerAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "attachment",
+          page: 0,
+          count: state.attachments.count,
+        },
+      })
+      .then((res) => {
+        setState((o) => ({
+          ...o,
+          attachments: {
+            ...o.attachments,
+            loading: false,
+            // data: [{
+            //   page: 0,
+            //   records: res.data.response
+            // }],
+            data: [
+              ...res.data.response
+            ],
+            fetchedPage: [0],
+            currentPage: 0,
+            documentCount: res.data.attachmentCount,
+            pages: res.data.pages,
+          },
+        }));
+      })
+      .catch((error) =>
+        pushToast({
+          message: error.message,
+          type: toastTypes.ERROR,
+        })
+      );
+  }
+  function getAttachmentByPage(page, cb) {
+    // console.log(page, state.attachments.fetchedPage.indexOf(page));
+    // if (!state.attachments.data.some((item) => item.page === page)) {
+    if (state.attachments.fetchedPage.indexOf(page) === -1) {
+      setState((o) => ({
+        ...o,
+        attachments: {
+          ...o.attachments,
+          loading: true
+        }
+      }));
+
+      return axios
+        .get(managerAPI, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          params: {
+            view: "attachment",
+            page: page,
+            count: 5,
+          },
+        })
+        .then((res) => {
+          setState((o) => {
+            const newData = o.attachments.data.slice();
+            newData.splice((page + 1) * o.attachments.count, 0, ...res.data.response);
+            return ({
+              ...o,
+              attachments: {
+                ...o.attachments,
+                loading: false,
+                currentPage: page,
+                fetchedPage: [...o.attachments.fetchedPage, page],
+                data: newData
+              },
+            })
+          });
+          cb(res.data.response);
+        })
+        .catch((error) => {
+          cb([]);
+          pushToast({
+            message: error.message,
+            type: toastTypes.ERROR
+          });
+        });
+    }
+  }
+  async function getDashBoardOverview() {
+    return axios.get(managerAPI, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        view: 'overview'
+      }
+    }).then(res => {
+      setState(o => ({
+        ...o,
+        totalWorkspace: res.data.totalWorkspace,
+        totalPost: res.data.totalPost,
+        totalUser: res.data.totalUser
+      }));
+    }).catch(error => pushToast({
+      message: error.message,
+      type: toastTypes.ERROR
+    }))
+  }
+  function getMostLikePosts() {
+    return axios
+      .get(managerAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "mostlikepost",
+        },
+      })
+      .then((res) => {
+        setState(oldState => ({
+          ...oldState,
+          statistics: {
+            ...oldState.statistics,
+            mostLikePosts: [...res.data.response],
+          }
+        }));
+      })
+      .catch((error) => {
+        pushToast({ message: error.message, type: toastTypes.ERROR });
+      });
+  }
+  function getMostCategory() {
+    return axios
+      .get(managerAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "mostcategory",
+        },
+      })
+      .then((res) => {
+        setState(oldState => ({
+          ...oldState,
+          statistics: {
+            ...oldState.statistics,
+            mostCategories: [...res.data.response],
+          }
+        }));
+      })
+      .catch((error) => {
+        pushToast({ message: error.message, type: toastTypes.ERROR });
+      });
   }
   function createNewAccount(username, email, password, role, cb) {
     return axios
@@ -119,7 +293,7 @@ export default function AdminContext({ children }) {
           pushToast({
             message: 'Add new user successfully',
             type: toastTypes.SUCCESS
-          })
+          });
           cb({
             message: "Successfully, Add New User",
           });
@@ -134,7 +308,7 @@ export default function AdminContext({ children }) {
         pushToast({
           message: 'Add user failed!',
           type: toastTypes.ERROR
-        })
+        });
         cb({ error: error.message });
       });
   }
@@ -172,7 +346,7 @@ export default function AdminContext({ children }) {
           pushToast({
             message: 'Update username successfully',
             type: toastTypes.SUCCESS
-          })
+          });
           cb({
             message: "Edit username successfully",
           });
@@ -314,91 +488,7 @@ export default function AdminContext({ children }) {
       });
   }
   function blockAccount(accountId, cb) { }
-  function getAttachmentList(cb) {
-    return axios
-      .get(managerAPI, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        params: {
-          view: "attachment",
-          page: 0,
-          count: state.attachments.count,
-        },
-      })
-      .then((res) => {
-        setState((o) => ({
-          ...o,
-          attachments: {
-            ...o.attachments,
-            loading: false,
-            // data: [{
-            //   page: 0,
-            //   records: res.data.response
-            // }],
-            data: [
-              ...res.data.response
-            ],
-            fetchedPage: [0],
-            currentPage: 0,
-            documentCount: res.data.attachmentCount,
-            pages: res.data.pages,
-          },
-        }));
-      })
-      .catch((error) =>
-        pushToast({
-          message: error.message,
-          type: toastTypes.ERROR,
-        })
-      );
-  }
-  function getAttachmentByPage(page, cb) {
-    // console.log(page, state.attachments.fetchedPage.indexOf(page));
-    // if (!state.attachments.data.some((item) => item.page === page)) {
-    if (state.attachments.fetchedPage.indexOf(page) === -1) {
-      setState((o) => ({
-        ...o,
-        attachments: {
-          ...o.attachments,
-          loading: true
-        }
-      }));
-
-      return axios
-        .get(managerAPI, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          params: {
-            view: "attachment",
-            page: page,
-            count: 5,
-          },
-        })
-        .then((res) => {
-          setState((o) => {
-            const newData = o.attachments.data.slice();
-            newData.splice((page + 1) * o.attachments.count, 0, ...res.data.response);
-            return ({
-              ...o,
-              attachments: {
-                ...o.attachments,
-                loading: false,
-                currentPage: page,
-                fetchedPage: [...o.attachments.fetchedPage, page],
-                data: newData
-              },
-            })
-          });
-        })
-        .catch((error) => pushToast({
-          message: error.message,
-          type: toastTypes.ERROR
-        }));
-    }
-  }
-  function deleteSingleAttachment(attachmentId, currentPage, cb) {
+  function deleteSingleAttachment(attachmentId, cb) {
     setState(o => {
       return {
         ...o,
@@ -420,14 +510,16 @@ export default function AdminContext({ children }) {
       pushToast({
         message: 'Deleted Attachment Successfully!',
         type: toastTypes.SUCCESS
-      })
-    }).catch(error => pushToast({
-      message: error.message,
-      type: toastTypes.ERROR
-    }))
+      });
+      cb({ message: 'get successfully' });
+    }).catch(error => {
+      pushToast({
+        message: error.message,
+        type: toastTypes.ERROR
+      });
+      cb({ error: 'get failed!' });
+    });
   }
-  function assignMemberToWorkspace() { }
-  function assignRoleToAccount() { }
   async function downloadSingleAttachment(attachmentId) {
     return axios.get(`${host}/api/v1/download`, {
       headers: {
@@ -451,50 +543,21 @@ export default function AdminContext({ children }) {
       link.parentNode.removeChild(link);
     }).catch(err => pushToast({ message: err.message, type: toastTypes.ERROR }));
   }
-  async function getDashBoardOverview() {
-    return axios.get(managerAPI, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: 'overview'
-      }
-    }).then(res => {
-      console.log(res.data);
-      setState(o => ({
-        ...o,
-        totalWorkspace: res.data.totalWorkspace,
-        totalPost: res.data.totalPost,
-        totalUser: res.data.totalUser
-      }));
-    }).catch(error => pushToast({
-      message: error.message,
-      type: toastTypes.ERROR
-    }))
-  }
-  async function getTopPost() {
-    return axios.get(managerAPI, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: 'overview'
-      }
-    })
+
+  const contextValues = {
+    ...state,
+    createNewAccount,
+    editUsername,
+    editEmail,
+    editPassword,
+    editRole,
+    getAttachmentByPage,
+    deleteSingleAttachment,
+    downloadSingleAttachment
   }
   return (
     <AdminContextAPI.Provider
-      value={{
-        ...state,
-        createNewAccount,
-        editUsername,
-        editEmail,
-        editPassword,
-        editRole,
-        getAttachmentByPage,
-        deleteSingleAttachment,
-        downloadSingleAttachment
-      }}
+      value={contextValues}
     >
       {children}
     </AdminContextAPI.Provider>

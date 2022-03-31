@@ -24,3 +24,4 @@ IconComponent.Avatar = ({ children, ...props }) => {
 }
 IconComponent.Badge = ({ children, ...props }) => <span className="icon__badge" {...props}>{children}</span>
 IconComponent.Image = ({ ...props }) => <img src={props.src} alt={props.alt} className="icon__image" loading='eager'></img>
+IconComponent.Spinner = ({ children, ...props }) => <span className="icon__spinner">{children}</span>
