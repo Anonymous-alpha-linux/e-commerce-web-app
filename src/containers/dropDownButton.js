@@ -1,16 +1,20 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Dropdown } from '../components'
 import DropDown from '../components/dropdown'
 import { useModal } from '../hooks';
 
 export default function DropdownButton({ children, component, position = 'middle', ...props }) {
-    const [openContent, toggleContent] = useModal();
+    // const [openContent, toggleContent] = useModal();
+    const [openContent, setOpenContent] = useState(false);
+    const contentRef = useRef(null);
+
     return (
-        <Dropdown
-            onClick={toggleContent}
-            onMouseLeave={toggleContent}>
-            <DropDown.DropBtn>{component}</DropDown.DropBtn>
+        <Dropdown onMouseLeave={() => setOpenContent(false)}>
+            <DropDown.DropBtn
+                onClick={() => setOpenContent(o => !o)}
+            >{component}</DropDown.DropBtn>
             {openContent && <DropDown.Content
+                forwardref={contentRef}
                 style={position === 'middle' && {
                     ...props.style,
                     left: '50%',

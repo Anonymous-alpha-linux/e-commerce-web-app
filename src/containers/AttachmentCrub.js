@@ -10,7 +10,7 @@ import { SecondPagination } from ".";
 import Modal from "./modal";
 
 
-export default function AttachmentCrub() {
+export default function AttachmentCRUD() {
   const [API, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
@@ -18,8 +18,8 @@ export default function AttachmentCrub() {
 
   const { attachments, getAttachmentByPage, deleteSingleAttachment } = useAdminContext();
   const getAttachmentByPageRef = useRef(getAttachmentByPage);
-  const [searchInput, setSearchInput] = useState("");
 
+  const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [attachRecord, setAttachRecord] = useState();
   const [dataRecords, setDataRecords] = useState([]);
@@ -130,17 +130,6 @@ export default function AttachmentCrub() {
                       />
                     })
               }
-              {/*                     
-                    dataRecords.slice().splice(currentPage * attachments.count, (currentPage + 1) * attachments.count).map((attachment, index) => {
-                      console.log(attachment);
-                      return <AttachmentData
-                        key={index}
-                        data={attachment}
-                        index={index}
-                        deleteAttachment={deleteAttachment}
-                      />; 
-                    })}  
-                    */}
             </tbody>
           </table>
         </div>

@@ -1,47 +1,60 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ContainerComponent, Form, Icon, LogoIcon, Text } from "../components";
 import { useAuthorizationContext } from "../redux";
 import useValidate from "../hooks/useValidate";
-import actions from "../redux/reducers/actions";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { FaUserAlt } from "react-icons/fa";
 
 const Login = () => {
   const { login, user } = useAuthorizationContext();
 
-  const [input, setInput] = useState({});
+  const [input, setInput] = useState({
+    email: "",
+    password: "",
+  });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const firstSubmitRef = useRef(false);
   const location = useLocation();
+  const navigate = useNavigate();
   //toast
   const submitHandler = async (e) => {
     e.preventDefault();
+    firstSubmitRef.current = true;
+    validateInput(() => {
+      login(input, () => {
+        console.log("loged");
+        navigate("/");
+      });
+    });
+  };
+  const inputHandler = (e) => {
+    if (firstSubmitRef.current) {
+    }
+    setInput((oldInput) => {
+      return {
+        ...oldInput,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+  const validateInput = async (cb) => {
     try {
-      Object.entries(input).forEach((entry) => {
+      await Object.entries(input).forEach((entry) => {
         const key = entry[0];
         const value = entry[1];
         const validate = new useValidate(value);
+
         if (key === "email") validate.isEmpty().isEmail();
         else if (key === "password") validate.isEmpty();
       });
-      await login(input);
+      cb();
     } catch (error) {
       setError(error.message);
       setMessage("");
     }
   };
-  const inputHandler = React.useCallback(
-    (e) => {
-      setInput((oldInput) => {
-        return {
-          ...oldInput,
-          [e.target.name]: e.target.value,
-        };
-      });
-    },
-    [input]
-  );
 
   if (user.isLoggedIn) {
     return <Navigate to={"/"} state={{ from: location }} replace />;
@@ -78,8 +91,7 @@ const Login = () => {
                         fontSize: "20px",
                       }}
                     >
-                      {" "}
-                      Fucking Login
+                      Login
                     </Text.Title>
                   </ContainerComponent.Pane>
                   <Form.Input
@@ -110,7 +122,7 @@ const Login = () => {
                 </ContainerComponent.Flex>
               </Form.Container>
               {message && (
-                <Form.Message style={{ textAlign: "center", color: "red" }}>
+                <Form.Message style={{ textAlign: "center", color: "green" }}>
                   {message}
                 </Form.Message>
               )}

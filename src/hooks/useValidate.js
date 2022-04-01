@@ -12,51 +12,64 @@ export default class useValidate {
     this.config = config;
   }
 
-  isEmail(message = "Not Email") {
+  isEmail(message = "Please input your email") {
     if (!/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.input))
       throw new Error(message);
     return this;
   }
-  isEmpty(message = "please fill in empty input") {
+  isEmpty(message = "Please fill in empty input") {
     if (!this.input.length) throw new Error(message);
     return this;
   }
-  isNumber() {
+  isNumber(message = "This is not a number") {
     const regex = new RegExp(
       "^(-?[1-9]+\\d*([.]\\d+)?)$|^(-?0[.]\\d*[1-9]+)$|^0$"
     );
-    if (!regex.test(this.input)) throw new Error("this is not a number");
+    if (!regex.test(this.input)) throw new Error(message);
     return this;
   }
-  isPhone() {
+  isPhone(message = "This is not a phone number") {
     const regex = new RegExp(
       "^[+]?[(]?[0-9]{3}[)]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$"
     );
-    if (!regex.test(this.input)) throw new Error("this is not a phone number");
+    if (!regex.test(this.input)) throw new Error(message);
     return this;
   }
-  isEnoughLength() {
+  isEnoughLength(message = "This is too long", options = { length: 10 }) {
+    this.config = { ...this.config, ...this.options };
+    if (!this.input) return this;
     if (this.input.length < this.config.length)
-      throw new Error("this is too long");
+      throw new Error(message);
     return this;
   }
-  isNotSpecial() {
+  isNotSpecial(message = "This input must contains special character") {
     const regex = new RegExp("[-’/`~!#*$@_%+=.,^&(){}[]|;:”<>?\\]");
     if (regex.test(this.input))
-      throw new Error("this input contains special character");
+      throw new Error(message);
     return this;
   }
-  isNotCode() {
+  isNotCode(message = "This input must contains code") {
     if (/<[a-z][\s\S]*>/.test(this.input))
-      throw new Error("this input contains code");
+      throw new Error(message);
     return this;
   }
-  isPassWord() {
+  isPassWord(message = "This input must contains 1 capital character, number and special character", options = { passwordLength: 8 }) {
+    this.config = { ...this.config, ...options };
     const regex = new RegExp(
       `^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{${this.config.passwordLength},}$`
     );
     if (!regex.test(this.input))
-      throw new Error("this input is not like password");
+      throw new Error(message);
+    return this;
+  }
+
+  isAge(message = "Your date is not capable") {
+    const now = new Date().getFullYear();
+    const input = new Date(this.input).getFullYear();
+
+    if (now - input < 18) {
+      throw new Error(message);
+    }
     return this;
   }
 }

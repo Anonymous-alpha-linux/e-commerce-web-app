@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSpring, animated } from "react-spring";
 import { Link } from "react-router-dom";
 
 import { MdOutlineWork } from "react-icons/md";
@@ -21,6 +22,7 @@ import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 import { AddFromWorkspace } from ".";
 import { useModal, useMedia } from "../hooks";
 import Modal from "./modal";
+import { Dropdown } from "../components";
 import DropdownButton from "./dropDownButton";
 import TriggerLoading from "./triggerLoading";
 
@@ -29,6 +31,10 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
   // const [modalWS, setModalWS] = useState(false);
   const [modalWS, setModalWS] = useModal(false);
   const [switchToggle, setSwitchToggle] = useModal(false);
+  const rotateAnimate = useSpring({
+    transformOrigin: "center 2px",
+    transform: switchToggle ? "rotate(90deg)" : "rotate(0deg)",
+  });
   const { workspaces, loadMore, loadMoreWorkspaceList } = useWorkspaceContext();
   const { user } = useAuthorizationContext();
 
@@ -112,16 +118,20 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                   >
                     <Text.Title>Workspace</Text.Title>
                   </Text.MiddleLine>
+
                   <Text.RightLine>
                     <Icon
                       style={{
                         position: "absolute",
                         right: "5%",
                         fontSize: "25px",
+                        top: "50%",
                       }}
                       onClick={setSwitchToggle}
                     >
-                      <AiFillRightCircle></AiFillRightCircle>
+                      <animated.div style={rotateAnimate}>
+                        <AiFillRightCircle></AiFillRightCircle>
+                      </animated.div>
                     </Icon>
                   </Text.RightLine>
                 </Text.Line>
@@ -129,38 +139,36 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
             </ContainerComponent.Flex>
 
             {switchToggle && (
-              <ContainerComponent.Toggle style={{ margin: "0 auto" }}>
+              <ContainerComponent.Toggle
+                style={{ margin: "0 auto", padding: "0 10px" }}
+              >
                 <ContainerComponent.Item
                   style={{
                     width: "100%",
-                    padding: 20,
-                    paddingTop: 25,
-                    boxShadow: "2px 0 5px #000",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "20px",
+                    padding: "10px",
+                    // boxShadow: "2px 0 5px #000",
                     position: "relative",
+                    cursor: "pointer",
                   }}
                   onClick={() => setModalWS(!modalWS)}
                 >
-                  <Icon
+                  <Text.MiddleLine>
+                    <Icon
+                      style={{
+                        fontSize: "33px",
+                      }}
+                    >
+                      <TiPlus></TiPlus>
+                    </Icon>
+                  </Text.MiddleLine>
+                  <Text.MiddleLine
                     style={{
-                      transform: "translateX(-50%)",
-                      fontSize: "33px",
-                      position: "absolute",
+                      width: "calc(100% - 20px)",
+                      transform: "translateX(27%)",
                     }}
                   >
-                    <TiPlus></TiPlus>
-                  </Icon>
-                  <Text.Title
-                    style={{
-                      right: "50%",
-                      transform: "translateX(50%)",
-                      position: "absolute",
-                    }}
-                  >
-                    Add Workspace
-                  </Text.Title>
+                    <Text.Title>Add Workspace</Text.Title>
+                  </Text.MiddleLine>
                 </ContainerComponent.Item>
                 {/* workspaceData */}
                 <ContainerComponent.Item
@@ -213,10 +221,19 @@ const EditToggle = ({ item, clickLoader }) => {
   const [modal, toggleModal] = useModal();
   const [memberModal, toggleMemberModal] = useModal();
   const [workspaceModal, toggleWorkspaceModal] = useModal();
+  const [openDropdown, setDropdown] = useState(false);
+  const dropDownAnimate = useSpring({
+    height: openDropdown ? 110 : 0,
+  });
+  const rotateAnimate = useSpring({
+    transformOrigin: "center 10px",
+    transform: openDropdown ? "rotate(-180deg)" : "rotate(0deg)",
+  });
   const device = useMedia(480, 1080);
   return (
     <>
       <ContainerComponent.Item
+        onMouseLeave={() => setDropdown(false)}
         style={{ width: "100%", padding: "10px", minWidth: "230px" }}
       >
         <ContainerComponent.Flex
@@ -238,16 +255,20 @@ const EditToggle = ({ item, clickLoader }) => {
               <TimespanChild expireTime={item.expireTime}></TimespanChild>
             </ContainerComponent.Pane>
           </Text.MiddleLine>
-
-          <Text.MiddleLine>
-            <DropdownButton
-              position="right"
-              component={
+          <animated.div style={rotateAnimate}>
+            <Text.MiddleLine onClick={() => setDropdown((prev) => !prev)}>
+              <Dropdown>
                 <Icon style={{ fontSize: "20px" }}>
                   <AiFillCaretDown></AiFillCaretDown>
                 </Icon>
-              }
-            >
+              </Dropdown>
+            </Text.MiddleLine>
+          </animated.div>
+        </ContainerComponent.Flex>
+
+        <animated.div style={{ ...dropDownAnimate, overflow: "hidden" }}>
+          <ContainerComponent.Flex style={{ flexDirection: "column" }}>
+            <ContainerComponent.Item>
               {(device === media.MOBILE && (
                 <ButtonComponent>
                   <Link
@@ -255,19 +276,20 @@ const EditToggle = ({ item, clickLoader }) => {
                     style={{ color: "#fff" }}
                     onClick={clickLoader}
                   >
-                    <Text.Line>
+                    <Text.Line style={{ textAlign: "center" }}>
                       <Text.NoWrapText>Assign QA Coordinator</Text.NoWrapText>
                     </Text.Line>
                   </Link>
                 </ButtonComponent>
               )) || (
                 <ButtonComponent onClick={toggleModal}>
-                  <Text.Line>
+                  <Text.Line style={{ textAlign: "center" }}>
                     <Text.NoWrapText>Assign QA Coordinator</Text.NoWrapText>
                   </Text.Line>
                 </ButtonComponent>
               )}
-
+            </ContainerComponent.Item>
+            <ContainerComponent.Item>
               {(device === media.MOBILE && (
                 <ButtonComponent>
                   <Link
@@ -275,35 +297,36 @@ const EditToggle = ({ item, clickLoader }) => {
                     style={{ color: "#fff" }}
                     onClick={clickLoader}
                   >
-                    <Text.Line>
+                    <Text.Line style={{ textAlign: "center" }}>
                       <Text.NoWrapText>Add Member</Text.NoWrapText>
                     </Text.Line>
                   </Link>
                 </ButtonComponent>
               )) || (
                 <ButtonComponent onClick={toggleMemberModal}>
-                  <Text.Line>
+                  <Text.Line style={{ textAlign: "center" }}>
                     <Text.NoWrapText>Add Member</Text.NoWrapText>
                   </Text.Line>
                 </ButtonComponent>
               )}
-
+            </ContainerComponent.Item>
+            <ContainerComponent.Item>
               {(device === media.MOBILE && (
                 <ButtonComponent>
-                  <Text.Line>
+                  <Text.Line style={{ textAlign: "center" }}>
                     <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
                   </Text.Line>
                 </ButtonComponent>
               )) || (
                 <ButtonComponent onClick={toggleWorkspaceModal}>
-                  <Text.Line>
+                  <Text.Line style={{ textAlign: "center" }}>
                     <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
                   </Text.Line>
                 </ButtonComponent>
               )}
-            </DropdownButton>
-          </Text.MiddleLine>
-        </ContainerComponent.Flex>
+            </ContainerComponent.Item>
+          </ContainerComponent.Flex>
+        </animated.div>
       </ContainerComponent.Item>
 
       <Modal
@@ -380,7 +403,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       );
       var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
-      if (days > 0) {
+      if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+        setBlockWorkspace(false);
         setCounterTimer({
           days,
           hours,
@@ -402,6 +426,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       clearInterval(interval);
     };
   }, [workspaces]);
+
   function convertTo2Digit(number) {
     return number.toLocaleString("en-US", {
       minimumIntegerDigits: 2,
@@ -425,7 +450,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
         <ContainerComponent.Inner
           style={{ margin: "0 auto", textAlign: "center" }}
         >
-          {counterTimer.days > 0 ? (
+          {(!blockWorkspace && (
             <ContainerComponent.Flex
               style={{
                 // alignItems: 'center',
@@ -476,7 +501,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
                 >{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
               </ContainerComponent.Item>
             </ContainerComponent.Flex>
-          ) : (
+          )) || (
             <ContainerComponent.Pane
               style={{ color: "red", fontWeight: 500, fontSize: "0.8em" }}
             >
@@ -511,6 +536,7 @@ function WorkspaceModal({ workspaceId, workTitle, toggleModal }) {
       workspaceInfo.eventTime,
       () => {
         setLoading(false);
+        toggleModal();
       }
     );
   }

@@ -163,51 +163,51 @@ export default function AdminContext({ children }) {
   function getAttachmentByPage(page, cb) {
     // console.log(page, state.attachments.fetchedPage.indexOf(page));
     // if (!state.attachments.data.some((item) => item.page === page)) {
-    if (state.attachments.fetchedPage.indexOf(page) === -1) {
-      setState((o) => ({
-        ...o,
-        attachments: {
-          ...o.attachments,
-          loading: true
-        }
-      }));
+    // if (state.attachments.fetchedPage.indexOf(page) === -1) {
+    setState((o) => ({
+      ...o,
+      attachments: {
+        ...o.attachments,
+        loading: true
+      }
+    }));
 
-      return axios
-        .get(managerAPI, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          params: {
-            view: "attachment",
-            page: page,
-            count: 5,
-          },
-        })
-        .then((res) => {
-          setState((o) => {
-            const newData = o.attachments.data.slice();
-            newData.splice((page + 1) * o.attachments.count, 0, ...res.data.response);
-            return ({
-              ...o,
-              attachments: {
-                ...o.attachments,
-                loading: false,
-                currentPage: page,
-                fetchedPage: [...o.attachments.fetchedPage, page],
-                data: newData
-              },
-            })
-          });
-          cb(res.data.response);
-        })
-        .catch((error) => {
-          cb([]);
-          pushToast({
-            message: error.message,
-            type: toastTypes.ERROR
-          });
+    return axios
+      .get(managerAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "attachment",
+          page: page,
+          count: 5,
+        },
+      })
+      .then((res) => {
+        setState((o) => {
+          const newData = o.attachments.data.slice();
+          newData.splice((page + 1) * o.attachments.count, 0, ...res.data.response);
+          return ({
+            ...o,
+            attachments: {
+              ...o.attachments,
+              loading: false,
+              currentPage: page,
+              fetchedPage: [...o.attachments.fetchedPage, page],
+              data: newData
+            },
+          })
         });
-    }
+        cb(res.data.response);
+      })
+      .catch((error) => {
+        cb([]);
+        pushToast({
+          message: error.message,
+          type: toastTypes.ERROR
+        });
+      });
+    // }
   }
   async function getDashBoardOverview() {
     return axios.get(managerAPI, {

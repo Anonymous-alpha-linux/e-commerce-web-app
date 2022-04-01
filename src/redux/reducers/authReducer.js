@@ -17,7 +17,7 @@ const authReducer = (state, action) => {
         case actions.SET_OFF_LOADING:
             return {
                 ...state, authLoading: false,
-            }
+            };
         case actions.AUTHENTICATE_ACTION:
             return {
                 ...state,
@@ -27,6 +27,7 @@ const authReducer = (state, action) => {
         case actions.AUTHENTICATE_FAILED:
             return {
                 ...state,
+                isLoggedIn: false,
                 authLoading: false
             };
         case actions.GET_PROFILE:

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { FaTimes } from "react-icons/fa";
 import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
@@ -20,15 +20,16 @@ import {
   Icon,
   Text,
 } from "../components";
-import { navigator as navigators, navData, roles } from "../fixtures";
+import { navigator as navigators, navData, roles, media } from "../fixtures";
 import {
   useAuthorizationContext,
   useNotifyContext,
   useWorkspaceContext,
 } from "../redux";
 import DropdownButton from "./dropDownButton";
-import { useModal } from "../hooks";
+import { useMedia, useModal } from "../hooks";
 import Modal from "./modal";
+import NotificationContainer from "./notification";
 
 export default function Navigation() {
   const [screenColumn, setScreenColumn] = useState(2);
@@ -183,6 +184,7 @@ export default function Navigation() {
 }
 const Navigator = ({ closeNavigator }) => {
   const [openModal, toggleModal] = useModal();
+
   return (
     <>
       <ContainerComponent.BackDrop
@@ -205,6 +207,7 @@ const Navigator = ({ closeNavigator }) => {
           {navigators.map((navigate, index) =>
             navigate.trigger ? (
               <ContainerComponent.Item
+                key={index + 1}
                 onClick={() => {
                   toggleModal();
                 }}
@@ -273,6 +276,8 @@ const AuthStatus = React.memo(function AuthStatus({
 }) {
   const { user, logout } = useAuthorizationContext();
   const { notify } = useNotifyContext();
+  const device = useMedia(480, 1080);
+
   const [isNew, setIsNew] = useState(false);
 
   useEffect(() => {
@@ -314,27 +319,31 @@ const AuthStatus = React.memo(function AuthStatus({
         </Icon.CircleIcon>
       </ContainerComponent.Item> */}
       <ContainerComponent.Item>
-        <Icon.CircleIcon onClick={turnOffBadge}>
-          <Link to="/portal/notification">
-            <IoNotificationsOutline></IoNotificationsOutline>
-          </Link>
-        </Icon.CircleIcon>
+        {(device === media.MOBILE && (
+          <Icon.CircleIcon className="" onClick={turnOffBadge}>
+            <Link to="/portal/notification">
+              <IoNotificationsOutline></IoNotificationsOutline>
+            </Link>
+          </Icon.CircleIcon>
+        )) || (
+          <DropdownButton
+            position="right"
+            component={
+              <Icon.CircleIcon onClick={turnOffBadge}>
+                <IoNotificationsOutline></IoNotificationsOutline>
+              </Icon.CircleIcon>
+            }
+            style={{
+              minWidth: "420px",
+              maxHeight: "567px",
+              overflowY: "scroll",
+            }}
+          >
+            <NotificationContainer></NotificationContainer>
+          </DropdownButton>
+        )}
+
         {isNew && <Icon.Badge></Icon.Badge>}
-        {/* {screenColumn < 3 &&
-                    ||
-                    <AnimateComponent
-                        className="fixed__container"
-                        run={openNotify}
-                        component={
-                            <Icon.CircleIcon>
-                                <IoNotificationsOutline></IoNotificationsOutline>
-                            </Icon.CircleIcon>}
-                        classNames={"dropdown"}
-                        unmountOnExit={true}
-                        timeout={300}>
-                        <NotificationContainer></NotificationContainer>
-                    </AnimateComponent>
-                } */}
       </ContainerComponent.Item>
       <ContainerComponent.Item>
         {(screenColumn < 3 && (
@@ -360,9 +369,14 @@ const AuthStatus = React.memo(function AuthStatus({
 });
 const WorkspaceList = () => {
   const { user, editCurrentWorkspace } = useAuthorizationContext();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const { workspaces } = useWorkspaceContext();
   function selectHandler(workspaceId) {
-    editCurrentWorkspace(workspaceId);
+    editCurrentWorkspace(workspaceId, () => {
+      navigate(location.pathname);
+    });
   }
   return (
     <>
@@ -386,7 +400,7 @@ const WorkspaceList = () => {
               style={{
                 width: "100%",
                 padding: "10px",
-                minWidth: "230px",
+                minWidth: "280px",
                 ...disabledStyled(),
               }}
             >

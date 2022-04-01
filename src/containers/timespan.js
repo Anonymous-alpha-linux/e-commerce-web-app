@@ -55,6 +55,13 @@ export default function Timespan({
         }
     }, []);
 
+    function convertTo2Digit(number) {
+        return number.toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false
+        });
+    }
+
     return <ContainerComponent.Section
         style={{
             padding: '10px 0',
@@ -85,7 +92,7 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${counterTimer.hours}`} </ButtonComponent>
+                    <ButtonComponent>{`${convertTo2Digit(counterTimer.hours)}`} </ButtonComponent>
                     <Text.Bold>Hours</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -94,7 +101,7 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${counterTimer.minutes}`}</ButtonComponent>
+                    <ButtonComponent>{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
                     <Text.Bold>Minutes</Text.Bold>
                 </ContainerComponent.Item>
 
@@ -103,10 +110,10 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${counterTimer.seconds}`}</ButtonComponent>
+                    <ButtonComponent>{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
                     <Text.Bold>Seconds</Text.Bold>
                 </ContainerComponent.Item>
-            </ContainerComponent.Flex> || <ContainerComponent.Pane style={{ background: '#333', color: "red", fontWeight: '600' }}>Closed</ContainerComponent.Pane>}
+            </ContainerComponent.Flex> || <ContainerComponent.Pane style={{ color: "red", fontWeight: '600' }}>Closed</ContainerComponent.Pane>}
         </ContainerComponent.Inner>
     </ContainerComponent.Section>
 }

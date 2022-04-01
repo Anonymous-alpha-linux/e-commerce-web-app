@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
   Home,
@@ -41,22 +42,25 @@ import roles from "./fixtures/roles";
 import "./scss/main.scss";
 import { MessageBox } from "./components";
 import Signout from "./pages/signout";
+import Layout from "./pages/layout";
 
 function App() {
   const { user } = useAuthorizationContext();
+
   return (
-    <NotifyContext>
-      <BrowserRouter>
-        {/* {user.role === roles.STAFF && } */}
-        <Routes>
+    <BrowserRouter>
+      {/* {user.role === roles.STAFF && } */}
+      <Routes>
+        <Route element={<Layout></Layout>}>
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
           <Route path="logout" element={<Signout></Signout>}></Route>
-          <Route
-            path="reset_password"
+          <Route path="reset_password"
             element={<ForgetPassword></ForgetPassword>}
           ></Route>
-          <Route path="/" element={<Home></Home>}>
+          <Route path="/" element={<ProtectedPage>
+            <Home></Home>
+          </ProtectedPage>}>
             {
               // 1. Admin Role
               (user.role === roles.ADMIN && (
@@ -256,13 +260,13 @@ function App() {
                 ))
             }
           </Route>
-          <Route
-            path="/*"
-            element={<h1>404 Error: Page Not Found...</h1>}
-          ></Route>
-        </Routes>
-      </BrowserRouter>
-    </NotifyContext>
+        </Route>
+        <Route
+          path="/*"
+          element={<h1>404 Error: Page Not Found...</h1>}
+        ></Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

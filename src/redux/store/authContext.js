@@ -1,11 +1,5 @@
 import axios from "axios";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useReducer,
-} from "react";
+import React, { createContext, useContext, useState, useReducer } from "react";
 import { mainAPI } from "../../config";
 import { Loading } from "../../pages";
 import { io } from "socket.io-client";
@@ -18,6 +12,7 @@ const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
   const [user, setUser] = useReducer(authReducer, initialAuth);
+  // const [loading, setLoading] = useState(false);
   const [authAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST]
@@ -31,36 +26,26 @@ export default function AuthenticationContext({ children }) {
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
-  useEffect(() => {
+  React.useEffect(() => {
     onLoadUser();
-    return () => {
-      cancelTokenSource.cancel();
-    };
   }, []);
   const onLoadUser = (cb) => {
-    setUser({
-      type: actions.SET_LOADING,
-    });
     return axios
       .get(authAPI, {
-        cancelToken: cancelTokenSource.token,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       })
       .then((response) => {
-        if (response.status > 199 && response.status <= 299) {
-          setUser({
-            type: actions.AUTHENTICATE_ACTION,
-            payload: response.data,
-          });
-          let socket = io(host);
-          socket.auth = { accessToken: localStorage.getItem("accessToken") };
-          setSocket(socket);
-          getProfile(response.data.accountId);
+        setUser({
+          type: actions.AUTHENTICATE_ACTION,
+          payload: response.data,
+        });
+        let socket = io(host);
+        socket.auth = { accessToken: localStorage.getItem("accessToken") };
+        setSocket(socket);
+        if (typeof cb !== "undefined") {
           cb(response.data.accountId);
-        } else {
-          throw new Error("Get user data Failed!");
         }
       })
       .catch((error) => {
@@ -68,52 +53,57 @@ export default function AuthenticationContext({ children }) {
           type: actions.AUTHENTICATE_FAILED,
         });
         pushToast({
-          message: "Signin successfully to system",
+          message: "Sign-in to system",
           type: toastTypes.INFO,
         });
+        if (typeof cb !== "undefined") {
+          cb({});
+        }
       });
   };
-  function login(data) {
+  function login(data, cb) {
     const loginApi =
       process.env.REACT_APP_ENVIRONMENT === "development"
         ? mainAPI.LOCALHOST_LOGIN
         : mainAPI.CLOUD_API_LOGIN;
     return axios
-      .post(loginApi, data, {
-        cancelToken: cancelTokenSource.token,
-      })
-      .then((res) => {
-        localStorage.setItem("accessToken", res.data.accessToken);
+      .post(loginApi, data, {})
+      .then(async (res) => {
+        await localStorage.setItem("accessToken", res.data.accessToken);
+
         pushToast({
-          messge: "Login successfully",
+          message: "Login successfully",
           type: toastTypes.SUCCESS,
         });
-        return onLoadUser();
+
+        setUser({
+          type: actions.LOGIN_ACTION,
+          payload: res.data,
+        });
+
+        onLoadUser();
+
+        cb();
       })
       .catch((error) => {
-        setUser({
-          type: actions.AUTHENTICATE_FAILED,
-        });
-        pushToast({
-          message: "Login to system",
-          type: toastTypes.INFO,
-        });
+        if (error.response.status === 401) {
+          setUser({
+            type: actions.AUTHENTICATE_FAILED,
+          });
+          pushToast({
+            message: error.response.data.error,
+            type: toastTypes.ERROR,
+          });
+          cb();
+        } else {
+          pushToast({
+            message: "Please login to system",
+            type: toastTypes.INFO,
+          });
+          cb();
+        }
       });
   }
-  // const register = async (data) => {
-  //   const registerApi = mainAPI.CLOUD_API_REGISTER;
-  //   // const registerApi = mainAPI.LOCALHOST_REGISTER;
-  //   return axios.post(registerApi, { ...data }, {
-  //     cancelToken: cancelTokenSource.token
-  //   })
-  //     .then(res => {
-  //       localStorage.setItem('accessToken', res.data.accessToken);
-  //       setUser({ ...res.data });
-  //     }).catch(error => setUser({
-  //       type: actions.ERROR_ACTION,
-  //       error: error.message
-  //     }));
-  // };
   async function logout() {
     const logoutApi =
       process.env.REACT_APP_ENVIRONMENT === "development"
@@ -135,10 +125,9 @@ export default function AuthenticationContext({ children }) {
         });
       });
   }
-  function getProfile(accountId) {
+  function getProfile(accountId, cb) {
     return axios
       .get(authAPI, {
-        cancelToken: cancelTokenSource.token,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -148,50 +137,48 @@ export default function AuthenticationContext({ children }) {
         },
       })
       .then((res) => {
-        setUser({
-          type: actions.GET_PROFILE,
-          payload: res.data.response,
-        });
+        // setUser({
+        //   type: actions.GET_PROFILE,
+        //   payload: res.data.response,
+        // });
+        cb(res.data.response);
       })
       .catch((error) => {
-        pushToast({
-          message: "Get Profile Failed",
-          type: toastTypes.ERROR,
-        });
+        if (user.accountId === accountId) {
+          pushToast({
+            message: "You are not fulfill profile",
+            type: toastTypes.WARNING,
+          });
+        }
+        cb({ error: "Get profile failed" });
       });
   }
-  function editProfile(input) {
+  function editProfile(input, cb) {
     return axios
-      .put(
-        authAPI,
-        {
-          ...input,
+      .put(authAPI, input, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-        {
-          cancelToken: cancelTokenSource.token,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          params: {
-            view: "profile",
-          },
-        }
-      )
+        params: {
+          view: "profile",
+        },
+      })
       .then((res) => {
         pushToast({
           message: "Edit Profile Successful",
           type: toastTypes.SUCCESS,
         });
-        getProfile();
+        cb(res.data.response);
       })
       .catch((error) => {
         pushToast({
           message: "Edit Profile Failed",
           type: toastTypes.ERROR,
         });
+        cb({ error: "get profile failed" });
       });
   }
-  function editCurrentWorkspace(workspaceId) {
+  function editCurrentWorkspace(workspaceId, cb) {
     return axios
       .put(
         staffAPI,
@@ -208,43 +195,44 @@ export default function AuthenticationContext({ children }) {
         }
       )
       .then((res) => {
-        onLoadUser();
+        onLoadUser(cb);
         pushToast({
           message: "Update Workspace successfully",
           type: toastTypes.SUCCESS,
+        }).catch((err) => {
+          pushToast({
+            message: err.message,
+            type: toastTypes.ERROR,
+            timeout: 10000,
+          });
         });
-      })
-      .catch((err) => {
-        pushToast({
-          message: err.message,
-          type: toastTypes.ERROR,
-          timeout: 10000,
-        });
+        cb();
       });
   }
+  function searchQuery() {}
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (
-    <>
-      <AuthenticationContextAPI.Provider
-        value={{
-          loading: user.authLoading,
-          user,
-          profile: user.profile,
-          socket,
-          cancelTokenSource,
-          toastList,
-          pushToast,
-          pullToast,
-          login,
-          logout,
-          editProfile,
-          editCurrentWorkspace,
-        }}
-      >
-        {children}
-      </AuthenticationContextAPI.Provider>
-    </>
+    <AuthenticationContextAPI.Provider
+      value={{
+        loading: user.authLoading,
+        user,
+        profile: user.profile,
+        socket,
+        cancelTokenSource,
+        toastList,
+        pushToast,
+        pullToast,
+        onLoadUser,
+        login,
+        logout,
+        editProfile,
+        editCurrentWorkspace,
+        getProfile,
+      }}
+    >
+      {children}
+    </AuthenticationContextAPI.Provider>
   );
 }
 

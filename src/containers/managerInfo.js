@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ContainerComponent,
   Icon,
@@ -6,19 +6,36 @@ import {
   Form,
   Text,
 } from "../components";
-import { useWorkspaceContext } from "../redux";
+import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 
 export default function ManagerInfo() {
   const { workspace } = useWorkspaceContext();
-  const {
-    profileImage,
-    username,
-    email,
-    role: { roleName },
-    profile,
-  } = workspace.manager;
-  const { firstName, lastName, age, address, gender, introduction, phone } =
-    profile;
+  const { getProfile } = useAuthorizationContext();
+
+  const [profile, setProfile] = useState({
+    profileImage: "",
+    lastName: "",
+    firstName: "",
+    roleName: "",
+    introduction: "",
+    gender: "",
+    age: "",
+    email: "",
+    workTitle: "",
+  });
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (workspace.manager) {
+      setLoading(true);
+      getProfile(workspace.manager, (data) => {
+        setLoading(false);
+        console.log(data);
+        if (!data.error) {
+          setProfile((o) => ({ ...o, ...data }));
+        }
+      });
+    }
+  }, [workspace]);
 
   return (
     <ContainerComponent style={{ padding: "10px" }}>
@@ -37,13 +54,18 @@ export default function ManagerInfo() {
               }}
             >
               <Icon.Image
-                src={`${profileImage}`}
+                src={`${
+                  profile.profileImage ||
+                  process.env.PUBLIC_URL + "/add-avatar.jpg"
+                }`}
                 alt={`Avatar`}
                 style={{ objectFit: "fill" }}
               ></Icon.Image>
             </Icon.CircleIcon>
             <Text.CenterLine style={{ paddingTop: "10px" }}>
-              <Text.Title>{lastName + " " + firstName}</Text.Title>
+              <Text.Title>{`${profile.lastName || "Anonymous"} ${
+                profile.firstName || "Nguyen"
+              }`}</Text.Title>
               <Text.Subtitle
                 style={{
                   textTransform: "capitalize",
@@ -51,7 +73,7 @@ export default function ManagerInfo() {
                   fontWeight: 500,
                 }}
               >
-                {roleName}
+                {profile.roleName || "QA Coordinator"}
               </Text.Subtitle>
             </Text.CenterLine>
           </Text.CenterLine>
@@ -86,7 +108,7 @@ export default function ManagerInfo() {
               borderRadius: "20px",
               padding: "30px 0 0 10px",
             }}
-            value={introduction}
+            value={profile.introduction}
             placeholder="Your introduction"
           ></Form.TextArea>
           <Text.MiddleLine
@@ -102,7 +124,7 @@ export default function ManagerInfo() {
           <Form.Input
             readOnly={true}
             style={{ textAlign: "right" }}
-            value={gender.toUpperCase()}
+            value={profile.gender.toUpperCase()}
             placeholder="Post your information"
           ></Form.Input>
 
@@ -119,7 +141,7 @@ export default function ManagerInfo() {
           <Form.Input
             placeholder="Choose Date"
             readOnly={true}
-            value={age}
+            value={profile.age}
             style={{ textAlign: "right" }}
           ></Form.Input>
           <Text.MiddleLine
@@ -136,7 +158,7 @@ export default function ManagerInfo() {
             placeholder="Post your information"
             readOnly={true}
             style={{ textAlign: "right" }}
-            value={email}
+            value={profile.email}
           ></Form.Input>
 
           <Text.MiddleLine
