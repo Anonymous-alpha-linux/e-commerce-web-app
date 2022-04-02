@@ -103,7 +103,8 @@ AnimateComponent.Zoom = function AnimatedZoom({
   ...props
 }) {
   let [x, y] = zoom instanceof Object ? [zoom.x, zoom.y] : [zoom, zoom];
-  const transition = useTransition(children, {
+  var arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
     from: { transform: `scale(0)`, opacity: 0 },
     enter: { transform: `scale(${x}, ${y})`, opacity: 1, ...style },
     delay: 200,
@@ -111,7 +112,7 @@ AnimateComponent.Zoom = function AnimatedZoom({
   return transition(
     (style, item) =>
       item && (
-        <animated.div key={item.key} style={style} {...props}>
+        <animated.div style={style} {...props}>
           {item}
         </animated.div>
       )

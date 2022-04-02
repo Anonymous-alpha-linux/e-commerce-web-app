@@ -107,7 +107,7 @@ export default function Workspace() {
             };
             return (
               <AnimateComponent.Zoom key={`${post._id}-${index}`}>
-                <List.Item key={`${post._id}-${index}`} id={post._id}>
+                <List.Item id={post._id}>
                   <PostContainer
                     postId={_id}
                     postHeader={postHeader}
