@@ -1,5 +1,10 @@
 import React, { useRef, useState } from "react";
-import { ButtonComponent, ContainerComponent, List } from "../../components";
+import {
+  ButtonComponent,
+  ContainerComponent,
+  List,
+  AnimateComponent,
+} from "../../components";
 import {
   Filter,
   LazyLoading,
@@ -101,14 +106,16 @@ export default function Workspace() {
               comments,
             };
             return (
-              <List.Item key={`${post._id}-${index}`} id={post._id}>
-                <PostContainer
-                  postId={_id}
-                  postHeader={postHeader}
-                  postBody={postBody}
-                  postFooter={postFooter}
-                ></PostContainer>
-              </List.Item>
+              <AnimateComponent.Zoom key={`${post._id}-${index}`}>
+                <List.Item key={`${post._id}-${index}`} id={post._id}>
+                  <PostContainer
+                    postId={_id}
+                    postHeader={postHeader}
+                    postBody={postBody}
+                    postFooter={postFooter}
+                  ></PostContainer>
+                </List.Item>
+              </AnimateComponent.Zoom>
             );
           })}
         </List>

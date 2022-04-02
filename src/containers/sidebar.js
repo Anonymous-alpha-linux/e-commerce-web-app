@@ -15,6 +15,7 @@ import {
   Icon,
   Preview,
   Text,
+  AnimateComponent,
 } from "../components";
 import { UserAll, ListMember } from "../pages";
 import { sidebarData, media } from "../fixtures";
@@ -31,10 +32,6 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
   // const [modalWS, setModalWS] = useState(false);
   const [modalWS, setModalWS] = useModal(false);
   const [switchToggle, setSwitchToggle] = useModal(false);
-  const rotateAnimate = useSpring({
-    transformOrigin: "center 2px",
-    transform: switchToggle ? "rotate(90deg)" : "rotate(0deg)",
-  });
   const { workspaces, loadMore, loadMoreWorkspaceList } = useWorkspaceContext();
   const { user } = useAuthorizationContext();
 
@@ -129,9 +126,9 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                       }}
                       onClick={setSwitchToggle}
                     >
-                      <animated.div style={rotateAnimate}>
+                      <AnimateComponent.Rotate state={switchToggle} deg={90}>
                         <AiFillRightCircle></AiFillRightCircle>
-                      </animated.div>
+                      </AnimateComponent.Rotate>
                     </Icon>
                   </Text.RightLine>
                 </Text.Line>
@@ -222,13 +219,6 @@ const EditToggle = ({ item, clickLoader }) => {
   const [memberModal, toggleMemberModal] = useModal();
   const [workspaceModal, toggleWorkspaceModal] = useModal();
   const [openDropdown, setDropdown] = useState(false);
-  const dropDownAnimate = useSpring({
-    height: openDropdown ? 110 : 0,
-  });
-  const rotateAnimate = useSpring({
-    transformOrigin: "center 10px",
-    transform: openDropdown ? "rotate(-180deg)" : "rotate(0deg)",
-  });
   const device = useMedia(480, 1080);
   return (
     <>
@@ -255,7 +245,7 @@ const EditToggle = ({ item, clickLoader }) => {
               <TimespanChild expireTime={item.expireTime}></TimespanChild>
             </ContainerComponent.Pane>
           </Text.MiddleLine>
-          <animated.div style={rotateAnimate}>
+          <AnimateComponent.Rotate state={openDropdown} deg={-180}>
             <Text.MiddleLine onClick={() => setDropdown((prev) => !prev)}>
               <Dropdown>
                 <Icon style={{ fontSize: "20px" }}>
@@ -263,10 +253,10 @@ const EditToggle = ({ item, clickLoader }) => {
                 </Icon>
               </Dropdown>
             </Text.MiddleLine>
-          </animated.div>
+          </AnimateComponent.Rotate>
         </ContainerComponent.Flex>
 
-        <animated.div style={{ ...dropDownAnimate, overflow: "hidden" }}>
+        <AnimateComponent.Dropdown state={openDropdown} height={110}>
           <ContainerComponent.Flex style={{ flexDirection: "column" }}>
             <ContainerComponent.Item>
               {(device === media.MOBILE && (
@@ -326,7 +316,7 @@ const EditToggle = ({ item, clickLoader }) => {
               )}
             </ContainerComponent.Item>
           </ContainerComponent.Flex>
-        </animated.div>
+        </AnimateComponent.Dropdown>
       </ContainerComponent.Item>
 
       <Modal

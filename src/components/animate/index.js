@@ -55,3 +55,65 @@ AnimateComponent.SlideRight = function AnimatedSlideRight({
     </>
   );
 };
+
+AnimateComponent.Dropdown = function AnimatedDropdown({
+  children,
+  state,
+  height,
+  style,
+  ...props
+}) {
+  const transition = useTransition(state, {
+    from: { height: 0 },
+    enter: { height: height, overflow: "hidden", ...style },
+    leave: { height: 0 },
+  });
+  return transition(
+    (style, item) =>
+      item && (
+        <animated.div style={style} {...props}>
+          {children}
+        </animated.div>
+      )
+  );
+};
+
+AnimateComponent.Rotate = function AnimatedRotate({
+  children,
+  state,
+  deg,
+  style,
+  ...props
+}) {
+  const spring = useSpring({
+    transform: `rotate(${state ? deg : 0}deg)`,
+    ...style,
+  });
+  return (
+    <animated.div style={spring} {...props}>
+      {children}
+    </animated.div>
+  );
+};
+
+AnimateComponent.Zoom = function AnimatedZoom({
+  children,
+  zoom = 1,
+  style,
+  ...props
+}) {
+  let [x, y] = zoom instanceof Object ? [zoom.x, zoom.y] : [zoom, zoom];
+  const transition = useTransition(children, {
+    from: { transform: `scale(0)`, opacity: 0 },
+    enter: { transform: `scale(${x}, ${y})`, opacity: 1, ...style },
+    delay: 200,
+  });
+  return transition(
+    (style, item) =>
+      item && (
+        <animated.div key={item.key} style={style} {...props}>
+          {item}
+        </animated.div>
+      )
+  );
+};

@@ -23,9 +23,9 @@ export default React.memo(function WorkspaceContext({ children }) {
   const { REACT_APP_ENVIRONMENT } = process.env;
   const workspaceAPI = REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
   useEffect(() => {
-    if (!workspaceState.page) {
-      localStorage.setItem("workspace", 0);
-    }
+    // if (!workspaceState.page) {
+    //   localStorage.setItem("workspace", 0);
+    // }
     onLoadWorkspaceList();
   }, [user]);
 

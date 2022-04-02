@@ -58,7 +58,6 @@ export default function Personal() {
             });
         })
     }
-
     const validateInput = async (cb) => {
         try {
             await Object.entries(input).forEach((entry) => {

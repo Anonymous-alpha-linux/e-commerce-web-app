@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { ContainerComponent, Text } from '../components'
 import { useMedia } from '../hooks';
@@ -6,8 +6,13 @@ import { useAdminContext, useWorkspaceContext } from '../redux'
 import { media } from '../fixtures';
 
 export default function DashboardOverview() {
-    const { totalWorkspace, totalPost, totalUser } = useAdminContext();
+    const { totalWorkspace, totalPost, totalUser, getDashBoardOverview } = useAdminContext();
     const device = useMedia(420, 1080);
+    useEffect(() => {
+        getDashBoardOverview(data => {
+            console.log(data);
+        });
+    }, []);
     return (
         <ContainerComponent>
             <ContainerComponent.GridThreeColumns style={{ color: 'white', justifyContent: 'center', width: '100%', fontSize: '12px', gridTemplateColumns: `${device === media.MOBILE ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'}` }}>
