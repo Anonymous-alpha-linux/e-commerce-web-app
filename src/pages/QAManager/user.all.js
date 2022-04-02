@@ -11,7 +11,8 @@ import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from '.
 import { roles, toastTypes } from '../../fixtures';
 
 function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) {
-    const { accounts: { data } } = useAdminContext();
+    const { accounts: { data }, getAccountList } = useAdminContext();
+    const { getWorkspaceMembers } = useWorkspaceContext();
     const { id } = useParams();
     let workspaceid = id || workspaceId;
 
@@ -20,13 +21,28 @@ function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) 
         outputs: []
     });
     const [input, setInput] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
 
+    useEffect(() => {
+        setLoading(true);
+        getAccountList(() => {
+            getWorkspaceMembers(workspaceid, members => {
+                setState({
+                    members: members,
+                    outputs: data.filter(account => [roles.QA_COORDINATOR, roles.STAFF].includes(account.role.roleName)),
+                });
+                setLoading(false);
+            });
+        });
+    }, []);
     useEffect(() => {
         setState(oldState => ({
             members: data.filter(member => filter.includes(member.role.roleName)),
             outputs: data.filter(member => filter.includes(member.role.roleName))
         }));
     }, [data]);
+
+
     function inputHandler(e) {
         setInput(e.target.value);
         searchMember(e.target.value);
@@ -62,7 +78,7 @@ function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) 
                 </Form.Button>
             </ContainerComponent.Flex>
 
-            <ContainerComponent.Item style={{ position: "relative" }}>
+            <ContainerComponent.Item className="staffCRUD__searchbar" style={{ position: "relative" }}>
                 <Message.SearchForm style={{
                     display: 'flex',
                     justifyContent: "flex-start",
@@ -87,7 +103,7 @@ function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) 
                 </Message.SearchForm>
             </ContainerComponent.Item>
 
-            <ContainerComponent.Pane>
+            <ContainerComponent.Pane className="staffCRUD__memberList">
                 <MemberListData dataList={state.outputs} workspaceId={workspaceid}></MemberListData>
             </ContainerComponent.Pane>
         </ContainerComponent.Inner>

@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
-import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components"; import { useAuthorizationContext, useNotifyContext, usePostContext, useWorkspaceContext, } from "../redux";
+import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components";
+import { useAuthorizationContext, useNotifyContext, usePostContext, useWorkspaceContext, } from "../redux";
 import { notifyData, socketTargets } from '../fixtures'
 import { InteractFooter, TriggerLoading } from ".";
 export default function Comment({ postAuthor, postId, commentLogs }) {

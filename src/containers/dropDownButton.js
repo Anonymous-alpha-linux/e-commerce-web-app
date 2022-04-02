@@ -13,7 +13,7 @@ export default function DropdownButton({ children, component, position = 'middle
         // onMouseLeave={() => setOpenContent(false)}
         >
             <DropDown.DropBtn
-                onClick={() => toggleContent()}
+                onClick={toggleContent}
             >{component}</DropDown.DropBtn>
 
 
