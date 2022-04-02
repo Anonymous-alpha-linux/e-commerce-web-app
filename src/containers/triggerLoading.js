@@ -26,10 +26,10 @@ export default function TriggerLoading({ children, loader, loadMore, ...restProp
                         await loaderRef.current();
                         await setLoading(false);
                     }}>
-                    More...
+
+                    {loading && <Loader></Loader> || "More..."}
                 </Text.Subtitle>
             }
-            {loading && <Loader></Loader>}
         </>
     )
 }

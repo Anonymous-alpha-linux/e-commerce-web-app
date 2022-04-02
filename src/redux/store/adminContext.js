@@ -43,7 +43,7 @@ export default function AdminContext({ children }) {
     totalWorkspace: 0,
     totalPost: 0,
     totalUser: 0,
-    loading: true,
+    // loading: true,
   });
 
   const { pushToast } = useAuthorizationContext();
@@ -59,16 +59,9 @@ export default function AdminContext({ children }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? mainAPI.LOCALHOST_STAFF
       : mainAPI.CLOUD_API_STAFF;
-
-  useEffect(() => {
-    getDashBoardOverview();
-    getAccountList();
-    getRoleList();
-    getAttachmentList();
-    getMostLikePosts();
-    getMostCategory();
-  }, []);
-
+  // useEffect(() => {
+  //   getAttachmentList();
+  // }, []);
 
   function getAccountList(cb) {
     return axios
@@ -118,8 +111,14 @@ export default function AdminContext({ children }) {
           ...o,
           roles: res.data.response,
         }));
+        if (cb !== 'undefined')
+          cb(res.data.response);
       })
-      .catch(() => pushToast({ message: "Get Role List Failed", type: toastTypes.ERROR }));
+      .catch((error) => {
+        pushToast({ message: "Get Role List Failed", type: toastTypes.ERROR });
+        if (cb !== 'undefined')
+          cb({ error: "Get role list failed" });
+      });
   }
   function getAttachmentList(cb) {
     return axios
@@ -134,6 +133,7 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
+        console.log(res.data);
         setState((o) => ({
           ...o,
           attachments: {
@@ -152,18 +152,19 @@ export default function AdminContext({ children }) {
             pages: res.data.pages,
           },
         }));
+        if (cb !== 'undefined')
+          cb(res.data.response);
       })
-      .catch((error) =>
+      .catch((error) => {
         pushToast({
           message: error.message,
           type: toastTypes.ERROR,
-        })
-      );
+        });
+        if (cb !== 'undefined')
+          cb({ error: 'get attachment list failed!' });
+      });
   }
   function getAttachmentByPage(page, cb) {
-    // console.log(page, state.attachments.fetchedPage.indexOf(page));
-    // if (!state.attachments.data.some((item) => item.page === page)) {
-    // if (state.attachments.fetchedPage.indexOf(page) === -1) {
     setState((o) => ({
       ...o,
       attachments: {
@@ -209,7 +210,7 @@ export default function AdminContext({ children }) {
       });
     // }
   }
-  async function getDashBoardOverview() {
+  function getDashBoardOverview(cb) {
     return axios.get(managerAPI, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -224,10 +225,16 @@ export default function AdminContext({ children }) {
         totalPost: res.data.totalPost,
         totalUser: res.data.totalUser
       }));
-    }).catch(error => pushToast({
-      message: error.message,
-      type: toastTypes.ERROR
-    }))
+      if (cb !== 'undefined')
+        cb(res.data);
+    }).catch(error => {
+      pushToast({
+        message: error.message,
+        type: toastTypes.ERROR
+      });
+      if (cb !== 'undefined')
+        cb({ error: 'Cannot get dashboard overview' });
+    })
   }
   function getMostLikePosts() {
     return axios
@@ -543,9 +550,14 @@ export default function AdminContext({ children }) {
       link.parentNode.removeChild(link);
     }).catch(err => pushToast({ message: err.message, type: toastTypes.ERROR }));
   }
-
   const contextValues = {
     ...state,
+    getDashBoardOverview,
+    getAccountList,
+    getRoleList,
+    getAttachmentList,
+    getMostLikePosts,
+    getMostCategory,
     createNewAccount,
     editUsername,
     editEmail,
