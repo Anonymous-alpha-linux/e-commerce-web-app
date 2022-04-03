@@ -251,7 +251,7 @@ export default function PostModal() {
                         ></ButtonComponent.Toggle>
                     </Text.RightLine>
                 </Text.Line>
-                <Form.Input id="title" name="title" onChange={inputHandler} value={input.title} placeholder="Your post title" style={{ margin: '10px 0' }}></Form.Input>
+                <Form.Input id="title" name="title" onChange={inputHandler} value={input.title} placeholder="Your post title" className="postModal__titleInput"></Form.Input>
                 <Form.TextArea
                     id="content"
                     name="content"
@@ -260,24 +260,29 @@ export default function PostModal() {
                     style={{
                         width: "100%",
                         height: "100px",
+                        borderRadius:"10px",
+                        borderColor: "rgb(22, 61, 60)"
                     }}
                 ></Form.TextArea>
+                <Text.Label style={{ fontSize: "14px" }}>Category:</Text.Label>
                 <Text.Line className="postModal__category">
                     <TagInput
                         itemList={categories}
                         formField={input.categories}
                         setFormField={setInput}
+                        style= {{ minHeight: "45px"}}
                     ></TagInput>
                 </Text.Line>
                 <ContainerComponent.Pane
                     className="upload__input"
                     style={{
-                        padding: "10px 0",
+                        padding: "10px 0 0",
                     }}>
                     <UploadForm
                         files={input.files}
                         eliminateFile={eliminateFile}
                         setFiles={pushInputHandler}
+                        style ={{ padding: "10px 0 0" }}
                     ></UploadForm>
                 </ContainerComponent.Pane>
                 <Text.Line className="postModal__conditional">
@@ -289,12 +294,14 @@ export default function PostModal() {
                             ref={checkedCondition}
                         ></Form.Checkbox>
                     </Text.MiddleLine>
-                    <Text.MiddleLine>
+                    <Text.MiddleLine >
                         <Text.Paragraph
                             onClick={() => setOpenCondition(true)}
                             style={{
                                 color: "blue",
                                 margin: "0",
+                                marginLeft: "10px",
+                                // fontSize: '12px'
                             }}
                         >
                             Condition and Term
@@ -313,7 +320,7 @@ export default function PostModal() {
                 name="id"
                 id="id"
                 value={id}></Form.Input>} */}
-                <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
+                <Form.Input type="submit" value={id ? "Edit" : "Submit"} className="postModal__summitButton"></Form.Input>
             </Form>
             {loading && <Loading></Loading>}
         </ContainerComponent.Section>

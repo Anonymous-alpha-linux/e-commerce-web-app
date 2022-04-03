@@ -88,7 +88,7 @@ const UploadPreview = ({ files, setFiles, eliminateFile, setError }) => {
   if (loading) return <Loading></Loading>;
   return (
     <ContainerComponent.Section className="form-upload__container">
-      <Text.Label htmlFor="files">Upload Files:</Text.Label>
+      <Text.Label htmlFor="files" style={{ fontSize:'14px'}}>Upload Files:</Text.Label>
       <Text.Line
         style={{
           marginBottom: "10px",
