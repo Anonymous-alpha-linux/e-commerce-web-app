@@ -12,7 +12,6 @@ import { useAuthorizationContext } from ".";
 import { Loading } from "../../pages";
 import { postReducer, initialPostPage } from "../reducers";
 import { notifyData, socketTargets, toastTypes } from "../../fixtures";
-import { useNotifyContext } from "..";
 import { useWorkspaceContext } from "./workspaceContext";
 const PostContextAPI = createContext();
 

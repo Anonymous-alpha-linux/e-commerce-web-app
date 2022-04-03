@@ -255,67 +255,68 @@ const EditToggle = ({ item, clickLoader }) => {
             </Text.MiddleLine>
           </AnimateComponent.Rotate>
         </ContainerComponent.Flex>
-
-        <AnimateComponent.Dropdown state={openDropdown} height={110}>
-          <ContainerComponent.Flex style={{ flexDirection: "column" }}>
-            <ContainerComponent.Item>
-              {(device === media.MOBILE && (
-                <ButtonComponent>
-                  <Link
-                    to={`/management/workspace/${item._id}`}
-                    style={{ color: "#fff" }}
-                    onClick={clickLoader}
-                  >
+        <AnimateComponent.Dropdown height={110}>
+          {openDropdown && (
+            <ContainerComponent.Flex style={{ flexDirection: "column" }}>
+              <ContainerComponent.Item>
+                {(device === media.MOBILE && (
+                  <ButtonComponent>
+                    <Link
+                      to={`/management/workspace/${item._id}`}
+                      style={{ color: "#fff" }}
+                      onClick={clickLoader}
+                    >
+                      <Text.Line style={{ textAlign: "center" }}>
+                        <Text.NoWrapText>Assign QA Coordinator</Text.NoWrapText>
+                      </Text.Line>
+                    </Link>
+                  </ButtonComponent>
+                )) || (
+                  <ButtonComponent onClick={toggleModal}>
                     <Text.Line style={{ textAlign: "center" }}>
                       <Text.NoWrapText>Assign QA Coordinator</Text.NoWrapText>
                     </Text.Line>
-                  </Link>
-                </ButtonComponent>
-              )) || (
-                <ButtonComponent onClick={toggleModal}>
-                  <Text.Line style={{ textAlign: "center" }}>
-                    <Text.NoWrapText>Assign QA Coordinator</Text.NoWrapText>
-                  </Text.Line>
-                </ButtonComponent>
-              )}
-            </ContainerComponent.Item>
-            <ContainerComponent.Item>
-              {(device === media.MOBILE && (
-                <ButtonComponent>
-                  <Link
-                    to={`/management/workspace_member/${item._id}`}
-                    style={{ color: "#fff" }}
-                    onClick={clickLoader}
-                  >
+                  </ButtonComponent>
+                )}
+              </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                {(device === media.MOBILE && (
+                  <ButtonComponent>
+                    <Link
+                      to={`/management/workspace_member/${item._id}`}
+                      style={{ color: "#fff" }}
+                      onClick={clickLoader}
+                    >
+                      <Text.Line style={{ textAlign: "center" }}>
+                        <Text.NoWrapText>Add Member</Text.NoWrapText>
+                      </Text.Line>
+                    </Link>
+                  </ButtonComponent>
+                )) || (
+                  <ButtonComponent onClick={toggleMemberModal}>
                     <Text.Line style={{ textAlign: "center" }}>
                       <Text.NoWrapText>Add Member</Text.NoWrapText>
                     </Text.Line>
-                  </Link>
-                </ButtonComponent>
-              )) || (
-                <ButtonComponent onClick={toggleMemberModal}>
-                  <Text.Line style={{ textAlign: "center" }}>
-                    <Text.NoWrapText>Add Member</Text.NoWrapText>
-                  </Text.Line>
-                </ButtonComponent>
-              )}
-            </ContainerComponent.Item>
-            <ContainerComponent.Item>
-              {(device === media.MOBILE && (
-                <ButtonComponent>
-                  <Text.Line style={{ textAlign: "center" }}>
-                    <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
-                  </Text.Line>
-                </ButtonComponent>
-              )) || (
-                <ButtonComponent onClick={toggleWorkspaceModal}>
-                  <Text.Line style={{ textAlign: "center" }}>
-                    <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
-                  </Text.Line>
-                </ButtonComponent>
-              )}
-            </ContainerComponent.Item>
-          </ContainerComponent.Flex>
+                  </ButtonComponent>
+                )}
+              </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                {(device === media.MOBILE && (
+                  <ButtonComponent>
+                    <Text.Line style={{ textAlign: "center" }}>
+                      <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
+                    </Text.Line>
+                  </ButtonComponent>
+                )) || (
+                  <ButtonComponent onClick={toggleWorkspaceModal}>
+                    <Text.Line style={{ textAlign: "center" }}>
+                      <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
+                    </Text.Line>
+                  </ButtonComponent>
+                )}
+              </ContainerComponent.Item>
+            </ContainerComponent.Flex>
+          )}
         </AnimateComponent.Dropdown>
       </ContainerComponent.Item>
 

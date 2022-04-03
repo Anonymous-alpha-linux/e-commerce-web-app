@@ -12,22 +12,28 @@ import { toastTypes, roles } from "../../fixtures";
 
 export default function MemberList({ workspaceId }) {
     const { workspaces, getWorkspaceMembers } = useWorkspaceContext();
-    const { accounts: { data } } = useAdminContext();
+    const { accounts: { data }, getAccountList } = useAdminContext();
     const { id } = useParams();
     let workspaceid = id || workspaceId;
+    console.log(workspaceid)
     const [state, setState] = useState({
         members: [],
         outputs: []
     });
     const [input, setInput] = React.useState('');
     useEffect(() => {
+        getAccountList();
+    }, []);
+    useEffect(() => {
         getWorkspaceMembers(workspaceid, members => {
+            console.log(members);
             setState({
                 members: members,
                 outputs: data.filter(account => [roles.QA_COORDINATOR, roles.STAFF].includes(account.role.roleName)),
             });
         });
     }, [data, workspaceid]);
+
     function inputHandler(e) {
         setInput(e.target.value);
         searchMember(e.target.value);

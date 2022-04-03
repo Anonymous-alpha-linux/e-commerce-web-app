@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Dropdown } from "../components";
+import { Dropdown, AnimateComponent } from "../components";
 import DropDown from "../components/dropdown";
 import { OutsideAlert, useModal } from "../hooks";
 
 export default function DropdownButton({
   children,
   component,
+  height,
   position = "middle",
   ...props
 }) {
@@ -17,10 +18,7 @@ export default function DropdownButton({
     <Dropdown
     // onMouseLeave={() => setOpenContent(false)}
     >
-      <DropDown.DropBtn onClick={() => toggleContent()}>
-        {component}
-      </DropDown.DropBtn>
-
+      <DropDown.DropBtn onClick={toggleContent}>{component}</DropDown.DropBtn>
       {openContent && (
         <OutsideAlert toggleShowing={toggleContent}>
           <DropDown.Content
@@ -40,17 +38,19 @@ export default function DropdownButton({
               }
             }
           >
-            {React.Children.toArray(children).map((item, index) => {
-              return (
-                <DropDown.Item
-                  key={index + 1}
-                  value={item.value}
-                  style={{ cursor: "pointer" }}
-                >
-                  {item}
-                </DropDown.Item>
-              );
-            })}
+            <AnimateComponent.Dropdown height={height}>
+              {React.Children.toArray(children).map((item, index) => {
+                return (
+                  <DropDown.Item
+                    key={index + 1}
+                    value={item.value}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {item}
+                  </DropDown.Item>
+                );
+              })}
+            </AnimateComponent.Dropdown>
           </DropDown.Content>
         </OutsideAlert>
       )}

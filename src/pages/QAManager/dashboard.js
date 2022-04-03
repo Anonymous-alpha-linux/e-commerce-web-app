@@ -58,12 +58,6 @@ Chart.register(
 );
 
 export default function Dashboard() {
-  const {
-    getAccountList,
-    getRoleList,
-    getAttachmentList,
-  } = useAdminContext();
-
   return (
     <ContainerComponent className="dashboard__root">
       <ContainerComponent.Pane className="overview__container">

@@ -17,11 +17,8 @@ const WorkspaceContextAPI = createContext();
 export default React.memo(function WorkspaceContext({ children }) {
   const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
   const { user, pushToast } = useAuthorizationContext();
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const cancelTokenSource = axios.CancelToken.source();
-  const { REACT_APP_ENVIRONMENT } = process.env;
-  const workspaceAPI = REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
+  const workspaceAPI = process.env.REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
+  // const cancelTokenSource = axios.CancelToken.source();
   useEffect(() => {
     // if (!workspaceState.page) {
     //   localStorage.setItem("workspace", 0);
@@ -93,7 +90,7 @@ export default React.memo(function WorkspaceContext({ children }) {
           type: actions.SET_LOADING,
           loading: false,
         });
-        setError(error.message);
+        pushToast({ error: error.message, type: toastTypes.ERROR });
       });
   }
   function onLoadWorkspace() {
@@ -111,7 +108,7 @@ export default React.memo(function WorkspaceContext({ children }) {
       })
       // onLoadManagerInfo(res.data.response.manger);
     }).catch(err => {
-      setError(err.message);
+      pushToast({ error: err.message, type: toastTypes.ERROR });
     })
   }
   function onLoadManagerInfo(managerId) {
@@ -135,7 +132,9 @@ export default React.memo(function WorkspaceContext({ children }) {
           },
         });
       })
-      .catch((error) => setError(error.message));
+      .catch((error) => {
+        pushToast({ error: error.message, type: toastTypes.ERROR });
+      });
   }
   function updateWorkspaceById(workspaceId) {
     return axios.get(workspaceAPI, {

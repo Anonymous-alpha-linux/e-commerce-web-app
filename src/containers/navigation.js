@@ -10,16 +10,11 @@ import {
 } from "react-icons/io5";
 import { BsList, BsCaretDownFill } from "react-icons/bs";
 import { GrStackOverflow } from "react-icons/gr";
+import { ImSpinner } from "react-icons/im";
 
 import logo from "../assets/Logoidea2.jpg";
 
-import {
-  ButtonComponent,
-  ContainerComponent,
-  Dropdown,
-  Icon,
-  Text,
-} from "../components";
+import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
 import { navigator as navigators, navData, roles, media } from "../fixtures";
 import {
   useAuthorizationContext,
@@ -30,12 +25,14 @@ import DropdownButton from "./dropDownButton";
 import { useMedia, useModal } from "../hooks";
 import Modal from "./modal";
 import NotificationContainer from "./notification";
+import { ListMember, UserAll } from "../pages";
 
 export default function Navigation() {
+  const { user } = useAuthorizationContext();
   const [screenColumn, setScreenColumn] = useState(2);
   const [openNavigator, setOpenNavigator] = useState(false);
+  const [openMemberModal, toggleMemberModal] = useModal();
   const navigate = useNavigate();
-  const { workspaces } = useWorkspaceContext();
 
   const responsiveHandler = () => {
     const { width } = window.screen;
@@ -139,17 +136,15 @@ export default function Navigation() {
                   </>
                 }
               >
-                <WorkspaceList></WorkspaceList>
+                <WorkspaceList
+                  toggleMemberModal={toggleMemberModal}
+                ></WorkspaceList>
               </DropdownButton>
-
               {navData.map((link, index) => {
                 return (
                   <ContainerComponent.Item key={index + 1}>
                     {(link.path && (
                       <Link to={link.path} style={{ color: "#fff" }}>
-                        {/* <Text.MiddleLine style={{ marginRight: '5px' }}>
-                        <Icon>{link.icon}</Icon>
-                      </Text.MiddleLine> */}
                         <Text>{link.name}</Text>
                       </Link>
                     )) || (
@@ -167,6 +162,10 @@ export default function Navigation() {
                 );
               })}
             </ContainerComponent.MiddleInner>
+
+            <Modal isShowing={openMemberModal} toggle={toggleMemberModal}>
+              <ListMember workspaceId={user.workspace}></ListMember>
+            </Modal>
           </ContainerComponent.Item>
         )}
         <ContainerComponent.Item>
@@ -275,20 +274,6 @@ const AuthStatus = React.memo(function AuthStatus({
   openNavigator,
 }) {
   const { user, logout } = useAuthorizationContext();
-  const { notify } = useNotifyContext();
-  const device = useMedia(480, 1080);
-
-  const [isNew, setIsNew] = useState(false);
-
-  useEffect(() => {
-    if (notify.newNodes.length > 0) {
-      setIsNew(true);
-    }
-  }, [notify.newNodes.length]);
-
-  function turnOffBadge(e) {
-    setIsNew(false);
-  }
 
   if (!user.isLoggedIn) {
     return (
@@ -319,31 +304,7 @@ const AuthStatus = React.memo(function AuthStatus({
         </Icon.CircleIcon>
       </ContainerComponent.Item> */}
       <ContainerComponent.Item>
-        {(device === media.MOBILE && (
-          <Icon.CircleIcon className="" onClick={turnOffBadge}>
-            <Link to="/portal/notification">
-              <IoNotificationsOutline></IoNotificationsOutline>
-            </Link>
-          </Icon.CircleIcon>
-        )) || (
-          <DropdownButton
-            position="right"
-            component={
-              <Icon.CircleIcon onClick={turnOffBadge}>
-                <IoNotificationsOutline></IoNotificationsOutline>
-              </Icon.CircleIcon>
-            }
-            style={{
-              minWidth: "420px",
-              maxHeight: "567px",
-              overflowY: "scroll",
-            }}
-          >
-            <NotificationContainer></NotificationContainer>
-          </DropdownButton>
-        )}
-
-        {isNew && <Icon.Badge></Icon.Badge>}
+        <Notification></Notification>
       </ContainerComponent.Item>
       <ContainerComponent.Item>
         {(screenColumn < 3 && (
@@ -367,17 +328,9 @@ const AuthStatus = React.memo(function AuthStatus({
     </ContainerComponent.Flex>
   );
 });
-const WorkspaceList = () => {
-  const { user, editCurrentWorkspace } = useAuthorizationContext();
-  const navigate = useNavigate();
-  const location = useLocation();
-
+const WorkspaceList = ({ toggleMemberModal }) => {
+  const { user } = useAuthorizationContext();
   const { workspaces } = useWorkspaceContext();
-  function selectHandler(workspaceId) {
-    editCurrentWorkspace(workspaceId, () => {
-      navigate(location.pathname);
-    });
-  }
   return (
     <>
       {!!workspaces.length &&
@@ -391,12 +344,6 @@ const WorkspaceList = () => {
             <ContainerComponent.Item
               className="workspaceList__item"
               key={index + 1}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!disabled) {
-                  selectHandler(item._id);
-                }
-              }}
               style={{
                 width: "100%",
                 padding: "10px",
@@ -404,50 +351,96 @@ const WorkspaceList = () => {
                 ...disabledStyled(),
               }}
             >
-              <ContainerComponent.Flex
-                style={{
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text.MiddleLine>
-                  <Icon style={{ fontSize: "25px" }}>
-                    <GrStackOverflow></GrStackOverflow>
-                  </Icon>
-                </Text.MiddleLine>
-
-                <Text.MiddleLine>
-                  <ContainerComponent.Pane>
-                    <Text.Title style={{ textAlign: "center" }}>
-                      {item.workTitle}
-                    </Text.Title>
-                    <TimespanChild expireTime={item.expireTime}></TimespanChild>
-                  </ContainerComponent.Pane>
-                </Text.MiddleLine>
-
-                <Text.MiddleLine>
-                  {user.role !== roles.STAFF && (
-                    <DropdownButton
-                      position="left"
-                      component={
-                        <ContainerComponent.Pane>
-                          <Icon>
-                            <AiFillCaretDown></AiFillCaretDown>
-                          </Icon>
-                        </ContainerComponent.Pane>
-                      }
-                    >
-                      <ToolPanel></ToolPanel>
-                    </DropdownButton>
-                  )}
-                </Text.MiddleLine>
-              </ContainerComponent.Flex>
+              <WorkspaceItem
+                item={item}
+                toggleMemberModal={toggleMemberModal}
+              ></WorkspaceItem>
             </ContainerComponent.Item>
           );
         })}
     </>
   );
 };
+function WorkspaceItem({ item, toggleMemberModal }) {
+  const { user, editCurrentWorkspace } = useAuthorizationContext();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const disabled = user.workspace === item._id;
+
+  function selectHandler(workspaceId) {
+    setLoading(true);
+    editCurrentWorkspace(workspaceId, async () => {
+      await setLoading(false);
+      navigate(location.pathname);
+    });
+  }
+
+  if (loading)
+    return (
+      <Text.CenterLine style={{ height: "50px", fontSize: "40px" }}>
+        <Icon.Spinner>
+          <ImSpinner></ImSpinner>
+        </Icon.Spinner>
+      </Text.CenterLine>
+    );
+  return (
+    <ContainerComponent.Flex
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!disabled) {
+          selectHandler(item._id);
+        }
+      }}
+      style={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        textAlign: "center",
+      }}
+    >
+      <Text.MiddleLine>
+        <Icon style={{ fontSize: "25px" }}>
+          <GrStackOverflow></GrStackOverflow>
+        </Icon>
+      </Text.MiddleLine>
+
+      <Text.MiddleLine>
+        <ContainerComponent.Pane>
+          <Text.Title
+            style={{ textAlign: "center", textTransform: "capitalize" }}
+          >
+            {item.workTitle}
+          </Text.Title>
+          <TimespanChild expireTime={item.expireTime}></TimespanChild>
+        </ContainerComponent.Pane>
+      </Text.MiddleLine>
+
+      <Text.MiddleLine>
+        {user.role !== roles.STAFF && (
+          <DropdownButton
+            position="left"
+            component={
+              <ContainerComponent.Pane>
+                <Icon>
+                  <AiFillCaretDown></AiFillCaretDown>
+                </Icon>
+              </ContainerComponent.Pane>
+            }
+          >
+            <ButtonComponent
+              onClick={() => {
+                console.log("toggle");
+                toggleMemberModal();
+              }}
+            >
+              Add member
+            </ButtonComponent>
+          </DropdownButton>
+        )}
+      </Text.MiddleLine>
+    </ContainerComponent.Flex>
+  );
+}
 function TimespanChild({ startTime = Date.now(), expireTime }) {
   const startDate = new Date(startTime).getTime();
   const expireDate = new Date(expireTime).getTime();
@@ -566,6 +559,48 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
     </ContainerComponent.Section>
   );
 }
-function ToolPanel() {
-  return <ButtonComponent>Add new staff</ButtonComponent>;
+function Notification() {
+  const { notify } = useNotifyContext();
+  const device = useMedia(480, 1080);
+  const [isNew, setIsNew] = useState(false);
+
+  useEffect(() => {
+    if (notify.newNodes.length > 0) {
+      setIsNew(true);
+    }
+  }, [notify.newNodes.length]);
+
+  function turnOffBadge(e) {
+    setIsNew(false);
+  }
+
+  return (
+    <>
+      {(device === media.MOBILE && (
+        <Icon.CircleIcon className="" onClick={turnOffBadge}>
+          <Link to="/portal/notification">
+            <IoNotificationsOutline></IoNotificationsOutline>
+          </Link>
+        </Icon.CircleIcon>
+      )) || (
+        <DropdownButton
+          position="right"
+          component={
+            <Icon.CircleIcon onClick={turnOffBadge}>
+              <IoNotificationsOutline></IoNotificationsOutline>
+            </Icon.CircleIcon>
+          }
+          style={{
+            minWidth: "420px",
+            maxHeight: "567px",
+            overflowY: "scroll",
+            marginTop: "10px",
+          }}
+        >
+          <NotificationContainer></NotificationContainer>
+        </DropdownButton>
+      )}
+      {isNew && <Icon.Badge></Icon.Badge>}
+    </>
+  );
 }

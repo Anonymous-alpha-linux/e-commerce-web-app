@@ -58,17 +58,6 @@ Chart.register(
 );
 
 export default function Dashboard() {
-  const { statistics: { mostLikePosts, mostLikeUser },
-    getAccountList,
-    getRoleList,
-    getAttachmentList,
-  } = useAdminContext();
-
-  useEffect(() => {
-    // getAccountList();
-    // getRoleList();
-    // getAttachmentList();
-  }, []);
   return (
     <ContainerComponent className="dashboard__root">
       <ContainerComponent.Pane className="overview__container">

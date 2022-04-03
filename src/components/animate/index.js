@@ -58,21 +58,23 @@ AnimateComponent.SlideRight = function AnimatedSlideRight({
 
 AnimateComponent.Dropdown = function AnimatedDropdown({
   children,
-  state,
   height,
   style,
   ...props
 }) {
-  const transition = useTransition(state, {
+  const arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
     from: { height: 0 },
     enter: { height: height, overflow: "hidden", ...style },
     leave: { height: 0 },
+    expires: 200,
   });
   return transition(
     (style, item) =>
       item && (
         <animated.div style={style} {...props}>
-          {children}
+          {item}
         </animated.div>
       )
   );
