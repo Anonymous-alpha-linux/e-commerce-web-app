@@ -11,7 +11,7 @@
   --header--gadient: linear-gradient(
     to bottom,
     #25211e 0,
-    rgba(37, 33, 30, 0) 100%
+    rgba(37, 33, 30, 0) 100%,
   );
 }
 
@@ -32,7 +32,6 @@ body {
 #root {
   height: 100vh;
   position: relative;
-  max-width: 1550px;
   margin: 0 auto;
 }
 

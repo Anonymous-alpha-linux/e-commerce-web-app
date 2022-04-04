@@ -117,11 +117,14 @@ export default React.memo(function PostContext({ children }) {
           payload: res.data.response,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        setError(error.message);
+        pushToast({
+          message: "Get Post Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function filterPost(filter) {
@@ -148,10 +151,13 @@ export default React.memo(function PostContext({ children }) {
         });
       })
       .catch((error) => {
-        // setPost({
-        //   type: actions.SET_OFF_LOADING,
-        // });
-        setError(error.message);
+        setPost({
+          type: actions.SET_OFF_LOADING,
+        });
+        pushToast({
+          message: "Filter Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function loadNextPosts(cb) {
@@ -210,6 +216,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Create Post Successful",
+          type: toastTypes.SUCCESS
+        });
         setPost({
           type: actions.PUSH_IDEA,
           payload: [res.data.response],
@@ -239,6 +249,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Update Post Successful",
+          type: toastTypes.SUCCESS
+        });
         setPost({
           type: actions.UPDATE_SINGLE_POST,
           payload: res.data.response,
@@ -264,6 +278,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Delete Post Successful",
+          type: toastTypes.SUCCESS
+        });
         setPost({
           type: actions.REMOVE_SINGLE_POST,
           postId: postId,
@@ -316,6 +334,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Post Idea Successful",
+          type: toastTypes.SUCCESS
+        });
         createSinglePost(res.data.response[0]._id, cb);
         pushToast({
           message: 'Posted successfully',
@@ -404,7 +426,7 @@ export default React.memo(function PostContext({ children }) {
     socket.emit("dislike post", {
       postId,
       userId,
-    });
+    })
   }
   function receiveRealTimeDisLike() {
     socket.on("dislike post", (data) => {
@@ -454,7 +476,10 @@ export default React.memo(function PostContext({ children }) {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        setError(error.message);
+        pushToast({
+          message: "Get Post Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function filterMyPost(filter) {
@@ -471,17 +496,24 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Filter Successful",
+          type: toastTypes.SUCCESS
+        });
         return setPost({
           type: actions.FILTER_MY_POST,
           payload: res.data.response,
           filter: filter,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
-        setError(error.message);
+        pushToast({
+          message: "Filter Failed",
+          type: toastTypes.ERROR
+        });
       });
   }
   function loadMyNextPosts(cb) {
@@ -938,6 +970,20 @@ export default React.memo(function PostContext({ children }) {
           setError(error.message);
         });
     } else if (type === "rate comment") {
+      const { _id: commentId } = input;
+      setPost({
+        type: actions.RATE_COMMENT,
+        payload: {
+          like: input.like,
+          dislike: input.dislike,
+          likedAccounts: input.likedAccounts,
+          dislikedAccounts: input.dislikedAccounts
+        },
+        liked: input.liked,
+        disliked: input.disliked,
+        commentId,
+        postId
+      });
       return axios
         .put(
           postAPI,
@@ -951,7 +997,7 @@ export default React.memo(function PostContext({ children }) {
             },
             params: {
               view: "comment",
-              commentid: input.commentId,
+              commentid: commentId,
               interact: "rate",
             },
           }
@@ -993,6 +1039,19 @@ export default React.memo(function PostContext({ children }) {
           setError(error.message);
         });
     } else if (type === "rate reply") {
+      const { like, dislike, likedAccounts, dislikedAccounts, commentId, replyId } = input;
+      setPost({
+        type: actions.RATE_COMMENT_REPLY,
+        postId,
+        commentId,
+        replyId,
+        payload: {
+          like,
+          dislike,
+          likedAccounts,
+          dislikedAccounts
+        }
+      });
       return axios
         .put(
           postAPI,

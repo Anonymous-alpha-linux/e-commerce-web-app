@@ -2,8 +2,7 @@
    background-color: #fff;
    color: #333;
    width: 100%;
-   max-width: 320px;
-   min-width: 310px;
+   max-width: 320px; 
    padding: 10px;
    text &__container {
       display: flex;
@@ -18,13 +17,16 @@
       border-radius: 20px;
       padding: 8px 12px;
       width: 100%;
+      &:focus{
+         border-color: #333;
+      }
    }
    &__link {
       text-align: left;
       text-decoration: none;
       color: #444;
       &:hover {
-         color: #ffb400;
+         color: #333;
       }
    }
    &__button {
@@ -34,7 +36,7 @@
       border: 1px solid #e8eced;
       text-align: center;
       &:hover {
-         background-color: #ffb400 !important;
+         background-color: #333 !important;
          transition: all 0.15s linear;
       }
    }
@@ -60,8 +62,12 @@
       color: #444;
       border-radius: 5px;
       font-size: 13px;
+      border-right: 10px solid transparent !important;
    }
    &__option {
       font-size: 10px;
    }
+}
+textarea:disabled ,input:disabled{
+   background-color: white;
 }

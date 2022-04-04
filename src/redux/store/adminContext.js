@@ -100,6 +100,10 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Get Role List Successful",
+          type: toastTypes.SUCCESS
+        });
         setState((o) => ({
           ...o,
           roles: res.data.response,

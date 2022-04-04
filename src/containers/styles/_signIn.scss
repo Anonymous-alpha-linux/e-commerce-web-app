@@ -3,6 +3,27 @@
   width: 100vw;
   height: 100vh;
   justify-content: center;
+  &__loginTitle{
+    top:10%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%,0);
+    width: fit-content;
+  }
+  &__login{
+    justify-content: center;
+    align-items: center;
+    gap:20px;
+    flex-wrap: nowrap;
+    width: fit-content;
+  }
+  &__subText{
+    font-weight: 300;
+    color: #fff;
+    margin: 0;
+    font-size: 16px;
+    font-style: italic;
+  }
   &__green {
     background: #163d3c;
     width: 100%;
@@ -47,22 +68,12 @@
     box-shadow: 5px 5px 5px #bdecd8;
   }
   &__text {
-    transform: translateY(-50%);
-    font-size: 20px;
+    font-size: 23px;
     color: white;
     font-weight: 400;
     margin: 5px;
-  }
-  &__icon {
-    font-size: 50px;
-    position: relative;
     text-align: center;
-  }
-  &__icon2 {
-    font-size: 50px;
-    display: none;
-    position: relative;
-    text-align: center;
+    cursor: default;
   }
   &__button {
     background-color: #163d3c;
@@ -76,12 +87,16 @@
     &:hover {
       background-color: white;
       color: #163d3c;
+      transition: all 0.3s;
     }
   }
   @media screen and (min-width: 768px) {
     display: flex;
     flex-direction: row;
     position: relative;
+  &__loginTitle {
+    top: 18%;
+  }
     &__green {
       position: relative;
       width: 60%;
@@ -95,12 +110,6 @@
     }
     &__form {
       width: 80%;
-    }
-    &__icon {
-      top: 25%;
-    }
-    &__icon2 {
-      display: block;
     }
     &__text {
       font-size: 40px;

@@ -19,7 +19,7 @@ function DashBoardHeader({ children }) {
   // const [openSideBar, setOpenSidebar] = useState(false);
   const [openSideBar, toggleSidebar] = useModal();
   const sideBarRef = useState(null);
-  const device = useMedia(420, 1080);
+  const device = useMedia(520, 1080);
 
   return (
     <ContainerComponent className="manager_root">
@@ -46,7 +46,7 @@ function DashBoardHeader({ children }) {
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
       </ContainerComponent>
-      <ContainerComponent className="manager__body">
+      <ContainerComponent className="manager__body" style={{ background: '#A9C39E' }}>
         <AnimateComponent.SlideRight className="sidebar__root" state={openSideBar}>
           <Sidebar closeSidebar={() => toggleSidebar()}></Sidebar>
         </AnimateComponent.SlideRight>

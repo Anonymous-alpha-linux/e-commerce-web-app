@@ -87,7 +87,6 @@ AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, trigger
     ...menuPosition,
     ...style,
   });
-  console.log(isToggled);
 
   return (
     <>
@@ -151,7 +150,6 @@ AnimateComponent.DropdownHover = function AnimatedDropdownHover({ children, stat
     ...menuPosition,
     ...style,
   });
-  console.log(isToggled);
 
   return (
     <>
