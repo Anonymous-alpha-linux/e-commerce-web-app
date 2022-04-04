@@ -121,12 +121,12 @@ export default function Personal() {
                 <Modal isShowing={openWorkspaceModal} toggle={toggleWorkspaceModal}>
                 </Modal>
             </ContainerComponent.Pane>
+
             <Form onSubmit={submitHandler}
                 style={{ height:"fit-content",width:"100%",padding:"0",maxWidth:"unset" }}>
                 <ContainerComponent.Inner className="personal__greenBot">
                     <ContainerComponent.Pane style={{
                         padding: '0',
-                        zIndex:"111",
                         maxWidth:"720px",
                         width: '100%'
                     }}>
