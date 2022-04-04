@@ -313,14 +313,16 @@ $color-accent-light: #40916c;
 .submit_edit {
    // margin: $space-between;
    height: $box-height;
+   border:none;
    width: 70%;
    background: $color-accent-light;
-   @include border($border-radius);
+   border-radius: 15px;
    font-weight: 600;
    text-transform: capitalize;
    color: white;
    cursor: pointer;
-   margin: 0 auto;
+   margin: 5px auto;
+   padding: 5px;
 }
 
 .MadalBackDrop {
@@ -396,18 +398,6 @@ $color-accent-light: #40916c;
       height: 50%;
       box-shadow: -1px -1px 2px rgb(154, 159, 165);
    }
-}
-.submit_edit {
-   // margin: $space-between;
-   height: $box-height;
-   width: 70%;
-   background: $color-accent-light;
-   @include border($border-radius);
-   font-weight: 600;
-   text-transform: capitalize;
-   color: white;
-   cursor: pointer;
-   margin: 0 auto;
 }
 
 .MadalBackDrop {

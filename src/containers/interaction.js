@@ -74,15 +74,16 @@ function Interaction({ like, dislike, likedAccounts, dislikedAccounts, entity, i
                 ></input>
                 <Icon.CircleIcon
                     className="likeIcon"
+                    style={{ marginRight: "5px" }}
                     onClick={() => {
                         document.getElementById(`like - ${props._id} `).click();
                     }}
                 >
                     <FaThumbsUp
-                        stroke="#000"
+                        stroke="#163D3C"
                         strokeWidth={20}
                         style={{
-                            fill: `${interact.liked ? "blue" : "transparent"} `,
+                            fill: `${interact.liked ? "#163D3C" : "transparent"} `,
                             position: "absolute",
                             top: "50%",
                             transform: "translate(-50%,-50%)",
@@ -104,15 +105,16 @@ function Interaction({ like, dislike, likedAccounts, dislikedAccounts, entity, i
                 ></input>
                 <Icon.CircleIcon
                     className="dislikeIcon"
+                    style={{marginRight:"5px"}}
                     onClick={() => {
                         document.getElementById(`dislike ${props._id} `).click();
                     }}
                 >
                     <FaThumbsDown
-                        stroke="#000"
+                        stroke="#163D3C"
                         strokeWidth={20}
                         style={{
-                            fill: `${interact.disliked ? "blue" : "transparent"} `,
+                            fill: `${interact.disliked ? "#163D3C" : "transparent"} `,
                             position: "absolute",
                             top: "50%",
                             transform: "translate(-50%,-50%)",

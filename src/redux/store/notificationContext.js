@@ -43,6 +43,10 @@ export default function NotificationContext({ children }) {
             }
         })
             .then(res => {
+                pushToast({
+                    message: 'Successful',
+                    type: toastTypes.SUCCESS
+                })
                 setNotify({
                     type: actions.GET_NOTIFICATIONS,
                     payload: res.data.response
@@ -68,6 +72,10 @@ export default function NotificationContext({ children }) {
                 count: notify.count
             }
         }).then(res => {
+            pushToast({
+                message: 'Successful',
+                type: toastTypes.SUCCESS
+            })
             setNotify({
                 type: actions.PUSH_NOTIFICATION,
                 payload: res.data.response

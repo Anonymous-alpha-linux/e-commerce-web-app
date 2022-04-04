@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaBell } from 'react-icons/fa';
 import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
 import {
   IoNotificationsOutline,
@@ -9,30 +9,20 @@ import {
   IoHomeSharp,
 } from "react-icons/io5";
 import { BsList, BsCaretDownFill } from "react-icons/bs";
-import { GrStackOverflow } from "react-icons/gr";
-import { ImSpinner } from "react-icons/im";
+import { GrStackOverflow } from 'react-icons/gr';
 
-import logo from "../assets/Logoidea2.jpg";
+import { ImSpinner } from 'react-icons/im';
+import logo from '../assets/Logoidea2.jpg';
+import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
 
-import {
-  ButtonComponent,
-  ContainerComponent,
-  Icon,
-  Text,
-  Form,
-  AnimateComponent,
-} from "../components";
-import { Searchbar } from ".";
-import { navigator as navigators, navData, roles, media } from "../fixtures";
-import {
-  useAuthorizationContext,
-  useNotifyContext,
-  useWorkspaceContext,
-} from "../redux";
+import { navigator as navigators, navData, roles, media } from '../fixtures';
+import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
 import DropdownButton from "./dropDownButton";
 import { useMedia, useModal, OutsideAlert } from "../hooks";
 import Modal from "./modal";
 import NotificationContainer from "./notification";
+
+import { Logo } from ".";
 import { ListMember, UserAll } from "../pages";
 
 export default function Navigation() {
@@ -45,7 +35,7 @@ export default function Navigation() {
 
   const responsiveHandler = () => {
     const { width } = window.screen;
-    if (width <= 650) {
+    if (width <= 768) {
       setScreenColumn(2);
     } else {
       setScreenColumn(3);
@@ -91,10 +81,10 @@ export default function Navigation() {
                   })
                 }
               >
-                {/* <IoLogoApple></IoLogoApple> */}
-                <Icon.Image src={logo} alt={"logo"}></Icon.Image>
+                 <Logo></Logo>
               </Icon.CircleIcon>
             </ContainerComponent.Item>
+
             <ContainerComponent.Item
               onClick={() => {
                 setOpenSearch((prev) => !prev);
@@ -127,62 +117,42 @@ export default function Navigation() {
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
         {screenColumn > 2 && (
-          <ContainerComponent.Item style={{ color: "#fff" }}>
-            <ContainerComponent.MiddleInner
-              style={{ flexDirection: "row", height: "100%", gap: "1.2rem" }}
-            >
+          <ContainerComponent.Item style={{ color: '#fff' }}>
+            <ContainerComponent.MiddleInner style={{ flexDirection: 'row', height: '100%', gap: '2.5rem' }}>
               <ContainerComponent.Item>
-                <Link to="/" style={{ color: "#fff" }}>
-                  <Text.MiddleLine style={{ marginRight: "5px" }}>
-                    <Icon>
-                      <IoHomeSharp></IoHomeSharp>
-                    </Icon>
-                  </Text.MiddleLine>
-                  <Text>Home</Text>
+                <Link to="/" style={{display:"flex",justifyContent:"center",alignItems:"center",color: '#fff' }}>
+                  <Text style={{background:"0"}} className="navigation__text">Home</Text>
                 </Link>
               </ContainerComponent.Item>
-              <DropdownButton
-                position="middle"
-                style={{
-                  paddingTop: "16px",
-                  background: "rgb(22, 61, 60)",
-                  color: "#fff",
-                }}
-                component={
-                  <>
-                    <Text style={{ marginRight: "5px" }}>Workspace</Text>
-                    <Text.MiddleLine>
-                      <Icon>
-                        <BsCaretDownFill></BsCaretDownFill>
-                      </Icon>
-                    </Text.MiddleLine>
-                  </>
-                }
-              >
-                <WorkspaceList
-                  toggleMemberModal={toggleMemberModal}
-                ></WorkspaceList>
+              <DropdownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
+                <ContainerComponent.Inner style={{display:"flex"}}>
+                  <Text className="navigation__text" style={{ marginRight: '5px' }}>Workspace</Text>
+                  <Text.MiddleLine>
+                    <Icon>
+                      <BsCaretDownFill></BsCaretDownFill>
+                    </Icon>
+                  </Text.MiddleLine>
+                </ContainerComponent.Inner>
+              </>}>
+                <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
               </DropdownButton>
               {navData.map((link, index) => {
-                return (
-                  <ContainerComponent.Item key={index + 1}>
-                    {(link.path && (
-                      <Link to={link.path} style={{ color: "#fff" }}>
-                        <Text>{link.name}</Text>
-                      </Link>
-                    )) || (
-                      <>
-                        {/* <Text.MiddleLine style={{ marginRight: '5px' }}>
+                return <ContainerComponent.Item key={index + 1}>
+                  {link.path && <Link to={link.path}
+                    style={{ color: '#fff' }}>
+                    <TextclassName="navigation__text">
+                      {link.name}
+                    </Text>
+                  </Link> || <>
+                      {/* <Text.MiddleLine style={{ marginRight: '5px' }}>
                           <Icon>{link.icon}</Icon>
                         </Text.MiddleLine> */}
-                        <Text>{link.name}</Text>
-                      </>
-                    )}
-                    {link.subDocs && (
-                      <DropdownButton component={<></>}></DropdownButton>
-                    )}
-                  </ContainerComponent.Item>
-                );
+                    <Text className="navigation__text">
+                        {link.name}
+                      </Text>
+                    </>}
+                  {link.subDocs && <DropdownButton component={<></>}></DropdownButton>}
+                </ContainerComponent.Item>
               })}
             </ContainerComponent.MiddleInner>
 
@@ -326,24 +296,25 @@ const AuthStatus = React.memo(function AuthStatus({
           </Link>
         </Icon.CircleIcon>
       </ContainerComponent.Item> */}
+
       <ContainerComponent.Item>
         <Notification></Notification>
       </ContainerComponent.Item>
       <ContainerComponent.Item>
-        {(screenColumn < 3 && (
-          <Icon.CircleIcon onClick={openNavigator}>
-            <BsList></BsList>
-          </Icon.CircleIcon>
-        )) || (
-          <Text.MiddleLine style={{ verticalAlign: "text-bottom" }}>
-            <Link
-              to={"/"}
-              style={{
-                color: "#fff",
-              }}
-              onClick={logout}
-            >
-              <ButtonComponent>Logout</ButtonComponent>
+        {screenColumn < 3 &&
+            <Icon.CircleIcon onClick={openNavigator}>
+              <BsList style={{fontWeight:"600",fontSize:"20px"}}></BsList>
+            </Icon.CircleIcon>
+          ||
+          <Text.MiddleLine className="navigation__logoutFrame">
+            <Link to={"/"}
+            className="navigation__logOut"
+            style={{
+              color: '#fff'
+            }} onClick={logout}>
+              <ButtonComponent className="navigation__logout">
+                Log out
+              </ButtonComponent>
             </Link>
           </Text.MiddleLine>
         )}
@@ -354,36 +325,21 @@ const AuthStatus = React.memo(function AuthStatus({
 const WorkspaceList = ({ toggleMemberModal }) => {
   const { user } = useAuthorizationContext();
   const { workspaces } = useWorkspaceContext();
-  return (
-    <>
-      {!!workspaces.length &&
-        workspaces.map((item, index) => {
-          const disabled = user.workspace === item._id;
-          const disabledStyled = () => ({
-            background: `${disabled ? "#f2f3f4" : "rgb(22, 61, 60)"}`,
-            color: `${disabled ? "#000" : "#fff"}`,
-          });
-          return (
-            <ContainerComponent.Item
-              className="workspaceList__item"
-              key={index + 1}
-              style={{
-                width: "100%",
-                padding: "10px",
-                minWidth: "280px",
-                ...disabledStyled(),
-              }}
-            >
-              <WorkspaceItem
-                item={item}
-                toggleMemberModal={toggleMemberModal}
-              ></WorkspaceItem>
-            </ContainerComponent.Item>
-          );
-        })}
-    </>
-  );
-};
+  return <>
+    {!!workspaces.length && workspaces.map((item, index) => {
+      const disabled = user.workspace === item._id;
+      const disabledStyled = () => ({
+        background: `${disabled ? '#fff' : "rgb(22, 61, 60)"}`,
+        color: `${disabled ? '#000' : "#fff"}`,
+      })
+
+      return <ContainerComponent.Item className="workspaceList__item" key={index + 1}
+        style={{ width: "100%", padding: "10px", minWidth: "280px", ...disabledStyled() }}>
+        <WorkspaceItem item={item} toggleMemberModal={toggleMemberModal}></WorkspaceItem>
+      </ContainerComponent.Item>
+    })}
+  </>
+}
 function WorkspaceItem({ item, toggleMemberModal }) {
   const { user, editCurrentWorkspace } = useAuthorizationContext();
   const [loading, setLoading] = useState(false);

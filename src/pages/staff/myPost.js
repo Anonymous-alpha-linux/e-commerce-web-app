@@ -24,18 +24,20 @@ export default function MyPost() {
         };
     }, []);
 
-    return (<ContainerComponent className="workspace" id="workspace">
-        <PostForm></PostForm>
-        <Filter loader={filterMyPost} selectOptions={[
-            {
-                label: 'Most Recent',
-                value: 2
-            },
-            {
-                label: 'Most Likely',
-                value: 3
-            }
-        ]}></Filter>
+    return (<ContainerComponent style={{ background:"#A9C39E"}} className="workspace" id="workspace">
+        <ContainerComponent.Inner className="myPost__header">
+            <PostForm></PostForm>
+            <Filter loader={filterMyPost} selectOptions={[
+                {
+                    label: 'Most Recent',
+                    value: 2
+                },
+                {
+                    label: 'Most Likely',
+                    value: 3
+                }
+            ]}></Filter>
+        </ContainerComponent.Inner>
         <LazyLoading loader={loadMyNextPosts}>
             <List className="workspace__postList" ref={listRef}>
                 {/* {!myPosts.length && <List.Item>

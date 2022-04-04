@@ -38,3 +38,4 @@ export {default as SinglePost} from "./singlePost"
 export { default as Modal } from "./modal";
 export { default as AttachmentCrub } from "./AttachmentCrub";
 export { default as SecondPagination } from "./pagination2";
+export {default as Logo} from './logo'

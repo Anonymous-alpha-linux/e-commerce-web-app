@@ -38,9 +38,9 @@ export default function ManagerInfo() {
   }, [workspace]);
 
   return (
-    <ContainerComponent style={{ padding: "10px" }}>
-      <ContainerComponent.Inner>
-        <ContainerComponent.Pane style={{ position: "relative" }}>
+    <ContainerComponent style={{ padding: "10px", }}>
+      <ContainerComponent.Inner className="personal__green">
+        <ContainerComponent.Pane className="personal__frameAva" style={{ position: "relative", }}>
           <Text.CenterLine
             style={{ position: "relative", zIndex: 1, height: "27.5px" }}
           >
@@ -90,95 +90,47 @@ export default function ManagerInfo() {
             }}
           ></Text.Line>
         </ContainerComponent.Pane>
-        <ContainerComponent.Pane style={{ padding: "20px 0" }}>
-          <Text.Title
-            style={{
-              lineHeight: "2px",
-              textIndent: "10px",
-              transform: "translateY(20px)",
-            }}
-          >
-            Profile
-          </Text.Title>
-          <Form.TextArea
-            readOnly={true}
-            rows={15}
-            style={{
-              width: "100%",
-              borderRadius: "20px",
-              padding: "30px 0 0 10px",
-            }}
-            value={profile.introduction}
-            placeholder="Your introduction"
-          ></Form.TextArea>
-          <Text.MiddleLine
-            style={{
-              lineHeight: 0,
-              textIndent: "5px",
-              transform: "translateY(25px)",
-              fontWeight: 800,
-            }}
-          >
-            <Text.Label>Gender</Text.Label>
-          </Text.MiddleLine>
-          <Form.Input
-            readOnly={true}
-            style={{ textAlign: "right" }}
-            value={profile.gender.toUpperCase()}
-            placeholder="Post your information"
-          ></Form.Input>
+      </ContainerComponent.Inner>
 
-          <Text.MiddleLine
-            style={{
-              lineHeight: 0,
-              textIndent: "5px",
-              transform: "translateY(25px)",
-              fontWeight: 800,
-            }}
-          >
-            <Text.Label>Age</Text.Label>
-          </Text.MiddleLine>
-          <Form.Input
-            placeholder="Choose Date"
-            readOnly={true}
-            value={profile.age}
-            style={{ textAlign: "right" }}
-          ></Form.Input>
-          <Text.MiddleLine
-            style={{
-              lineHeight: 0,
-              textIndent: "5px",
-              transform: "translateY(25px)",
-              fontWeight: 800,
-            }}
-          >
-            <Text.Label>Email</Text.Label>
-          </Text.MiddleLine>
-          <Form.Input
-            placeholder="Post your information"
-            readOnly={true}
-            style={{ textAlign: "right" }}
-            value={profile.email}
-          ></Form.Input>
+      <ContainerComponent.Inner>
+        <ContainerComponent.Pane className="personal__threeFrame"></ContainerComponent.Pane>
 
-          <Text.MiddleLine
-            style={{
-              lineHeight: 0,
-              textIndent: "5px",
-              transform: "translateY(25px)",
-              fontWeight: 800,
-            }}
-          >
-            <Text.Label>Department</Text.Label>
-          </Text.MiddleLine>
-          <Form.Input
-            placeholder="Choose Date"
-            readOnly={true}
-            value={workspace.workTitle}
-            style={{
-              textAlign: "right",
-            }}
-          ></Form.Input>
+        <ContainerComponent.Pane className="personal__greenBot" style={{paddingTop: '20px'}}>
+          <ContainerComponent.Inner style={{
+            padding: '20px 0 0 0',
+            maxWidth: "720px",
+            width: '100%'
+          }}>
+            <Text.Title style={{ lineHeight: "2px", textIndent: "10px", transform: "translateY(20px)", }}>
+              Profile
+            </Text.Title>
+            <Form.TextArea readOnly={true} rows={15} style={{ width: "100%", borderRadius: "20px", padding: "30px 0 0 10px", }} value={profile.introduction} placeholder="Your introduction"></Form.TextArea>
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800, }}>
+              <Text.Label>Gender</Text.Label>
+            </Text.MiddleLine>
+            <Form.Input readOnly={true} style={{ textAlign: "right", }} value={profile.gender.toUpperCase()} placeholder="Post your information"></Form.Input>
+
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800 }}>
+              <Text.Label>Age</Text.Label>
+            </Text.MiddleLine>
+            <Form.Input placeholder="Choose Date" readOnly={true} value={profile.age} style={{ textAlign: "right", }}></Form.Input>
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800, }}>
+              <Text.Label>Email</Text.Label>
+            </Text.MiddleLine>
+            <Form.Input placeholder="Post your information" readOnly={true} style={{ textAlign: "right", }} value={profile.email}></Form.Input>
+
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800, }}  >
+              <Text.Label>Department</Text.Label>
+            </Text.MiddleLine>
+            <Form.Input
+              placeholder="Choose Date"
+              readOnly={true}
+              value={workspace.workTitle}
+              style={{
+                textAlign: "right",
+              }}
+            ></Form.Input>
+          </ContainerComponent.Inner>
         </ContainerComponent.Pane>
       </ContainerComponent.Inner>
     </ContainerComponent>

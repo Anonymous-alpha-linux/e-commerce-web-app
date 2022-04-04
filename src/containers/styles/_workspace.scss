@@ -2,9 +2,30 @@
    max-width: 680px !important;
    margin: 0 auto;
    width: 100%;
-   border: 1px solid grey;
-   box-shadow: 0 -20px grey inset;
-   &__postList {
-      background: #fff;
+   &__postList{
+      background-color: #A9C39E;
    }
+   @media screen and (min-width: 768px){
+         background-color: #A9C39E;
+         padding-top: 20px;
+      .timespan{
+         border-radius: 10px;
+      }
+      &__form {
+         border-radius: 10px;
+         padding: 15px 15px;
+         background-color: #DCE7D7;
+         margin-bottom: 20px;
+      }
+      &__innerForm{
+         border-radius: 10px;
+         overflow: hidden;
+         background-color: #DCE7D7;
+      }
+      &__postList {
+         border-radius: "10px";
+         background:"#A9C39E";
+      }
+   }
+   
 }
