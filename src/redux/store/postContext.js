@@ -242,14 +242,14 @@ export default React.memo(function PostContext({ children }) {
           payload: [res.data.response],
         });
         pushToast({
-          message: 'Posted successfully',
-          type: toastTypes.SUCCESS
+          message: "Posted successfully",
+          type: toastTypes.SUCCESS,
         });
       })
       .catch((error) => {
         pushToast({
-          message: 'Posted failed',
-          type: toastTypes.ERROR
+          message: "Posted failed",
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -278,8 +278,8 @@ export default React.memo(function PostContext({ children }) {
       })
       .catch((error) => {
         pushToast({
-          message: 'Updated post failed',
-          type: toastTypes.ERROR
+          message: "Updated post failed",
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -304,15 +304,15 @@ export default React.memo(function PostContext({ children }) {
           postId: postId,
         });
         pushToast({
-          message: 'Deleted post successfully',
-          type: toastTypes.SUCCESS
+          message: "Deleted post successfully",
+          type: toastTypes.SUCCESS,
         });
         cb(postId);
       })
       .catch((error) => {
         pushToast({
-          message: 'Deleted post failed',
-          type: toastTypes.ERROR
+          message: "Deleted post failed",
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -357,15 +357,15 @@ export default React.memo(function PostContext({ children }) {
         });
         createSinglePost(res.data.response[0]._id, cb);
         pushToast({
-          message: 'Posted successfully',
-          type: toastTypes.SUCCESS
+          message: "Posted successfully",
+          type: toastTypes.SUCCESS,
         });
         cb(res.data.response[0]._id);
       })
       .catch((err) => {
         pushToast({
-          message: 'Posted failed',
-          type: toastTypes.ERROR
+          message: "Posted failed",
+          type: toastTypes.ERROR,
         });
         cb(error);
       });
@@ -414,8 +414,8 @@ export default React.memo(function PostContext({ children }) {
       })
       .catch((error) => {
         pushToast({
-          message: 'Edit Post successfully',
-          type: toastTypes.ERROR
+          message: "Edit Post successfully",
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -424,7 +424,7 @@ export default React.memo(function PostContext({ children }) {
       type: actions.LIKE_POST,
       postId,
       userId,
-      input
+      input,
     });
   }
   function dislikePost(input, postId, userId) {
@@ -728,14 +728,14 @@ export default React.memo(function PostContext({ children }) {
           postId: postId,
         });
         pushToast({
-          message: 'Posted comment',
-          type: toastTypes.SUCCESS
+          message: "Posted comment",
+          type: toastTypes.SUCCESS,
         });
       })
       .catch((error) => {
         pushToast({
-          message: 'Failed to posted comment',
-          type: toastTypes.ERROR
+          message: "Failed to posted comment",
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -875,7 +875,14 @@ export default React.memo(function PostContext({ children }) {
   function interactPost(postId, type, input, cb) {
     // Set Loading for waiting post
     if (type === "rate") {
-      const { isLiked, isDisliked, like, dislike, likedAccounts, dislikedAccounts } = input;
+      const {
+        isLiked,
+        isDisliked,
+        like,
+        dislike,
+        likedAccounts,
+        dislikedAccounts,
+      } = input;
       setPost({
         type: actions.RATE_POST,
         postId,
@@ -883,9 +890,9 @@ export default React.memo(function PostContext({ children }) {
           like,
           dislike,
           likedAccounts,
-          dislikedAccounts
-        }
-      })
+          dislikedAccounts,
+        },
+      });
       return axios
         .put(
           postAPI,
@@ -1151,7 +1158,7 @@ export default React.memo(function PostContext({ children }) {
       .then((data) => cb(data))
       .catch((error) => setError(error.message));
   }
-  function getGzipFile() { }
+  function getGzipFile() {}
   async function downloadHandler(attachmentId) {
     return axios
       .get(`${host}/api/v1/download`, {

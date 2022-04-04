@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import { FaTimes, FaBell } from 'react-icons/fa';
 import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
-import { IoNotificationsOutline, IoSearchSharp, IoHomeSharp } from "react-icons/io5";
+import {
+  IoNotificationsOutline,
+  IoSearchSharp,
+  IoHomeSharp,
+} from "react-icons/io5";
 import { BsList, BsCaretDownFill } from "react-icons/bs";
 import { GrStackOverflow } from 'react-icons/gr';
 
@@ -13,7 +18,7 @@ import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
 import { navigator as navigators, navData, roles, media } from '../fixtures';
 import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
 import DropdownButton from "./dropDownButton";
-import { useMedia, useModal } from "../hooks";
+import { useMedia, useModal, OutsideAlert } from "../hooks";
 import Modal from "./modal";
 import NotificationContainer from "./notification";
 
@@ -25,6 +30,7 @@ export default function Navigation() {
   const [screenColumn, setScreenColumn] = useState(2);
   const [openNavigator, setOpenNavigator] = useState(false);
   const [openMemberModal, toggleMemberModal] = useModal();
+  const [openSearch, setOpenSearch] = useState(false);
   const navigate = useNavigate();
 
   const responsiveHandler = () => {
@@ -47,8 +53,20 @@ export default function Navigation() {
   }, [window.screen.width]);
 
   return (
-    <ContainerComponent className="navigation__container" style={{ background: "#163d3c", position: "sticky", top: 0, left: 0, zIndex: 100, }}>
-      <ContainerComponent.Flex className="navigation__grid" columns={screenColumn}>
+    <ContainerComponent
+      className="navigation__container"
+      style={{
+        background: "#163d3c",
+        position: "sticky",
+        top: 0,
+        left: 0,
+        zIndex: 100,
+      }}
+    >
+      <ContainerComponent.Flex
+        className="navigation__grid"
+        columns={screenColumn}
+      >
         <ContainerComponent.Item>
           <ContainerComponent.Flex
             style={{
@@ -56,11 +74,45 @@ export default function Navigation() {
             }}
           >
             <ContainerComponent.Item>
-              <ContainerComponent.Inner onClick={() => navigate('/', {
-                replace: true
-              })}>
-                <Logo></Logo>
-              </ContainerComponent.Inner>
+              <Icon.CircleIcon
+                onClick={() =>
+                  navigate("/", {
+                    replace: true,
+                  })
+                }
+              >
+                 <Logo></Logo>
+              </Icon.CircleIcon>
+            </ContainerComponent.Item>
+
+            <ContainerComponent.Item
+              onClick={() => {
+                setOpenSearch((prev) => !prev);
+              }}
+            >
+              <AnimateComponent.Width>
+                {openSearch && (
+                  <OutsideAlert
+                    style={{ position: "absolute" }}
+                    toggleShowing={() => setOpenSearch((prev) => !prev)}
+                  >
+                    <Form.Input placeholder="Search post/username/workspace"></Form.Input>
+                  </OutsideAlert>
+                )}
+              </AnimateComponent.Width>
+              <Link
+                to="/portal/search"
+                style={{
+                  paddingLeft: "0",
+                  color: "#fff",
+                  display: "inline-block",
+                  verticalAlign: "middle",
+                  lineHeight: "100%",
+                  margin: 0,
+                }}
+              >
+                {!openSearch && <IoSearchSharp></IoSearchSharp>}
+              </Link>
             </ContainerComponent.Item>
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
@@ -116,11 +168,9 @@ export default function Navigation() {
           ></AuthStatus>
         </ContainerComponent.Item>
       </ContainerComponent.Flex>
-      {
-        openNavigator && (
-          <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
-        )
-      }
+      {openNavigator && (
+        <Navigator closeNavigator={() => setOpenNavigator(false)}></Navigator>
+      )}
     </ContainerComponent>
   );
 }
@@ -132,28 +182,28 @@ const Navigator = ({ closeNavigator }) => {
       <ContainerComponent.BackDrop
         onClick={closeNavigator}
       ></ContainerComponent.BackDrop>
-      <ContainerComponent className="navigator__container" style={{ position: "fixed", bottom: 0, left: 0, zIndex: 10, borderRadius: "20px 20px 0 0", background: "#333", color: "#fff", padding: "10px" }}>
+      <ContainerComponent
+        className="navigator__container"
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          zIndex: 10,
+          borderRadius: "20px 20px 0 0",
+          background: "#333",
+          color: "#fff",
+          padding: "10px",
+        }}
+      >
         <ContainerComponent.GridThreeColumns style={{ zIndex: 10 }}>
-          {navigators.map((navigate, index) => (navigate.trigger ? <ContainerComponent.Item key={index + 1} onClick={() => {
-            toggleModal()
-          }}>
-            <ContainerComponent.MiddleInner>
-              <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
-              <Icon.Label
-                style={{
-                  fontWeight: "bold",
-                  textTransform: "capitalize",
+          {navigators.map((navigate, index) =>
+            navigate.trigger ? (
+              <ContainerComponent.Item
+                key={index + 1}
+                onClick={() => {
+                  toggleModal();
                 }}
               >
-                {navigate.label}
-              </Icon.Label>
-            </ContainerComponent.MiddleInner>
-          </ContainerComponent.Item>
-            :
-            <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
-              <Link to={navigate.link} style={{
-                color: '#fff'
-              }}>
                 <ContainerComponent.MiddleInner>
                   <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
                   <Icon.Label
@@ -165,11 +215,40 @@ const Navigator = ({ closeNavigator }) => {
                     {navigate.label}
                   </Icon.Label>
                 </ContainerComponent.MiddleInner>
-              </Link>
-            </ContainerComponent.Item>
-          ))}
+              </ContainerComponent.Item>
+            ) : (
+              <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
+                <Link
+                  to={navigate.link}
+                  style={{
+                    color: "#fff",
+                  }}
+                >
+                  <ContainerComponent.MiddleInner>
+                    <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
+                    <Icon.Label
+                      style={{
+                        fontWeight: "bold",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {navigate.label}
+                    </Icon.Label>
+                  </ContainerComponent.MiddleInner>
+                </Link>
+              </ContainerComponent.Item>
+            )
+          )}
         </ContainerComponent.GridThreeColumns>
-        <Modal isShowing={openModal} toggle={toggleModal} style={{ zIndex: 100, padding: '1px 10px 10px 10px', background: '#fff' }}>
+        <Modal
+          isShowing={openModal}
+          toggle={toggleModal}
+          style={{
+            zIndex: 100,
+            padding: "1px 10px 10px 10px",
+            background: "#fff",
+          }}
+        >
           <ContainerComponent.Flex>
             <ContainerComponent.Item onClick={toggleModal}>
               <Icon.CircleIcon>
@@ -201,7 +280,7 @@ const AuthStatus = React.memo(function AuthStatus({
         </Link>
       </div>
     );
-  };
+  }
 
   return (
     <ContainerComponent.Flex
@@ -238,7 +317,7 @@ const AuthStatus = React.memo(function AuthStatus({
               </ButtonComponent>
             </Link>
           </Text.MiddleLine>
-        }
+        )}
       </ContainerComponent.Item>
     </ContainerComponent.Flex>
   );
@@ -276,47 +355,70 @@ function WorkspaceItem({ item, toggleMemberModal }) {
     });
   }
 
-  if (loading) return <Text.CenterLine style={{ height: '50px', fontSize: '40px' }}>
-    <Icon.Spinner>
-      <ImSpinner></ImSpinner>
-    </Icon.Spinner>
-  </Text.CenterLine>
-  return <ContainerComponent.Flex onClick={(e) => {
-    e.stopPropagation();
-    if (!disabled) {
-      selectHandler(item._id);
-    }
-  }
-  } style={{ alignItems: "center", justifyContent: "space-between", textAlign: 'center' }}>
-    <Text.MiddleLine>
-      <Icon style={{ fontSize: "25px" }}>
-        <GrStackOverflow></GrStackOverflow>
-      </Icon>
-    </Text.MiddleLine>
-
-    <Text.MiddleLine>
-      <ContainerComponent.Pane>
-        <Text.Title style={{ textAlign: "center", textTransform: 'capitalize' }}>
-          {item.workTitle}
-        </Text.Title>
-        <TimespanChild expireTime={item.expireTime}></TimespanChild>
-      </ContainerComponent.Pane>
-    </Text.MiddleLine>
-
-    <Text.MiddleLine>
-      {user.role !== roles.STAFF && <DropdownButton position="left" component={<ContainerComponent.Pane>
-        <Icon>
-          <AiFillCaretDown></AiFillCaretDown>
+  if (loading)
+    return (
+      <Text.CenterLine style={{ height: "50px", fontSize: "40px" }}>
+        <Icon.Spinner>
+          <ImSpinner></ImSpinner>
+        </Icon.Spinner>
+      </Text.CenterLine>
+    );
+  return (
+    <ContainerComponent.Flex
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!disabled) {
+          selectHandler(item._id);
+        }
+      }}
+      style={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        textAlign: "center",
+      }}
+    >
+      <Text.MiddleLine>
+        <Icon style={{ fontSize: "25px" }}>
+          <GrStackOverflow></GrStackOverflow>
         </Icon>
-      </ContainerComponent.Pane>}>
-        <ButtonComponent onClick={() => {
-          console.log("toggle");
-          toggleMemberModal();
-        }}>Add member</ButtonComponent>
-      </DropdownButton>
-      }
-    </Text.MiddleLine>
-  </ContainerComponent.Flex>
+      </Text.MiddleLine>
+
+      <Text.MiddleLine>
+        <ContainerComponent.Pane>
+          <Text.Title
+            style={{ textAlign: "center", textTransform: "capitalize" }}
+          >
+            {item.workTitle}
+          </Text.Title>
+          <TimespanChild expireTime={item.expireTime}></TimespanChild>
+        </ContainerComponent.Pane>
+      </Text.MiddleLine>
+
+      <Text.MiddleLine>
+        {user.role !== roles.STAFF && (
+          <DropdownButton
+            position="left"
+            component={
+              <ContainerComponent.Pane>
+                <Icon>
+                  <AiFillCaretDown></AiFillCaretDown>
+                </Icon>
+              </ContainerComponent.Pane>
+            }
+          >
+            <ButtonComponent
+              onClick={() => {
+                console.log("toggle");
+                toggleMemberModal();
+              }}
+            >
+              Add member
+            </ButtonComponent>
+          </DropdownButton>
+        )}
+      </Text.MiddleLine>
+    </ContainerComponent.Flex>
+  );
 }
 function TimespanChild({ startTime = Date.now(), expireTime }) {
   const startDate = new Date(startTime).getTime();
@@ -332,7 +434,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
     days,
     hours,
     minutes,
-    seconds
+    seconds,
   });
   const [blockWorkspace, setBlockWorkspace] = useState(false);
 
@@ -341,7 +443,9 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       const now = new Date().getTime();
       var timeleft = expireDate - now;
       var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
-      var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var hours = Math.floor(
+        (timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
       var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
       if (days > 0) {
@@ -349,10 +453,9 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           days,
           hours,
           minutes,
-          seconds
+          seconds,
         });
-      }
-      else {
+      } else {
         setBlockWorkspace(true);
         setCounterTimer({
           days: 0,
@@ -365,64 +468,72 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
 
     return () => {
       clearInterval(interval);
-    }
+    };
   }, []);
 
-
   function convertTo2Digit(number) {
-    return number.toLocaleString('en-US', {
+    return number.toLocaleString("en-US", {
       minimumIntegerDigits: 2,
-      useGrouping: false
+      useGrouping: false,
     });
   }
   return (
     <ContainerComponent.Section className="timespan__container">
-      <ContainerComponent.Inner style={{ margin: "0 auto", textAlign: "center" }}>
-        {counterTimer.days > 0 && <ContainerComponent.Flex
-          style={{
-            // alignItems: 'center',
-            justifyContent: "center",
-          }}
-        >
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
+      <ContainerComponent.Inner
+        style={{ margin: "0 auto", textAlign: "center" }}
+      >
+        {(counterTimer.days > 0 && (
+          <ContainerComponent.Flex
+            style={{
+              // alignItems: 'center',
+              justifyContent: "center",
+            }}
           >
-            <ButtonComponent style={{ padding: "5px 15px" }}>
-              {`${counterTimer.days}`}
-            </ButtonComponent>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent style={{ padding: "5px 15px" }}>
+                {`${counterTimer.days}`}
+              </ButtonComponent>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item>
-            <Text>:</Text>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item>
+              <Text>:</Text>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${convertTo2Digit(counterTimer.hours)}`}</ButtonComponent>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent
+                style={{ padding: "5px 10px" }}
+              >{`${convertTo2Digit(counterTimer.hours)}`}</ButtonComponent>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item>
-            <Text>:</Text>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item>
+              <Text>:</Text>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent
+                style={{ padding: "5px 10px" }}
+              >{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item>
-            <Text>:</Text>
-          </ContainerComponent.Item>
+            <ContainerComponent.Item>
+              <Text>:</Text>
+            </ContainerComponent.Item>
 
-          <ContainerComponent.Item
-            style={{ fontSize: "13px", padding: "5px 0" }}
-          >
-            <ButtonComponent style={{ padding: "5px 10px" }}>{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
-          </ContainerComponent.Item>
-
-        </ContainerComponent.Flex> || <ContainerComponent.Pane>Closed</ContainerComponent.Pane>}
+            <ContainerComponent.Item
+              style={{ fontSize: "13px", padding: "5px 0" }}
+            >
+              <ButtonComponent
+                style={{ padding: "5px 10px" }}
+              >{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
+            </ContainerComponent.Item>
+          </ContainerComponent.Flex>
+        )) || <ContainerComponent.Pane>Closed</ContainerComponent.Pane>}
       </ContainerComponent.Inner>
     </ContainerComponent.Section>
   );
@@ -442,20 +553,33 @@ function Notification() {
     setIsNew(false);
   }
 
-  return <>
-    {device === media.MOBILE &&
-      <Icon.CircleIcon className="" onClick={turnOffBadge}>
-        <Link to="/portal/notification">
-          <IoNotificationsOutline></IoNotificationsOutline>
-        </Link>
-      </Icon.CircleIcon>
-      ||
-      <DropdownButton position="right" component={<Icon.CircleIcon onClick={turnOffBadge}>
-        <IoNotificationsOutline></IoNotificationsOutline>
-      </Icon.CircleIcon>} style={{ minWidth: '420px', maxHeight: '567px', overflowY: 'scroll', marginTop: '10px' }}>
-        <NotificationContainer></NotificationContainer>
-      </DropdownButton>
-    }
-    {isNew && <Icon.Badge></Icon.Badge>}
-  </>
+  return (
+    <>
+      {(device === media.MOBILE && (
+        <Icon.CircleIcon className="" onClick={turnOffBadge}>
+          <Link to="/portal/notification">
+            <IoNotificationsOutline></IoNotificationsOutline>
+          </Link>
+        </Icon.CircleIcon>
+      )) || (
+        <DropdownButton
+          position="right"
+          component={
+            <Icon.CircleIcon onClick={turnOffBadge}>
+              <IoNotificationsOutline></IoNotificationsOutline>
+            </Icon.CircleIcon>
+          }
+          style={{
+            minWidth: "420px",
+            maxHeight: "567px",
+            overflowY: "scroll",
+            marginTop: "10px",
+          }}
+        >
+          <NotificationContainer></NotificationContainer>
+        </DropdownButton>
+      )}
+      {isNew && <Icon.Badge></Icon.Badge>}
+    </>
+  );
 }
