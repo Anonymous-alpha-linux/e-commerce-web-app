@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ContainerComponent } from "../../components";
 import { DashboardOverview } from "../../containers";
 import { useAdminContext } from '../../redux';
@@ -58,7 +58,6 @@ Chart.register(
 );
 
 export default function Dashboard() {
-  const { statistics: { mostLikePosts, mostLikeUser } } = useAdminContext();
   return (
     <ContainerComponent className="dashboard__root">
       <ContainerComponent.Pane className="overview__container">
@@ -79,7 +78,7 @@ export default function Dashboard() {
 }
 
 function MostLikedPosts() {
-  const { statistics: { mostLikePosts } } = useAdminContext();
+  const { statistics: { mostLikePosts }, getMostLikePosts } = useAdminContext();
   let barData = {
     id: "1",
     labels: mostLikePosts.map(post => post.title),
@@ -97,6 +96,9 @@ function MostLikedPosts() {
       }
     ]
   }
+  useEffect(() => {
+    getMostLikePosts();
+  }, []);
   return (
     <PolarArea width={'100%'} height={'100%'}
       options={{ responsive: true, plugins: { title: { display: true, text: 'Top 3 most favorite post' } }, legend: { display: true, position: "bottom" } }}
@@ -104,8 +106,8 @@ function MostLikedPosts() {
 }
 
 function MostCategory() {
-  const { statistics: { mostCategories } } = useAdminContext();
-
+  const { statistics: { mostCategories }, getMostCategory
+  } = useAdminContext();
   let barData = {
     id: "1",
     labels: mostCategories.map(c => c.name),
@@ -124,6 +126,9 @@ function MostCategory() {
       }
     ]
   }
+  useEffect(() => {
+    getMostCategory();
+  }, []);
 
   return (
     <Pie width={'100%'} height={'100%'}

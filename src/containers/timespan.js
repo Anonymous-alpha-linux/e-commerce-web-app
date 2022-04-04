@@ -53,7 +53,7 @@ export default function Timespan({
         return () => {
             clearInterval(interval);
         }
-    }, []);
+    }, [expireTime]);
 
     function convertTo2Digit(number) {
         return number.toLocaleString('en-US', {
