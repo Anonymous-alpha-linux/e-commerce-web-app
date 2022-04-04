@@ -58,22 +58,21 @@ AnimateComponent.SlideRight = function AnimatedSlideRight({
 
 AnimateComponent.Dropdown = function AnimatedDropdown({
   children,
-  height,
   style,
   ...props
 }) {
   const arrChild = React.Children.toArray(children);
   const transition = useTransition(arrChild, {
     keys: (item) => item.key,
-    from: { height: 0 },
-    enter: { height: height, overflow: "hidden", ...style },
-    leave: { height: 0 },
-    expires: 200,
+    from: { maxHeight: 0 },
+    enter: { maxHeight: 800, overflow: "hidden", ...style },
+    leave: { maxHeight: 0 },
+    config: { duration: 600 },
   });
   return transition(
-    (style, item) =>
+    (prop, item) =>
       item && (
-        <animated.div style={style} {...props}>
+        <animated.div style={prop} {...props}>
           {item}
         </animated.div>
       )
@@ -116,6 +115,25 @@ AnimateComponent.Zoom = function AnimatedZoom({
     (style, item) =>
       item && (
         <animated.div style={style} {...props}>
+          {item}
+        </animated.div>
+      )
+  );
+};
+
+AnimateComponent.Width = function AnimateWidth({ children, style, ...props }) {
+  const arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
+    from: { maxWidth: 0, opacity: 0 },
+    enter: { maxWidth: 200, opacity: 1, ...style },
+    leave: { maxWidth: 0, opacity: 0 },
+    config: { duration: 400 },
+  });
+  return transition(
+    (prop, item) =>
+      item && (
+        <animated.div style={prop} {...props}>
           {item}
         </animated.div>
       )

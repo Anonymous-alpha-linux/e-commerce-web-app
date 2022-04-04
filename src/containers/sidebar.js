@@ -255,7 +255,7 @@ const EditToggle = ({ item, clickLoader }) => {
             </Text.MiddleLine>
           </AnimateComponent.Rotate>
         </ContainerComponent.Flex>
-        <AnimateComponent.Dropdown height={110}>
+        <AnimateComponent.Dropdown>
           {openDropdown && (
             <ContainerComponent.Flex style={{ flexDirection: "column" }}>
               <ContainerComponent.Item>

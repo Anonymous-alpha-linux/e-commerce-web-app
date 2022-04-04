@@ -14,7 +14,15 @@ import { ImSpinner } from "react-icons/im";
 
 import logo from "../assets/Logoidea2.jpg";
 
-import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
+import {
+  ButtonComponent,
+  ContainerComponent,
+  Icon,
+  Text,
+  Form,
+  AnimateComponent,
+} from "../components";
+import { Searchbar } from ".";
 import { navigator as navigators, navData, roles, media } from "../fixtures";
 import {
   useAuthorizationContext,
@@ -22,7 +30,7 @@ import {
   useWorkspaceContext,
 } from "../redux";
 import DropdownButton from "./dropDownButton";
-import { useMedia, useModal } from "../hooks";
+import { useMedia, useModal, OutsideAlert } from "../hooks";
 import Modal from "./modal";
 import NotificationContainer from "./notification";
 import { ListMember, UserAll } from "../pages";
@@ -32,6 +40,7 @@ export default function Navigation() {
   const [screenColumn, setScreenColumn] = useState(2);
   const [openNavigator, setOpenNavigator] = useState(false);
   const [openMemberModal, toggleMemberModal] = useModal();
+  const [openSearch, setOpenSearch] = useState(false);
   const navigate = useNavigate();
 
   const responsiveHandler = () => {
@@ -86,7 +95,21 @@ export default function Navigation() {
                 <Icon.Image src={logo} alt={"logo"}></Icon.Image>
               </Icon.CircleIcon>
             </ContainerComponent.Item>
-            <ContainerComponent.Item>
+            <ContainerComponent.Item
+              onClick={() => {
+                setOpenSearch((prev) => !prev);
+              }}
+            >
+              <AnimateComponent.Width>
+                {openSearch && (
+                  <OutsideAlert
+                    style={{ position: "absolute" }}
+                    toggleShowing={() => setOpenSearch((prev) => !prev)}
+                  >
+                    <Form.Input placeholder="Search post/username/workspace"></Form.Input>
+                  </OutsideAlert>
+                )}
+              </AnimateComponent.Width>
               <Link
                 to="/portal/search"
                 style={{
@@ -98,7 +121,7 @@ export default function Navigation() {
                   margin: 0,
                 }}
               >
-                <IoSearchSharp></IoSearchSharp>
+                {!openSearch && <IoSearchSharp></IoSearchSharp>}
               </Link>
             </ContainerComponent.Item>
           </ContainerComponent.Flex>

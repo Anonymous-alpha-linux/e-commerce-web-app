@@ -38,7 +38,7 @@ export default function DropdownButton({
               }
             }
           >
-            <AnimateComponent.Dropdown height={height}>
+            <AnimateComponent.Dropdown>
               {React.Children.toArray(children).map((item, index) => {
                 return (
                   <DropDown.Item
