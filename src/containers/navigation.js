@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaBell } from 'react-icons/fa';
 import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
 import { IoNotificationsOutline, IoSearchSharp, IoHomeSharp } from "react-icons/io5";
 import { BsList, BsCaretDownFill } from "react-icons/bs";
 import { GrStackOverflow } from 'react-icons/gr';
-
 import logo from '../assets/Logoidea2.jpg';
-
 import { ButtonComponent, ContainerComponent, Dropdown, Icon, Text } from "../components";
 import { navigator as navigators, navData, roles, media } from '../fixtures';
 import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
@@ -16,6 +13,7 @@ import DropdownButton from "./dropDownButton";
 import { useMedia, useModal } from "../hooks";
 import Modal from "./modal";
 import NotificationContainer from "./notification";
+import { Logo } from ".";
 
 export default function Navigation() {
   const [screenColumn, setScreenColumn] = useState(2);
@@ -25,7 +23,7 @@ export default function Navigation() {
 
   const responsiveHandler = () => {
     const { width } = window.screen;
-    if (width <= 650) {
+    if (width <= 768) {
       setScreenColumn(2);
     } else {
       setScreenColumn(3);
@@ -52,53 +50,34 @@ export default function Navigation() {
             }}
           >
             <ContainerComponent.Item>
-              <Icon.CircleIcon onClick={() => navigate('/', {
+              <ContainerComponent.Inner onClick={() => navigate('/', {
                 replace: true
               })}>
-                {/* <IoLogoApple></IoLogoApple> */}
-                <Icon.Image src={logo} alt={'logo'}></Icon.Image>
-              </Icon.CircleIcon>
-            </ContainerComponent.Item>
-            <ContainerComponent.Item>
-              <Link to="/portal/search"
-                style={{
-                  paddingLeft: "0",
-                  color: "#fff",
-                  display: "inline-block",
-                  verticalAlign: "middle",
-                  lineHeight: "100%",
-                  margin: 0,
-                }}
-              >
-                <IoSearchSharp></IoSearchSharp>
-              </Link>
+                <Logo></Logo>
+              </ContainerComponent.Inner>
             </ContainerComponent.Item>
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
         {screenColumn > 2 && (
           <ContainerComponent.Item style={{ color: '#fff' }}>
-            <ContainerComponent.MiddleInner style={{ flexDirection: 'row', height: '100%', gap: '1.2rem' }}>
+            <ContainerComponent.MiddleInner style={{ flexDirection: 'row', height: '100%', gap: '2.5rem' }}>
               <ContainerComponent.Item>
-                <Link to="/" style={{ color: '#fff' }}>
-                  <Text.MiddleLine style={{ marginRight: '5px' }}>
-                    <Icon>
-                      <IoHomeSharp></IoHomeSharp>
-                    </Icon>
-                  </Text.MiddleLine>
-                  <Text>Home</Text>
+                <Link to="/" style={{display:"flex",justifyContent:"center",alignItems:"center",color: '#fff' }}>
+                  <Text style={{background:"0"}} className="navigation__text">Home</Text>
                 </Link>
               </ContainerComponent.Item>
               <DropdownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
-                <Text style={{ marginRight: '5px' }}>Workspace</Text>
-                <Text.MiddleLine>
-                  <Icon>
-                    <BsCaretDownFill></BsCaretDownFill>
-                  </Icon>
-                </Text.MiddleLine>
+                <ContainerComponent.Inner style={{display:"flex"}}>
+                  <Text className="navigation__text" style={{ marginRight: '5px' }}>Workspace</Text>
+                  <Text.MiddleLine>
+                    <Icon>
+                      <BsCaretDownFill></BsCaretDownFill>
+                    </Icon>
+                  </Text.MiddleLine>
+                </ContainerComponent.Inner>
               </>}>
                 <WorkspaceList></WorkspaceList>
               </DropdownButton>
-
               {navData.map((link, index) => {
                 return <ContainerComponent.Item key={index + 1}>
                   {link.path && <Link
@@ -107,14 +86,14 @@ export default function Navigation() {
                     {/* <Text.MiddleLine style={{ marginRight: '5px' }}>
                         <Icon>{link.icon}</Icon>
                       </Text.MiddleLine> */}
-                    <Text>
+                    <Text className="navigation__text">
                       {link.name}
                     </Text>
                   </Link> || <>
                       {/* <Text.MiddleLine style={{ marginRight: '5px' }}>
                           <Icon>{link.icon}</Icon>
                         </Text.MiddleLine> */}
-                      <Text>
+                    <Text className="navigation__text">
                         {link.name}
                       </Text>
                     </>}
@@ -246,17 +225,17 @@ const AuthStatus = React.memo(function AuthStatus({
           </Link>
         </Icon.CircleIcon>
       </ContainerComponent.Item> */}
-      <ContainerComponent.Item>
+      <ContainerComponent.Item className="navigation__bell">
         {device === media.MOBILE &&
           <Icon.CircleIcon className="" onClick={turnOffBadge}>
             <Link to="/portal/notification">
-              <IoNotificationsOutline></IoNotificationsOutline>
+              <FaBell style={{ color: "#163D3C" }}></FaBell>
             </Link>
           </Icon.CircleIcon>
           ||
           <DropdownButton position="right" component={<Icon.CircleIcon onClick={turnOffBadge}>
-            <IoNotificationsOutline></IoNotificationsOutline>
-          </Icon.CircleIcon>} style={{ minWidth: '420px', maxHeight: '567px', overflowY: 'scroll' }}>
+            <FaBell style={{ color:"#163D3C"}}></FaBell>
+          </Icon.CircleIcon>} style={{ minWidth: '420px', maxHeight: '567px', overflowY: 'scroll',transform:"translate(12%,2%)" }}>
             <NotificationContainer></NotificationContainer>
           </DropdownButton>
         }
@@ -265,16 +244,18 @@ const AuthStatus = React.memo(function AuthStatus({
       </ContainerComponent.Item>
       <ContainerComponent.Item>
         {screenColumn < 3 &&
-          <Icon.CircleIcon onClick={openNavigator}>
-            <BsList></BsList>
-          </Icon.CircleIcon>
+            <Icon.CircleIcon onClick={openNavigator}>
+              <BsList style={{fontWeight:"600",fontSize:"20px"}}></BsList>
+            </Icon.CircleIcon>
           ||
-          <Text.MiddleLine style={{ verticalAlign: 'text-bottom' }}>
-            <Link to={"/"} style={{
+          <Text.MiddleLine className="navigation__logoutFrame">
+            <Link to={"/"}
+            className="navigation__logOut"
+            style={{
               color: '#fff'
             }} onClick={logout}>
-              <ButtonComponent >
-                Logout
+              <ButtonComponent className="navigation__logout">
+                Log out
               </ButtonComponent>
             </Link>
           </Text.MiddleLine>
@@ -296,18 +277,18 @@ const WorkspaceList = () => {
     {!!workspaces.length && workspaces.map((item, index) => {
       const disabled = user.workspace === item._id;
       const disabledStyled = () => ({
-        background: `${disabled ? '#f2f3f4' : "rgb(22, 61, 60)"}`,
+        background: `${disabled ? '#fff' : "rgb(22, 61, 60)"}`,
         color: `${disabled ? '#000' : "#fff"}`,
       })
-      return <ContainerComponent.Item className="workspaceList__item" key={index + 1} onClick={(e) => {
+      return <ContainerComponent.Item key={index + 1} onClick={(e) => {
         e.stopPropagation();
         if (!disabled) {
           selectHandler(item._id);
         }
-      }} style={{ width: "100%", padding: "10px", minWidth: "280px", ...disabledStyled() }}>
+      }} style={{cursor:"pointer", width: "100%", padding: "10px", minWidth: "280px", ...disabledStyled() }}>
         <ContainerComponent.Flex style={{ alignItems: "center", justifyContent: "space-between" }}>
           <Text.MiddleLine>
-            <Icon style={{ fontSize: "25px" }}>
+            <Icon style={{ fontSize: "25px",transform:"translateX(20%)"}}>
               <GrStackOverflow></GrStackOverflow>
             </Icon>
           </Text.MiddleLine>

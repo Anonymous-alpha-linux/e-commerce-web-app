@@ -1,0 +1,11 @@
+.myPost{
+    &__header{
+        background:white;
+    }
+    @media screen and (min-width:768px) {
+        &__header{
+            border-radius: 10px;
+            overflow: hidden;
+        }
+    }
+}

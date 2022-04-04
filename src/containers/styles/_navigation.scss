@@ -2,4 +2,58 @@
    &__grid {
       justify-content: space-between;
    }
+   &__text{
+      margin: 0%;
+      padding: 0%;
+      font-weight: 500;
+      background-color: none;
+      &:hover{
+         transform: translateY(-15%);
+      }
+   }
+   &__bell{
+      display: flex;
+      align-items: center;
+      transform:translateX(-30%);
+   }
+   &__logo{
+      cursor: pointer;
+      justify-content: center;
+      align-items: center;
+      border-radius: 5px;
+   }
+   &__logout{
+      background-color: #fff;
+      color: #163D3C;
+      padding: 5px;
+      border-radius: 15px;
+      width: 80px;
+      text-align: center;
+      border: 1px solid #163D3C;
+      font-weight: 500;
+      &:hover {
+         background-color: #163D3C;
+         color: white;
+         border: 1px solid #fff;
+         transition: all 0.3s;
+      }
+   }
+   @media screen and (min-width:768px) {
+      &__bell{
+         transform: translateX(-150%);
+      }
+      &__logOut{
+         vertical-align: bottom;
+         display: flex;
+         align-items: center;
+         transform:translateX(-35%);
+         justify-content: center;
+      }
+      &__logo{
+         margin-left: 30px;
+      }
+      &__logout{
+         margin-right: 16px;
+      }
+   }
 }

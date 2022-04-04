@@ -35,23 +35,27 @@ export default function Workspace() {
 
   return (
     <ContainerComponent className="workspace" id="workspace">
-      <Timespan expireTime={workspace.expireTime} setBlockWorkspace={setBlockWorkspace}></Timespan>
-      {!blockWorkspace && <PostForm></PostForm>}
-      <Filter
-        loader={filterPost}
-        selectOptions={[
-          {
-            label: "Most Recent",
-            value: 0,
-          },
-          {
-            label: "Most Liked",
-            value: 1,
-          },
-        ]}
-      ></Filter>
+      <ContainerComponent.Inner className="workspace__form">
+        <ContainerComponent.Inner className="workspace__innerForm">
+          <Timespan style={{width:"100vw"}} expireTime={workspace.expireTime} setBlockWorkspace={setBlockWorkspace}></Timespan>
+          {!blockWorkspace && <PostForm></PostForm>}
+          <Filter
+            loader={filterPost}
+            selectOptions={[
+              {
+                label: "Most Recent",
+                value: 0,
+              },
+              {
+                label: "Most Liked",
+                value: 1,
+              },
+            ]}
+          ></Filter>
+        </ContainerComponent.Inner>
+      </ContainerComponent.Inner>
       <LazyLoading loader={loadNextPosts}>
-        <List className="workspace__postList" ref={listRef}>
+        <List style={{ borderRadius: "10px", background:"#A9C39E"}} className="workspace__postList" ref={listRef}>
           {posts.map((post, index) => {
             const {
               _id,
@@ -100,14 +104,14 @@ console.log(post);
               comments,
             };
             return (
-              <List.Item key={`${post._id}-${index}`} id={post._id}>
-                <PostContainer
-                  postId={_id}
-                  postHeader={postHeader}
-                  postBody={postBody}
-                  postFooter={postFooter}
-                ></PostContainer>
-              </List.Item>
+                  <List.Item key={`${post._id}-${index}`} id={post._id}>
+                    <PostContainer
+                      postId={_id}
+                      postHeader={postHeader}
+                      postBody={postBody}
+                      postFooter={postFooter}
+                    ></PostContainer>
+                  </List.Item>
             );
           })}
         </List>

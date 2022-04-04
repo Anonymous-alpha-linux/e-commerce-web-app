@@ -64,6 +64,7 @@
          color: #000;
          -webkit-transition: visibility 0s linear 0s, opacity 0s;
          transition: visibility 0s linear 0s, opacity 0s;
+         padding: 5px;
       }
 
       &--off {
@@ -93,7 +94,7 @@
    }
 
    &__input:checked + &__slider {
-      background-color: #2196f3;
+      background-color: rgb(22, 61, 60);
       .switch__slider--off {
          opacity: 0;
          -webkit-transition: visibility 0s linear 0s, opacity 0s;
@@ -111,11 +112,12 @@
          vertical-align: middle;
          -webkit-transition: visibility 0s linear 0s, opacity 0.8s;
          transition: visibility 0s linear 0s, opacity 0.8s;
+         color:#fff;
       }
    }
 
    &__input:focus + &__slider {
-      box-shadow: 0 0 1px #2196f3;
+      box-shadow: 0 0 1px rgb(22, 61, 60);
    }
 
    &__input:checked + &__slider:before {
@@ -336,7 +338,18 @@ $fec-button-border-radius-default: 2px !default;
    @include pure-button(#368868, #368868, 1, 0, 1px solid #368868, 10px);
    border-radius: 20px;
 }
-
+.btn-rounded-Regis {
+   border-radius: 25px;
+   padding: 10px 12px;
+   background-color: #163D3C;
+   color: #fff;
+   border: none;
+   font-weight: 500;
+   &:hover{
+      background-color: #ffff;
+      color: #163D3C;
+   }
+}
 //Gobal Style for button
 //default variables
 $fec-button-border-default: none !default;

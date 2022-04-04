@@ -64,9 +64,10 @@ export default function Timespan({
 
     return <ContainerComponent.Section
         style={{
-            padding: '10px 0',
+            padding: '10px 10px',
+            background:"white"
         }}
-        className="timespan__container"
+        className="timespan"
     >
         <ContainerComponent.Inner
             style={{
@@ -74,7 +75,7 @@ export default function Timespan({
                 textAlign: 'center',
             }}
         >
-            <Text>Time to close Workspace</Text>
+            <Text style={{fontWeight:"600",fontSize:"17px"}}>Time to close Workspace</Text>
             {counterTimer.days > 0 && <ContainerComponent.Flex
                 style={{
                     // alignItems: 'center',
@@ -83,35 +84,35 @@ export default function Timespan({
                 }}
             >
                 <ContainerComponent.Item>
-                    <ButtonComponent>{counterTimer.days}</ButtonComponent>
-                    <Text.Bold>Days</Text.Bold>
+                    <ButtonComponent className="timeSpan__button" style={{ background: '#163D3C' }}>{counterTimer.days}</ButtonComponent>
+                    <Text.Bold style={{ color: '#163D3C' }}>Days</Text.Bold>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text>:</Text>
+                    <Text style={{ transform: "translateY(14%)", fontWeight: "700", color:"#163D3C"}}>:</Text>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${convertTo2Digit(counterTimer.hours)}`} </ButtonComponent>
-                    <Text.Bold>Hours</Text.Bold>
+                    <ButtonComponent className="timeSpan__button" style={{ background:'#163D3C'}}>{`${convertTo2Digit(counterTimer.hours)}`} </ButtonComponent>
+                    <Text.Bold style={{ color: '#163D3C' }}>Hours</Text.Bold>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text>:</Text>
+                    <Text style={{ transform: "translateY(14%)", fontWeight: "700", color: "#163D3C" }}>:</Text>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
-                    <Text.Bold>Minutes</Text.Bold>
+                    <ButtonComponent className="timeSpan__button" style={{ background: '#163D3C' }}>{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
+                    <Text.Bold style={{ color: '#163D3C' }}>Minutes</Text.Bold>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text>:</Text>
+                    <Text style={{ transform: "translateY(14%)", fontWeight: "700", color: "#163D3C" }}>:</Text>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent>{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
-                    <Text.Bold>Seconds</Text.Bold>
+                    <ButtonComponent className="timeSpan__button" style={{ background: '#163D3C' }}>{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
+                    <Text.Bold style={{ color: '#163D3C' }}>Seconds</Text.Bold>
                 </ContainerComponent.Item>
             </ContainerComponent.Flex> || <ContainerComponent.Pane style={{ color: "red", fontWeight: '600' }}>Closed</ContainerComponent.Pane>}
         </ContainerComponent.Inner>

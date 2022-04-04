@@ -64,24 +64,27 @@ const Login = () => {
   return (
     <>
       <ContainerComponent>
-        <ContainerComponent.Flex className={"signIn"}>
-          <ContainerComponent.Inner className={"signIn__green"}>
-            {/* <Text.Title style={{fontWeight:"500",fontSize:"25px"}} className={"signIn__text"}>Idea Hub</Text.Title> */}
-            <Text.Title className={"signIn__text"}>WELCOME !</Text.Title>
+        <ContainerComponent.Flex className="signIn">
+          <ContainerComponent.Inner className="signIn__green">
+            <ContainerComponent.Pane style={{transform:"translateY(-50%)"}}>
+              <Text.Title className="signIn__text">WELCOME !</Text.Title>
+              <Text.Title className="signIn__subText">Sign in to continute access the IdeaHub</Text.Title>
+            </ContainerComponent.Pane>  
           </ContainerComponent.Inner>
-          <ContainerComponent.Inner className={"signIn__content"}>
+          <ContainerComponent.Inner className="signIn__content">
+                  <ContainerComponent.Pane className="signIn__loginTitle">
+                    <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "28px",marginBottom:"10px" }}>Hello!</Text.Title>
+                    <ContainerComponent.Flex className="signIn__login">
+                      <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "21px" }}>Login</Text.Title>
+                      <Text.Title style={{ fontSize: "20px",fontWeight:"350",width:"fit-content" }}>Your Account</Text.Title>
+                    </ContainerComponent.Flex>
+                  </ContainerComponent.Pane>
             <Form className="signIn__form"
               method={"POST"}
               onSubmit={submitHandler}
             >
-              <Form.Container className={"signIn__formContainer"}>
+              <Form.Container className="signIn__formContainer">
                 <ContainerComponent.Flex style={{ flexDirection: "column", gap: "30px" }}>
-                  <ContainerComponent.Pane>
-                    <Icon className={"signIn__icon"}>
-                      <FaUserAlt style={{ transform: "translate(-50%,-150%)" }}></FaUserAlt>
-                    </Icon>
-                    <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "20px" }}>Login</Text.Title>
-                  </ContainerComponent.Pane>
                   <Form.Input
                     className={"signIn__input"}
                     placeholder="Email"
@@ -93,7 +96,7 @@ const Login = () => {
                   ></Form.Input>
 
                   <Form.Input
-                    className={"signIn__input"}
+                    className="signIn__input"
                     placeholder="Password"
                     type="password"
                     name="password"

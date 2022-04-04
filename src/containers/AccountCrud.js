@@ -4,7 +4,7 @@ import Pagination from "./Pagination";
 import { useAdminContext, useAuthorizationContext } from "../redux";
 import { mainAPI } from "../config";
 import useValidate from "../hooks/useValidate";
-import { Icon, Text } from "../components";
+import { ContainerComponent, Icon, Text } from "../components";
 import { Loader } from '../containers';
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { roles, toastTypes } from "../fixtures";
@@ -33,84 +33,92 @@ export default function AccountCrud() {
     });
   }, [data, currentPage]);
   return (
-    <div className="categoryCRUD__root">
-      <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
-        Register New Account
-      </button>
-      {modal && (
-        <div className="MadalBackDrop">
-          <div className="MobalCenter">
-            <ModalAddFormAccount setModal={setModal} modal={modal} />
-          </div>
-        </div>
-      )}
-
-      <div className="table__container" style={{ overflowX: 'scroll', boxShadow: '-1px 1px #000,-1px 1px #000', padding: '10px 0' }}>
-        <table className="table table-style">
-          <thead>
-            <tr>
-              <th scope="col" style={{ textAlign: "center", width: "5%" }}>
-                ID
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                User Name
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                Email
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                Register date
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                Role
-              </th>
-              <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                <SearchAccount
-                  accounts={data}
-                  searchInput={searchInput}
-                  setSearchInput={setSearchInput}
-                  setFilteredResults={setFilteredResults}
-                  currentTableData={data}
-                  filteredResults={filteredResults}
+    <ContainerComponent style={{ backgroundColor: "#A9C39E",height:"100%"}}>
+      <div className="categoryCRUD__root" style={{ margin: "0 auto"}}>
+        <ContainerComponent.Inner className="workspace__form" style={{margin:"0 auto"}}>
+          <ContainerComponent.Inner style={{overflow:"hiden"}} className="workspace__innerForm">
+            <div style={{padding: '10px'}}>
+              <button className="btn-rounded-Regis" style={{margin: "20px 0"}} onClick={() => setModal(!modal)}>
+                Register New Account
+              </button>
+              {modal && (
+                <div className="MadalBackDrop">
+                  <div className="MobalCenter">
+                    <ModalAddFormAccount setModal={setModal} modal={modal} />
+                  </div>
+                </div>
+              )}
+              <div className="table__container" style={{ overflowX: 'scroll', borderRadius:"15px",overflow:"hiden", padding: '10px 0', backgroundColor: "#fff" }}>
+                <table className="table table-style">
+                  <thead>
+                    <tr>
+                      <th scope="col" style={{ textAlign: "center", width: "4%" }}>
+                        ID
+                      </th>
+                      <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                        User Name
+                      </th>
+                      <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                        Email
+                      </th>
+                      <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                        Register date
+                      </th>
+                      <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                        Role
+                      </th>
+                      <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                        <SearchAccount
+                          accounts={data}
+                          searchInput={searchInput}
+                          setSearchInput={setSearchInput}
+                          setFilteredResults={setFilteredResults}
+                          currentTableData={data}
+                          filteredResults={filteredResults}
+                        />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (<tr>
+                      <td colSpan={6}>
+                        <Text.Line style={{ position: 'relative' }}>
+                          <Loader></Loader>
+                        </Text.Line>
+                      </td>
+                    </tr>) : searchInput !== ""
+                      ? filteredResults.map((accounts, index) => (
+                        <AccountData key={index} data={accounts} index={index} />
+                      ))
+                      : dataRecords.map((accounts, index) => (
+                        <AccountData key={index} data={accounts} index={index} />
+                      ))}
+                    {!data?.length && (
+                      <tr>
+                        <td>
+                          <h2>No Account</h2>
+                        </td>
+                        <td>
+                          <h2>Empty data</h2>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                <Pagination
+                  className="pagination-bar"
+                  currentPage={currentPage}
+                  totalCount={data.length}
+                  pageSize={PageSize}
+                  onPageChange={(page) => setCurrentPage(page)}
                 />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (<tr>
-              <td colSpan={6}>
-                <Text.Line style={{ position: 'relative' }}>
-                  <Loader></Loader>
-                </Text.Line>
-              </td>
-            </tr>) : searchInput !== ""
-              ? filteredResults.map((accounts, index) => (
-                <AccountData key={index} data={accounts} index={index} />
-              ))
-              : dataRecords.map((accounts, index) => (
-                <AccountData key={index} data={accounts} index={index} />
-              ))}
-            {!data?.length && (
-              <tr>
-                <td>
-                  <h2>No Account</h2>
-                </td>
-                <td>
-                  <h2>Empty data</h2>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <Pagination
-          className="pagination-bar"
-          currentPage={currentPage}
-          totalCount={data.length}
-          pageSize={PageSize}
-          onPageChange={(page) => setCurrentPage(page)}
-        />
+              </div>
+            </div>
+          </ContainerComponent.Inner>
+        </ContainerComponent.Inner>
       </div>
-    </div>
+
+    </ContainerComponent>
   );
 }
 function AccFormEdit({ modalEdit, setModalEdit, data }) {
@@ -214,6 +222,7 @@ function AccFormEdit({ modalEdit, setModalEdit, data }) {
                   value={input.username}
                 />
                 <button
+                  style={{fontSize:"12px"}}
                   type="submit"
                   className="submit_edit"
                   onClick={onSubmitName}
@@ -427,6 +436,14 @@ function ModalAddFormAccount({ setModal, modal }) {
   return (
     <>
       <div className="c-modal__containerAccount">
+        <div style={{textAlign: "right"}}>
+        <button
+          className="btn-trans-Cancel"
+          onClick={() => setModal(!modal)}
+        >
+          X
+        </button>
+        </div>
         <form>
           <div className="form-container">
             <div className="question-container">
@@ -522,12 +539,7 @@ function ModalAddFormAccount({ setModal, modal }) {
               >
                 Register
               </button>
-              <button
-                className="btn-trans-Cancel"
-                onClick={() => setModal(!modal)}
-              >
-                Close
-              </button>
+              
             </div>
           </div>
           {error && (
@@ -566,7 +578,7 @@ function AccountData({ data, index }) {
   }
   return (
     <tr key={index}>
-      <td style={{ textAlign: "center", width: "5%" }}>{index + 1}</td>
+      <td style={{ textAlign: "center", width: "1%" }}>{index + 1}</td>
       <td style={{ textAlign: "center", width: "10%", marginLeft: "5%" }}>
         {data.username}
       </td>
@@ -595,6 +607,7 @@ function AccountData({ data, index }) {
         </Modal>
         {data._id !== user.accountId &&
           <button
+          style={{margin: "3px"}}
             onClick={toggleModalEdit}
             className="btn-warning"
           >
