@@ -46,7 +46,7 @@ function DashBoardHeader({ children }) {
           </ContainerComponent.Item>
         </ContainerComponent.Flex>
       </ContainerComponent>
-      <ContainerComponent className="manager__body">
+      <ContainerComponent className="manager__body" style={{ background: '#A9C39E'}}>
         <AnimateComponent.SlideRight className="sidebar__root" state={openSideBar}>
           <Sidebar closeSidebar={() => toggleSidebar()}></Sidebar>
         </AnimateComponent.SlideRight>

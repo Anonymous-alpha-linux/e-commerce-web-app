@@ -6,7 +6,9 @@ export default function Staff() {
   return <>
     <Nav></Nav>
     <ContainerComponent className="staff__root" style={{
-      height: '100%'
+      background:"#A9C39E",
+      width:"100%",
+      height: 'fix-content'
     }}>
       <Outlet></Outlet>
     </ContainerComponent>
