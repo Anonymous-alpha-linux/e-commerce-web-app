@@ -10,7 +10,7 @@ import { ImSpinner } from 'react-icons/im';
 
 import logo from '../assets/Logoidea2.jpg';
 
-import { ButtonComponent, ContainerComponent, Icon, Text } from "../components";
+import { AnimateComponent, ButtonComponent, ContainerComponent, Icon, Text } from "../components";
 import { navigator as navigators, navData, roles, media } from '../fixtures';
 import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
 import DropdownButton from "./dropDownButton";
@@ -91,7 +91,8 @@ export default function Navigation() {
                   <Text>Home</Text>
                 </Link>
               </ContainerComponent.Item>
-              <DropdownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
+
+              {/* <DropdownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
                 <Text style={{ marginRight: '5px' }}>Workspace</Text>
                 <Text.MiddleLine>
                   <Icon>
@@ -100,7 +101,11 @@ export default function Navigation() {
                 </Text.MiddleLine>
               </>}>
                 <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
-              </DropdownButton>
+              </DropdownButton> */}
+
+              <AnimateComponent.Dropdown style={{ marginTop: '16px' }} triggerComponent={<Text style={{ marginRight: '5px' }}>Workspace</Text>}>
+                <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
+              </AnimateComponent.Dropdown>
               {navData.map((link, index) => {
                 return <ContainerComponent.Item key={index + 1}>
                   {link.path && <Link to={link.path}
@@ -276,6 +281,7 @@ const WorkspaceList = ({ toggleMemberModal }) => {
 }
 function WorkspaceItem({ item, toggleMemberModal }) {
   const { user, editCurrentWorkspace } = useAuthorizationContext();
+  const { workspace } = useWorkspaceContext();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -317,13 +323,12 @@ function WorkspaceItem({ item, toggleMemberModal }) {
     </Text.MiddleLine>
 
     <Text.MiddleLine>
-      {user.role !== roles.STAFF && <DropdownButton position="left" component={<ContainerComponent.Pane>
+      {user.accountId === item.manager && <DropdownButton position="left" component={<ContainerComponent.Pane>
         <Icon>
           <AiFillCaretDown></AiFillCaretDown>
         </Icon>
       </ContainerComponent.Pane>}>
         <ButtonComponent onClick={() => {
-          console.log("toggle");
           toggleMemberModal();
         }}>Add member</ButtonComponent>
       </DropdownButton>

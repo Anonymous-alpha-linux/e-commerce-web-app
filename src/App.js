@@ -49,7 +49,6 @@ function App() {
 
   return (
     <BrowserRouter>
-      {/* {user.role === roles.STAFF && } */}
       <Routes>
         <Route element={<Layout></Layout>}>
           <Route path="login" element={<Login></Login>}></Route>
