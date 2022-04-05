@@ -54,93 +54,105 @@ export default function AttachmentCRUD() {
     });
   }
   return (
-    <div className="categoryCRUD__root">
-      <ContainerComponent.Inner className="categoryCRUD__inner" style={{ width: 'fit-content', margin: '0 auto' }}>
-        <div className="table__container" style={{ overflowX: 'scroll' }}>
-          <table className="table table-style">
-            <thead>
-              <tr>
-                <th scope="col" style={{ textAlign: "center", width: "3%" }}>
-                  No
-                </th>
-                <th scope="col" style={{ textAlign: "center", width: "15%" }}>
-                  File Name
-                </th>
-                <th scope="col" style={{ textAlign: "center", width: "5%" }}>
-                  Type
-                </th>
-                <th scope="col" style={{ textAlign: "center", width: "5%" }}>
-                  Size
-                </th>
-                <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                  Date
-                </th>
-                <th scope="col" style={{ textAlign: "center", width: "10%" }}>
-                  {/* <SearchAttachment
-                    Attechment={attachRecord}
-                    searchInput={searchInput}
-                    setSearchInput={setSearchInput}
-                    setFilteredResults={setFilteredResults}
-                    currentTableData={attachRecord}
-                    filteredResults={filteredResults}
-                  /> */}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {attachments.loading ?
-                (<tr>
-                  <td colSpan={6}>
-                    <Text.Line style={{ position: 'relative' }}>
-                      <Loader></Loader>
-                    </Text.Line>
-                  </td>
-                </tr>)
-                :
-                !attachments.data?.length ?
-                  (
-                    <tr>
-                      <td>
-                        <h2>No Category</h2>
-                      </td>
-                      <td>
-                        <h2>Empty</h2>
-                      </td>
-                    </tr>
-                  )
+    <div className="categoryCRUD__root" style={{display:"flex",justifyContent:"center"}}>
+      <ContainerComponent.Inner style={{
+        flexGrow: "1",
+        padding:"20px",
+        maxWidth:"1320px",
+        margin:"25px",
+        display:"block",
+        background:"#DCE7D7",
+        borderRadius:"10px",
+        overflow:"hidden"
+      }}>
+        <ContainerComponent.Inner className="categoryCRUD__inner" style={{maxWidth:"1300px", margin: '0 auto',borderRadius:"10px",overflow:"hidden" }}>
+          <div className="table__container" style={{ overflowX: 'scroll',width:"100%" }}>
+            <table className="table table-style" style={{ width: "100%" }}>
+              <thead>
+                <tr style={{ background: "#f2f8fb" }} >
+                  <th scope="col" style={{ padding: "10px", textAlign: "center", width: "3%" }}>
+                    No
+                  </th>
+                  <th scope="col" style={{ textAlign: "center", width: "15%" }}>
+                    File Name
+                  </th>
+                  <th scope="col" style={{ textAlign: "center", width: "5%" }}>
+                    Type
+                  </th>
+                  <th scope="col" style={{ textAlign: "center", width: "5%" }}>
+                    Size
+                  </th>
+                  <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                    Date
+                  </th>
+                  <th scope="col" style={{ textAlign: "center", width: "10%" }}>
+                    {/* <SearchAttachment
+                      Attechment={attachRecord}
+                      searchInput={searchInput}
+                      setSearchInput={setSearchInput}
+                      setFilteredResults={setFilteredResults}
+                      currentTableData={attachRecord}
+                      filteredResults={filteredResults}
+                    /> */}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {attachments.loading ?
+                  (<tr>
+                    <td colSpan={6}>
+                      <Text.Line style={{ position: 'relative' }}>
+                        <Loader></Loader>
+                      </Text.Line>
+                    </td>
+                  </tr>)
                   :
-                  searchInput !== "" ?
-                    filteredResults.map((attachment, index) => {
-                      return (
-                        <AttachmentData
+                  !attachments.data?.length ?
+                    (
+                      <tr>
+                        <td>
+                          <h2>No Category</h2>
+                        </td>
+                        <td>
+                          <h2>Empty</h2>
+                        </td>
+                      </tr>
+                    )
+                    :
+                    searchInput !== "" ?
+                      filteredResults.map((attachment, index) => {
+                        return (
+                          <AttachmentData
+                            key={index}
+                            data={attachment}
+                            index={index}
+                            deleteAttachment={deleteAttachment}
+                          />
+                        )
+                      })
+                      :
+                      dataRecords.map((attachment, index) => {
+                        return <AttachmentData
                           key={index}
                           data={attachment}
                           index={index}
                           deleteAttachment={deleteAttachment}
                         />
-                      )
-                    })
-                    :
-                    dataRecords.map((attachment, index) => {
-                      return <AttachmentData
-                        key={index}
-                        data={attachment}
-                        index={index}
-                        deleteAttachment={deleteAttachment}
-                      />
-                    })
-              }
-            </tbody>
-          </table>
-        </div>
-        <SecondPagination
-          page={currentPage}
-          firstPage={1}
-          lastPage={attachments.pages}
-          onChangePage={changeCurrentPage}
-          onLoadData={getAttachmentByPageRef.current}
-        ></SecondPagination>
-        {/* <SecondPagination page={currentPage} pages={attachments.pages} changePage={changeCurrentPage}></SecondPagination> */}
+                      })
+                }
+              </tbody>
+            </table>
+          </div>
+          <SecondPagination
+            page={currentPage}
+            firstPage={1}
+            lastPage={attachments.pages}
+            onChangePage={changeCurrentPage}
+            onLoadData={getAttachmentByPageRef.current}
+          ></SecondPagination>
+          {/* <SecondPagination page={currentPage} pages={attachments.pages} changePage={changeCurrentPage}></SecondPagination> */}
+        </ContainerComponent.Inner>
+
       </ContainerComponent.Inner>
     </div>
   );
@@ -183,18 +195,21 @@ function AttachmentData({ data, deleteAttachment, index }) {
         <button
           onClick={() => toggleModalDetail()}
           className="btn-blue"
+          style={{margin:"5px"}}
         >
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>
         <button
           onClick={() => { downloadSingleAttachment(data._id) }}
           className="btn-green"
+          style={{ margin: "5px" }}
         >
           {data._id === "" ? <span></span> : <span>Download</span>}
         </button>
         <button
           onClick={() => deleteAttachment(data._id)}
           className="btn-red"
+          style={{ margin: "5px" }}
         >
           {data._id === "" ? <span></span> : <span>Delete</span>}
         </button>

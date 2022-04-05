@@ -9,55 +9,34 @@ export default function DashboardOverview() {
     const { totalWorkspace, totalPost, totalUser } = useAdminContext();
     const device = useMedia(420, 1080);
     return (
-        <ContainerComponent>
-            <ContainerComponent.GridThreeColumns style={{ color: 'white', justifyContent: 'center', width: '100%', fontSize: '12px', gridTemplateColumns: `${device === media.MOBILE ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'}` }}>
-                <ContainerComponent.Item >
-                    <div className="square" style={{
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'green',
-                        padding: '20px',
-                        borderRadius: '20px'
-                    }}>
-                        <Text.CenterLine>
-                            {totalWorkspace}
+        <ContainerComponent style={{borderRadius:"10px"}}>
+            <ContainerComponent.Inner style={{width:"100%"}}>
+                <Text.Title className="overview__title">OverView</Text.Title>
+            </ContainerComponent.Inner>
+            <ContainerComponent.GridThreeColumns style={{ color: 'white',alignContent:"center", justifyContent: 'center', width: '100%', fontSize: '12px', gridTemplateColumns: `${device === media.MOBILE ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'}` }}>
+                <ContainerComponent.Item className="overview__square">
+                        <Text.CenterLine style={{fontSize:'25px',fontWeight:"600"}}>
+                            {totalWorkspace}    
                         </Text.CenterLine>
-                        <Text.CenterLine>
+                        <Text.CenterLine className="overview__text">
                             Total Workspace
                         </Text.CenterLine>
-                    </div>
                 </ContainerComponent.Item>
-                <ContainerComponent.Item>
-                    <div className="square" style={{
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'green',
-                        padding: '20px',
-                        borderRadius: '20px'
-                    }}>
-                        <Text.CenterLine>
+                <ContainerComponent.Item className="overview__square">
+                    <Text.CenterLine style={{ fontSize: '25px', fontWeight: "600" }}>
                             {totalPost}
                         </Text.CenterLine>
-                        <Text.CenterLine>
+                        <Text.CenterLine className="overview__text">
                             Total Post
                         </Text.CenterLine>
-                    </div>
                 </ContainerComponent.Item>
-                <ContainerComponent.Item>
-                    <div className="square" style={{
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'green',
-                        padding: '20px',
-                        borderRadius: '20px'
-                    }}>
-                        <Text.CenterLine>
+                <ContainerComponent.Item className="overview__square">
+                    <Text.CenterLine style={{ fontSize: '25px', fontWeight: "600" }}>
                             {totalUser}
                         </Text.CenterLine>
-                        <Text.CenterLine>
+                        <Text.CenterLine className="overview__text">
                             Total User
                         </Text.CenterLine>
-                    </div>
                 </ContainerComponent.Item>
             </ContainerComponent.GridThreeColumns>
         </ContainerComponent>

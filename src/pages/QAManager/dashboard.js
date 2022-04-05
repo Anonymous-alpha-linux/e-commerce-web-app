@@ -60,17 +60,17 @@ Chart.register(
 export default function Dashboard() {
   const { statistics: { mostLikePosts, mostLikeUser } } = useAdminContext();
   return (
-    <ContainerComponent className="dashboard__root">
-      <ContainerComponent.Pane className="overview__container">
+    <ContainerComponent style={{ background:"#A9C39E"}} className="dashboard__root">
+      <ContainerComponent.Pane style={{padding:"15px",margin:"20px 10px"}} className="workspace__innerForm">
         <DashboardOverview></DashboardOverview>
       </ContainerComponent.Pane>
-      <ContainerComponent.Pane style={{ padding: '32px 10px', overflowX: 'scroll' }}>
-        <ContainerComponent.Inner style={{ maxWidth: '650px', height: '100%', borderRadius: '20px', border: '1px solid #000', margin: '0 auto', }}>
+      <ContainerComponent.Pane className="workspace__innerForm" style={{margin:"10px",border:"none", padding: '15px 15px', overflowX: 'scroll' }}>
+        <ContainerComponent.Inner style={{background:"#fff", maxWidth: '640px', height: '100%', borderRadius: '10px', margin: '0 auto', }}>
           <MostLikedPosts></MostLikedPosts>
         </ContainerComponent.Inner>
       </ContainerComponent.Pane>
-      <ContainerComponent.Pane style={{ padding: '32px 10px', overflowX: 'scroll' }}>
-        <ContainerComponent.Inner style={{ maxWidth: '650px', height: '100%', borderRadius: '20px', border: '1px solid #000', margin: '0 auto' }}>
+      <ContainerComponent.Pane className="workspace__innerForm" style={{ margin: "20px 10px", border: "none", padding: '15px 15px', overflowX: 'scroll'}}>
+        <ContainerComponent.Inner style={{background:"white", maxWidth: '640px', height: '100%', borderRadius: '10px', margin: '0 auto' }}>
           <MostCategory></MostCategory>
         </ContainerComponent.Inner>
       </ContainerComponent.Pane>

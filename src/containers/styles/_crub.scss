@@ -150,7 +150,10 @@ $color-accent-light: #40916c;
 .submit_category:hover {
    @include shadow($color-dark);
 }
+// input:focus{
+//    outline: none;
 
+// }
 .table {
    &.table-style {
       border-collapse: separate;
@@ -161,7 +164,6 @@ $color-accent-light: #40916c;
             border-left: 0 solid #f4f9fb;
          }
          &:hover {
-            background-color: #f2f8fb !important;
          }
       }
 
@@ -179,7 +181,7 @@ $color-accent-light: #40916c;
 
       & > tbody {
          & > tr {
-            box-shadow: 1px 0px 7px 0 rgba(55, 64, 68, 0.6);
+            // box-shadow: 1px 0px 7px 0 rgba(55, 64, 68, 0.6);
             background: #fff;
             & > td {
                border-bottom: 3px solid rgb(57, 66, 57);

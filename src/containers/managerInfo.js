@@ -38,7 +38,7 @@ export default function ManagerInfo() {
   }, [workspace]);
 
   return (
-    <ContainerComponent style={{ padding: "10px", }}>
+    <ContainerComponent>
       <ContainerComponent.Inner className="personal__green">
         <ContainerComponent.Pane className="personal__frameAva" style={{ position: "relative", }}>
           <Text.CenterLine
@@ -83,25 +83,25 @@ export default function ManagerInfo() {
             maxWidth: "720px",
             width: '100%'
           }}>
-            <Text.Title style={{ lineHeight: "2px", textIndent: "10px", transform: "translateY(20px)", }}>
+            <Text.Title style={{ lineHeight: "2px", textIndent: "10px", transform: "translate(10px,24px)", }}>
               Profile
             </Text.Title>
-            <Form.TextArea readOnly={true} rows={15} style={{ width: "100%", borderRadius: "20px", padding: "30px 0 0 10px", }} value={profile.introduction} placeholder="Your introduction"></Form.TextArea>
-            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800, }}>
+            <Form.TextArea readOnly={true} rows={15} style={{ width: "100%", borderRadius: "10px", padding: "40px 10px 10px 20px", }} value={profile.introduction} placeholder="Your introduction"></Form.TextArea>
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translate(10px,24px)", fontWeight: 800, }}>
               <Text.Label>Gender</Text.Label>
             </Text.MiddleLine>
-            <Form.Input readOnly={true} style={{ textAlign: "right", }} value={profile.gender.toUpperCase()} placeholder="Post your information"></Form.Input>
+            <Form.Input readOnly={true} style={{ border: "1px solid #163D3C", textAlign: "right", borderRadius: "10px" }} value={profile.gender.toUpperCase()} placeholder="Post your information"></Form.Input>
 
-            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800 }}>
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translate(10px,24px)", fontWeight: 800 }}>
               <Text.Label>Age</Text.Label>
             </Text.MiddleLine>
-            <Form.Input placeholder="Choose Date" readOnly={true} value={profile.age} style={{ textAlign: "right", }}></Form.Input>
-            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800, }}>
+            <Form.Input placeholder="Choose Date" readOnly={true} value={profile.age} style={{ border: "1px solid #163D3C", textAlign: "right", borderRadius: "10px" }}></Form.Input>
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translate(10px,24px)", fontWeight: 800, }}>
               <Text.Label>Email</Text.Label>
             </Text.MiddleLine>
-            <Form.Input placeholder="Post your information" readOnly={true} style={{ textAlign: "right", }} value={profile.email}></Form.Input>
+            <Form.Input placeholder="Post your information" readOnly={true} style={{ border: "1px solid #163D3C", textAlign: "right", borderRadius: "10px" }} value={profile.email}></Form.Input>
 
-            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translateY(25px)", fontWeight: 800, }}  >
+            <Text.MiddleLine style={{ lineHeight: 0, textIndent: "5px", transform: "translate(10px,24px)", fontWeight: 800, }}  >
               <Text.Label>Department</Text.Label>
             </Text.MiddleLine>
             <Form.Input
@@ -109,7 +109,9 @@ export default function ManagerInfo() {
               readOnly={true}
               value={workspace.workTitle}
               style={{
+                border: "1px solid #163D3C",
                 textAlign: "right",
+                borderRadius:"10px"
               }}
             ></Form.Input>
           </ContainerComponent.Inner>

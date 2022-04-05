@@ -110,11 +110,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-<<<<<<< HEAD
-        // setPost({
-        //   type: actions.SET_OFF_LOADING,
-        // });
-=======
         pushToast({
           message: "Get Post Successful",
           type: toastTypes.SUCCESS
@@ -122,7 +117,6 @@ export default React.memo(function PostContext({ children }) {
         setPost({
           type: actions.SET_OFF_LOADING,
         });
->>>>>>> refs/remotes/origin/khanh
         return setPost({
           type: actions.GET_POST_LIST,
           payload: res.data.response,
@@ -162,12 +156,6 @@ export default React.memo(function PostContext({ children }) {
         });
       })
       .catch((error) => {
-<<<<<<< HEAD
-        // setPost({
-        //   type: actions.SET_OFF_LOADING,
-        // });
-        setError(error.message);
-=======
         setPost({
           type: actions.SET_OFF_LOADING,
         });
@@ -175,7 +163,6 @@ export default React.memo(function PostContext({ children }) {
           message: "Filter Failed",
           type: toastTypes.ERROR
         });
->>>>>>> refs/remotes/origin/khanh
       });
   }
   function loadNextPosts(cb) {
@@ -402,14 +389,11 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-<<<<<<< HEAD
-=======
         pushToast({
           message: "Edit Idea Successful",
           type: toastTypes.SUCCESS
         });
         console.log(res.data.response);
->>>>>>> refs/remotes/origin/khanh
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
@@ -493,13 +477,10 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-<<<<<<< HEAD
-=======
         pushToast({
           message: "Get Post Successful",
           type: toastTypes.SUCCESS
         });
->>>>>>> refs/remotes/origin/khanh
         setPost({
           type: actions.GET_MY_POST,
           payload: res.data.response,
