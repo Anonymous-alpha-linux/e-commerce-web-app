@@ -1,9 +1,10 @@
-import React from 'react';
-import { ContainerComponent } from '../../components';
-import { Nav } from '..';
-import { Outlet } from 'react-router-dom';
+import React from "react";
+import { ContainerComponent } from "../../components";
+import { Nav } from "..";
+import { Outlet } from "react-router-dom";
+import { AdminContext } from "../../redux";
 export default function Staff() {
-  return <>
+  return <AdminContext>
     <Nav></Nav>
     <ContainerComponent className="staff__root" style={{
       background: "#A9C39E",
@@ -12,5 +13,5 @@ export default function Staff() {
     }}>
       <Outlet></Outlet>
     </ContainerComponent>
-  </>
+  </AdminContext>
 }

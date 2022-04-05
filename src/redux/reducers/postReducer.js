@@ -75,13 +75,22 @@ const postReducer = (state, action) => {
       );
       return singlePost;
     case actions.RATE_POST:
-      return actionHandler.updateItem("myPosts", post => {
-        if (post._id === action.postId) return { ...post, ...action.payload };
-        return post;
-      }, actionHandler.updateItem("posts", post => {
-        if (post._id === action.postId) return { ...post, ...action.payload }
-        return post
-      }, state));
+      return actionHandler.updateItem(
+        "myPosts",
+        (post) => {
+          if (post._id === action.postId) return { ...post, ...action.payload };
+          return post;
+        },
+        actionHandler.updateItem(
+          "posts",
+          (post) => {
+            if (post._id === action.postId)
+              return { ...post, ...action.payload };
+            return post;
+          },
+          state
+        )
+      );
     case actions.LIKE_POST:
       return actionHandler.updateItem(
         "myPosts",
@@ -99,7 +108,9 @@ const postReducer = (state, action) => {
                       (acc) => acc === action.userId
                     );
                   }
-                  return post.likedAccounts.filter((acc) => acc !== action.userId);
+                  return post.likedAccounts.filter(
+                    (acc) => acc !== action.userId
+                  );
                 },
                 post
               )
@@ -361,6 +372,35 @@ const postReducer = (state, action) => {
           state
         )
       );
+
+    case actions.GET_MY_POST:
+      return {
+        ...state,
+        myPosts: action.payload,
+        myPage: 0,
+        filter: 2,
+      };
+    case actions.LOAD_MORE_MY_POST:
+      return {
+        ...state,
+        myPosts: action.payload.length
+          ? state.myPosts.concat(action.payload)
+          : state.myPosts,
+        myPage: action.payload.length ? state.myPage + 1 : state.myPage,
+      };
+    case actions.FILTER_MY_POST:
+      return {
+        ...state,
+        myPosts: action.payload,
+        myPage: 0,
+        filter: action.filter,
+      };
+    case actions.UPDATE_MY_POST:
+      return {
+        ...state,
+        myPosts: action.payload,
+        myPage: 0,
+      };
 
     case actions.GET_MY_POST:
       return {

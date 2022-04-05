@@ -6,7 +6,7 @@ import { FaSearch, FaFilter } from "react-icons/fa";
 import { ImSpinner6 } from 'react-icons/im';
 import { TiUserDelete } from "react-icons/ti";
 
-import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from "../../redux";
+import { useAdminContext, useWorkspaceContext } from "../../redux";
 import { ContainerComponent, Form, Icon, Message, Text, } from "../../components";
 import { toastTypes, roles } from "../../fixtures";
 
@@ -15,14 +15,15 @@ export default function MemberList({ workspaceId }) {
     const { accounts: { data }, getAccountList } = useAdminContext();
     const { id } = useParams();
     let workspaceid = id || workspaceId;
-    console.log(workspaceid)
     const [state, setState] = useState({
         members: [],
         outputs: []
     });
     const [input, setInput] = React.useState('');
     useEffect(() => {
-        getAccountList();
+        getAccountList(data => {
+            console.log(data);
+        });
     }, []);
     useEffect(() => {
         getWorkspaceMembers(workspaceid, members => {

@@ -13,15 +13,15 @@ export default function ManagerInfo() {
   const { getProfile } = useAuthorizationContext();
 
   const [profile, setProfile] = useState({
-    profileImage: '',
-    lastName: '',
-    firstName: '',
-    roleName: '',
-    introduction: '',
-    gender: '',
-    age: '',
-    email: '',
-    workTitle: '',
+    profileImage: "",
+    lastName: "",
+    firstName: "",
+    roleName: "",
+    introduction: "",
+    gender: "",
+    age: "",
+    email: "",
+    workTitle: "",
   });
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -31,30 +31,46 @@ export default function ManagerInfo() {
         setLoading(false);
         console.log(data);
         if (!data.error) {
-          setProfile(o => ({ ...o, ...data }));
+          setProfile((o) => ({ ...o, ...data }));
         }
       });
     }
   }, [workspace]);
 
   return (
-    <ContainerComponent style={{ padding: "10px", }}>
+    <ContainerComponent>
       <ContainerComponent.Inner className="personal__green">
         <ContainerComponent.Pane className="personal__frameAva" style={{ position: "relative", }}>
           <Text.CenterLine
-            style={{ position: "relative", zIndex: 1, height: "27.5px" }}>
+            style={{ position: "relative", zIndex: 1, height: "27.5px" }}
+          >
             <Icon.CircleIcon
-              style={{ display: "inline-block", overflow: "hidden", width: "57px", height: "57px", zIndex: 1, }}>
-              <Icon.Image src={`${profile.profileImage || process.env.PUBLIC_URL + '/add-avatar.jpg'}`} alt={`Avatar`} style={{ objectFit: "fill", }}></Icon.Image>
+              style={{
+                display: "inline-block",
+                overflow: "hidden",
+                width: "57px",
+                height: "57px",
+                zIndex: 1,
+              }}
+            >
+              <Icon.Image
+                src={`${profile.profileImage ||
+                  process.env.PUBLIC_URL + "/add-avatar.jpg"
+                  }`}
+                alt={`Avatar`}
+                style={{ objectFit: "fill" }}
+              ></Icon.Image>
             </Icon.CircleIcon>
-            <Text.CenterLine style={{ paddingTop: "10px", }}>
-              <Text.Title>{`${profile.lastName || "Anonymous"} ${profile.firstName || "Nguyen"}`}</Text.Title>
+            <Text.CenterLine style={{ paddingTop: "10px" }}>
+              <Text.Title>{`${profile.lastName || "Anonymous"} ${profile.firstName || "Nguyen"
+                }`}</Text.Title>
               <Text.Subtitle
                 style={{
                   textTransform: "capitalize",
                   opacity: 0.5,
                   fontWeight: 500,
-                }}>
+                }}
+              >
                 {profile.roleName || "QA Coordinator"}
               </Text.Subtitle>
             </Text.CenterLine>
@@ -77,7 +93,7 @@ export default function ManagerInfo() {
       <ContainerComponent.Inner>
         <ContainerComponent.Pane className="personal__threeFrame"></ContainerComponent.Pane>
 
-        <ContainerComponent.Pane className="personal__greenBot" style={{paddingTop: '20px'}}>
+        <ContainerComponent.Pane className="personal__greenBot" style={{ paddingTop: '20px' }}>
           <ContainerComponent.Inner style={{
             padding: '20px 0 0 0',
             maxWidth: "720px",

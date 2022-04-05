@@ -22,8 +22,9 @@ const navigators = [
     {
         icon: <FaUsers></FaUsers>,
         label: 'workspace',
-        // link: 'workspace',
-        trigger: true,
+        link: '/management/workspace_member/',
+        destination: true,
+        // trigger: true,
     },
     {
         icon: <FaUserTie></FaUserTie>,

@@ -1,10 +1,20 @@
 import React, { useState, useRef } from "react";
-import { ContainerComponent, Icon, Text, Preview, Dropdown } from "../components";
+import {
+  ContainerComponent,
+  Icon,
+  Text,
+  Preview,
+  Dropdown,
+} from "../components";
 import { FaThumbsUp, FaThumbsDown, FaRegEdit, FaEraser } from "react-icons/fa";
-import { IoIosArrowDown } from 'react-icons/io';
-import { HiDownload } from 'react-icons/hi';
+import { IoIosArrowDown } from "react-icons/io";
+import { HiDownload } from "react-icons/hi";
 import { Comment, DropDownButton, GridPreview } from ".";
-import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
+import {
+  useAuthorizationContext,
+  useNotifyContext,
+  usePostContext,
+} from "../redux";
 import { Link, useNavigate } from "react-router-dom";
 import { roles } from "../fixtures";
 import axios from "axios";
@@ -14,7 +24,14 @@ import { mainAPI } from "../config";
 export default function Post({ postHeader, postBody, postFooter }) {
   const { user } = useAuthorizationContext();
   const { interactPost, getPostComments, deleteSinglePost } = usePostContext();
-  const { like, dislike, isLiked, isDisliked, likedAccounts, dislikedAccounts } = postFooter;
+  const {
+    like,
+    dislike,
+    isLiked,
+    isDisliked,
+    likedAccounts,
+    dislikedAccounts,
+  } = postFooter;
 
   const { sendNotification } = useNotifyContext();
   const isFirstRender = useRef(true);
@@ -26,55 +43,65 @@ export default function Post({ postHeader, postBody, postFooter }) {
   const checkedHandler = async (e) => {
     if (e.target.name === "like") {
       likeHandler();
-    }
-    else if (e.target.name === "dislike") {
+    } else if (e.target.name === "dislike") {
       dislikeHandler();
     }
     // interactRef.current(postHeader.id, 'rate', { like: !isLiked ? like + 1 : like - 1, dislike: !isDisliked ? dislike + 1 : dislike - 1, likedAccounts: [...likedAccounts, user.accountId], dislikedAccounts: [...dislikedAccounts, user.accountId], isDisliked: !isDisliked, isLiked: !isLiked });
   };
   const likeHandler = () => {
-    interactRef.current(postHeader.id, 'rate', {
+    interactRef.current(postHeader.id, "rate", {
       like: !isLiked ? like + 1 : like - 1,
       dislike: isDisliked ? dislike - 1 : dislike,
-      likedAccounts: !isLiked ? [...likedAccounts, user.accountId] : likedAccounts.filter(acc => acc !== user.accountId),
-      dislikedAccounts: isDisliked ? dislikedAccounts.filter(acc => acc !== user.accountId) : dislikedAccounts,
+      likedAccounts: !isLiked
+        ? [...likedAccounts, user.accountId]
+        : likedAccounts.filter((acc) => acc !== user.accountId),
+      dislikedAccounts: isDisliked
+        ? dislikedAccounts.filter((acc) => acc !== user.accountId)
+        : dislikedAccounts,
       isLiked: !isLiked,
       isDisliked: false,
     });
-  }
+  };
   const dislikeHandler = () => {
-    interactRef.current(postHeader.id, 'rate', {
+    interactRef.current(postHeader.id, "rate", {
       like: isLiked ? like - 1 : like,
       dislike: !isDisliked ? dislike + 1 : dislike - 1,
-      likedAccounts: isLiked ? likedAccounts.filter(acc => acc !== user.accountId) : likedAccounts,
-      dislikedAccounts: !isDisliked ? [...dislikedAccounts, user.accountId] : dislikedAccounts.filter(acc => acc !== user.accountId),
+      likedAccounts: isLiked
+        ? likedAccounts.filter((acc) => acc !== user.accountId)
+        : likedAccounts,
+      dislikedAccounts: !isDisliked
+        ? [...dislikedAccounts, user.accountId]
+        : dislikedAccounts.filter((acc) => acc !== user.accountId),
       isLiked: false,
       isDisliked: !isDisliked,
     });
-  }
+  };
   const downloadHandler = async (e) => {
-    return axios.get(`${mainAPI.LOCALHOST_HOST}/api/v1/download`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: 'post',
-        postid: postHeader.id
-      },
-    }).then(res => {
-      const link = document.createElement('a');
-      link.href = res.data.response;
+    return axios
+      .get(`${mainAPI.LOCALHOST_HOST}/api/v1/download`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "post",
+          postid: postHeader.id,
+        },
+      })
+      .then((res) => {
+        const link = document.createElement("a");
+        link.href = res.data.response;
 
-      // Append to html link element page
-      document.body.appendChild(link);
+        // Append to html link element page
+        document.body.appendChild(link);
 
-      // Start download
-      link.click();
+        // Start download
+        link.click();
 
-      // Clean up and remove the link
-      link.parentNode.removeChild(link);
-    }).catch(err => console.log(err.message));
-  }
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      })
+      .catch((err) => console.log(err.message));
+  };
   const parseTime = (time) => {
     const now = new Date(Date.now());
     const end = new Date(time);
@@ -82,7 +109,8 @@ export default function Post({ postHeader, postBody, postFooter }) {
 
     if (diff.getUTCDate() - 1 === 0) {
       if (diff.getUTCHours() > 1) return diff.getUTCHours() + " hours ago";
-      if (diff.getUTCMinutes() > 1) return diff.getUTCMinutes() + " minutes ago";
+      if (diff.getUTCMinutes() > 1)
+        return diff.getUTCMinutes() + " minutes ago";
       return diff.getUTCSeconds() + " seconds ago";
     }
     if (diff.getUTCDate() < 30) return diff.getUTCDate() + " days ago";
@@ -91,7 +119,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
 
   React.useEffect(() => {
     getComment.current = getPostComments;
-  }, [getPostComments])
+  }, [getPostComments]);
   React.useEffect(() => {
     isFirstRender.current = false;
   }, []);

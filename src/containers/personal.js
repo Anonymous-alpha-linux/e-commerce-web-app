@@ -98,7 +98,7 @@ export default function Personal() {
         <ContainerComponent.Inner>
             {/* {personal three button} */}
             <ContainerComponent.Pane className="personal__threeFrame">
-                <ContainerComponent.Flex style={{justifyContent:"center",gap: "20px",alignItems:"center", maxWidth:'680px', margin: '0 auto'}}>
+                <ContainerComponent.Flex style={{ justifyContent: "center", gap: "20px", alignItems: "center", maxWidth: '680px', margin: '0 auto' }}>
                     <ContainerComponent.Item>
                         <ButtonComponent className="personal__button">
                             <Text.Center>
@@ -106,12 +106,22 @@ export default function Personal() {
                             </Text.Center>
                         </ButtonComponent>
                     </ContainerComponent.Item>
-                    
+
                     <ContainerComponent.Item>
                         <Link to="/history" state={{ from: location }}>
                             <ButtonComponent className="personal__button">
                                 <Text.Center>
                                     My Post
+                                </Text.Center>
+                            </ButtonComponent>
+                        </Link>
+                    </ContainerComponent.Item>
+
+                    <ContainerComponent.Item>
+                        <Link to="/profile/manager" state={{ from: location }}>
+                            <ButtonComponent className="personal__button">
+                                <Text.Center>
+                                    Manager
                                 </Text.Center>
                             </ButtonComponent>
                         </Link>
@@ -122,11 +132,11 @@ export default function Personal() {
             </ContainerComponent.Pane>
 
             <Form onSubmit={submitHandler}
-                style={{ height:"fit-content",width:"100%",padding:"0",maxWidth:"unset" }}>
+                style={{ height: "fit-content", width: "100%", padding: "0", maxWidth: "unset" }}>
                 <ContainerComponent.Inner className="personal__greenBot">
                     <ContainerComponent.Pane style={{
                         padding: '0',
-                        maxWidth:"720px",
+                        maxWidth: "720px",
                         width: '100%'
                     }}>
                         <Text.Title
@@ -161,7 +171,7 @@ export default function Personal() {
                         </Text.MiddleLine>
                         <Form.Input style={{
                             textAlign: 'right',
-                            border:"1px solid #163D3C",
+                            border: "1px solid #163D3C",
                             borderRadius: "10px"
                         }}
                             name="firstName"
@@ -235,7 +245,7 @@ export default function Personal() {
                             // transform: 'translate(10px,25px)',
                             fontWeight: 800
                         }}>
-                            {<Text.Label style={{ color:"#163D3C"}}>
+                            {<Text.Label style={{ color: "#163D3C" }}>
                                 Gender
                             </Text.Label>}
                         </Text.MiddleLine>
@@ -247,14 +257,14 @@ export default function Personal() {
                                 fontWeight: 800,
                                 width: '100%',
                                 height: '35px',
-                                paddingLeft:"10px",
+                                paddingLeft: "10px",
                                 border: "1px solid #163D3C",
                                 borderRadius: "10px",
                             }}
                             onChange={inputHandler}
                             name={'gender'}
-                            >
-                            <Form.Option style={{marginLeft:"10px"}} value={'male'}>Male</Form.Option>
+                        >
+                            <Form.Option style={{ marginLeft: "10px" }} value={'male'}>Male</Form.Option>
                             <Form.Option style={{ marginLeft: "10px" }} value={'female'}>Female</Form.Option>
                         </Form.Select>
                         {/* Date of birth */}
@@ -263,7 +273,7 @@ export default function Personal() {
                             transform: 'translate(10px,24px)',
                             fontWeight: 800
                         }}>
-                            <Text.Label style={{padding:"6px"}}>
+                            <Text.Label style={{ padding: "6px" }}>
                                 {isEdit ? 'Day of Birth' : 'Age'}
                             </Text.Label>
                         </Text.MiddleLine>
@@ -277,7 +287,7 @@ export default function Personal() {
                                 textAlign: 'right',
                                 border: "1px solid #163D3C",
                                 borderRadius: "10px",
-                                height:"fir-content"
+                                height: "fir-content"
                             }}></Form.Input>
 
                         <Text.MiddleLine style={{
@@ -317,45 +327,45 @@ export default function Personal() {
                             style={{
                                 textAlign: 'right',
                                 border: "1px solid #163D3C",
-                                borderRadius:"10px"
+                                borderRadius: "10px"
                             }}></Form.Input>
-                            <Text.RightLine>
-                                {isEdit && <>
-                                    <Form.Input
-                                        type='submit'
-                                        style={{ display: 'none' }}
-                                        onClick={(e) => {
-                                            submitHandler(e);
-                                        }}>
-                                    </Form.Input>
-                                    <Text.Line>
-                                        <Text.MiddleLine>
-                                            <ButtonComponent 
-                                                className="personal__edit"
-                                                style={{ cursor: 'pointer', marginBottom: '25px',transform:"translateX(-10%)" }}
-                                                onClick={() => setIsEdit(false)}>
-                                                Cancel
-                                            </ButtonComponent>
-                                        </Text.MiddleLine>
-                                        <Text.MiddleLine>
+                        <Text.RightLine>
+                            {isEdit && <>
+                                <Form.Input
+                                    type='submit'
+                                    style={{ display: 'none' }}
+                                    onClick={(e) => {
+                                        submitHandler(e);
+                                    }}>
+                                </Form.Input>
+                                <Text.Line>
+                                    <Text.MiddleLine>
+                                        <ButtonComponent
+                                            className="personal__edit"
+                                            style={{ cursor: 'pointer', marginBottom: '25px', transform: "translateX(-10%)" }}
+                                            onClick={() => setIsEdit(false)}>
+                                            Cancel
+                                        </ButtonComponent>
+                                    </Text.MiddleLine>
+                                    <Text.MiddleLine>
                                         <ButtonComponent className="personal__edit" style={{ cursor: 'pointer', marginBottom: '25px' }}
-                                                onClick={() => { document.querySelector('input[type=submit]').click(); }}
-                                            >
-                                                Save
-                                            </ButtonComponent>
-                                        </Text.MiddleLine>
-                                    </Text.Line>
-                                </>
-                                    ||
-                                    <ButtonComponent
-                                        className="personal__edit"
-                                        style={{ cursor: 'pointer', marginBottom: '25px' }}
-                                        onClick={() => setIsEdit(true)}>
-                                        Edit
-                                    </ButtonComponent>
-                                }
-                            </Text.RightLine>
-                            {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
+                                            onClick={() => { document.querySelector('input[type=submit]').click(); }}
+                                        >
+                                            Save
+                                        </ButtonComponent>
+                                    </Text.MiddleLine>
+                                </Text.Line>
+                            </>
+                                ||
+                                <ButtonComponent
+                                    className="personal__edit"
+                                    style={{ cursor: 'pointer', marginBottom: '25px' }}
+                                    onClick={() => setIsEdit(true)}>
+                                    Edit
+                                </ButtonComponent>
+                            }
+                        </Text.RightLine>
+                        {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
                     </ContainerComponent.Pane>
                 </ContainerComponent.Inner>
             </Form>

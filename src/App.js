@@ -46,7 +46,6 @@ import Layout from "./pages/layout";
 
 function App() {
   const { user } = useAuthorizationContext();
-
   return (
     <BrowserRouter>
       <Routes>
@@ -72,24 +71,47 @@ function App() {
                   }
                 >
                   <Route index element={<AdminDashBoard></AdminDashBoard>} />
-                  <Route path="/management/attachment" element={<AttachmentCrub></AttachmentCrub>} />
-                  <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
-                  <Route path="/management/member" element={<AccountCrud></AccountCrud>} />
+                  <Route
+                    path="/management/attachment"
+                    element={<AttachmentCrub></AttachmentCrub>}
+                  />
+                  <Route
+                    path="/management/category"
+                    element={<CategoryManagement></CategoryManagement>}
+                  />
+                  <Route
+                    path="/management/member"
+                    element={<AccountCrud></AccountCrud>}
+                  />
                 </Route>
               )) ||
               // 2. QA manager
               (user.role === roles.QA_MANAGER && (
                 <Route
                   path=""
-                  element={<ProtectedPage authorized={[roles.QA_MANAGER]}>
-                    <QAManager></QAManager>
-                  </ProtectedPage>}
+                  element={
+                    <ProtectedPage authorized={[roles.QA_MANAGER]}>
+                      <QAManager></QAManager>
+                    </ProtectedPage>
+                  }
                 >
                   {/* <Route index element={<Workspace></Workspace>} /> */}
-                  <Route index element={<DashboardManager></DashboardManager>} />
-                  <Route path="/workspace" element={<Workspace></Workspace>} />
-                  <Route path="/management/attachment" element={<AttachmentCrub></AttachmentCrub>} />
-                  <Route path="/management/category" element={<CategoryManagement></CategoryManagement>} />
+                  <Route
+                    index
+                    element={<DashboardManager></DashboardManager>}
+                  />
+                  <Route
+                    path="/workspace"
+                    element={<Workspace></Workspace>}
+                  />
+                  <Route
+                    path="/management/attachment"
+                    element={<AttachmentCrub></AttachmentCrub>}
+                  />
+                  <Route
+                    path="/management/category"
+                    element={<CategoryManagement></CategoryManagement>}
+                  />
                   <Route path="/management/workspace_member">
                     <Route path=":id" element={<ListMember></ListMember>} />
                   </Route>
@@ -182,6 +204,9 @@ function App() {
                     path="/management/member"
                     element={<ListMember></ListMember>}
                   />
+                  <Route path="/management/workspace_member">
+                    <Route path=":id" element={<ListMember></ListMember>} />
+                  </Route>
                 </Route>
               )) ||
               // 4. Staff
@@ -227,6 +252,9 @@ function App() {
                       path="addgroup"
                       element={<AddGroupContainer></AddGroupContainer>}
                     />
+                  </Route>
+                  <Route path="/management/workspace_member">
+                    <Route path=":id" element={<ListMember></ListMember>} />
                   </Route>
                   <Route
                     path="workspace"

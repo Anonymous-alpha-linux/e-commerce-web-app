@@ -88,36 +88,37 @@ AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, trigger
     ...style,
   });
 
+
+
   return (
-    <>
-      <animated.div
-        style={menubg}
-        className="radiowrapper"
-        onClick={() => setToggle(!isToggled)}
+    <animated.div
+      style={menubg}
+      className="radiowrapper"
+      onClick={() => setToggle(!isToggled)}
+    >
+      <Text.MiddleLine>
+        {triggerComponent}
+      </Text.MiddleLine>
+      <animated.span
+        style={{
+          transform: y.interpolate((y) => `rotateX(${y}deg)`),
+          display: 'inline-block',
+          verticalAlign: 'middle'
+        }}
       >
-        <Text.MiddleLine>
-          {triggerComponent}
-        </Text.MiddleLine>
-        <animated.span
-          style={{
-            transform: y.interpolate((y) => `rotateX(${y}deg)`),
-            display: 'inline-block',
-            verticalAlign: 'middle'
-          }}
-        >
-          <Icon>
-            <BsCaretDownFill></BsCaretDownFill>
-          </Icon>
-        </animated.span>
-        <animated.div style={menuAppear}>
-          {isToggled ?
-            <OutsideAlert toggleShowing={() => setToggle(o => !o)}>
-              {children}
-            </OutsideAlert>
-            : null}
-        </animated.div>
+        <Icon>
+          <BsCaretDownFill></BsCaretDownFill>
+        </Icon>
+      </animated.span>
+      <animated.div style={menuAppear}>
+        {isToggled ?
+          <OutsideAlert toggleShowing={() => setToggle(o => !o)}>
+            {children}
+          </OutsideAlert>
+          : null}
       </animated.div>
-    </>
+    </animated.div>
+
   );
 }
 
@@ -182,3 +183,88 @@ AnimateComponent.DropdownHover = function AnimatedDropdownHover({ children, stat
     </>
   );
 }
+
+AnimateComponent.DropdownClick = function AnimatedDropdownClick({
+  children,
+  style,
+  ...props
+}) {
+  const arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
+    from: { maxHeight: 0 },
+    enter: { maxHeight: 800, overflow: "hidden", ...style },
+    leave: { maxHeight: 0 },
+    config: { duration: 600 },
+  });
+  return transition(
+    (prop, item) =>
+      item && (
+        <animated.div style={prop} {...props}>
+          {item}
+        </animated.div>
+      )
+  );
+};
+
+AnimateComponent.Rotate = function AnimatedRotate({
+  children,
+  state,
+  deg,
+  style,
+  ...props
+}) {
+  const spring = useSpring({
+    transform: `rotate(${state ? deg : 0}deg)`,
+    ...style,
+  });
+  return (
+    <animated.div style={spring} {...props}>
+      {children}
+    </animated.div>
+  );
+};
+
+AnimateComponent.Zoom = function AnimatedZoom({
+  children,
+  zoom = 1,
+  style,
+  ...props
+}) {
+  let [x, y] = zoom instanceof Object ? [zoom.x, zoom.y] : [zoom, zoom];
+  var arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
+    from: { transform: `scale(0)`, opacity: 0 },
+    enter: { transform: `scale(${x}, ${y})`, opacity: 1, ...style },
+    delay: 200, 
+    reset: false
+  });
+  return transition(
+    (style, item) =>
+      item && (
+        <animated.div style={style} {...props}>
+          {item}
+        </animated.div>
+      )
+  );
+};
+
+AnimateComponent.Width = function AnimateWidth({ children, style, ...props }) {
+  const arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
+    from: { maxWidth: 0, opacity: 0 },
+    enter: { maxWidth: 200, opacity: 1, ...style },
+    leave: { maxWidth: 0, opacity: 0 },
+    config: { duration: 400 },
+  });
+  return transition(
+    (prop, item) =>
+      item && (
+        <animated.div style={prop} {...props}>
+          {item}
+        </animated.div>
+      )
+  );
+};
