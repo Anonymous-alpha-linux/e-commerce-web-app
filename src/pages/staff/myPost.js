@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Loading } from '..';
-import { ContainerComponent, List } from '../../components';
+import { AnimateComponent, ContainerComponent, List } from '../../components';
 import { Filter, LazyLoading, PostContainer, PostForm } from '../../containers';
 import { usePostContext, useAuthorizationContext } from '../../redux';
 import axios from 'axios';
@@ -24,18 +24,20 @@ export default function MyPost() {
         };
     }, []);
 
-    return (<ContainerComponent className="workspace" id="workspace">
-        <PostForm></PostForm>
-        <Filter loader={filterMyPost} selectOptions={[
-            {
-                label: 'Most Recent',
-                value: 2
-            },
-            {
-                label: 'Most Likely',
-                value: 3
-            }
-        ]}></Filter>
+    return (<ContainerComponent style={{ background: "#A9C39E" }} className="workspace" id="workspace">
+        <ContainerComponent.Inner className="myPost__header">
+            <PostForm></PostForm>
+            <Filter loader={filterMyPost} selectOptions={[
+                {
+                    label: 'Most Recent',
+                    value: 2
+                },
+                {
+                    label: 'Most Likely',
+                    value: 3
+                }
+            ]}></Filter>
+        </ContainerComponent.Inner>
         <LazyLoading loader={loadMyNextPosts}>
             <List className="workspace__postList" ref={listRef}>
                 {/* {!myPosts.length && <List.Item>
@@ -89,14 +91,16 @@ export default function MyPost() {
                         comments
                     };
                     return (
-                        <List.Item key={post._id}
-                            id={post._id}>
-                            <PostContainer
-                                postHeader={postHeader}
-                                postBody={postBody}
-                                postFooter={postFooter}
-                            ></PostContainer>
-                        </List.Item>
+                        <AnimateComponent.Zoom key={post._id}>
+                            <List.Item
+                                id={post._id}>
+                                <PostContainer
+                                    postHeader={postHeader}
+                                    postBody={postBody}
+                                    postFooter={postFooter}
+                                ></PostContainer>
+                            </List.Item>
+                        </AnimateComponent.Zoom>
                     );
                 })}
             </List>

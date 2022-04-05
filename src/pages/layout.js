@@ -12,20 +12,24 @@ export default function Layout() {
     }
 
     return <>
-        <ContainerComponent.Flex style={{
+        <ContainerComponent.Section style={{
             position: 'fixed',
             bottom: '0',
             right: '10px',
             zIndex: 100,
             padding: '10px',
-            flexDirection: 'column',
-            gap: '10px',
             maxHeight: '200px'
         }}>
-            {toastList.map((toast, index) => {
-                return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={toast.timeout || 3000} pullItem={pullToast} />
-            })}
-        </ContainerComponent.Flex>
+            <ContainerComponent.Flex style={{
+                position: 'absolute',
+                flexDirection: 'column',
+                gap: '10px',
+            }}>
+                {toastList.map((toast, index) => {
+                    return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={toast.timeout || 3000} pullItem={pullToast} />
+                })}
+            </ContainerComponent.Flex>
+        </ContainerComponent.Section>
         <Outlet></Outlet>
     </>
 }

@@ -1,15 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-    ButtonComponent,
-    ContainerComponent,
-    Form,
-    Icon,
-    MessageBox,
-    Text
+  ButtonComponent,
+  ContainerComponent,
+  Form,
+  Icon,
+  MessageBox,
+  Text,
 } from "../components";
 import { ConditionContainer, UploadForm } from ".";
-import { useAuthorizationContext, useNotifyContext, usePostContext } from "../redux";
-import { notifyData, socketTargets } from '../fixtures';
+import {
+  useAuthorizationContext,
+  useNotifyContext,
+  usePostContext,
+} from "../redux";
+import { notifyData, socketTargets } from "../fixtures";
 
 import { Loading } from "../pages";
 import useValidate from "../hooks/useValidate";
@@ -19,109 +23,174 @@ import TagInput from "./tagsinput";
 import axios from "axios";
 
 export default function PostModal() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [input, setInput] = useState({
-        title: '',
-        content: "",
-        private: false,
-        condition: false,
-        categories: [],
-        files: [],
+  const [input, setInput] = useState({
+    content: "",
+    private: false,
+    condition: false,
+    categories: [],
+    files: [],
+  });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [openCondition, setOpenCondition] = useState(false);
+
+  const { id } = useParams();
+  const { user } = useAuthorizationContext();
+  const { sendNotification } = useNotifyContext();
+  const { posts, categories, getFile, postIdea, getSinglePost } =
+    usePostContext();
+  const privateChecked = useRef(null);
+  const mountedRef = useRef(false);
+  const checkedCondition = useRef(false);
+  const getFileRef = useRef(getFile);
+  const cancelTokenSource = axios.CancelToken.source();
+  // const [staffURL, host] = process.env.REACT_APP_ENVIRONMENT === "development" ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
+
+  const isOverflowFile = (currentFileList, fileSize) => {
+    const currentSize = currentFileList.reduce((prev, file) => {
+      return prev + file.size / 1024;
+    }, 0);
+    return currentSize + fileSize > 5120;
+  };
+  const editHandler = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    postIdea(
+      input,
+      (postId) => {
+        setLoading(false);
+        navigate("/");
+      },
+      {
+        isEdit: true,
+        postId: id,
+      }
+    );
+  };
+  const submitHandler = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // 1. Validate the input
+      const valContent = new useValidate(input.content);
+      const check = valContent.isEmpty().input;
+      if (!input.categories.length) throw new Error("Please select a category");
+      if (!checkedCondition.current.checked) {
+        throw new Error("Please checked our terms and condition");
+      }
+      // 2. Post a new idea
+      postIdea(input, (postId) => {
+        setLoading(false);
+        sendNotification(
+          notifyData.CREATE_POST,
+          `/#${postId}`,
+          socketTargets.WITHOUT_BROADCAST
+        );
+        navigate("/");
+      });
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  };
+  const inputHandler = (e) => {
+    setInput((input) => ({
+      ...input,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const checkedHandler = (e) => {
+    setInput((input) => ({
+      ...input,
+      [e.target.name]: e.target.checked,
+    }));
+  };
+  const pushInputHandler = (e) => {
+    const filter = Array.from(e.target.files)
+      .map((file) => {
+        let size = file.size / 1024;
+        if (isOverflowFile(input.files, size)) {
+          alert("File size is overflow");
+          setError("File size is overflow");
+          return;
+        }
+        return file;
+      })
+      .filter((file) => file);
+
+    setInput((input) => {
+      return {
+        ...input,
+        files: [...input.files, ...filter],
+      };
     });
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
-    const [openCondition, setOpenCondition] = useState(false);
+  };
+  const eliminateFile = (id) => {
+    setInput((input) => ({
+      ...input,
+      files: input.files.filter((file, index) => id !== index),
+    }));
+  };
 
-    const { id } = useParams();
-    const { user } = useAuthorizationContext();
-    const { sendNotification } = useNotifyContext();
-    const {
-        posts,
-        categories,
-        getFile,
-        postIdea,
-        getSinglePost
-    } = usePostContext();
-    const privateChecked = useRef(null);
-    const mountedRef = useRef(false);
-    const checkedCondition = useRef(false);
-    const getFileRef = useRef(getFile);
-    const cancelTokenSource = axios.CancelToken.source();
-    // const [staffURL, host] = process.env.REACT_APP_ENVIRONMENT === "development" ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
-
-
-    const isOverflowFile = (currentFileList, fileSize) => {
-        const currentSize = currentFileList.reduce((prev, file) => {
-            return prev + file.size / 1024;
-        }, 0);
-        return currentSize + fileSize > 5120;
-    };
-    const editHandler = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        postIdea(input, postId => {
-            setLoading(false);
-            navigate("/");
-        }, {
-            isEdit: true,
-            postId: id,
-        });
-    };
-    const submitHandler = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            // 1. Validate the input
-            const valContent = new useValidate(input.content);
-            const check = valContent.isEmpty().input;
-            if (!input.categories.length) throw new Error("Please select a category");
-            if (!checkedCondition.current.checked) {
-                throw new Error("Please checked our terms and condition");
-            }
-            // 2. Post a new idea
-            postIdea(input, postId => {
-                setLoading(false);
-                sendNotification(notifyData.CREATE_POST, `/#${postId}`, socketTargets.WITHOUT_BROADCAST);
-                navigate("/");
+  useEffect(() => {
+    mountedRef.current = true;
+    setLoading(true);
+    if (id) {
+      // Stage 1
+      Promise.resolve({
+        then: function (resolve, reject) {
+          try {
+            getSinglePost(id, (post) => {
+              resolve(post);
             });
-        } catch (error) {
+          } catch (error) {
+            reject(error.message);
+          }
+        },
+      })
+        .then((post) => {
+          return Promise.all([
+            post,
+            ...post.attachments.map((attach) => {
+              return new Promise((resolve, reject) => {
+                getFileRef
+                  .current(attach, (file) => {
+                    resolve(file);
+                  })
+                  .catch((error) => reject(error));
+              });
+            }),
+          ]);
+        })
+        .then((data) => {
+          const [post, ...files] = data;
+          const { content, hideAuthor, categories } = post;
+          if (mountedRef.current) {
+            setInput((input) => ({
+              ...input,
+              content: content,
+              private: hideAuthor,
+              categories: categories.map((single) => single._id),
+              files: files,
+            }));
+            setLoading(false);
+          }
+        })
+        .catch((error) => {
+          if (mountedRef.current) {
             setLoading(false);
             setError(error.message);
-        }
-    };
-    const inputHandler = (e) => {
-        setInput((input) => ({
-            ...input,
-            [e.target.name]: e.target.value,
-        }));
-    };
-    const checkedHandler = (e) => {
-        setInput((input) => ({
-            ...input,
-            [e.target.name]: e.target.checked,
-        }));
-    };
-    const pushInputHandler = (e) => {
-        const filter = Array.from(e.target.files)
-            .map((file) => {
-                let size = file.size / 1024;
-                if (isOverflowFile(input.files, size)) {
-                    alert("File size is overflow");
-                    setError("File size is overflow");
-                    return;
-                }
-                return file;
-            })
-            .filter((file) => file);
-
-        setInput((input) => {
-            return {
-                ...input,
-                files: [...input.files, ...filter],
-            };
+          }
         });
+    } else {
+      setLoading(false);
+    }
+    return () => {
+      mountedRef.current = false;
+      cancelTokenSource.cancel();
     };
     const eliminateFile = (id) => {
         setInput((input) => ({
@@ -308,15 +377,14 @@ export default function PostModal() {
                         </Text.Paragraph>
                     </Text.MiddleLine>
                 </Text.Line>
-
-                {openCondition && (
-                    <ConditionContainer
-                        closeCondition={() => setOpenCondition(false)}
-                    ></ConditionContainer>
-                )}
-                {message && <MessageBox.TextMessage>{message}</MessageBox.TextMessage>}
-                {error && <MessageBox.TextMessage>{error}</MessageBox.TextMessage>}
-                {/* {id && <Form.Input type='hidden'
+        {openCondition && (
+          <ConditionContainer
+            closeCondition={() => setOpenCondition(false)}
+          ></ConditionContainer>
+        )}
+        {message && <MessageBox.TextMessage>{message}</MessageBox.TextMessage>}
+        {error && <MessageBox.TextMessage>{error}</MessageBox.TextMessage>}
+        {/* {id && <Form.Input type='hidden'
                 name="id"
                 id="id"
                 value={id}></Form.Input>} */}

@@ -10,7 +10,7 @@ export default function ToastMessage({
   message,
   timeout,
   type = toastTypes.WARNING,
-  pullItem
+  pullItem,
 }) {
   const toastRef = useRef();
   const [isExpired, setExpired] = useState(false);
@@ -25,22 +25,25 @@ export default function ToastMessage({
     };
   }, []);
 
-  return !isExpired ? <div className={`${styles.ToastMessage} ${styles[type]}`}>
-    <h5 style={{
-      color: `${type === toastTypes.ERROR ? "red" : "green"}`,
-      textTransform: "uppercase",
-      margin: 0
-    }}
-    >
-      {type}
-    </h5>
-    <span>{message}</span>
-    <div className={styles.Loader}>
-      <div
-        className={styles.Bar}
-        ref={toastRef}
-        style={{ "--timeout": `${timeout / 1000}s` }}
-      ></div>
+  return !isExpired ? (
+    <div className={`${styles.ToastMessage} ${styles[type]}`}>
+      <h5
+        style={{
+          color: `${type === toastTypes.ERROR ? "red" : "green"}`,
+          textTransform: "uppercase",
+          margin: 0,
+        }}
+      >
+        {type}
+      </h5>
+      <span>{message}</span>
+      <div className={styles.Loader}>
+        <div
+          className={styles.Bar}
+          ref={toastRef}
+          style={{ "--timeout": `${timeout / 1000}s` }}
+        ></div>
+      </div>
     </div>
-  </div> : null
+  ) : null;
 }

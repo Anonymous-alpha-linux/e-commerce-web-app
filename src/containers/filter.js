@@ -16,7 +16,7 @@ export default function Filter({ forwardedRef, ...props }) {
     loader(filterValue);
   };
   return (
-    <ContainerComponent>
+    <ContainerComponent style={{ borderRadius: "10px"}}>
       <ContainerComponent.Inner
         style={{
           position: "relative",
@@ -43,7 +43,7 @@ export default function Filter({ forwardedRef, ...props }) {
               <Form.Select onChange={selectHandler}>
                 {selectOptions.map((option, index) => {
                   return (
-                    <Form.Option key={index + 1} value={option.value}>
+                    <Form.Option className="filter__section" key={index + 1} value={option.value}>
                       {option.label}
                     </Form.Option>
                   );

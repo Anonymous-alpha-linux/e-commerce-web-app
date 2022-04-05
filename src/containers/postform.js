@@ -13,7 +13,7 @@ export default function PostForm() {
         className="post-form__container"
         style={{
             padding: '10px',
-            backgroundColor: "#EEF5EB"
+            backgroundColor: "#DCE7D7"
         }}>
         <ContainerComponent.Flex style={{ alignItems: 'center' }}>
             <ContainerComponent.Item>
@@ -31,7 +31,8 @@ export default function PostForm() {
                 <Text.Title>{user.account}</Text.Title>
                 <Link to="/portal/idea">
                     <Form.Input
-                        placeholder="Post your idea"
+                        style={{ marginTop: "4px", border:"1px solid #C4C4C4"}}
+                        placeholder="Hey, what is your idea?"
                     // onClick={() => setOpenModal(!openModal)}
                     >
                     </Form.Input>

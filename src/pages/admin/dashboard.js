@@ -58,32 +58,30 @@ Chart.register(
 );
 
 export default function Dashboard() {
-  const { statistics: { mostLikePosts, mostLikeUser },
-    getAccountList,
-    getRoleList,
-    getAttachmentList,
-  } = useAdminContext();
-
-  useEffect(() => {
-    // getAccountList();
-    // getRoleList();
-    // getAttachmentList();
-  }, []);
   return (
-    <ContainerComponent className="dashboard__root">
-      <ContainerComponent.Pane className="overview__container">
-        <DashboardOverview></DashboardOverview>
-      </ContainerComponent.Pane>
-      <ContainerComponent.Pane style={{ padding: '32px 10px', overflowX: 'scroll' }}>
-        <ContainerComponent.Inner style={{ maxWidth: '650px', height: '100%', borderRadius: '20px', border: '1px solid #000', margin: '0 auto', }}>
-          <MostLikedPosts></MostLikedPosts>
-        </ContainerComponent.Inner>
-      </ContainerComponent.Pane>
-      <ContainerComponent.Pane style={{ padding: '32px 10px', overflowX: 'scroll' }}>
-        <ContainerComponent.Inner style={{ maxWidth: '650px', height: '100%', borderRadius: '20px', border: '1px solid #000', margin: '0 auto' }}>
-          <MostCategory></MostCategory>
-        </ContainerComponent.Inner>
-      </ContainerComponent.Pane>
+    <ContainerComponent style={{ backgroundColor: '#A9C39E' }} className="dashboard__root">
+      <ContainerComponent.Inner style={{ margin: "20px", padding: "15px", borderRadius: "10px", background: "#DCE7D7", overflow: "hidden" }}>
+        <ContainerComponent.Pane className="overview__container">
+            <DashboardOverview></DashboardOverview>
+          </ContainerComponent.Pane>
+      </ContainerComponent.Inner>
+
+      <ContainerComponent.Inner style={{ margin: "20px", padding: "15px", borderRadius: "10px", background: "#DCE7D7", overflow: "hidden"  }}>
+          <ContainerComponent.Pane style={{backgroundColor:"white", padding: '15px 15px', overflowX: 'scroll',borderRadius:"10px" }}>
+            <ContainerComponent.Inner style={{ maxWidth: '650px', height: '100%', borderRadius: '20px', border: '1px solid #000', margin: '0 auto', }}>
+              <MostLikedPosts></MostLikedPosts>
+            </ContainerComponent.Inner>
+          </ContainerComponent.Pane>
+      </ContainerComponent.Inner>
+
+      <ContainerComponent.Inner style={{ margin: "20px", padding: "15px", borderRadius: "10px", background: "#DCE7D7", overflow: "hidden" }}>
+        <ContainerComponent.Pane style={{ backgroundColor: "white", padding: '15px 15px', overflowX: 'scroll', borderRadius: "10px" }}>
+          <ContainerComponent.Inner style={{ maxWidth: '650px', height: '100%', borderRadius: '20px', border: '1px solid #000', margin: '0 auto',padding:"15px" }}>
+            <MostCategory></MostCategory>
+          </ContainerComponent.Inner>
+        </ContainerComponent.Pane>
+      </ContainerComponent.Inner>
+
     </ContainerComponent>
   );
 }
@@ -97,12 +95,15 @@ function MostLikedPosts() {
       {
         data: mostLikePosts.map(post => post.like),
         borderColor: "black",
-        backgroundColor: ['rgb(255, 99, 132)',
+        backgroundColor: [
+          "green",
+          "#33EFAB", "#40916C", "#333",
+          'rgb(255, 99, 132)',
           'rgb(75, 192, 192)',
           'rgb(255, 205, 86)',
           'rgb(201, 203, 207)',
           'rgb(54, 162, 235)',
-          "#33EFAB", "#40916C", "#333"],
+        ],
         fill: true
       }
     ]
@@ -125,12 +126,14 @@ function MostCategory() {
         data: mostCategories.map(c => c.count),
         borderColor: "black",
         backgroundColor: [
+          'green',
+          "#33EFAB", "#40916C", "#333",
           'rgb(255, 99, 132)',
           'rgb(75, 192, 192)',
           'rgb(255, 205, 86)',
           'rgb(201, 203, 207)',
           'rgb(54, 162, 235)',
-          "#33EFAB", "#40916C", "#333"],
+        ],
         fill: true
       }
     ]

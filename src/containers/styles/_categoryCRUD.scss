@@ -1,5 +1,22 @@
 .categoryCRUD {
    &__root {
-      padding: 50px 20px 40px;
+   }
+
+}
+.search-textbox{
+   margin:10px;
+}
+.btn__category{
+   padding:8px;
+   border-radius: 10px;
+   border: #163D3C 1px solid;
+   margin-bottom: 20px;
+   cursor: pointer;
+   transition: 0.3s;
+   background-color: #163D3C;
+   color:#fff;
+   &:hover{
+      color: #163D3C;
+      background-color: white;
    }
 }

@@ -9,6 +9,7 @@ function Pagination({
   onLoadData,
   onReset
 }) {
+
   const onPrevious = () => {
     onChangePage(page > 0 ? page - 1 : page);
     if (typeof onLoadData !== 'undefined') {
@@ -35,23 +36,31 @@ function Pagination({
         </Text.MiddleLine>
         {Array(lastPage - firstPage + 1)
           .fill()
-          .map((_, index) => (
+          .map((_, index) => {
+            let selectedStyle = page === index ? {
+              borderRadius:"50%",
+              background:"#163D3C",
+              color:"white",
+              width:"39px",
+              textAlign:"center"
+            } : {};
+            return (
             <Text.MiddleLine
               key={index + 1}
               onClick={() => {
                 onSelected(index);
               }}
               style={{
-                color: `${page === index ? "blue" : "#000"}`,
                 fontWeight: "bold",
-                padding: '10px',
-                border: '1px solid #000',
-                cursor: 'pointer'
+                padding: '10px',  
+                borderRadius: "10px",
+                cursor: 'pointer',
+                ...selectedStyle
               }}
             >
               {firstPage + index}
             </Text.MiddleLine>
-          ))}
+          )})}
         <Text.MiddleLine className="pagination__next" style={{
           padding: '10px',
           cursor: 'pointer'

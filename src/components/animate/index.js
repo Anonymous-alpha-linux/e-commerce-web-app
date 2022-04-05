@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import { useSpring, animated, useTransition } from "react-spring";
+import { BsCaretDownFill } from 'react-icons/bs';
+import { Icon, Text } from '..';
+import { OutsideAlert } from "../../hooks";
 export default function AnimateComponent({
   children,
   timeout,
@@ -53,5 +56,218 @@ AnimateComponent.SlideRight = function AnimatedSlideRight({
         );
       })}
     </>
+  );
+};
+AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, triggerComponent, position = "middle", style, ...props }) {
+  const [isToggled, setToggle] = useState(false);
+  const menubg = useSpring({
+    // background: isToggled ? "#333" : "transparent",
+    position: 'relative'
+  });
+  const { y } = useSpring({
+    y: isToggled ? 180 : 0
+  });
+
+  let menuPosition = position === 'middle' && {
+    ...props.style,
+    left: '50%',
+    transform: 'translateX(-50%)',
+  } || position === 'left' && {
+    ...props.style,
+    left: '0'
+  } || {
+    ...props.style,
+    right: 0
+  }
+
+  const menuAppear = useSpring({
+    position: 'absolute',
+    transform: isToggled ? "translate3D(0,0,0)" : "translate3D(0,-120px,0)",
+    opacity: isToggled ? 1 : 0,
+    ...menuPosition,
+    ...style,
+  });
+
+
+
+  return (
+    <animated.div
+      style={menubg}
+      className="radiowrapper"
+      onClick={() => setToggle(!isToggled)}
+    >
+      <Text.MiddleLine>
+        {triggerComponent}
+      </Text.MiddleLine>
+      <animated.span
+        style={{
+          transform: y.interpolate((y) => `rotateX(${y}deg)`),
+          display: 'inline-block',
+          verticalAlign: 'middle'
+        }}
+      >
+        <Icon>
+          <BsCaretDownFill></BsCaretDownFill>
+        </Icon>
+      </animated.span>
+      <animated.div style={menuAppear}>
+        {isToggled ?
+          <OutsideAlert toggleShowing={() => setToggle(o => !o)}>
+            {children}
+          </OutsideAlert>
+          : null}
+      </animated.div>
+    </animated.div>
+
+  );
+}
+
+AnimateComponent.DropdownHover = function AnimatedDropdownHover({ children, state, triggerComponent, position = "middle", style, ...props }) {
+  const [isToggled, setToggle] = useState(false);
+  const menubg = useSpring({
+    // background: isToggled ? "#333" : "transparent",
+    position: 'relative'
+  });
+  const { y } = useSpring({
+    y: isToggled ? 180 : 0
+  });
+
+  let menuPosition = position === 'middle' && {
+    ...props.style,
+    left: '50%',
+    transform: 'translateX(-50%)',
+  } || position === 'left' && {
+    ...props.style,
+    left: '0'
+  } || {
+    ...props.style,
+    right: 0
+  }
+
+  const menuAppear = useSpring({
+    position: 'absolute',
+    transform: isToggled ? "translate3D(0,0,0)" : "translate3D(0,-120px,0)",
+    opacity: isToggled ? 1 : 0,
+    ...menuPosition,
+    ...style,
+  });
+
+  return (
+    <>
+      <animated.div
+        style={menubg}
+        className="radiowrapper"
+        onMouseEnter={() => setToggle(true)}
+        onMouseLeave={() => setToggle(false)}
+      >
+        <Text.MiddleLine>
+          {triggerComponent}
+        </Text.MiddleLine>
+        <animated.span
+          style={{
+            transform: y.interpolate((y) => `rotateX(${y}deg)`),
+            display: 'inline-block',
+            verticalAlign: 'middle'
+          }}
+        >
+          <Icon>
+            <BsCaretDownFill></BsCaretDownFill>
+          </Icon>
+        </animated.span>
+        <animated.div style={menuAppear}>
+          {isToggled ?
+            { children }
+            : null}
+        </animated.div>
+      </animated.div>
+    </>
+  );
+}
+
+AnimateComponent.DropdownClick = function AnimatedDropdownClick({
+  children,
+  style,
+  ...props
+}) {
+  const arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
+    from: { maxHeight: 0, overflow: "hidden" },
+    enter: (item) => async (next, cancel) => {
+      await next({ maxHeight: 800, ...style });
+      await next({ overflow: "visible" });
+    },
+    leave: [{ overflow: "hidden" }, { maxHeight: 0 }],
+    config: { duration: 600 },
+  });
+  return transition(
+    (prop, item) =>
+      item && (
+        <animated.div style={prop} {...props}>
+          {item}
+        </animated.div>
+      )
+  );
+};
+
+AnimateComponent.Rotate = function AnimatedRotate({
+  children,
+  state,
+  deg,
+  style,
+  ...props
+}) {
+  const spring = useSpring({
+    transform: `rotate(${state ? deg : 0}deg)`,
+    ...style,
+  });
+  return (
+    <animated.div style={spring} {...props}>
+      {children}
+    </animated.div>
+  );
+};
+
+AnimateComponent.Zoom = function AnimatedZoom({
+  children,
+  zoom = 1,
+  style,
+  ...props
+}) {
+  let [x, y] = zoom instanceof Object ? [zoom.x, zoom.y] : [zoom, zoom];
+  var arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
+    from: { transform: `scale(0)`, opacity: 0 },
+    enter: { transform: `scale(${x}, ${y})`, opacity: 1, ...style },
+    delay: 200, 
+    reset: false
+  });
+  return transition(
+    (style, item) =>
+      item && (
+        <animated.div style={style} {...props}>
+          {item}
+        </animated.div>
+      )
+  );
+};
+
+AnimateComponent.Width = function AnimateWidth({ children, style, ...props }) {
+  const arrChild = React.Children.toArray(children);
+  const transition = useTransition(arrChild, {
+    keys: (item) => item.key,
+    from: { maxWidth: 0, opacity: 0 },
+    enter: { maxWidth: 200, opacity: 1, ...style },
+    leave: { maxWidth: 0, opacity: 0 },
+    config: { duration: 400 },
+  });
+  return transition(
+    (prop, item) =>
+      item && (
+        <animated.div style={prop} {...props}>
+          {item}
+        </animated.div>
+      )
   );
 };

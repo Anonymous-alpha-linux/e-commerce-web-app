@@ -6,13 +6,13 @@ import { FaSearch, FaFilter } from "react-icons/fa";
 import { ImSpinner6 } from 'react-icons/im';
 import { TiUserDelete } from "react-icons/ti";
 
-import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from "../../redux";
+import { useAdminContext, useWorkspaceContext } from "../../redux";
 import { ContainerComponent, Form, Icon, Message, Text, } from "../../components";
 import { toastTypes, roles } from "../../fixtures";
 
 export default function MemberList({ workspaceId }) {
     const { workspaces, getWorkspaceMembers } = useWorkspaceContext();
-    const { accounts: { data } } = useAdminContext();
+    const { accounts: { data }, getAccountList } = useAdminContext();
     const { id } = useParams();
     let workspaceid = id || workspaceId;
     const [state, setState] = useState({
@@ -21,13 +21,20 @@ export default function MemberList({ workspaceId }) {
     });
     const [input, setInput] = React.useState('');
     useEffect(() => {
+        getAccountList(data => {
+            console.log(data);
+        });
+    }, []);
+    useEffect(() => {
         getWorkspaceMembers(workspaceid, members => {
+            console.log(members);
             setState({
                 members: members,
                 outputs: data.filter(account => [roles.QA_COORDINATOR, roles.STAFF].includes(account.role.roleName)),
             });
         });
     }, [data, workspaceid]);
+
     function inputHandler(e) {
         setInput(e.target.value);
         searchMember(e.target.value);

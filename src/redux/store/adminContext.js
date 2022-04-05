@@ -55,13 +55,6 @@ export default function AdminContext({ children }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? mainAPI.LOCALHOST_MANAGER
       : mainAPI.CLOUD_API_MANAGER;
-  const staffAPI =
-    process.env.REACT_APP_ENVIRONMENT === "development"
-      ? mainAPI.LOCALHOST_STAFF
-      : mainAPI.CLOUD_API_STAFF;
-  // useEffect(() => {
-  //   getAttachmentList();
-  // }, []);
 
   function getAccountList(cb) {
     return axios
@@ -107,6 +100,10 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Get Role List Successful",
+          type: toastTypes.SUCCESS
+        });
         setState((o) => ({
           ...o,
           roles: res.data.response,

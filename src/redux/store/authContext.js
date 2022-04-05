@@ -1,10 +1,5 @@
 import axios from "axios";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useReducer,
-} from "react";
+import React, { createContext, useContext, useState, useReducer } from "react";
 import { mainAPI } from "../../config";
 import { Loading } from "../../pages";
 import { io } from "socket.io-client";
@@ -22,47 +17,49 @@ export default function AuthenticationContext({ children }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
-  const staffAPI = process.env.REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
+  const staffAPI =
+    process.env.REACT_APP_ENVIRONMENT === "development"
+      ? mainAPI.LOCALHOST_STAFF
+      : mainAPI.CLOUD_API_STAFF;
 
-  const [toastList, pushToast, pullToast] = useMessage()
+  const [toastList, pushToast, pullToast] = useMessage();
   const [socket, setSocket] = useState(null);
   const cancelTokenSource = axios.CancelToken.source();
 
   React.useEffect(() => {
     onLoadUser();
   }, []);
-
   const onLoadUser = (cb) => {
     return axios
       .get(authAPI, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        }
+        },
       })
-      .then(response => {
+      .then((response) => {
         setUser({
           type: actions.AUTHENTICATE_ACTION,
           payload: response.data,
         });
         let socket = io(host);
-        socket.auth = { accessToken: localStorage.getItem('accessToken') };
+        socket.auth = { accessToken: localStorage.getItem("accessToken") };
         setSocket(socket);
-        if (typeof cb !== 'undefined') {
+        if (typeof cb !== "undefined") {
           cb(response.data.accountId);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         setUser({
           type: actions.AUTHENTICATE_FAILED,
         });
         pushToast({
           message: "Sign-in to system",
-          type: toastTypes.INFO
+          type: toastTypes.INFO,
         });
-        if (typeof cb !== 'undefined') {
+        if (typeof cb !== "undefined") {
           cb({});
         }
-      })
+      });
   };
   function login(data, cb) {
     const loginApi =
@@ -70,19 +67,18 @@ export default function AuthenticationContext({ children }) {
         ? mainAPI.LOCALHOST_LOGIN
         : mainAPI.CLOUD_API_LOGIN;
     return axios
-      .post(loginApi, data, {
-      })
+      .post(loginApi, data, {})
       .then(async (res) => {
         await localStorage.setItem("accessToken", res.data.accessToken);
 
         pushToast({
           message: "Login successfully",
-          type: toastTypes.SUCCESS
+          type: toastTypes.SUCCESS,
         });
 
         setUser({
           type: actions.LOGIN_ACTION,
-          payload: res.data
+          payload: res.data,
         });
 
         onLoadUser();
@@ -96,14 +92,13 @@ export default function AuthenticationContext({ children }) {
           });
           pushToast({
             message: error.response.data.error,
-            type: toastTypes.ERROR
+            type: toastTypes.ERROR,
           });
           cb();
-        }
-        else {
+        } else {
           pushToast({
             message: "Please login to system",
-            type: toastTypes.INFO
+            type: toastTypes.INFO,
           });
           cb();
         }
@@ -128,7 +123,7 @@ export default function AuthenticationContext({ children }) {
         pushToast({
           message: error.message,
         });
-      })
+      });
   }
   function getProfile(accountId, cb) {
     return axios
@@ -152,68 +147,73 @@ export default function AuthenticationContext({ children }) {
         if (user.accountId === accountId) {
           pushToast({
             message: "You are not fulfill profile",
-            type: toastTypes.WARNING
+            type: toastTypes.WARNING,
           });
         }
-        cb({ error: 'Get profile failed' });
+        cb({ error: "Get profile failed" });
       });
   }
   function editProfile(input, cb) {
     return axios
-      .put(
-        authAPI, input,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          params: {
-            view: "profile",
-          },
-        }
-      )
+      .put(authAPI, input, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "profile",
+        },
+      })
       .then((res) => {
         pushToast({
           message: "Edit Profile Successful",
-          type: toastTypes.SUCCESS
+          type: toastTypes.SUCCESS,
         });
         cb(res.data.response);
       })
       .catch((error) => {
         pushToast({
           message: "Edit Profile Failed",
-          type: toastTypes.ERROR
+          type: toastTypes.ERROR,
         });
         cb({ error: "get profile failed" });
       });
   }
   function editCurrentWorkspace(workspaceId, cb) {
-    return axios.put(staffAPI, {
-      workspaceid: workspaceId
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      params: {
-        view: "accountworkspace"
-      }
-    }).then(res => {
-      onLoadUser(cb);
-      pushToast({
-        message: "Update Workspace successfully",
-        type: toastTypes.SUCCESS
-      })
-    }).catch(err => {
-      pushToast({
-        message: err.message,
-        type: toastTypes.ERROR,
-        timeout: 10000,
+    return axios
+      .put(
+        staffAPI,
+        {
+          workspaceid: workspaceId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          params: {
+            view: "accountworkspace",
+          },
+        }
+      )
+      .then((res) => {
+        onLoadUser(cb);
+        pushToast({
+          message: "Update Workspace successfully",
+          type: toastTypes.SUCCESS,
+        }).catch((err) => {
+          pushToast({
+            message: err.message,
+            type: toastTypes.ERROR,
+            timeout: 10000,
+          });
+        });
+        cb();
       });
-      cb();
-    })
   }
-  function searchQuery() {
-
+  function changeAvatar(file) {
+const formData = new FormData();
+formData.append(file);
   }
+  function searchQuery() { }
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (
@@ -232,7 +232,7 @@ export default function AuthenticationContext({ children }) {
         logout,
         editProfile,
         editCurrentWorkspace,
-        getProfile
+        getProfile,
       }}
     >
       {children}
