@@ -1,7 +1,7 @@
-import React from 'react';
-import { ContainerComponent } from '../../components';
-import { Nav } from '..';
-import { Outlet } from 'react-router-dom';
+import React from "react";
+import { ContainerComponent } from "../../components";
+import { Nav } from "..";
+import { Outlet } from "react-router-dom";
 export default function Staff() {
   return <>
     <Nav></Nav>
