@@ -1,9 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import {
+  BarChart,
   ButtonComponent,
   ContainerComponent,
   List,
-  AnimateComponent,
 } from "../../components";
 import {
   Filter,
@@ -17,54 +17,49 @@ import { toastTypes } from "../../fixtures";
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
-  useNotifyContext,
   usePostContext,
   useWorkspaceContext,
 } from "../../redux";
 
 export default function Workspace() {
-  const { user } = useAuthorizationContext();
+  const { user, socket, error, setError } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
   const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
-  const { sendMessageToSpecificPerson } = useNotifyContext(true);
-
-  const [blockWorkspace, setBlockWorkspace] = useState(false);
-
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const listRef = useRef();
 
+  useEffect(() => {
+    setError("Error!");
+  }, []);
+
   return (
     <ContainerComponent className="workspace" id="workspace">
-      <ContainerComponent.Inner className="workspace__form">
-        <ContainerComponent.Inner className="workspace__innerForm">
-          <Timespan style={{width:"100vw"}} expireTime={workspace.expireTime} setBlockWorkspace={setBlockWorkspace}></Timespan>
-          {!blockWorkspace && <PostForm></PostForm>}
-          <Filter
-            loader={filterPost}
-            selectOptions={[
-              {
-                label: "Most Recent",
-                value: 0,
-              },
-              {
-                label: "Most Liked",
-                value: 1,
-              },
-            ]}
-          ></Filter>
-        </ContainerComponent.Inner>
-      </ContainerComponent.Inner>
+      <Timespan expireTime={workspace.expireTime}></Timespan>
+      <PostForm></PostForm>
+      <Filter
+        loader={filterPost}
+        selectOptions={[
+          {
+            label: "Most Recent",
+            value: 0,
+          },
+          {
+            label: "Most Liked",
+            value: 1,
+          },
+        ]}
+      ></Filter>
       <LazyLoading loader={loadNextPosts}>
-        <List style={{ borderRadius: "10px", background:"#A9C39E"}} className="workspace__postList" ref={listRef}>
-          {posts.map((post, index) => {
+        <List className="workspace__postList" ref={listRef}>
+          {posts.map((post) => {
             const {
               _id,
               postAuthor,
               content,
-              attachments,
+              attachment,
               like,
               dislike,
               likedAccounts,
@@ -73,7 +68,7 @@ export default function Workspace() {
               hideAuthor,
               comments,
             } = post;
-console.log(post);
+
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,
@@ -83,9 +78,10 @@ console.log(post);
               date: post.createdAt,
               hideAuthor,
             };
+
             let postBody = {
               content,
-              attachment: attachments.map((attach) => {
+              attachment: attachment.map((attach) => {
                 const { _id, fileType, online_url, filePath, fileFormat } =
                   attach;
                 return {
@@ -107,20 +103,22 @@ console.log(post);
               comments,
             };
             return (
-              <AnimateComponent.Zoom key={`${post._id}-${index}`}>
-                <List.Item id={post._id}>
-                  <PostContainer
-                    postId={_id}
-                    postHeader={postHeader}
-                    postBody={postBody}
-                    postFooter={postFooter}
-                  ></PostContainer>
-                </List.Item>
-              </AnimateComponent.Zoom>
+              <List.Item key={post._id} id={post._id}>
+                <PostContainer
+                  postId={_id}
+                  postHeader={postHeader}
+                  postBody={postBody}
+                  postFooter={postFooter}
+                  removeIdea={() => removeIdea(_id)}
+                ></PostContainer>
+              </List.Item>
             );
           })}
         </List>
       </LazyLoading>
+      {error && (
+        <Toast message={error} timeout={3000} type={toastTypes.ERROR} />
+      )}
     </ContainerComponent>
   );
 }

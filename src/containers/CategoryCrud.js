@@ -66,7 +66,7 @@ export default function Crud() {
 
           <div className="table__container" style={{width:"100%",background:"white",overflow:"scroll",paddingBottom:"1px",marginTop:"10px"}}>
             <table className="table table-style" style={{ minWidth: "550px",}}>
-              <thead style={{ background:"#163d3c"}}>
+              <thead>
                 <tr style={{background: "#f2f8fb"}}>
                   <th scope="col" style={{ textAlign: "center", width: "40%" }}>
                     ID
