@@ -160,7 +160,7 @@ export default React.memo(function PostContext({ children }) {
         });
         pushToast({
           message: "Filter Failed",
-          type: toastTypes.ERROR,
+          type: toastTypes.ERROR
         });
       });
   }
@@ -255,7 +255,7 @@ export default React.memo(function PostContext({ children }) {
       .then((res) => {
         pushToast({
           message: "Update Post Successful",
-          type: toastTypes.SUCCESS,
+          type: toastTypes.SUCCESS
         });
         setPost({
           type: actions.UPDATE_SINGLE_POST,
@@ -284,7 +284,7 @@ export default React.memo(function PostContext({ children }) {
       .then((res) => {
         pushToast({
           message: "Delete Post Successful",
-          type: toastTypes.SUCCESS,
+          type: toastTypes.SUCCESS
         });
         setPost({
           type: actions.REMOVE_SINGLE_POST,
@@ -340,7 +340,7 @@ export default React.memo(function PostContext({ children }) {
       .then((res) => {
         pushToast({
           message: "Post Idea Successful",
-          type: toastTypes.SUCCESS,
+          type: toastTypes.SUCCESS
         });
         createSinglePost(res.data.response[0]._id, cb);
         pushToast({
@@ -390,7 +390,7 @@ export default React.memo(function PostContext({ children }) {
       .then((res) => {
         pushToast({
           message: "Edit Idea Successful",
-          type: toastTypes.SUCCESS,
+          type: toastTypes.SUCCESS
         });
         console.log(res.data.response);
         updateSinglePost(res.data.response[0]._id);
@@ -478,7 +478,7 @@ export default React.memo(function PostContext({ children }) {
       .then((res) => {
         pushToast({
           message: "Get Post Successful",
-          type: toastTypes.SUCCESS,
+          type: toastTypes.SUCCESS
         });
         setPost({
           type: actions.GET_MY_POST,

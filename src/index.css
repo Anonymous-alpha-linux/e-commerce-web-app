@@ -30,7 +30,6 @@ body {
 }
 
 #root {
-  height: 100vh;
   position: relative;
   margin: 0 auto;
 }
