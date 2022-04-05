@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { FaTimes, FaBell } from "react-icons/fa";
+import { FaTimes, FaBell } from 'react-icons/fa';
 import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
 import {
   IoNotificationsOutline,
@@ -92,7 +92,7 @@ export default function Navigation() {
                   })
                 }
               >
-                <Logo></Logo>
+                 <Logo></Logo>
               </Icon.CircleIcon>
             </ContainerComponent.Item>
 
