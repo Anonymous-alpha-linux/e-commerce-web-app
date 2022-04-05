@@ -134,59 +134,62 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                 </Text.Line>
               </ContainerComponent.Item>
             </ContainerComponent.Flex>
-
-            {switchToggle && (
-              <ContainerComponent.Toggle
-                style={{ margin: "0 auto", padding: "0 10px" }}
-              >
-                <ContainerComponent.Item
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    // boxShadow: "2px 0 5px #000",
-                    position: "relative",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setModalWS(!modalWS)}
+            <AnimateComponent.Dropdown>
+              {switchToggle && (
+                <ContainerComponent.Toggle
+                  style={{ margin: "0 auto", padding: "0 10px" }}
                 >
-                  <Text.MiddleLine>
-                    <Icon
+                  <ContainerComponent.Item
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      // boxShadow: "2px 0 5px #000",
+                      position: "relative",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setModalWS(!modalWS)}
+                  >
+                    <Text.MiddleLine>
+                      <Icon
+                        style={{
+                          fontSize: "33px",
+                        }}
+                      >
+                        <TiPlus></TiPlus>
+                      </Icon>
+                    </Text.MiddleLine>
+                    <Text.MiddleLine
                       style={{
-                        fontSize: "33px",
+                        width: "calc(100% - 20px)",
+                        transform: "translateX(27%)",
                       }}
                     >
-                      <TiPlus></TiPlus>
-                    </Icon>
-                  </Text.MiddleLine>
-                  <Text.MiddleLine
-                    style={{
-                      width: "calc(100% - 20px)",
-                      transform: "translateX(27%)",
-                    }}
+                      <Text.Title>Add Workspace</Text.Title>
+                    </Text.MiddleLine>
+                  </ContainerComponent.Item>
+                  {/* workspaceData */}
+                  <ContainerComponent.Item
+                    style={{ maxHeight: "260px", overflowY: "scroll" }}
                   >
-                    <Text.Title>Add Workspace</Text.Title>
-                  </Text.MiddleLine>
-                </ContainerComponent.Item>
-                {/* workspaceData */}
-                <ContainerComponent.Item
-                  style={{ maxHeight: "260px", overflowY: "scroll" }}
-                >
-                  <TriggerLoading
-                    loadMore={loadMore}
-                    loader={loadMoreWorkspaceList}
-                  >
-                    {workspaces &&
-                      workspaces.map((item, index) => (
-                        <EditToggle
-                          item={item}
-                          key={index + 1}
-                          clickLoader={closeSidebar}
-                        ></EditToggle>
-                      ))}
-                  </TriggerLoading>
-                </ContainerComponent.Item>
-              </ContainerComponent.Toggle>
-            )}
+                    <TriggerLoading
+                      loadMore={loadMore}
+                      loader={loadMoreWorkspaceList}
+                    >
+                      {workspaces &&
+                        workspaces.map((item, index) => (
+                          <AnimateComponent.Zoom>
+                            <EditToggle
+                              item={item}
+                              key={index + 1}
+                              clickLoader={closeSidebar}
+                            ></EditToggle>
+                          </AnimateComponent.Zoom>
+                        ))}
+                    </TriggerLoading>
+                  </ContainerComponent.Item>
+                </ContainerComponent.Toggle>
+              )}
+            </AnimateComponent.Dropdown>
           </ContainerComponent.Inner>
 
           <ContainerComponent.Pane

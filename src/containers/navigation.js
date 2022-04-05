@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
 import { FaTimes, FaBell } from "react-icons/fa";
 import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
 import {
@@ -10,8 +9,8 @@ import {
 } from "react-icons/io5";
 import { BsList, BsCaretDownFill } from "react-icons/bs";
 import { GrStackOverflow } from "react-icons/gr";
-
 import { ImSpinner } from "react-icons/im";
+
 import logo from "../assets/Logoidea2.jpg";
 import {
   ButtonComponent,
@@ -20,6 +19,7 @@ import {
   Text,
   AnimateComponent,
   Form,
+  LogoIcon,
 } from "../components";
 
 import { navigator as navigators, navData, roles, media } from "../fixtures";
@@ -28,6 +28,7 @@ import {
   useNotifyContext,
   useWorkspaceContext,
 } from "../redux";
+
 import DropdownButton from "./dropDownButton";
 import { useMedia, useModal, OutsideAlert } from "../hooks";
 import Modal from "./modal";
@@ -85,15 +86,13 @@ export default function Navigation() {
             }}
           >
             <ContainerComponent.Item>
-              <Icon.CircleIcon
+              <LogoIcon
                 onClick={() =>
                   navigate("/", {
                     replace: true,
                   })
                 }
-              >
-                <Logo></Logo>
-              </Icon.CircleIcon>
+              ></LogoIcon>
             </ContainerComponent.Item>
 
             <ContainerComponent.Item
