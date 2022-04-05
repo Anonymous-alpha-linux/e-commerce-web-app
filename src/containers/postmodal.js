@@ -192,66 +192,6 @@ export default function PostModal() {
       mountedRef.current = false;
       cancelTokenSource.cancel();
     };
-    const eliminateFile = (id) => {
-        setInput((input) => ({
-            ...input,
-            files: input.files.filter((file, index) => id !== index),
-        }));
-    };
-
-    useEffect(() => {
-        mountedRef.current = true;
-        setLoading(true);
-        if (id) {
-            // Stage 1
-            Promise.resolve({
-                then: function (resolve, reject) {
-                    try {
-                        getSinglePost(id, post => {
-                            resolve(post);
-                        })
-                    } catch (error) {
-                        reject(error.message);
-                    }
-                }
-            }).then(post => {
-                return Promise.all([
-                    post,
-                    ...post.attachments.map(attach => {
-                        return new Promise((resolve, reject) => {
-                            getFileRef.current(attach, file => {
-                                resolve(file);
-                            }).catch(error => reject(error));
-                        });
-                    })])
-            }).then(data => {
-                const [post, ...files] = data;
-                const { title, content, hideAuthor, categories } = post;
-                if (mountedRef.current) {
-                    setInput(input => ({
-                        ...input,
-                        title: title,
-                        content: content,
-                        private: hideAuthor,
-                        categories: categories.map((single) => single._id),
-                        files: files,
-                    }));
-                    setLoading(false);
-                }
-            }).catch(error => {
-                if (mountedRef.current) {
-                    setLoading(false);
-                    setError(error.message);
-                }
-            });
-        }
-        else {
-            setLoading(false);
-        }
-        return () => {
-            mountedRef.current = false;
-            cancelTokenSource.cancel();
-        }
     }, [posts]);
     useEffect(() => {
         getFileRef.current = getFile;
