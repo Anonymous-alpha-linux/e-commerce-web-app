@@ -60,9 +60,10 @@ export default function AttachmentCRUD() {
         display:"block",
         background:"#DCE7D7",
         borderRadius:"10px",
-        overflow:"hidden"
+        overflow:"hidden",
+        height:"fit-content"
       }}>
-        <ContainerComponent.Inner className="categoryCRUD__inner" style={{maxWidth:"1300px", margin: '0 auto',borderRadius:"10px",overflow:"hidden" }}>
+        <ContainerComponent.Inner className="categoryCRUD__inner" style={{maxWidth:"1300px", margin: '0 auto',borderRadius:"10px",overflow:"hidden" ,height:"fit-content"}}>
           <div className="table__container" style={{ overflowX: 'scroll',width:"100%" }}>
             <table className="table table-style" style={{ width: "100%" }}>
               <thead>

@@ -38,12 +38,10 @@ export default function AccountCrud() {
   }, [data, currentPage]);
 
   return (
-    <ContainerComponent style={{ backgroundColor: "#A9C39E",height:"100%"}}>
-      <div className="categoryCRUD__root" style={{ margin: "0 auto"}}>
-        <ContainerComponent.Inner className="workspace__form" style={{margin:"0 auto"}}>
-          <ContainerComponent.Inner style={{overflow:"hiden"}} className="workspace__innerForm">
+    <ContainerComponent style={{ backgroundColor: "#A9C39E",height:"100%",display:"flex",justifyContent:"center"}}>
+        <ContainerComponent.Inner style={{borderRadius: "10px",flexGrow:"1",maxWidth:"1300px",height:"fit-content", background: "#DCE7D7",overflow: "hidden",margin:"30px 10px 10px 10px",padding:"10px"}}>
             <div style={{padding: '10px'}}>
-              <button className="btn-rounded-Regis" style={{margin: "20px 0"}} onClick={() => setModal(!modal)}>
+          <button className="btn-rounded-Regis" style={{ margin: "0 0 20px 0", border:"1px solid #163d3c",transition:"0.3s"}} onClick={() => setModal(!modal)}>
                 Register New Account
               </button>
               {modal && (
@@ -53,9 +51,9 @@ export default function AccountCrud() {
                   </div>
                 </div>
               )}
-              <div className="table__container" style={{ overflowX: 'scroll', borderRadius:"15px",overflow:"hiden", padding: '10px 0', backgroundColor: "#fff" }}>
+              <div className="table__container" style={{ overflowX: 'scroll', borderRadius:"15px",overflow:"hiden", padding: '0', backgroundColor: "#fff" }}>
                 <table className="table table-style">
-                  <thead>
+              <thead style={{ background: "#f2f8fb" }}>
                     <tr>
                       <th scope="col" style={{ textAlign: "center", width: "4%" }}>
                         ID
@@ -120,9 +118,6 @@ export default function AccountCrud() {
               </div>
             </div>
           </ContainerComponent.Inner>
-        </ContainerComponent.Inner>
-      </div>
-
     </ContainerComponent>
   );
 }
@@ -354,7 +349,7 @@ function AccFormEdit({ modalEdit, setModalEdit, data }) {
       </div>
       <div className="row" style={{ justifyContent: "right" }}>
         <button
-          style={{ textAlign: "left", fontWeight: "bold" }}
+          style={{ textAlign: "left", fontWeight: "bold"}}
           className="btn-trans-Cancel"
           onClick={() => setModalEdit()}>
           <strong>Exit</strong>
@@ -612,7 +607,7 @@ function AccountData({ data, index }) {
         </Modal>
         {data._id !== user.accountId &&
           <button
-          style={{margin: "3px"}}
+          style={{margin: "0 10px"}}
             onClick={toggleModalEdit}
             className="btn-warning"
           >
