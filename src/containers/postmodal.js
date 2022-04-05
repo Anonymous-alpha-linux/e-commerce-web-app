@@ -192,130 +192,191 @@ export default function PostModal() {
       mountedRef.current = false;
       cancelTokenSource.cancel();
     };
-  }, [posts]);
-  useEffect(() => {
-    getFileRef.current = getFile;
-  }, [getFile]);
-  return (
-    <ContainerComponent.Section className="postModal__container">
-      <Form
-        encType="multipart/form-data"
-        method={"POST"}
-        onSubmit={(e) => {
-          if (id) {
-            editHandler(e);
-          } else {
-            submitHandler(e);
-          }
-        }}
-        className="postModal__form"
-      >
-        <Text.Line className="postModal__header">
-          <Text.MiddleLine
-            onClick={() => {
-              // setOpenModal(modal => !modal);
-              navigate("/");
-            }}
-          >
-            <Text.MiddleLine>
-              <Icon style={{ display: "inline" }}>
-                <FaChevronLeft></FaChevronLeft>
-              </Icon>
-            </Text.MiddleLine>
-            <Text.Middle
-              style={{
-                verticalAlign: "middle",
-                textIndent: "12px",
-              }}
-            >
-              Back
-            </Text.Middle>
-          </Text.MiddleLine>
-          <Text.RightLine
-            style={{
-              width: "80%",
-              display: "inline-block",
-            }}
-          >
-            <Text.Title
-              style={{
-                textAlign: "right",
-              }}
-            >
-              Post Modal
-            </Text.Title>
-          </Text.RightLine>
-        </Text.Line>
-        <Text.Line style={{ margin: "15px 0" }}>
-          <Text.MiddleLine>
-            <Text.Label className="postModal__label">Author name:</Text.Label>
-          </Text.MiddleLine>
-          <Text.MiddleLine>
-            <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
-          </Text.MiddleLine>
-          <Text.RightLine>
-            <ButtonComponent.Toggle
-              onText="Hide"
-              offText="Show"
-              id="private"
-              name="private"
-              value={input.private}
-              onChange={checkedHandler}
-              ref={privateChecked}
-            ></ButtonComponent.Toggle>
-          </Text.RightLine>
-        </Text.Line>
-        <Form.TextArea
-          id="content"
-          name="content"
-          onChange={inputHandler}
-          value={input.content}
-          style={{
-            width: "100%",
-            height: "100px",
-          }}
-        ></Form.TextArea>
-        <Text.Line className="postModal__category">
-          <TagInput
-            itemList={categories}
-            formField={input.categories}
-            setFormField={setInput}
-          ></TagInput>
-        </Text.Line>
-        <ContainerComponent.Pane
-          className="upload__input"
-          style={{
-            padding: "10px 0",
-          }}
-        >
-          <UploadForm
-            files={input.files}
-            eliminateFile={eliminateFile}
-            setFiles={pushInputHandler}
-          ></UploadForm>
-        </ContainerComponent.Pane>
-        <Text.Line className="postModal__conditional">
-          <Text.MiddleLine>
-            <Form.Checkbox
-              id="condition"
-              name="condition"
-              onChange={checkedHandler}
-              ref={checkedCondition}
-            ></Form.Checkbox>
-          </Text.MiddleLine>
-          <Text.MiddleLine>
-            <Text.Paragraph
-              onClick={() => setOpenCondition(true)}
-              style={{
-                color: "blue",
-                margin: "0",
-              }}
-            >
-              Condition and Term
-            </Text.Paragraph>
-          </Text.MiddleLine>
-        </Text.Line>
+    const eliminateFile = (id) => {
+        setInput((input) => ({
+            ...input,
+            files: input.files.filter((file, index) => id !== index),
+        }));
+    };
 
+    useEffect(() => {
+        mountedRef.current = true;
+        setLoading(true);
+        if (id) {
+            // Stage 1
+            Promise.resolve({
+                then: function (resolve, reject) {
+                    try {
+                        getSinglePost(id, post => {
+                            resolve(post);
+                        })
+                    } catch (error) {
+                        reject(error.message);
+                    }
+                }
+            }).then(post => {
+                return Promise.all([
+                    post,
+                    ...post.attachments.map(attach => {
+                        return new Promise((resolve, reject) => {
+                            getFileRef.current(attach, file => {
+                                resolve(file);
+                            }).catch(error => reject(error));
+                        });
+                    })])
+            }).then(data => {
+                const [post, ...files] = data;
+                const { title, content, hideAuthor, categories } = post;
+                if (mountedRef.current) {
+                    setInput(input => ({
+                        ...input,
+                        title: title,
+                        content: content,
+                        private: hideAuthor,
+                        categories: categories.map((single) => single._id),
+                        files: files,
+                    }));
+                    setLoading(false);
+                }
+            }).catch(error => {
+                if (mountedRef.current) {
+                    setLoading(false);
+                    setError(error.message);
+                }
+            });
+        }
+        else {
+            setLoading(false);
+        }
+        return () => {
+            mountedRef.current = false;
+            cancelTokenSource.cancel();
+        }
+    }, [posts]);
+    useEffect(() => {
+        getFileRef.current = getFile;
+    }, [getFile]);
+    return (
+        <ContainerComponent.Section className="postModal__container">
+            <Form
+                encType="multipart/form-data"
+                method={"POST"}
+                onSubmit={(e) => {
+                    if (id) { editHandler(e); }
+                    else { submitHandler(e); }
+                }}
+                className="postModal__form">
+                <Text.Line className="postModal__header">
+                    <Text.MiddleLine
+                        onClick={() => {
+                            // setOpenModal(modal => !modal);
+                            navigate("/");
+                        }}>
+                        <Text.MiddleLine>
+                            <Icon style={{ display: "inline" }}>
+                                <FaChevronLeft></FaChevronLeft>
+                            </Icon>
+                        </Text.MiddleLine>
+                        <Text.Middle
+                            style={{
+                                verticalAlign: 'middle',
+                                textIndent: '12px'
+                            }}
+                        >
+                            Back
+                        </Text.Middle>
+                    </Text.MiddleLine>
+                    <Text.RightLine
+                        style={{
+                            width: "80%",
+                            display: "inline-block",
+                        }}
+                    >
+                        <Text.Title
+                            style={{
+                                textAlign: "right",
+                            }}
+                        >
+                            Post Modal
+                        </Text.Title>
+                    </Text.RightLine>
+                </Text.Line>
+                <Text.Line style={{ margin: "15px 0" }}>
+                    <Text.MiddleLine>
+                        <Text.Label className="postModal__label">Author name:</Text.Label>
+                    </Text.MiddleLine>
+                    <Text.MiddleLine>
+                        <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
+                    </Text.MiddleLine>
+                    <Text.RightLine>
+                        <ButtonComponent.Toggle
+                            onText="Hide"
+                            offText="Show"
+                            id="private"
+                            name="private"
+                            value={input.private}
+                            onChange={checkedHandler}
+                            ref={privateChecked}
+                        ></ButtonComponent.Toggle>
+                    </Text.RightLine>
+                </Text.Line>
+                <Form.Input id="title" name="title" onChange={inputHandler} value={input.title} placeholder="Your post title" className="postModal__titleInput"></Form.Input>
+                <Form.TextArea
+                    id="content"
+                    name="content"
+                    onChange={inputHandler}
+                    value={input.content}
+                    style={{
+                        width: "100%",
+                        height: "100px",
+                        borderRadius:"10px",
+                        borderColor: "rgb(22, 61, 60)"
+                    }}
+                ></Form.TextArea>
+                <Text.Label style={{ fontSize: "14px" }}>Category:</Text.Label>
+                <Text.Line className="postModal__category">
+                    <TagInput
+                        itemList={categories}
+                        formField={input.categories}
+                        setFormField={setInput}
+                        style= {{ minHeight: "45px"}}
+                    ></TagInput>
+                </Text.Line>
+                <ContainerComponent.Pane
+                    className="upload__input"
+                    style={{
+                        padding: "10px 0 0",
+                    }}>
+                    <UploadForm
+                        files={input.files}
+                        eliminateFile={eliminateFile}
+                        setFiles={pushInputHandler}
+                        style ={{ padding: "10px 0 0" }}
+                    ></UploadForm>
+                </ContainerComponent.Pane>
+                <Text.Line className="postModal__conditional">
+                    <Text.MiddleLine>
+                        <Form.Checkbox
+                            id="condition"
+                            name="condition"
+                            onChange={checkedHandler}
+                            ref={checkedCondition}
+                        ></Form.Checkbox>
+                    </Text.MiddleLine>
+                    <Text.MiddleLine >
+                        <Text.Paragraph
+                            onClick={() => setOpenCondition(true)}
+                            style={{
+                                color: "blue",
+                                margin: "0",
+                                marginLeft: "10px",
+                                // fontSize: '12px'
+                            }}
+                        >
+                            Condition and Term
+                        </Text.Paragraph>
+                    </Text.MiddleLine>
+                </Text.Line>
         {openCondition && (
           <ConditionContainer
             closeCondition={() => setOpenCondition(false)}
@@ -327,9 +388,9 @@ export default function PostModal() {
                 name="id"
                 id="id"
                 value={id}></Form.Input>} */}
-        <Form.Input type="submit" value={id ? "Edit" : "Submit"}></Form.Input>
-      </Form>
-      {loading && <Loading></Loading>}
-    </ContainerComponent.Section>
-  );
+                <Form.Input type="submit" value={id ? "Edit" : "Submit"} className="postModal__summitButton"></Form.Input>
+            </Form>
+            {loading && <Loading></Loading>}
+        </ContainerComponent.Section>
+    );
 }

@@ -43,11 +43,14 @@ export default function TagInput({ itemList, formField = [], setFormField }) {
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
+        minHeight: '45px',
+        textAlign: 'center'
       }}>
 
       {(!formField.length && !openInput) && <Text.Bold
         style={{
-          display: 'inline-block'
+          display: 'inline-block',
+          margin: '0 auto',
         }}>
         Select your category
       </Text.Bold>}
