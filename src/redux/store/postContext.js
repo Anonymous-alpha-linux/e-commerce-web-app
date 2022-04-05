@@ -123,7 +123,7 @@ export default React.memo(function PostContext({ children }) {
         });
         pushToast({
           message: "Get Post Failed",
-          type: toastTypes.ERROR
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -218,7 +218,7 @@ export default React.memo(function PostContext({ children }) {
       .then((res) => {
         pushToast({
           message: "Create Post Successful",
-          type: toastTypes.SUCCESS
+          type: toastTypes.SUCCESS,
         });
         setPost({
           type: actions.PUSH_IDEA,
@@ -384,12 +384,16 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: "Edit Idea Successful",
+          type: toastTypes.SUCCESS
+        });
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
       .catch((error) => {
         pushToast({
-          message: "Edit Post successfully",
+          message: "Edit Post Failed",
           type: toastTypes.ERROR,
         });
       });
@@ -478,7 +482,7 @@ export default React.memo(function PostContext({ children }) {
         });
         pushToast({
           message: "Get Post Failed",
-          type: toastTypes.ERROR
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -498,7 +502,7 @@ export default React.memo(function PostContext({ children }) {
       .then((res) => {
         pushToast({
           message: "Filter Successful",
-          type: toastTypes.SUCCESS
+          type: toastTypes.SUCCESS,
         });
         return setPost({
           type: actions.FILTER_MY_POST,
@@ -512,7 +516,7 @@ export default React.memo(function PostContext({ children }) {
         });
         pushToast({
           message: "Filter Failed",
-          type: toastTypes.ERROR
+          type: toastTypes.ERROR,
         });
       });
   }
@@ -1153,7 +1157,7 @@ export default React.memo(function PostContext({ children }) {
       .then((data) => cb(data))
       .catch((error) => setError(error.message));
   }
-  function getGzipFile() {}
+  function getGzipFile() { }
   async function downloadHandler(attachmentId) {
     return axios
       .get(`${host}/api/v1/download`, {

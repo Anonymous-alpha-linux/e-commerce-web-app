@@ -1,29 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { FaTimes, FaBell } from 'react-icons/fa';
-import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
-import {
-  IoNotificationsOutline,
-  IoSearchSharp,
-  IoHomeSharp,
-} from "react-icons/io5";
-import { BsList, BsCaretDownFill } from "react-icons/bs";
-import { GrStackOverflow } from 'react-icons/gr';
-
-import { ImSpinner } from 'react-icons/im';
-import logo from '../assets/Logoidea2.jpg';
+import { AiFillCaretDown } from "react-icons/ai";
+import { IoNotificationsOutline, IoSearchSharp } from "react-icons/io5";
+import { BsList } from "react-icons/bs";
+import { GrStackOverflow } from "react-icons/gr";
+import { ImSpinner } from "react-icons/im";
 
 import { AnimateComponent, ButtonComponent, ContainerComponent, Form, Icon, Text } from "../components";
-import { navigator as navigators, navData, roles, media } from '../fixtures';
-import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
-import DropdownButton from "./dropDownButton";
-import { useMedia, useModal, OutsideAlert } from "../hooks";
-import Modal from "./modal";
-import NotificationContainer from "./notification";
+import { ListMember } from "../pages";
+import { Modal, DropDownButton, NotificationContainer, Logo } from ".";
 
-import { Logo } from ".";
-import { ListMember, UserAll } from "../pages";
+import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
+import { useMedia, useModal, OutsideAlert } from "../hooks";
+
+import { navigator as navigators, navData, media } from '../fixtures';
+
 
 export default function Navigation() {
   const { user } = useAuthorizationContext();
@@ -118,15 +110,17 @@ export default function Navigation() {
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
         {screenColumn > 2 && (
-          <ContainerComponent.Item style={{ color: '#fff' }}>
-            <ContainerComponent.MiddleInner style={{ flexDirection: 'row', height: '100%', gap: '2.5rem' }}>
+          <ContainerComponent.Item style={{ color: "#fff" }}>
+            <ContainerComponent.MiddleInner
+              style={{ flexDirection: "row", height: "100%", gap: "2.5rem" }}
+            >
               <ContainerComponent.Item>
                 <Link to="/" style={{ display: "flex", justifyContent: "center", alignItems: "center", color: '#fff' }}>
                   <Text style={{ background: "0" }} className="navigation__text">Home</Text>
                 </Link>
               </ContainerComponent.Item>
 
-              {/* <DropdownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
+              {/* <DropDownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
                 <Text style={{ marginRight: '5px' }}>Workspace</Text>
                 <Text.MiddleLine>
                   <Icon>
@@ -135,7 +129,7 @@ export default function Navigation() {
                 </Text.MiddleLine>
               </>}>
                 <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
-              </DropdownButton> */}
+              </DropDownButton> */}
 
               <AnimateComponent.Dropdown style={{ marginTop: '16px' }} triggerComponent={<Text className="navigation__text" style={{ marginRight: '5px' }}>Workspace</Text>}>
                 <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
@@ -157,7 +151,7 @@ export default function Navigation() {
                         </Text>
                       </>
                     }
-                    {link.subDocs && <DropdownButton component={<></>}></DropdownButton>}
+                    {link.subDocs && <DropDownButton component={<></>}></DropDownButton>}
                   </ContainerComponent.Item>
                 })
               }
@@ -329,7 +323,8 @@ const AuthStatus = React.memo(function AuthStatus({
         <Notification></Notification>
       </ContainerComponent.Item>
       <ContainerComponent.Item>
-        {screenColumn < 3 &&
+        {
+          screenColumn < 3 &&
           <Icon.CircleIcon onClick={openNavigator}>
             <BsList style={{ fontWeight: "600", fontSize: "20px" }}></BsList>
           </Icon.CircleIcon>
@@ -352,21 +347,37 @@ const AuthStatus = React.memo(function AuthStatus({
 const WorkspaceList = ({ toggleMemberModal }) => {
   const { user } = useAuthorizationContext();
   const { workspaces } = useWorkspaceContext();
-  return <>
-    {!!workspaces.length && workspaces.map((item, index) => {
-      const disabled = user.workspace === item._id;
-      const disabledStyled = () => ({
-        background: `${disabled ? '#fff' : "rgb(22, 61, 60)"}`,
-        color: `${disabled ? '#000' : "#fff"}`,
-      })
+  return (
+    <>
+      {!!workspaces.length &&
+        workspaces.map((item, index) => {
+          const disabled = user.workspace === item._id;
+          const disabledStyled = () => ({
+            background: `${disabled ? "#fff" : "rgb(22, 61, 60)"}`,
+            color: `${disabled ? "#000" : "#fff"}`,
+          });
 
-      return <ContainerComponent.Item className="workspaceList__item" key={index + 1}
-        style={{ width: "100%", padding: "10px", minWidth: "280px", ...disabledStyled() }}>
-        <WorkspaceItem item={item} toggleMemberModal={toggleMemberModal}></WorkspaceItem>
-      </ContainerComponent.Item>
-    })}
-  </>
-}
+          return (
+            <ContainerComponent.Item
+              className="workspaceList__item"
+              key={index + 1}
+              style={{
+                width: "100%",
+                padding: "10px",
+                minWidth: "280px",
+                ...disabledStyled(),
+              }}
+            >
+              <WorkspaceItem
+                item={item}
+                toggleMemberModal={toggleMemberModal}
+              ></WorkspaceItem>
+            </ContainerComponent.Item>
+          );
+        })}
+    </>
+  );
+};
 function WorkspaceItem({ item, toggleMemberModal }) {
   const { user, editCurrentWorkspace } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
@@ -411,7 +422,7 @@ function WorkspaceItem({ item, toggleMemberModal }) {
     </Text.MiddleLine>
 
     <Text.MiddleLine>
-      {user.accountId === item.manager && <DropdownButton position="left" component={<ContainerComponent.Pane>
+      {user.accountId === item.manager && <DropDownButton position="left" component={<ContainerComponent.Pane>
         <Icon>
           <AiFillCaretDown></AiFillCaretDown>
         </Icon>
@@ -419,7 +430,7 @@ function WorkspaceItem({ item, toggleMemberModal }) {
         <ButtonComponent onClick={() => {
           toggleMemberModal();
         }}>Add member</ButtonComponent>
-      </DropdownButton>
+      </DropDownButton>
       }
     </Text.MiddleLine>
   </ContainerComponent.Flex>
@@ -566,7 +577,7 @@ function Notification() {
           </Link>
         </Icon.CircleIcon>
       )) || (
-          <DropdownButton
+          <DropDownButton
             position="right"
             component={
               <Icon.CircleIcon onClick={turnOffBadge}>
@@ -581,7 +592,7 @@ function Notification() {
             }}
           >
             <NotificationContainer></NotificationContainer>
-          </DropdownButton>
+          </DropDownButton>
         )}
       {isNew && <Icon.Badge></Icon.Badge>}
     </>

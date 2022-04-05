@@ -23,13 +23,13 @@ import {
   ListMember,
   UserAll,
   AdminDashBoard,
+  EmailConfirmation
 } from "./pages";
 
 import {
   AccountCrud,
   AddGroupContainer,
   AttachmentCrub,
-  DashboardHeader,
   ManagerInfo,
   MessageContainer,
   NotificationContainer,
@@ -37,7 +37,7 @@ import {
   PostModal,
   Searchbar,
 } from "./containers";
-import { useAuthorizationContext, NotifyContext } from "./redux";
+import { useAuthorizationContext } from "./redux";
 import roles from "./fixtures/roles";
 import "./scss/main.scss";
 import { MessageBox } from "./components";
@@ -53,6 +53,7 @@ function App() {
           <Route path="login" element={<Login></Login>}></Route>
           <Route path="register" element={<Register></Register>}></Route>
           <Route path="logout" element={<Signout></Signout>}></Route>
+          <Route path="confirmation/{email}" element={<EmailConfirmation></EmailConfirmation>}></Route>
           <Route path="reset_password"
             element={<ForgetPassword></ForgetPassword>}
           ></Route>
@@ -71,6 +72,9 @@ function App() {
                   }
                 >
                   <Route index element={<AdminDashBoard></AdminDashBoard>} />
+                  <Route path="profile" element={<Profile></Profile>}>
+                    <Route path="personal" element={<Personal></Personal>} />
+                  </Route>
                   <Route
                     path="/management/attachment"
                     element={<AttachmentCrub></AttachmentCrub>}
@@ -83,6 +87,12 @@ function App() {
                     path="/management/member"
                     element={<AccountCrud></AccountCrud>}
                   />
+                  <Route path="/management/workspace_member">
+                    <Route path=":id" element={<ListMember></ListMember>} />
+                  </Route>
+                  <Route path="/management/workspace">
+                    <Route path=":id" element={<UserAll></UserAll>} />
+                  </Route>
                 </Route>
               )) ||
               // 2. QA manager
@@ -120,10 +130,6 @@ function App() {
                   </Route>
                   <Route path="profile" element={<Profile></Profile>}>
                     <Route path="personal" element={<Personal></Personal>} />
-                    <Route
-                      path="manager"
-                      element={<ManagerInfo></ManagerInfo>}
-                    />
                   </Route>
                   <Route path="history" element={<MyPost></MyPost>} />
                   <Route path="q&a" element={<QA></QA>}></Route>

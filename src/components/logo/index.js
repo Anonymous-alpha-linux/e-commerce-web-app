@@ -3,7 +3,7 @@ const LogoIcon = () => {
         <div style={{
             width: "60px",
             height: "60px",
-            backgroundColor: "#1B1B1B",
+            backgroundColor: "#163D3C",
             color: "white",
             borderRadius: "50px",
             textAlign: "center",
@@ -16,18 +16,20 @@ const LogoIcon = () => {
                     fontWeight: "bold",
                 }}
             >
-                IDEA
+                Idea
             </p>
             <p
                 style={{
                     borderRadius: "10px",
-                    backgroundColor: "#33EFAB",
-                    width: "50px",
+                    backgroundColor: "white",
+                    color:"#163D3C",
+                    padding:"0 5px",
                     margin: "0 auto",
                     fontWeight: "bold",
+                    width:"fit-content"
                 }}
             >
-                Fly
+                Hub
             </p>
         </div>
     );

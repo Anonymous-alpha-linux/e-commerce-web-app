@@ -1,0 +1,26 @@
+.overview{
+    &__text{
+        text-align: center;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    &__square{
+        margin: 20px 20px;
+        height: 100px;
+        background-color: #136C44;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        border-radius: 20px;
+        gap:8px;
+        box-shadow: 5px 5px 3px #95D5B2;
+    }
+    &__title{
+        text-align: center;
+        margin: 0;
+        padding: 10px 10px 0px 10px;
+        font-weight: 400; 
+        font-size: 30px;
+    }
+}

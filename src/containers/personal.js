@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
+import { roles } from '../fixtures';
 import { mainAPI } from '../config';
 import { Link, useLocation } from 'react-router-dom';
 import Modal from './modal';
@@ -99,33 +100,36 @@ export default function Personal() {
             {/* {personal three button} */}
             <ContainerComponent.Pane className="personal__threeFrame">
                 <ContainerComponent.Flex style={{ justifyContent: "center", gap: "20px", alignItems: "center", maxWidth: '680px', margin: '0 auto' }}>
-                    <ContainerComponent.Item>
-                        <ButtonComponent className="personal__button">
-                            <Text.Center>
-                                Information
-                            </Text.Center>
-                        </ButtonComponent>
-                    </ContainerComponent.Item>
-
-                    <ContainerComponent.Item>
-                        <Link to="/history" state={{ from: location }}>
+                    {[roles.STAFF, roles.QA_COORDINATOR].includes(user.role) && (<>
+                        <ContainerComponent.Item>
                             <ButtonComponent className="personal__button">
                                 <Text.Center>
-                                    My Post
+                                    Information
                                 </Text.Center>
                             </ButtonComponent>
-                        </Link>
-                    </ContainerComponent.Item>
+                        </ContainerComponent.Item>
 
-                    <ContainerComponent.Item>
-                        <Link to="/profile/manager" state={{ from: location }}>
-                            <ButtonComponent className="personal__button">
-                                <Text.Center>
-                                    Manager
-                                </Text.Center>
-                            </ButtonComponent>
-                        </Link>
-                    </ContainerComponent.Item>
+
+                        <ContainerComponent.Item>
+                            <Link to="/history" state={{ from: location }}>
+                                <ButtonComponent className="personal__button">
+                                    <Text.Center>
+                                        My Post
+                                    </Text.Center>
+                                </ButtonComponent>
+                            </Link>
+                        </ContainerComponent.Item>
+
+                        <ContainerComponent.Item>
+                            <Link to="/profile/manager" state={{ from: location }}>
+                                <ButtonComponent className="personal__button">
+                                    <Text.Center>
+                                        Manager
+                                    </Text.Center>
+                                </ButtonComponent>
+                            </Link>
+                        </ContainerComponent.Item>
+                    </>)}
                 </ContainerComponent.Flex>
                 <Modal isShowing={openWorkspaceModal} toggle={toggleWorkspaceModal}>
                 </Modal>

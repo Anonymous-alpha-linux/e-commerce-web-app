@@ -56,9 +56,6 @@ export default function AdminContext({ children }) {
       ? mainAPI.LOCALHOST_MANAGER
       : mainAPI.CLOUD_API_MANAGER;
 
-  useEffect(() => {
-    console.log(state);
-  }, [state]);
   function getAccountList(cb) {
     return axios
       .get(adminAPI, {

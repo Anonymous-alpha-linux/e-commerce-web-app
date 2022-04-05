@@ -10,7 +10,7 @@ import { ContainerComponent, Form, Icon, Text, Message, ButtonComponent } from '
 import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from '../../redux';
 import { roles, toastTypes } from '../../fixtures';
 
-function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) {
+function UserAll({ filter = [roles.QA_COORDINATOR], workspaceId }) {
     const { accounts: { data }, getAccountList } = useAdminContext();
     const { getWorkspaceMembers } = useWorkspaceContext();
     const { id } = useParams();
@@ -24,24 +24,27 @@ function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) 
     const [loading, setLoading] = React.useState(false);
 
     useEffect(() => {
-        setLoading(true);
-        getAccountList(() => {
+        getAccountList((accounts) => {
             getWorkspaceMembers(workspaceid, members => {
+                const filterRoles = filter || [roles.QA_COORDINATOR, roles.STAFF];
+                let output = accounts.filter(account => filterRoles.includes(account.role.roleName));
                 setState({
                     members: members,
-                    outputs: data.filter(account => [roles.QA_COORDINATOR, roles.STAFF].includes(account.role.roleName)),
+                    outputs: output,
                 });
-                setLoading(false);
             });
         });
     }, []);
-    useEffect(() => {
-        setState(oldState => ({
-            members: data.filter(member => filter.includes(member.role.roleName)),
-            outputs: data.filter(member => filter.includes(member.role.roleName))
-        }));
-    }, [data]);
-
+    // useEffect(() => {
+    //     console.log(data);
+    //     setState(oldState => {
+    //         let output = data.filter(member => filter.includes(member.role.roleName))
+    //         return {
+    //             members: output,
+    //             outputs: output
+    //         }
+    //     });
+    // }, [data]);
 
     function inputHandler(e) {
         setInput(e.target.value);
@@ -60,23 +63,22 @@ function UserAll({ filter = [roles.STAFF, roles.QA_COORDINATOR], workspaceId }) 
             width: '100%',
             height: '650px',
             top: '50px',
+            padding: "8px"
         }}
     >
         <ContainerComponent.Inner>
-            <ContainerComponent.Flex style={{ justifyContent: "space-between", padding: "10px" }}>
-                <Form.Button style={{ border: "none", marginTop: "5px" }}>
-                    <Text.MiddleLine>
-                        <Icon
-                            style={{
-                                fontSize: '14px'
-                            }}
-                        >
-                            <AiOutlineLeft />
-                        </Icon>
-                    </Text.MiddleLine>
-                    <Text.MiddleLine>Back</Text.MiddleLine>
-                </Form.Button>
-            </ContainerComponent.Flex>
+            <Form.Button style={{ border: "none", padding: '10px 2px' }}>
+                <Text.MiddleLine>
+                    <Icon
+                        style={{
+                            fontSize: '14px'
+                        }}
+                    >
+                        <AiOutlineLeft />
+                    </Icon>
+                </Text.MiddleLine>
+                <Text.MiddleLine>Back</Text.MiddleLine>
+            </Form.Button>
 
             <ContainerComponent.Item className="staffCRUD__searchbar" style={{ position: "relative" }}>
                 <Message.SearchForm style={{

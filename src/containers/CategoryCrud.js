@@ -51,81 +51,83 @@ export default function Crud() {
       })
       .catch((error) => console.log(error.message));
   }
-  return (
-    <div className="categoryCRUD__root">
-      <ContainerComponent.Inner className="categoryCRUD__inner" style={{ width: 'fit-content', margin: '0 auto' }}>
-        <button className="btn-rounded-green" onClick={() => setModal(!modal)}>
-          Create New Category
-        </button>
-        {modal && (
-          <div style={{ height: "0px" }}>
-            <ModalAddFormCategory setModal={setModal} modal={modal} />
+  return (<ContainerComponent style={{ display: "flex", justifyContent: "center", background:"#A9C39E"}}>
+    <ContainerComponent.Inner style={{ margin: "30px", flexGrow: "1", padding: '20px 20px 20px 20px', maxWidth: "820px", height: "fit-content", borderRadius: "10px", background:"#DCE7D7",overflow:"hidden"}}>
+      <div className="categoryCRUD__root" style={{ width: "100%", maxWidth: "800px", background:"#DCE7D7"}}>
+        <ContainerComponent.Inner className="categoryCRUD__inner" style={{ margin: '0 auto', height: "100%",background:"white",borderRadius:"10px",paddingBottom:"1px"}}>
+          <button className="btn__category" style={{margin:"15px"}}  onClick={() => setModal(!modal)}>
+            Create New Category
+          </button>
+          {modal && (
+            <div style={{ height: "0px" }}>
+              <ModalAddFormCategory setModal={setModal} modal={modal} />
+            </div>
+          )}
+
+          <div className="table__container" style={{width:"100%",background:"white",overflow:"scroll",paddingBottom:"1px",marginTop:"10px"}}>
+            <table className="table table-style" style={{ minWidth: "550px",}}>
+              <thead style={{ background:"#163d3c"}}>
+                <tr style={{background: "#f2f8fb"}}>
+                  <th scope="col" style={{ textAlign: "center", width: "40%" }}>
+                    ID
+                  </th>
+                  <th scope="col" style={{ textAlign: "center", width: "40%"}}>
+                    Title
+                  </th>
+                  <th>
+                    <SearchCategory
+                      categories={categories}
+                      searchInput={searchInput}
+                      setSearchInput={setSearchInput}
+                      setFilteredResults={setFilteredResults}
+                      currentTableData={categories}
+                      filteredResults={filteredResults}
+                    />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {(categoryLoading && <tr><td colSpan={3}><Loader></Loader></td></tr>) || searchInput !== ""
+                  ? filteredResults.map((category, index) => (
+                    <CategoryData
+                      key={index}
+                      data={category}
+                      index={index}
+                      deleteCate={deleteCate}
+                    />
+                  ))
+                  : dataRecords.map((category, index) => (
+                    <CategoryData
+                      key={index}
+                      data={category}
+                      index={index}
+                      deleteCate={deleteCate}
+                    />
+                  ))}
+                {/* {!categories?.length && (
+                <tr>
+                  <td>
+                    <h2>No Category</h2>
+                  </td>
+                  <td>
+                    <h2>Empty</h2>
+                  </td>
+                </tr>
+              )} */}
+              </tbody>
+            </table>
           </div>
-        )}
-
-        <div className="table__container">
-          <table className="table table-style">
-            <thead>
-              <tr>
-                <th scope="col" style={{ textAlign: "center", width: "40%" }}>
-                  ID
-                </th>
-                <th scope="col" style={{ textAlign: "center", width: "40%" }}>
-                  Title
-                </th>
-                <th>
-                  <SearchCategory
-                    categories={categories}
-                    searchInput={searchInput}
-                    setSearchInput={setSearchInput}
-                    setFilteredResults={setFilteredResults}
-                    currentTableData={categories}
-                    filteredResults={filteredResults}
-                  />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {(categoryLoading && <tr><td colSpan={3}><Loader></Loader></td></tr>) || searchInput !== ""
-                ? filteredResults.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))
-                : dataRecords.map((category, index) => (
-                  <CategoryData
-                    key={index}
-                    data={category}
-                    index={index}
-                    deleteCate={deleteCate}
-                  />
-                ))}
-              {/* {!categories?.length && (
-              <tr>
-                <td>
-                  <h2>No Category</h2>
-                </td>
-                <td>
-                  <h2>Empty</h2>
-                </td>
-              </tr>
-            )} */}
-            </tbody>
-          </table>
-
-          <Pagination
-            className="pagination-bar"
-            currentPage={currentPage}
-            totalCount={categories.length}
-            pageSize={PageSize}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
-        </div>
-      </ContainerComponent.Inner>
-    </div>
+              <Pagination
+                className="pagination-bar"
+                currentPage={currentPage}
+                totalCount={categories.length}
+                pageSize={PageSize}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+        </ContainerComponent.Inner>
+      </div>
+    </ContainerComponent.Inner>
+  </ContainerComponent>
   );
 }
 function ModalAddFormCategory({ setModal, modal }) {

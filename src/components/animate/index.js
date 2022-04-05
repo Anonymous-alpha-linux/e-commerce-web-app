@@ -192,9 +192,12 @@ AnimateComponent.DropdownClick = function AnimatedDropdownClick({
   const arrChild = React.Children.toArray(children);
   const transition = useTransition(arrChild, {
     keys: (item) => item.key,
-    from: { maxHeight: 0 },
-    enter: { maxHeight: 800, overflow: "hidden", ...style },
-    leave: { maxHeight: 0 },
+    from: { maxHeight: 0, overflow: "hidden" },
+    enter: (item) => async (next, cancel) => {
+      await next({ maxHeight: 800, ...style });
+      await next({ overflow: "visible" });
+    },
+    leave: [{ overflow: "hidden" }, { maxHeight: 0 }],
     config: { duration: 600 },
   });
   return transition(
