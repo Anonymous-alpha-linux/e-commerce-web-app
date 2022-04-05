@@ -16,7 +16,7 @@ export default function AttachmentCRUD() {
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
 
-  const { attachments, getAttachmentByPage, deleteSingleAttachment } = useAdminContext();
+  const { attachments, getAttachmentByPage, getAttachmentList, deleteSingleAttachment } = useAdminContext();
   const getAttachmentByPageRef = useRef(getAttachmentByPage);
 
   const [searchInput, setSearchInput] = useState("");
@@ -26,14 +26,11 @@ export default function AttachmentCRUD() {
 
   const [currentPage, changeCurrentPage] = usePagination2(0);
 
+
   useEffect(() => {
-    // setDataRecords(attachments.data.find((item) => item.page === currentPage).records);
     setDataRecords(attachments.data);
     setAttachRecord(attachments.data);
-  }, [
-    // attachments?.data, 
-    // attachRecord
-  ]);
+  }, [attachments]);
   useEffect(() => {
     getAttachmentByPageRef.current(currentPage, attachmentList => {
       setDataRecords(attachmentList);

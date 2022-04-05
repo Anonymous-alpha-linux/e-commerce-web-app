@@ -18,7 +18,7 @@ export default function AccountCrud() {
       ? [mainAPI.LOCALHOST_ADMIN, mainAPI.LOCALHOST_HOST]
       : [mainAPI.LOCALHOST_ADMIN, mainAPI.CLOUD_HOST];
   let PageSize = 8;
-  const { accounts: { data, loading } } = useAdminContext();
+  const { accounts: { data, loading }, getAccountList, getRoleList } = useAdminContext();
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
@@ -26,12 +26,17 @@ export default function AccountCrud() {
   const [dataRecords, setDataRecords] = useState([]);
 
   useEffect(() => {
+    getAccountList();
+    getRoleList();
+  }, []);
+  useEffect(() => {
     setDataRecords((e) => {
       const firstPageIndex = (currentPage - 1) * PageSize;
       const lastPageIndex = firstPageIndex + PageSize;
       return data.slice(firstPageIndex, lastPageIndex);
     });
   }, [data, currentPage]);
+
   return (
     <ContainerComponent style={{ backgroundColor: "#A9C39E",height:"100%"}}>
       <div className="categoryCRUD__root" style={{ margin: "0 auto"}}>

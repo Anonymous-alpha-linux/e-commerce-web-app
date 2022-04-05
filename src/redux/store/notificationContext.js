@@ -12,7 +12,7 @@ export default function NotificationContext({ children }) {
     const { pushToast } = useAuthorizationContext();
     const [showUpdate, setShowUpdate] = useState(true);
     const [notify, setNotify] = useReducer(notifyReducer, initialNotify);
-    const { user, socket, setError, setMessage } = useAuthorizationContext();
+    const { user, socket } = useAuthorizationContext();
     const [notifyAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
     // const cancelTokenSource = axios.CancelToken.source();
 
@@ -31,7 +31,7 @@ export default function NotificationContext({ children }) {
         };
     }, [socket]);
 
-    function loadNotifications() {
+    function loadNotifications(cb) {
         return axios.get(notifyAPI, {
             headers: {
                 'Authorization': `Bearer ${user.accessToken}`
@@ -51,12 +51,14 @@ export default function NotificationContext({ children }) {
                     type: actions.GET_NOTIFICATIONS,
                     payload: res.data.response
                 });
+                cb({ message: 'Get notification successfully!' });
             })
             .catch(() => {
                 pushToast({
                     message: 'Loading Notifications Failed',
                     type: toastTypes.ERROR
-                })
+                });
+                cb({ error: 'Get notification failed' });
             });
     }
     function loadMoreNotifications() {
@@ -107,13 +109,13 @@ export default function NotificationContext({ children }) {
     }
     function handleError() {
         socket.on('connect_failed', function (error) {
-            setError(error.message);
+            pushToast({ message: error.message, type: toastTypes.ERROR });
         })
         socket.on("connect_error", (error) => {
-            setError(error.message);
+            pushToast({ message: error.message, type: toastTypes.ERROR });
         });
         socket.on('error', error => {
-            setError(error.message);
+            pushToast({ message: error.message, type: toastTypes.ERROR });
         });
     }
     function handleOffline(handler) {
@@ -165,7 +167,7 @@ export default function NotificationContext({ children }) {
     //         type: actions.GET_NOTIFICATIONS,
     //         payload: res.data.response
     //     })).catch(error => {
-    //         setError(error.message);
+    //          pushToast({ message: error.message, type: toastTypes.ERROR });
     //     });
     // }
     // function loadMoreNotification() {
@@ -183,7 +185,7 @@ export default function NotificationContext({ children }) {
     //         type: actions.GET_NOTIFICATIONS,
     //         payload: res.data.response
     //     })).catch(error => {
-    //         setError(error.message);
+    //          pushToast({ message: error.message, type: toastTypes.ERROR });
     //     });
     // }
 
