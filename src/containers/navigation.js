@@ -88,7 +88,7 @@ export default function Navigation() {
                 return <ContainerComponent.Item key={index + 1}>
                   {link.path && <Link to={link.path}
                     style={{ color: '#fff' }}>
-                    <TextclassName="navigation__text">
+                    <Text className="navigation__text">
                       {link.name}
                     </Text>
                   </Link> || <>

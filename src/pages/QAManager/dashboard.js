@@ -60,15 +60,15 @@ Chart.register(
 export default function Dashboard() {
   return (
     <ContainerComponent style={{ background:"#A9C39E"}} className="dashboard__root">
-      <ContainerComponent.Pane style={{padding:"15px",margin:"20px 10px"}} className="workspace__innerForm">
+      <ContainerComponent.Pane style={{ padding: "15px", margin: "20px 10px", borderRadius: "10px", background:"#DCE7D7",overflow:"hidden"}} className="workspace__innerForm">
         <DashboardOverview></DashboardOverview>
       </ContainerComponent.Pane>
-      <ContainerComponent.Pane className="workspace__innerForm" style={{margin:"10px",border:"none", padding: '15px 15px', overflowX: 'scroll' }}>
+      <ContainerComponent.Pane style={{ margin: "10px", border: "none", padding: '15px 15px', overflowX: 'scroll', borderRadius: "10px", background: "#DCE7D7", overflow: "hidden" }}>
         <ContainerComponent.Inner style={{background:"#fff", maxWidth: '640px', height: '100%', borderRadius: '10px', margin: '0 auto', }}>
           <MostLikedPosts></MostLikedPosts>
         </ContainerComponent.Inner>
       </ContainerComponent.Pane>
-      <ContainerComponent.Pane className="workspace__innerForm" style={{ margin: "20px 10px", border: "none", padding: '15px 15px', overflowX: 'scroll'}}>
+      <ContainerComponent.Pane style={{ margin: "20px 10px", border: "none", padding: '15px 15px', overflowX: 'scroll', borderRadius: "10px", background: "#DCE7D7", overflow: "hidden"}}>
         <ContainerComponent.Inner style={{background:"white", maxWidth: '640px', height: '100%', borderRadius: '10px', margin: '0 auto' }}>
           <MostCategory></MostCategory>
         </ContainerComponent.Inner>
