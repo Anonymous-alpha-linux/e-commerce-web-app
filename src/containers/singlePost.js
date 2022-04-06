@@ -20,8 +20,8 @@ export default function SinglePost() {
   const getComment = useRef(getPostComments);
 
   const [openComment, setOpenComment] = useState(false);
-
   const [index, setIndex] = useState(0);
+
   const [post, setPost] = useState(state);
 
   const host = process.env.REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_HOST : mainAPI.CLOUD_HOST;
@@ -104,6 +104,19 @@ export default function SinglePost() {
     // interactRef.current(postHeader.id, 'rate', { like: !isLiked ? like + 1 : like - 1, dislike: !isDisliked ? dislike + 1 : dislike - 1, likedAccounts: [...likedAccounts, user.accountId], dislikedAccounts: [...dislikedAccounts, user.accountId], isDisliked: !isDisliked, isLiked: !isLiked });
   };
   const likeHandler = () => {
+    setPost(oldPost => ({
+      ...oldPost,
+      like: !post.isLiked ? post.like + 1 : post.like - 1,
+      dislike: post.isDisliked ? post.dislike - 1 : post.dislike,
+      likedAccounts: !post.isLiked
+        ? [...post.likedAccounts, user.accountId]
+        : post.likedAccounts.filter((acc) => acc !== user.accountId),
+      dislikedAccounts: post.isDisliked
+        ? post.dislikedAccounts.filter((acc) => acc !== user.accountId)
+        : post.dislikedAccounts,
+      isLiked: !post.isLiked,
+      isDisliked: false,
+    }));
     interactRef.current(post.id, "rate", {
       like: !post.isLiked ? post.like + 1 : post.like - 1,
       dislike: post.isDisliked ? post.dislike - 1 : post.dislike,
@@ -120,6 +133,19 @@ export default function SinglePost() {
     });
   };
   const dislikeHandler = () => {
+    setPost(oldPost => ({
+      ...oldPost,
+      like: post.isLiked ? post.like - 1 : post.like,
+      dislike: !post.isDisliked ? post.dislike + 1 : post.dislike - 1,
+      likedAccounts: post.isLiked
+        ? post.likedAccounts.filter((acc) => acc !== user.accountId)
+        : post.likedAccounts,
+      dislikedAccounts: !post.isDisliked
+        ? [...post.dislikedAccounts, user.accountId]
+        : post.dislikedAccounts.filter((acc) => acc !== user.accountId),
+      isLiked: false,
+      isDisliked: !post.isDisliked,
+    }))
     interactRef.current(post.id, "rate", {
       like: post.isLiked ? post.like - 1 : post.like,
       dislike: !post.isDisliked ? post.dislike + 1 : post.dislike - 1,
@@ -234,7 +260,8 @@ export default function SinglePost() {
             <ContainerComponent.Item onClick={() => {
               if (!openComment) {
                 getComment.current(post?.id, (res) => {
-                  setPost(post => ({ ...post, comments: res }))
+                  console.log(res);
+                  setPost(post => ({ ...post, comments: res }));
                   setOpenComment(true);
                 });
               }
@@ -256,6 +283,7 @@ export default function SinglePost() {
             postAuthor={post?.postAuthor}
             postId={post?.id}
             commentLogs={post?.comments}
+            setPost={setPost}
           ></Comment>
         }
       </ContainerComponent.Inner>
