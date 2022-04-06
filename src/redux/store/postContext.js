@@ -198,7 +198,7 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((post) => {
-        return cb(post.data.response);
+        cb(post.data.response);
       })
       .catch((error) => {
         setError(error.message);
@@ -573,9 +573,6 @@ export default React.memo(function PostContext({ children }) {
         });
         cb(res.data.response);
       })
-      .then((success) => {
-        cb();
-      })
       .catch((error) => {
         setError(error.message);
       });
@@ -890,9 +887,11 @@ export default React.memo(function PostContext({ children }) {
           if (isDisliked) {
             sendRealTimeDisLike(postId, user.accountId);
           }
+          cb(input);
         })
         .catch((error) => {
-          setError(error.message);
+          pushToast({ error: error.message, type: toastTypes.ERROR });
+          cb({ error: error.message });
         });
     } else if (type === "like") {
       const { liked, disliked } = input;
@@ -975,7 +974,7 @@ export default React.memo(function PostContext({ children }) {
         .then((res) => {
           addSingleComment(postId, res.data.response._id);
           sendRealtimeComment(postId, res.data.response._id);
-          cb(res.data.response._id);
+          cb(res.data.response._id, input);
         })
         .catch((error) => {
           setError(error.message);

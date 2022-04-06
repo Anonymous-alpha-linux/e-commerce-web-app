@@ -36,6 +36,7 @@ import {
   Personal,
   PostModal,
   Searchbar,
+  SinglePost,
 } from "./containers";
 import { useAuthorizationContext } from "./redux";
 import roles from "./fixtures/roles";
@@ -265,6 +266,10 @@ function App() {
                   <Route
                     path="workspace"
                     element={<WorkspaceGroup></WorkspaceGroup>}
+                  />
+                  <Route
+                    path="post_detail/:postId"
+                    element={<SinglePost></SinglePost>}
                   />
                 </Route>
               ))

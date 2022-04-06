@@ -199,19 +199,19 @@ export default function AuthenticationContext({ children }) {
         pushToast({
           message: "Update Workspace successfully",
           type: toastTypes.SUCCESS,
-        }).catch((err) => {
-          pushToast({
-            message: err.message,
-            type: toastTypes.ERROR,
-            timeout: 10000,
-          });
-        });
+        })
         cb();
-      });
+      }).catch((err) => {
+        pushToast({
+          message: err.message,
+          type: toastTypes.ERROR,
+          timeout: 10000,
+        });
+      });;
   }
   function changeAvatar(file) {
-const formData = new FormData();
-formData.append(file);
+    const formData = new FormData();
+    formData.append(file);
   }
   function searchQuery() { }
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
