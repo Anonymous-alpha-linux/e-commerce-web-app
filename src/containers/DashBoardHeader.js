@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { VscThreeBars } from "react-icons/vsc";
-import {Logo} from '../containers'
+import { Logo } from '../containers'
 import {
   AnimateComponent,
   ContainerComponent,
@@ -19,11 +19,11 @@ function DashBoardHeader({ children }) {
   // const [openSideBar, setOpenSidebar] = useState(false);
   const [openSideBar, toggleSidebar] = useModal();
   const sideBarRef = useState(null);
-  const device = useMedia(500, 1080);
+  const device = useMedia(520, 1080);
 
   return (
     <ContainerComponent className="manager_root">
-      <ContainerComponent className="manager__header" style={{ padding: "10px 25px", position: "sticky", top: 0, left: 0, zIndex: 10, background:'#163D3C',color:'white'}}>
+      <ContainerComponent className="manager__header" style={{ padding: "10px 25px", position: "sticky", top: 0, left: 0, zIndex: 10, background: '#163D3C', color: 'white' }}>
         <ContainerComponent.Flex style={{ justifyContent: "space-between", alignItems: "center" }}>
           <ContainerComponent.Item>
             <Icon
@@ -47,7 +47,7 @@ function DashBoardHeader({ children }) {
 
         </ContainerComponent.Flex>
       </ContainerComponent>
-      <ContainerComponent className="manager__body" style={{ background: '#A9C39E'}}>
+      <ContainerComponent className="manager__body" style={{ background: '#A9C39E' }}>
         <AnimateComponent.SlideRight className="sidebar__root" state={openSideBar}>
           <Sidebar closeSidebar={() => toggleSidebar()}></Sidebar>
         </AnimateComponent.SlideRight>

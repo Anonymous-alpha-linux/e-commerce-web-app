@@ -130,10 +130,10 @@ const postReducer = (state, action) => {
                     if (action.isLiked) {
                       post.likedAccounts.unshift(action.userId);
                       post.dislikedAccounts.filter(
-                        (acc) => acc !== action.userId
+                        (acc) => acc === action.userId
                       );
-                    } else
-                      post.likedAccounts.filter((acc) => acc !== action.userId);
+                    }
+                    return post.likedAccounts.filter((acc) => acc !== action.userId);
                   },
                   post
                 )
@@ -201,23 +201,29 @@ const postReducer = (state, action) => {
             return actionHandler.updateItem(
               "comments",
               (comment) => {
-                if (comment._id === action.commentId)
-                  return actionHandler.updateItem(
-                    "like",
-                    action.isLiked ? post.like + 1 : post.like - 1,
-                    actionHandler.updateItem(
-                      "likedAccounts",
-                      (accounts) => {
-                        if (action.isLiked)
-                          post.likedAccounts.unshift(action.userId);
-                        else
-                          post.likedAccounts.filter(
-                            (acc) => acc !== action.userId
-                          );
-                      },
-                      comment
-                    )
-                  );
+                if (comment._id === action.commentId) {
+                  // return actionHandler.updateItem(
+                  //   "like",
+                  //   action.isLiked ? post.like + 1 : post.like - 1,
+                  //   actionHandler.updateItem(
+                  //     "likedAccounts",
+                  //     (accounts) => {
+                  //       if (action.isLiked)
+                  //         post.likedAccounts.unshift(action.userId);
+                  //       else
+                  //         post.likedAccounts.filter(
+                  //           (acc) => acc !== action.userId
+                  //         );
+                  //     },
+                  //     comment
+                  //   )
+                  // );
+                  return {
+                    ...comment,
+                    ...action.payload
+                  }
+                }
+                return comment;
               },
               post
             );
@@ -230,23 +236,28 @@ const postReducer = (state, action) => {
               return actionHandler.updateItem(
                 "comments",
                 (comment) => {
-                  if (comment._id === action.commentId)
-                    return actionHandler.updateItem(
-                      "like",
-                      action.isLiked ? post.like + 1 : post.like - 1,
-                      actionHandler.updateItem(
-                        "likedAccounts",
-                        (accounts) => {
-                          if (action.isLiked)
-                            post.likedAccounts.unshift(action.userId);
-                          else
-                            post.likedAccounts.filter(
-                              (acc) => acc !== action.userId
-                            );
-                        },
-                        comment
-                      )
-                    );
+                  if (comment._id === action.commentId) {
+                    // return actionHandler.updateItem(
+                    //   "like",
+                    //   action.isLiked ? post.like + 1 : post.like - 1,
+                    //   actionHandler.updateItem(
+                    //     "likedAccounts",
+                    //     (accounts) => {
+                    //       if (action.isLiked)
+                    //         post.likedAccounts.unshift(action.userId);
+                    //       else
+                    //         post.likedAccounts.filter(
+                    //           (acc) => acc !== action.userId
+                    //         );
+                    //     },
+                    //     comment
+                    //   )
+                    // );
+                    return {
+                      ...comment,
+                      ...action.payload
+                    }
+                  }
                   return comment;
                 },
                 post
@@ -310,6 +321,48 @@ const postReducer = (state, action) => {
                         comment
                       )
                     );
+                  return comment;
+                },
+                post
+              );
+            return post;
+          },
+          state
+        )
+      );
+    case actions.RATE_COMMENT:
+      return actionHandler.updateItem(
+        "myPosts",
+        (post) => {
+          if (post._id === action.postId)
+            return actionHandler.updateItem(
+              "comments",
+              (comment) => {
+                if (comment._id === action.commentId) {
+                  return {
+                    ...comment,
+                    ...action.payload
+                  }
+                }
+                return comment;
+              },
+              post
+            );
+          return post;
+        },
+        actionHandler.updateItem(
+          "posts",
+          (post) => {
+            if (post._id === action.postId)
+              return actionHandler.updateItem(
+                "comments",
+                (comment) => {
+                  if (comment._id === action.commentId) {
+                    return {
+                      ...comment,
+                      ...action.payload
+                    }
+                  }
                   return comment;
                 },
                 post
@@ -668,7 +721,6 @@ const postReducer = (state, action) => {
           action.commentId: [String]
           action.payload: [Object]
       */
-      console.log(action);
       return actionHandler.updateItem(
         "posts",
         (post) => {
@@ -710,7 +762,6 @@ const postReducer = (state, action) => {
           state
         )
       );
-
     // return {
     //   ...state,
     //   posts: state.posts.map(post => {
@@ -736,6 +787,57 @@ const postReducer = (state, action) => {
     //     return post;
     //   }),
     // }
+    case actions.RATE_COMMENT_REPLY:
+      return actionHandler.updateItem(
+        "myPosts",
+        (post) => {
+          if (post._id === action.postId)
+            return actionHandler.updateItem(
+              "comments",
+              (comment) => {
+                if (comment._id === action.commentId)
+                  return actionHandler.updateItem("replies", reply => {
+                    if (reply._id === action.replyId)
+                      return {
+                        ...reply,
+                        ...action.payload
+                      };
+                    return reply;
+                  }, comment);
+                return comment;
+              },
+              post
+            );
+          return post;
+        },
+        actionHandler.updateItem(
+          "posts",
+          (post) => {
+            if (post._id === action.postId) {
+              return actionHandler.updateItem(
+                "comments",
+                (comment) => {
+                  if (comment._id === action.commentId) {
+                    return actionHandler.updateItem("replies", reply => {
+                      if (reply._id === action.replyId) {
+                        return {
+                          ...reply,
+                          ...action.payload
+                        };
+                      }
+                      return reply;
+                    }, comment);
+                  }
+                  return comment;
+                },
+                post
+              );
+            }
+            return post;
+          },
+          state
+        )
+      );
 
     case actions.SET_LOADING:
       return {

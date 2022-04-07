@@ -50,20 +50,25 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                 padding: "5px",
               }}
             >
-              <Preview.Images
-                image={
-                  "https://us.123rf.com/450wm/triken/triken1608/triken160800029/61320775-male-avatar-profile-picture-default-user-avatar-guest-avatar-simply-human-head-vector-illustration-i.jpg?ver=6"
-                }
-                style={{
-                  width: "70px",
-                  height: "70px",
-                  borderRadius: "50%",
-                }}
-              ></Preview.Images>
+              <Link to="/profile/personal" onClick={closeSidebar}>
+                <Preview.Images
+                  image={
+                    user.profileImage ||
+                    "https://us.123rf.com/450wm/triken/triken1608/triken160800029/61320775-male-avatar-profile-picture-default-user-avatar-guest-avatar-simply-human-head-vector-illustration-i.jpg?ver=6"
+                  }
+                  style={{
+                    width: "70px",
+                    height: "70px",
+                    borderRadius: "50%",
+                  }}
+                ></Preview.Images>
+              </Link>
             </ContainerComponent.Flex>
 
             <Text.CenterLine>
-              <Text> {user.account}</Text>
+              <Link to="/profile/personal" onClick={closeSidebar}>
+                <Text> {user.account}</Text>
+              </Link>
             </Text.CenterLine>
             {/* sidebar links */}
             <ContainerComponent.Flex>
@@ -124,7 +129,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                         fontSize: "25px",
                         top: "50%",
                       }}
-                      onClick={setSwitchToggle}
+                      onClick={() => setSwitchToggle()}
                     >
                       <AnimateComponent.Rotate state={switchToggle} deg={90}>
                         <AiFillRightCircle></AiFillRightCircle>
@@ -134,7 +139,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                 </Text.Line>
               </ContainerComponent.Item>
             </ContainerComponent.Flex>
-            <AnimateComponent.Dropdown>
+            <AnimateComponent.DropdownClick>
               {switchToggle && (
                 <ContainerComponent.Toggle
                   style={{ margin: "0 auto", padding: "0 10px" }}
@@ -161,10 +166,11 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                     <Text.MiddleLine
                       style={{
                         width: "calc(100% - 20px)",
-                        transform: "translateX(27%)",
                       }}
                     >
-                      <Text.Title>Add Workspace</Text.Title>
+                      <Text.Title style={{ textAlign: "center" }}>
+                        Add Workspace
+                      </Text.Title>
                     </Text.MiddleLine>
                   </ContainerComponent.Item>
                   {/* workspaceData */}
@@ -189,7 +195,7 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                   </ContainerComponent.Item>
                 </ContainerComponent.Toggle>
               )}
-            </AnimateComponent.Dropdown>
+            </AnimateComponent.DropdownClick>
           </ContainerComponent.Inner>
 
           <ContainerComponent.Pane
@@ -258,7 +264,7 @@ const EditToggle = ({ item, clickLoader }) => {
             </Text.MiddleLine>
           </AnimateComponent.Rotate>
         </ContainerComponent.Flex>
-        <AnimateComponent.Dropdown>
+        <AnimateComponent.DropdownClick>
           {openDropdown && (
             <ContainerComponent.Flex style={{ flexDirection: "column" }}>
               <ContainerComponent.Item>
@@ -320,7 +326,7 @@ const EditToggle = ({ item, clickLoader }) => {
               </ContainerComponent.Item>
             </ContainerComponent.Flex>
           )}
-        </AnimateComponent.Dropdown>
+        </AnimateComponent.DropdownClick>
       </ContainerComponent.Item>
 
       <Modal
@@ -421,6 +427,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
     };
   }, [workspaces]);
 
+  function calculateBlockTime() {}
   function convertTo2Digit(number) {
     return number.toLocaleString("en-US", {
       minimumIntegerDigits: 2,

@@ -1,42 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { FaTimes, FaBell } from "react-icons/fa";
-import { AiOutlineMessage, AiFillCaretDown } from "react-icons/ai";
-import {
-  IoNotificationsOutline,
-  IoSearchSharp,
-  IoHomeSharp,
-} from "react-icons/io5";
-import { BsList, BsCaretDownFill } from "react-icons/bs";
+import { AiFillCaretDown } from "react-icons/ai";
+import { IoNotificationsOutline, IoSearchSharp } from "react-icons/io5";
+import { BsList } from "react-icons/bs";
 import { GrStackOverflow } from "react-icons/gr";
 import { ImSpinner } from "react-icons/im";
 
-import logo from "../assets/Logoidea2.jpg";
 import {
+  AnimateComponent,
   ButtonComponent,
   ContainerComponent,
+  Form,
   Icon,
   Text,
-  AnimateComponent,
-  Form,
-  LogoIcon,
 } from "../components";
+import { ListMember } from "../pages";
+import { Modal, DropDownButton, NotificationContainer, Logo } from ".";
 
-import { navigator as navigators, navData, roles, media } from "../fixtures";
 import {
   useAuthorizationContext,
   useNotifyContext,
   useWorkspaceContext,
 } from "../redux";
-
-import DropdownButton from "./dropDownButton";
 import { useMedia, useModal, OutsideAlert } from "../hooks";
-import Modal from "./modal";
-import NotificationContainer from "./notification";
 
-import { Logo } from ".";
-import { ListMember, UserAll } from "../pages";
+import { navigator as navigators, navData, media } from "../fixtures";
 
 export default function Navigation() {
   const { user } = useAuthorizationContext();
@@ -87,13 +76,15 @@ export default function Navigation() {
             }}
           >
             <ContainerComponent.Item>
-              <LogoIcon
+              <ContainerComponent.Pane
                 onClick={() =>
                   navigate("/", {
                     replace: true,
                   })
                 }
-              ></LogoIcon>
+              >
+                <Logo></Logo>
+              </ContainerComponent.Pane>
             </ContainerComponent.Item>
 
             <ContainerComponent.Item
@@ -101,29 +92,32 @@ export default function Navigation() {
                 setOpenSearch((prev) => !prev);
               }}
             >
-              <AnimateComponent.Width>
-                {openSearch && (
-                  <OutsideAlert
-                    style={{ position: "absolute" }}
-                    toggleShowing={() => setOpenSearch((prev) => !prev)}
-                  >
-                    <Form.Input placeholder="Search post/username/workspace"></Form.Input>
-                  </OutsideAlert>
-                )}
-              </AnimateComponent.Width>
-              <Link
-                to="/portal/search"
-                style={{
-                  paddingLeft: "0",
-                  color: "#fff",
-                  display: "inline-block",
-                  verticalAlign: "middle",
-                  lineHeight: "100%",
-                  margin: 0,
-                }}
-              >
-                {!openSearch && <IoSearchSharp></IoSearchSharp>}
-              </Link>
+              {screenColumn > 2 ? (
+                <AnimateComponent.Width>
+                  {openSearch && (
+                    <OutsideAlert
+                      style={{ position: "absolute" }}
+                      toggleShowing={() => setOpenSearch((prev) => !prev)}
+                    >
+                      <Form.Input placeholder="Search post/username/workspace"></Form.Input>
+                    </OutsideAlert>
+                  )}
+                </AnimateComponent.Width>
+              ) : (
+                <Link
+                  to="/portal/search"
+                  style={{
+                    paddingLeft: "0",
+                    color: "#fff",
+                    display: "inline-block",
+                    verticalAlign: "middle",
+                    lineHeight: "100%",
+                    margin: 0,
+                  }}
+                >
+                  {!openSearch && <IoSearchSharp></IoSearchSharp>}
+                </Link>
+              )}
             </ContainerComponent.Item>
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
@@ -150,35 +144,33 @@ export default function Navigation() {
                   </Text>
                 </Link>
               </ContainerComponent.Item>
-              <DropdownButton
-                position="middle"
-                style={{
-                  paddingTop: "16px",
-                  background: "rgb(22, 61, 60)",
-                  color: "#fff",
-                }}
-                component={
-                  <>
-                    <ContainerComponent.Inner style={{ display: "flex" }}>
-                      <Text
-                        className="navigation__text"
-                        style={{ marginRight: "5px" }}
-                      >
-                        Workspace
-                      </Text>
-                      <Text.MiddleLine>
-                        <Icon>
-                          <BsCaretDownFill></BsCaretDownFill>
-                        </Icon>
-                      </Text.MiddleLine>
-                    </ContainerComponent.Inner>
-                  </>
+
+              {/* <DropDownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
+                <Text style={{ marginRight: '5px' }}>Workspace</Text>
+                <Text.MiddleLine>
+                  <Icon>
+                    <BsCaretDownFill></BsCaretDownFill>
+                  </Icon>
+                </Text.MiddleLine>
+              </>}>
+                <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
+              </DropDownButton> */}
+
+              <AnimateComponent.Dropdown
+                style={{ marginTop: "16px" }}
+                triggerComponent={
+                  <Text
+                    className="navigation__text"
+                    style={{ marginRight: "5px" }}
+                  >
+                    Workspace
+                  </Text>
                 }
               >
                 <WorkspaceList
                   toggleMemberModal={toggleMemberModal}
                 ></WorkspaceList>
-              </DropdownButton>
+              </AnimateComponent.Dropdown>
               {navData.map((link, index) => {
                 return (
                   <ContainerComponent.Item key={index + 1}>
@@ -195,7 +187,7 @@ export default function Navigation() {
                       </>
                     )}
                     {link.subDocs && (
-                      <DropdownButton component={<></>}></DropdownButton>
+                      <DropDownButton component={<></>}></DropDownButton>
                     )}
                   </ContainerComponent.Item>
                 );
@@ -221,6 +213,7 @@ export default function Navigation() {
   );
 }
 const Navigator = ({ closeNavigator }) => {
+  const { user } = useAuthorizationContext();
   const [openModal, toggleModal] = useModal();
 
   return (
@@ -262,6 +255,27 @@ const Navigator = ({ closeNavigator }) => {
                   </Icon.Label>
                 </ContainerComponent.MiddleInner>
               </ContainerComponent.Item>
+            ) : navigate.destination ? (
+              <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
+                <Link
+                  to={`${navigate.link + user.workspace}`}
+                  style={{
+                    color: "#fff",
+                  }}
+                >
+                  <ContainerComponent.MiddleInner>
+                    <Icon.CircleIcon>{navigate.icon}</Icon.CircleIcon>
+                    <Icon.Label
+                      style={{
+                        fontWeight: "bold",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {navigate.label}
+                    </Icon.Label>
+                  </ContainerComponent.MiddleInner>
+                </Link>
+              </ContainerComponent.Item>
             ) : (
               <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
                 <Link
@@ -286,7 +300,7 @@ const Navigator = ({ closeNavigator }) => {
             )
           )}
         </ContainerComponent.GridThreeColumns>
-        <Modal
+        {/* <Modal
           isShowing={openModal}
           toggle={toggleModal}
           style={{
@@ -303,7 +317,7 @@ const Navigator = ({ closeNavigator }) => {
             </ContainerComponent.Item>
             <WorkspaceList></WorkspaceList>
           </ContainerComponent.Flex>
-        </Modal>
+        </Modal> */}
       </ContainerComponent>
     </>
   );
@@ -355,14 +369,13 @@ const AuthStatus = React.memo(function AuthStatus({
           <Text.MiddleLine className="navigation__logoutFrame">
             <Link
               to={"/"}
-              className="navigation__logOut"
               style={{
                 color: "#fff",
               }}
               onClick={logout}
             >
               <ButtonComponent className="navigation__logout">
-                Log out
+                Logout
               </ButtonComponent>
             </Link>
           </Text.MiddleLine>
@@ -407,6 +420,7 @@ const WorkspaceList = ({ toggleMemberModal }) => {
 };
 function WorkspaceItem({ item, toggleMemberModal }) {
   const { user, editCurrentWorkspace } = useAuthorizationContext();
+  const { workspace } = useWorkspaceContext();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -460,8 +474,8 @@ function WorkspaceItem({ item, toggleMemberModal }) {
       </Text.MiddleLine>
 
       <Text.MiddleLine>
-        {user.role !== roles.STAFF && (
-          <DropdownButton
+        {user.accountId === item.manager && (
+          <DropDownButton
             position="left"
             component={
               <ContainerComponent.Pane>
@@ -473,13 +487,12 @@ function WorkspaceItem({ item, toggleMemberModal }) {
           >
             <ButtonComponent
               onClick={() => {
-                console.log("toggle");
                 toggleMemberModal();
               }}
             >
               Add member
             </ButtonComponent>
-          </DropdownButton>
+          </DropDownButton>
         )}
       </Text.MiddleLine>
     </ContainerComponent.Flex>
@@ -627,7 +640,7 @@ function Notification() {
           </Link>
         </Icon.CircleIcon>
       )) || (
-        <DropdownButton
+        <DropDownButton
           position="right"
           component={
             <Icon.CircleIcon onClick={turnOffBadge}>
@@ -642,7 +655,7 @@ function Notification() {
           }}
         >
           <NotificationContainer></NotificationContainer>
-        </DropdownButton>
+        </DropDownButton>
       )}
       {isNew && <Icon.Badge></Icon.Badge>}
     </>

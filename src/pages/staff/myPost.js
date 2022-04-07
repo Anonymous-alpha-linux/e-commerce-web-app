@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Loading } from '..';
-import { ContainerComponent, List } from '../../components';
+import { AnimateComponent, ContainerComponent, List } from '../../components';
 import { Filter, LazyLoading, PostContainer, PostForm } from '../../containers';
 import { usePostContext, useAuthorizationContext } from '../../redux';
 import axios from 'axios';
@@ -24,7 +24,7 @@ export default function MyPost() {
         };
     }, []);
 
-    return (<ContainerComponent style={{ background:"#A9C39E"}} className="workspace" id="workspace">
+    return (<ContainerComponent style={{ background: "#A9C39E" }} className="workspace" id="workspace">
         <ContainerComponent.Inner className="myPost__header">
             <PostForm></PostForm>
             <Filter loader={filterMyPost} selectOptions={[
@@ -91,14 +91,16 @@ export default function MyPost() {
                         comments
                     };
                     return (
-                        <List.Item key={post._id}
-                            id={post._id}>
-                            <PostContainer
-                                postHeader={postHeader}
-                                postBody={postBody}
-                                postFooter={postFooter}
-                            ></PostContainer>
-                        </List.Item>
+                        <AnimateComponent.Zoom key={post._id}>
+                            <List.Item
+                                id={post._id}>
+                                <PostContainer
+                                    postHeader={postHeader}
+                                    postBody={postBody}
+                                    postFooter={postFooter}
+                                ></PostContainer>
+                            </List.Item>
+                        </AnimateComponent.Zoom>
                     );
                 })}
             </List>

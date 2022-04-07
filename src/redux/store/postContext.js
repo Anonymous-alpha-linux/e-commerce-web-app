@@ -109,13 +109,9 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Get Post Successful",
-          type: toastTypes.SUCCESS,
-        });
-        setPost({
-          type: actions.SET_OFF_LOADING,
-        });
+        // setPost({
+        //   type: actions.SET_OFF_LOADING,
+        // });
         return setPost({
           type: actions.GET_POST_LIST,
           payload: res.data.response,
@@ -392,13 +388,12 @@ export default React.memo(function PostContext({ children }) {
           message: "Edit Idea Successful",
           type: toastTypes.SUCCESS,
         });
-        console.log(res.data.response);
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
       .catch((error) => {
         pushToast({
-          message: "Edit Post successfully",
+          message: "Edit Post Failed",
           type: toastTypes.ERROR,
         });
       });
@@ -476,10 +471,6 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Get Post Successful",
-          type: toastTypes.SUCCESS,
-        });
         setPost({
           type: actions.GET_MY_POST,
           payload: res.data.response,
@@ -990,6 +981,20 @@ export default React.memo(function PostContext({ children }) {
           setError(error.message);
         });
     } else if (type === "rate comment") {
+      const { _id: commentId } = input;
+      setPost({
+        type: actions.RATE_COMMENT,
+        payload: {
+          like: input.like,
+          dislike: input.dislike,
+          likedAccounts: input.likedAccounts,
+          dislikedAccounts: input.dislikedAccounts,
+        },
+        liked: input.liked,
+        disliked: input.disliked,
+        commentId,
+        postId,
+      });
       return axios
         .put(
           postAPI,
@@ -1003,7 +1008,7 @@ export default React.memo(function PostContext({ children }) {
             },
             params: {
               view: "comment",
-              commentid: input.commentId,
+              commentid: commentId,
               interact: "rate",
             },
           }
@@ -1045,6 +1050,26 @@ export default React.memo(function PostContext({ children }) {
           setError(error.message);
         });
     } else if (type === "rate reply") {
+      const {
+        like,
+        dislike,
+        likedAccounts,
+        dislikedAccounts,
+        commentId,
+        replyId,
+      } = input;
+      setPost({
+        type: actions.RATE_COMMENT_REPLY,
+        postId,
+        commentId,
+        replyId,
+        payload: {
+          like,
+          dislike,
+          likedAccounts,
+          dislikedAccounts,
+        },
+      });
       return axios
         .put(
           postAPI,

@@ -54,18 +54,16 @@ export default function ManagerInfo() {
               }}
             >
               <Icon.Image
-                src={`${
-                  profile.profileImage ||
+                src={`${profile.profileImage ||
                   process.env.PUBLIC_URL + "/add-avatar.jpg"
-                }`}
+                  }`}
                 alt={`Avatar`}
                 style={{ objectFit: "fill" }}
               ></Icon.Image>
             </Icon.CircleIcon>
             <Text.CenterLine style={{ paddingTop: "10px" }}>
-              <Text.Title>{`${profile.lastName || "Anonymous"} ${
-                profile.firstName || "Nguyen"
-              }`}</Text.Title>
+              <Text.Title>{`${profile.lastName || "Anonymous"} ${profile.firstName || "Nguyen"
+                }`}</Text.Title>
               <Text.Subtitle
                 style={{
                   textTransform: "capitalize",
@@ -95,7 +93,7 @@ export default function ManagerInfo() {
       <ContainerComponent.Inner>
         <ContainerComponent.Pane className="personal__threeFrame"></ContainerComponent.Pane>
 
-        <ContainerComponent.Pane className="personal__greenBot" style={{paddingTop: '20px'}}>
+        <ContainerComponent.Pane className="personal__greenBot" style={{ paddingTop: '20px' }}>
           <ContainerComponent.Inner style={{
             padding: '20px 0 0 0',
             maxWidth: "720px",

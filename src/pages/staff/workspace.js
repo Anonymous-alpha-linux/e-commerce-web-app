@@ -40,7 +40,11 @@ export default function Workspace() {
     <ContainerComponent className="workspace" id="workspace">
       <ContainerComponent.Inner className="workspace__form">
         <ContainerComponent.Inner className="workspace__innerForm">
-          <Timespan style={{width:"100vw"}} expireTime={workspace.expireTime} setBlockWorkspace={setBlockWorkspace}></Timespan>
+          <Timespan
+            style={{ width: "100vw" }}
+            expireTime={workspace.expireTime}
+            setBlockWorkspace={setBlockWorkspace}
+          ></Timespan>
           {!blockWorkspace && <PostForm></PostForm>}
           <Filter
             loader={filterPost}
@@ -58,7 +62,11 @@ export default function Workspace() {
         </ContainerComponent.Inner>
       </ContainerComponent.Inner>
       <LazyLoading loader={loadNextPosts}>
-        <List style={{ borderRadius: "10px", background:"#A9C39E"}} className="workspace__postList" ref={listRef}>
+        <List
+          style={{ borderRadius: "10px", background: "#A9C39E" }}
+          className="workspace__postList"
+          ref={listRef}
+        >
           {posts.map((post, index) => {
             const {
               _id,
@@ -73,7 +81,6 @@ export default function Workspace() {
               hideAuthor,
               comments,
             } = post;
-
             let postHeader = {
               id: _id,
               postAuthor: postAuthor._id,

@@ -1,7 +1,9 @@
-import React from 'react'
+import React from 'react';
+import { useParams } from 'react-router-dom';
 import { ButtonComponent, ContainerComponent, Icon, Preview } from '../components'
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi'
 export default function SinglePost() {
+  const { id } = useParams();
   const [index, setIndex] = React.useState(0)
   const images = [
     { image: 'https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_960_720.jpg' },
@@ -16,6 +18,7 @@ export default function SinglePost() {
       return null;
     }
   }
+ 
   return (
     <ContainerComponent.Flex style={{ position: "relative", overflow: "hiden" }}>
       <ContainerComponent.Item style={{ height: '50%', width: "100%", padding: "0", flexGrow: "1", position: "relative" }}>

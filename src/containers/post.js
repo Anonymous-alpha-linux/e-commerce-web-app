@@ -134,7 +134,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
           className="post__section"
           style={{
             padding: "10px 20px",
-            background:"white"
+            background: "white"
           }}
         >
           <ContainerComponent.Pane className="post__header">
@@ -143,8 +143,8 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 verticalAlign: 'middle',
                 background: '#163d3c',
                 color: '#fff',
-                width:"45px",
-                height:"45px"
+                width: "45px",
+                height: "45px"
               }}>
                 <Preview.Images image={postHeader.image} alt={postHeader.alt}></Preview.Images>
               </Icon.Avatar>
@@ -156,7 +156,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
               <ContainerComponent.Flex>
                 <Text.Date style={{
                   marginRight: '8px',
-                  marginTop:"4px"
+                  marginTop: "4px"
                 }}>{parseTime(postHeader.date)}</Text.Date>
               </ContainerComponent.Flex>
             </ContainerComponent.InlineGroup>
@@ -208,17 +208,17 @@ export default function Post({ postHeader, postBody, postFooter }) {
 
 
           <ContainerComponent.Pane className="post__body">
-            <Text.Paragraph style={{padding:"0px 10px"}}>
+            <Text.Paragraph style={{ padding: "0px 10px" }}>
               {postBody.content}
             </Text.Paragraph>
             {!!postBody.attachment.length && <GridPreview files={postBody.attachment}></GridPreview>}
           </ContainerComponent.Pane>
 
-          <ContainerComponent.Pane className="post__footer" style={{ background: '#DCE7D7', boxShadow: '1px 1px .5px solid #000',borderRadius:"10px" }}>
-            <ContainerComponent.GridThreeColumns style={{margin:"15px 0 5px 0"}}>
+          <ContainerComponent.Pane className="post__footer" style={{ background: '#DCE7D7', boxShadow: '1px 1px .5px solid #000', borderRadius: "10px" }}>
+            <ContainerComponent.GridThreeColumns style={{ margin: "15px 0 5px 0" }}>
               <ContainerComponent.Item>
                 <Text.MiddleLine>
-                  <input type='checkbox' name="like" id={`like ${postHeader.id}`} value={isLiked} onChange={checkedHandler} style={{ display: 'none'}}></input>
+                  <input type='checkbox' name="like" id={`like ${postHeader.id}`} value={isLiked} onChange={checkedHandler} style={{ display: 'none' }}></input>
                   <Icon.CircleIcon
                     onClick={() => {
                       document.getElementById(`like ${postHeader.id}`).click();
@@ -226,7 +226,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
                     style={{ marginRight: '10px', color: '#fff', position: 'relative', }}>
                     <FaThumbsUp stroke='#163D3C'
                       strokeWidth={20}
-                      style={{ fill: `${isLiked ? '#163D3C' : 'transparent'}`,fontWeight:"600", color: "#b0b3b8", position: "absolute", top: '50%', transform: 'translate(-50%,-50%)', left: '50%' }} />
+                      style={{ fill: `${isLiked ? '#163D3C' : 'transparent'}`, fontWeight: "600", color: "#b0b3b8", position: "absolute", top: '50%', transform: 'translate(-50%,-50%)', left: '50%' }} />
                   </Icon.CircleIcon>
                   {like}
                 </Text.MiddleLine>
@@ -274,7 +274,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
                 }
               }}>
                 <Text.AbsoluteMiddle>
-                  <Text.CenterLine style={{ cursor: "pointer", fontWeight: "500", color:"#353535"}}>
+                  <Text.CenterLine style={{ cursor: "pointer", fontWeight: "500", color: "#353535" }}>
                     Comment ({postFooter.comment})
                   </Text.CenterLine>
                 </Text.AbsoluteMiddle>

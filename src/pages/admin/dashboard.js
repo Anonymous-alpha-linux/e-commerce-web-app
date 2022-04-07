@@ -95,12 +95,15 @@ function MostLikedPosts() {
       {
         data: mostLikePosts.map(post => post.like),
         borderColor: "black",
-        backgroundColor: ['rgb(255, 99, 132)',
+        backgroundColor: [
+          "green",
+          "#33EFAB", "#40916C", "#333",
+          'rgb(255, 99, 132)',
           'rgb(75, 192, 192)',
           'rgb(255, 205, 86)',
           'rgb(201, 203, 207)',
           'rgb(54, 162, 235)',
-          "#33EFAB", "#40916C", "#333"],
+        ],
         fill: true
       }
     ]
@@ -123,12 +126,14 @@ function MostCategory() {
         data: mostCategories.map(c => c.count),
         borderColor: "black",
         backgroundColor: [
+          'green',
+          "#33EFAB", "#40916C", "#333",
           'rgb(255, 99, 132)',
           'rgb(75, 192, 192)',
           'rgb(255, 205, 86)',
           'rgb(201, 203, 207)',
           'rgb(54, 162, 235)',
-          "#33EFAB", "#40916C", "#333"],
+        ],
         fill: true
       }
     ]

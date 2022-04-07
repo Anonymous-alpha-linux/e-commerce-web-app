@@ -38,7 +38,7 @@ export default function DropdownButton({
               }
             }
           >
-            <AnimateComponent.Dropdown>
+            <AnimateComponent.DropdownClick>
               {React.Children.toArray(children).map((item, index) => {
                 return (
                   <DropDown.Item
@@ -50,7 +50,7 @@ export default function DropdownButton({
                   </DropDown.Item>
                 );
               })}
-            </AnimateComponent.Dropdown>
+            </AnimateComponent.DropdownClick>
           </DropDown.Content>
         </OutsideAlert>
       )}

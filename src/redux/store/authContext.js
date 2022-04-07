@@ -209,7 +209,11 @@ export default function AuthenticationContext({ children }) {
         cb();
       });
   }
-  function searchQuery() {}
+  function changeAvatar(file) {
+const formData = new FormData();
+formData.append(file);
+  }
+  function searchQuery() { }
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (
