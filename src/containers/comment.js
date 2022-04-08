@@ -256,7 +256,7 @@ Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, 
   React.useEffect(() => {
     let interval = setInterval(() => {
       calcRemainingEventTime(workspace.eventTime);
-    }, 10000);
+    }, 180000);
     return () => {
       clearInterval(interval);
     }
@@ -339,7 +339,7 @@ Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, 
       </Text.MiddleLine>
     </Text.Line>
     <Text.Line>
-      <Form method="POST" style={{ width: "100%", padding: "5px 0 0 0", margin: "0" }} onSubmit={submitHandler}>
+      <Form style={{ width: "100%", padding: "5px 0 0 0", margin: "0" }} onSubmit={submitHandler}>
         <Form.Input ref={forwardedRef} name="content" style={{ width: "100%", marginTop: "4px", border: "1px solid #C4C4C4" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
         ></Form.Input>
         <input type="submit" style={{ display: "none" }} onSubmit={submitHandler}></input>
