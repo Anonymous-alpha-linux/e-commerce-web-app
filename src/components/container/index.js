@@ -4,7 +4,7 @@ import React from 'react';
 // 1. define the default component
 export default function ContainerComponent({ children, ...restProps }) {
     return (
-        <div {...restProps} className={`${restProps.className} container__root`}>
+        <div {...restProps} className={`${restProps.className || ""} container__root`}>
             {children}
         </div>
     )

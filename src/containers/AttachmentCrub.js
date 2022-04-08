@@ -20,51 +20,63 @@ export default function AttachmentCRUD() {
   const getAttachmentByPageRef = useRef(getAttachmentByPage);
 
   const [searchInput, setSearchInput] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const [filteredResults, setFilteredResults] = useState([]);
-  const [attachRecord, setAttachRecord] = useState();
   const [dataRecords, setDataRecords] = useState([]);
 
   const [currentPage, changeCurrentPage] = usePagination2(0);
 
 
+  // useEffect(() => {
+  //   setDataRecords(attachments.data);
+  // }, [attachments]);
+
+  // useEffect(() => {
+  //   getAttachmentList(data => {
+  //   });
+  // }, []);
   useEffect(() => {
-    setDataRecords(attachments.data);
-    setAttachRecord(attachments.data);
-  }, [attachments]);
-  useEffect(() => {
-    getAttachmentByPageRef.current(currentPage, attachmentList => {
-      setDataRecords(attachmentList);
+    getAttachmentByPageRef.current(currentPage, data => {
+      setDataRecords(data.response);
     });
   }, [currentPage]);
+
   useEffect(() => {
     getAttachmentByPageRef.current = getAttachmentByPage;
   }, [getAttachmentByPage]);
 
   function deleteAttachment(attachmentId) {
+    setLoading(true);
     deleteSingleAttachment(attachmentId, (options) => {
       if (options.message) {
-        console.log("deleted");
-        getAttachmentByPage(currentPage, attachmentList => {
-          setDataRecords(attachmentList);
-        });
+        if (dataRecords.length < 2) {
+          changeCurrentPage(currentPage - 1);
+        }
+        else {
+          getAttachmentByPageRef.current(currentPage, data => {
+            setDataRecords(data.response);
+          })
+        }
       }
+      setLoading(false);
     });
   }
   return (
-    <div className="categoryCRUD__root" style={{display:"flex",justifyContent:"center"}}>
+    <div className="categoryCRUD__root" style={{ display: "flex", justifyContent: "center" }}>
       <ContainerComponent.Inner style={{
         flexGrow: "1",
-        padding:"20px",
-        maxWidth:"1320px",
-        margin:"25px",
-        display:"block",
-        background:"#DCE7D7",
-        borderRadius:"10px",
-        overflow:"hidden",
-        height:"fit-content"
+        padding: "20px",
+        maxWidth: "1320px",
+        margin: "25px",
+        display: "block",
+        background: "#DCE7D7",
+        borderRadius: "10px",
+        overflow: "hidden",
+        height: "fit-content"
       }}>
-        <ContainerComponent.Inner className="categoryCRUD__inner" style={{maxWidth:"1300px", margin: '0 auto',borderRadius:"10px",overflow:"hidden" ,height:"fit-content"}}>
-          <div className="table__container" style={{ overflowX: 'scroll',width:"100%" }}>
+        <ContainerComponent.Inner className="categoryCRUD__inner" style={{ maxWidth: "1300px", margin: '0 auto', borderRadius: "10px", overflow: "hidden", height: "fit-content" }}>
+          <div className="table__container" style={{ overflowX: 'scroll', width: "100%" }}>
             <table className="table table-style" style={{ width: "100%" }}>
               <thead>
                 <tr style={{ background: "#f2f8fb" }} >
@@ -96,7 +108,7 @@ export default function AttachmentCRUD() {
                 </tr>
               </thead>
               <tbody>
-                {attachments.loading ?
+                {(attachments.loading || loading) ?
                   (<tr>
                     <td colSpan={6}>
                       <Text.Line style={{ position: 'relative' }}>
@@ -193,7 +205,7 @@ function AttachmentData({ data, deleteAttachment, index }) {
         <button
           onClick={() => toggleModalDetail()}
           className="btn-blue"
-          style={{margin:"5px"}}
+          style={{ margin: "5px" }}
         >
           {data._id === "" ? <span></span> : <span>Detail</span>}
         </button>

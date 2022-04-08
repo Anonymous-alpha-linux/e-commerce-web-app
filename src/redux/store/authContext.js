@@ -197,7 +197,7 @@ export default function AuthenticationContext({ children }) {
       .then((res) => {
         onLoadUser(cb);
         pushToast({
-          message: "Update Workspace successfully",
+          message: "Changed current workspace successfully",
           type: toastTypes.SUCCESS,
         })
         cb();

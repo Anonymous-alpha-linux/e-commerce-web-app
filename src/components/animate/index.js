@@ -31,6 +31,7 @@ export default function AnimateComponent({
     </>
   );
 }
+
 AnimateComponent.SlideRight = function AnimatedSlideRight({
   children,
   state,
@@ -58,16 +59,9 @@ AnimateComponent.SlideRight = function AnimatedSlideRight({
     </>
   );
 };
+
 AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, triggerComponent, position = "middle", style, ...props }) {
   const [isToggled, setToggle] = useState(false);
-  const menubg = useSpring({
-    // background: isToggled ? "#333" : "transparent",
-    position: 'relative'
-  });
-  const { y } = useSpring({
-    y: isToggled ? 180 : 0
-  });
-
   let menuPosition = position === 'middle' && {
     ...props.style,
     left: '50%',
@@ -80,15 +74,22 @@ AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, trigger
     right: 0
   }
 
-  const menuAppear = useSpring({
-    position: 'absolute',
-    transform: isToggled ? "translate3D(0,0,0)" : "translate3D(0,-120px,0)",
-    opacity: isToggled ? 1 : 0,
-    ...menuPosition,
-    ...style,
+  const menubg = useSpring({
+    // background: isToggled ? "#333" : "transparent",
+    position: 'relative'
   });
-
-
+  const { y } = useSpring({
+    y: isToggled ? 180 : 0
+  });
+  const menuAppear = useSpring({
+    to: {
+      position: 'absolute',
+      transform: isToggled ? "translate3D(0,0,0)" : "translate3D(0,-120px,0)",
+      opacity: isToggled ? 1 : 0,
+      ...menuPosition,
+      ...style,
+    }
+  });
 
   return (
     <animated.div
@@ -240,7 +241,8 @@ AnimateComponent.Zoom = function AnimatedZoom({
     keys: (item) => item.key,
     from: { transform: `scale(0)`, opacity: 0 },
     enter: { transform: `scale(${x}, ${y})`, opacity: 1, ...style },
-    delay: 200, 
+    leave: { transform: `scale(0)`, opacity: 0 },
+    delay: 200,
     reset: false
   });
   return transition(
@@ -271,3 +273,15 @@ AnimateComponent.Width = function AnimateWidth({ children, style, ...props }) {
       )
   );
 };
+
+AnimateComponent.TextFadeIn = function TextFadeIn({ children, style = { color: '#000' }, duration = 1000, ...props }) {
+  const textStyle = useSpring({
+    to: { color: style.color, opacity: 1 },
+    from: { color: 'transparent', opacity: 0 },
+    loop: false,
+    config: { duration: duration }
+  });
+  return <animated.div style={textStyle}>
+    {children}
+  </animated.div>
+}

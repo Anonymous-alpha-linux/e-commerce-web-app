@@ -453,7 +453,12 @@ const postReducer = (state, action) => {
               return actionHandler.getListItem(
                 "comments",
                 action.payload,
-                post
+                {
+                  ...post,
+                  loadMore: action.payload.length >= 10,
+                  count: 10,
+                  page: 0,
+                }
               );
             return post;
           },
@@ -497,7 +502,7 @@ const postReducer = (state, action) => {
           if (post._id === action.postid) {
             return {
               ...post,
-              comments: action.payload,
+              comments: action.payload.map(comment => ({ ...comment, page: 0, count: 10, loadMore: !!comment.reply })),
               page: 0,
               filter: action.filter,
               loadMore: true,
@@ -509,7 +514,7 @@ const postReducer = (state, action) => {
           if (post._id === action.postid) {
             return {
               ...post,
-              comments: action.payload,
+              comments: action.payload.map(comment => ({ ...comment, page: 0, count: 10, loadMore: !!comment.reply })),
               page: 0,
               filter: action.filter,
               loadMore: true,

@@ -40,9 +40,6 @@ export default function MyPost() {
         </ContainerComponent.Inner>
         <LazyLoading loader={loadMyNextPosts}>
             <List className="workspace__postList" ref={listRef}>
-                {/* {!myPosts.length && <List.Item>
-                    <Text.Center>Loading...</Text.Center>
-                </List.Item>} */}
                 {myPosts.map((post) => {
                     const {
                         _id,
@@ -57,7 +54,6 @@ export default function MyPost() {
                         hideAuthor,
                         comments
                     } = post;
-
                     let postHeader = {
                         id: _id,
                         postAuthor: postAuthor._id,

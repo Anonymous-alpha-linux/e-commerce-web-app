@@ -22,12 +22,10 @@ export default function MemberList({ workspaceId }) {
     const [input, setInput] = React.useState('');
     useEffect(() => {
         getAccountList(data => {
-            console.log(data);
         });
     }, []);
     useEffect(() => {
         getWorkspaceMembers(workspaceid, members => {
-            console.log(members);
             setState({
                 members: members,
                 outputs: data.filter(account => [roles.QA_COORDINATOR, roles.STAFF].includes(account.role.roleName)),

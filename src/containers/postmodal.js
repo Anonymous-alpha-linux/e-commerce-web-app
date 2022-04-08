@@ -201,7 +201,7 @@ export default function PostModal() {
           <Text.MiddleLine
             onClick={() => {
               // setOpenModal(modal => !modal);
-              navigate("/");
+              navigate(-1);
             }}>
             <Text.MiddleLine>
               <Icon style={{ display: "inline" }}>
