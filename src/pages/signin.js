@@ -24,7 +24,6 @@ const Login = () => {
     firstSubmitRef.current = true;
     validateInput(() => {
       login(input, () => {
-        console.log("loged");
         navigate("/");
       });
     });
@@ -65,19 +64,19 @@ const Login = () => {
       <ContainerComponent>
         <ContainerComponent.Flex className="signIn">
           <ContainerComponent.Inner className="signIn__green">
-            <ContainerComponent.Pane style={{transform:"translateY(-50%)"}}>
+            <ContainerComponent.Pane style={{ transform: "translateY(-50%)" }}>
               <Text.Title className="signIn__text">WELCOME !</Text.Title>
               <Text.Title className="signIn__subText">Sign in to continute access the IdeaHub</Text.Title>
-            </ContainerComponent.Pane>  
+            </ContainerComponent.Pane>
           </ContainerComponent.Inner>
           <ContainerComponent.Inner className="signIn__content">
-                  <ContainerComponent.Pane className="signIn__loginTitle">
-                    <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "28px",marginBottom:"10px" }}>Hello!</Text.Title>
-                    <ContainerComponent.Flex className="signIn__login">
-                      <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "21px" }}>Login</Text.Title>
-                      <Text.Title style={{ fontSize: "20px",fontWeight:"350",width:"fit-content" }}>Your Account</Text.Title>
-                    </ContainerComponent.Flex>
-                  </ContainerComponent.Pane>
+            <ContainerComponent.Pane className="signIn__loginTitle">
+              <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "28px", marginBottom: "10px" }}>Hello!</Text.Title>
+              <ContainerComponent.Flex className="signIn__login">
+                <Text.Title style={{ textAlign: "center", color: "#163d3c", fontSize: "21px" }}>Login</Text.Title>
+                <Text.Title style={{ fontSize: "20px", fontWeight: "350", width: "fit-content" }}>Your Account</Text.Title>
+              </ContainerComponent.Flex>
+            </ContainerComponent.Pane>
             <Form className="signIn__form"
               method={"POST"}
               onSubmit={submitHandler}

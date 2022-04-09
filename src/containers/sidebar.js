@@ -20,12 +20,10 @@ import {
 import { UserAll, ListMember } from "../pages";
 import { sidebarData, media } from "../fixtures";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
-import { AddFromWorkspace } from ".";
 import { useModal, useMedia } from "../hooks";
-import Modal from "./modal";
+
+import { AddFromWorkspace, TriggerLoading, Modal } from ".";
 import { Dropdown } from "../components";
-import DropdownButton from "./dropDownButton";
-import TriggerLoading from "./triggerLoading";
 
 export default function Sidebar({ closeSidebar, forwardRef }) {
   // const [switchToggle, setSwitchToggle] = useState(false);
@@ -232,6 +230,7 @@ const EditToggle = ({ item, clickLoader }) => {
   return (
     <>
       <ContainerComponent.Item
+        id={`workspace-${item._id}`}
         onMouseLeave={() => setDropdown(false)}
         style={{ width: "100%", padding: "10px", minWidth: "230px" }}
       >
@@ -324,6 +323,23 @@ const EditToggle = ({ item, clickLoader }) => {
                   </ButtonComponent>
                 )}
               </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                {(device === media.MOBILE && (
+                  <ButtonComponent>
+                    <Text.Line style={{ textAlign: "center" }}>
+                      <Link to="/workspace_overview">
+                        <Text.NoWrapText>Detail workspace</Text.NoWrapText>
+                      </Link>
+                    </Text.Line>
+                  </ButtonComponent>
+                )) || (
+                    <ButtonComponent onClick={toggleWorkspaceModal}>
+                      <Text.Line style={{ textAlign: "center" }}>
+                        <Text.NoWrapText>Workspace report</Text.NoWrapText>
+                      </Text.Line>
+                    </ButtonComponent>
+                  )}
+              </ContainerComponent.Item>
             </ContainerComponent.Flex>
           )}
         </AnimateComponent.DropdownClick>
@@ -373,7 +389,6 @@ const EditToggle = ({ item, clickLoader }) => {
   );
 };
 function TimespanChild({ startTime = Date.now(), expireTime }) {
-  const { workspaces } = useWorkspaceContext();
   const startDate = new Date(startTime).getTime();
   const expireDate = new Date(expireTime).getTime();
   const [loading, setLoading] = useState(false);
@@ -420,12 +435,13 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           seconds: 0,
         });
       }
+      setLoading(false);
     }, 1000);
-    setLoading(false);
+
     return () => {
       clearInterval(interval);
     };
-  }, [workspaces]);
+  }, []);
 
   function calculateBlockTime() {}
   function convertTo2Digit(number) {

@@ -31,9 +31,12 @@ export default function Navigation() {
   const { user } = useAuthorizationContext();
   const [screenColumn, setScreenColumn] = useState(2);
   const [openNavigator, setOpenNavigator] = useState(false);
-  const [openMemberModal, toggleMemberModal] = useModal();
   const [openSearch, setOpenSearch] = useState(false);
+
+  const [openMemberModal, toggleMemberModal] = useModal();
   const navigate = useNavigate();
+
+  const device = useMedia(480, 1050);
 
   const responsiveHandler = () => {
     const { width } = window.screen;
@@ -87,21 +90,26 @@ export default function Navigation() {
               </ContainerComponent.Pane>
             </ContainerComponent.Item>
 
-            <ContainerComponent.Item
-              onClick={() => {
-                setOpenSearch((prev) => !prev);
-              }}
-            >
-              {screenColumn > 2 ? (
+            <ContainerComponent.Item>
+              {device !== media.MOBILE ? (
                 <AnimateComponent.Width>
-                  {openSearch && (
-                    <OutsideAlert
-                      style={{ position: "absolute" }}
-                      toggleShowing={() => setOpenSearch((prev) => !prev)}
-                    >
-                      <Form.Input placeholder="Search post/username/workspace"></Form.Input>
-                    </OutsideAlert>
-                  )}
+                  {openSearch &&
+                    ((
+                      <OutsideAlert
+                        style={{ position: "absolute" }}
+                        toggleShowing={() => setOpenSearch((prev) => !prev)}
+                      >
+                        <Form.Input placeholder="Search post/username/workspace"></Form.Input>
+                      </OutsideAlert>
+                    ) || (
+                      <Icon
+                        onClick={() => {
+                          setOpenSearch((prev) => !prev);
+                        }}
+                      >
+                        <IoSearchSharp></IoSearchSharp>
+                      </Icon>
+                    ))}
                 </AnimateComponent.Width>
               ) : (
                 <Link
@@ -115,12 +123,15 @@ export default function Navigation() {
                     margin: 0,
                   }}
                 >
-                  {!openSearch && <IoSearchSharp></IoSearchSharp>}
+                  <Icon>
+                    <IoSearchSharp></IoSearchSharp>
+                  </Icon>
                 </Link>
               )}
             </ContainerComponent.Item>
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
+
         {screenColumn > 2 && (
           <ContainerComponent.Item style={{ color: "#fff" }}>
             <ContainerComponent.MiddleInner
@@ -258,7 +269,8 @@ const Navigator = ({ closeNavigator }) => {
             ) : navigate.destination ? (
               <ContainerComponent.Item key={index + 1} onClick={closeNavigator}>
                 <Link
-                  to={`${navigate.link + user.workspace}`}
+                  to={navigate.link}
+                  // to={`${navigate.link + user.workspace}`}
                   style={{
                     color: "#fff",
                   }}

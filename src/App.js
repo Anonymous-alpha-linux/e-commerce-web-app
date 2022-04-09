@@ -162,8 +162,7 @@ function App() {
               )) ||
               // 3. QA coordinator
               (user.role === roles.QA_COORDINATOR && (
-                <Route
-                  path=""
+                <Route path=""
                   element={
                     <ProtectedPage authorized={[roles.QA_COORDINATOR]}>
                       <QACoordinator></QACoordinator>
@@ -203,12 +202,10 @@ function App() {
                       element={<AddGroupContainer></AddGroupContainer>}
                     />
                   </Route>
-                  <Route
-                    path="/management/category"
+                  <Route path="/management/category"
                     element={<CategoryManagement></CategoryManagement>}
                   />
-                  <Route
-                    path="/management/member"
+                  <Route path="/management/member"
                     element={<ListMember></ListMember>}
                   />
                   <Route path="/management/workspace_member">
@@ -260,17 +257,13 @@ function App() {
                       element={<AddGroupContainer></AddGroupContainer>}
                     />
                   </Route>
+                  {/* <Route path="/management/workspace_list" /> */}
                   <Route path="/management/workspace_member">
                     <Route path=":id" element={<ListMember></ListMember>} />
                   </Route>
-                  <Route
-                    path="workspace"
-                    element={<WorkspaceGroup></WorkspaceGroup>}
-                  />
-                  <Route
-                    path="post_detail/:postId"
-                    element={<SinglePost></SinglePost>}
-                  />
+                  <Route path="workspace" element={<WorkspaceGroup></WorkspaceGroup>} />
+                  <Route path="/workspace_overview" element={<SinglePost></SinglePost>} />
+                  <Route path="post_detail/:postId" element={<SinglePost></SinglePost>} />
                 </Route>
               ))
             }

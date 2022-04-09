@@ -197,23 +197,24 @@ export default function AuthenticationContext({ children }) {
       .then((res) => {
         onLoadUser(cb);
         pushToast({
-          message: "Update Workspace successfully",
+          message: "Changed current workspace successfully",
           type: toastTypes.SUCCESS,
-        })
+        });
         cb();
-      }).catch((err) => {
+      })
+      .catch((err) => {
         pushToast({
           message: err.message,
           type: toastTypes.ERROR,
           timeout: 10000,
         });
-      });;
+      });
   }
   function changeAvatar(file) {
     const formData = new FormData();
     formData.append(file);
   }
-  function searchQuery() { }
+  function searchQuery() {}
   if (user.authLoading) return <Loading className="auth__loading"></Loading>;
 
   return (

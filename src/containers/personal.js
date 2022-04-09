@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ContainerComponent, Icon, ButtonComponent, Form, Text } from '../components';
+import { ContainerComponent, Icon, ButtonComponent, Form, Text, AnimateComponent } from '../components';
 import { useAuthorizationContext, useWorkspaceContext } from '../redux';
 import { roles } from '../fixtures';
 import { mainAPI } from '../config';
@@ -83,18 +83,20 @@ export default function Personal() {
     return <ContainerComponent className="personal">
         <ContainerComponent.Inner className="personal__green">
             {/* {personal avatar} */}
-            <ContainerComponent.Pane className="personal__frameAva">
-                <Text.CenterLine style={{ position: 'relative', zIndex: 1, height: '27.5px' }}>
-                    <Icon.CircleIcon className="personal__avatar">
-                        <Icon.Image src={`${user.profileImage}`} alt={`Avatar`} style={{ objectFit: 'fill', width: "16px", height: "16px" }}></Icon.Image>
-                    </Icon.CircleIcon>
-                    <Text.CenterLine style={{ paddingTop: '10px' }}>
-                        <Text.Title>{user.account}</Text.Title>
-                        <Text.Subtitle style={{ textTransform: 'capitalize', opacity: 0.5, fontWeight: 500 }}>{user.role}</Text.Subtitle>
+            <AnimateComponent.Zoom>
+                <ContainerComponent.Pane className="personal__frameAva">
+                    <Text.CenterLine style={{ position: 'relative', zIndex: 1, height: '27.5px' }}>
+                        <Icon.CircleIcon className="personal__avatar">
+                            <Icon.Image src={`${user.profileImage}`} alt={`Avatar`} style={{ objectFit: 'fill', width: "16px", height: "16px" }}></Icon.Image>
+                        </Icon.CircleIcon>
+                        <Text.CenterLine style={{ paddingTop: '10px' }}>
+                            <Text.Title>{user.account}</Text.Title>
+                            <Text.Subtitle style={{ textTransform: 'capitalize', opacity: 0.5, fontWeight: 500 }}>{user.role}</Text.Subtitle>
+                        </Text.CenterLine>
                     </Text.CenterLine>
-                </Text.CenterLine>
-                <Text.Line className="personal__smallShape"></Text.Line>
-            </ContainerComponent.Pane>
+                    <Text.Line className="personal__smallShape"></Text.Line>
+                </ContainerComponent.Pane>
+            </AnimateComponent.Zoom>
         </ContainerComponent.Inner>
         <ContainerComponent.Inner>
             {/* {personal three button} */}
@@ -138,241 +140,244 @@ export default function Personal() {
             <Form onSubmit={submitHandler}
                 style={{ height: "fit-content", width: "100%", padding: "0", maxWidth: "unset" }}>
                 <ContainerComponent.Inner className="personal__greenBot">
-                    <ContainerComponent.Pane style={{
-                        padding: '0',
-                        maxWidth: "720px",
-                        width: '100%'
-                    }}>
-                        <Text.Title
-                            className={"personal__title"}
-                            forwardedRef={titleRef}
-                        >Profile</Text.Title>
-                        <Form.TextArea placeholder="Some your introduction"
-                            rows={15}
-                            name={'introduction'}
-                            onChange={inputHandler}
-                            onScroll={(e) => {
-                                if (e.target.scrollTop > 10) titleRef.current.style.opacity = '0';
-                                else titleRef.current.style.opacity = '1';
-                            }}
-                            style={{
-                                width: '100%',
-                                padding: '30px 0 0 10px',
-                                borderRadius: "10px"
-                            }}
-                            disabled={!isEdit}
-                            value={input.introduction}></Form.TextArea>
-
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            textIndent: '5px',
-                            transform: 'translate(10px,24px)',
-                            fontWeight: 800,
+                    <AnimateComponent.TextFadeIn duration={500}>
+                        <ContainerComponent.Pane style={{
+                            padding: '0',
+                            maxWidth: "720px",
+                            width: '100%'
                         }}>
-                            <Text.Label>
-                                First name
-                            </Text.Label>
-                        </Text.MiddleLine>
-                        <Form.Input style={{
-                            textAlign: 'right',
-                            border: "1px solid #163D3C",
-                            borderRadius: "10px"
-                        }}
-                            name="firstName"
-                            onChange={inputHandler}
-                            value={input.firstName}
-                            disabled={!isEdit}></Form.Input>
+                            <Text.Title
+                                className={"personal__title"}
+                                forwardedRef={titleRef}
+                            >Profile</Text.Title>
+                            <Form.TextArea placeholder="Some your introduction"
+                                rows={15}
+                                name={'introduction'}
+                                onChange={inputHandler}
+                                onScroll={(e) => {
+                                    if (e.target.scrollTop > 10) titleRef.current.style.opacity = '0';
+                                    else titleRef.current.style.opacity = '1';
+                                }}
+                                style={{
+                                    width: '100%',
+                                    padding: '30px 0 0 10px',
+                                    borderRadius: "10px"
+                                }}
+                                disabled={!isEdit}
+                                value={input.introduction}></Form.TextArea>
 
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            textIndent: '5px',
-                            transform: 'translate(10px,24px)',
-                            fontWeight: 800
-                        }}>
-                            <Text.Label>
-                                Last name
-                            </Text.Label>
-                        </Text.MiddleLine>
-                        <Form.Input style={{
-                            textAlign: 'right',
-                            border: "1px solid #163D3C",
-                            borderRadius: "10px"
-                        }}
-                            name="lastName"
-                            onChange={inputHandler}
-                            value={input.lastName}
-                            disabled={!isEdit}></Form.Input>
-
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            textIndent: '5px',
-                            transform: 'translate(10px,24px)',
-                            fontWeight: 800
-                        }}>
-                            <Text.Label>
-                                Phone
-                            </Text.Label>
-                        </Text.MiddleLine>
-                        <Form.Input style={{
-                            textAlign: 'right',
-                            border: "1px solid #163D3C",
-                            borderRadius: "10px"
-                        }}
-                            name="phone"
-                            onChange={inputHandler}
-                            value={input.phone}
-                            disabled={!isEdit}></Form.Input>
-
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            textIndent: '5px',
-                            transform: 'translate(10px,24px)',
-                            fontWeight: 800
-                        }}>
-                            <Text.Label>
-                                Address
-                            </Text.Label>
-                        </Text.MiddleLine>
-                        <Form.Input style={{
-                            textAlign: 'right',
-                            border: "1px solid #163D3C",
-                            borderRadius: "10px"
-                        }}
-                            name="address"
-                            onChange={inputHandler}
-                            value={input.address}
-                            disabled={!isEdit}></Form.Input>
-
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            textIndent: '5px',
-                            // transform: 'translate(10px,25px)',
-                            fontWeight: 800
-                        }}>
-                            {<Text.Label style={{ color: "#163D3C" }}>
-                                Gender
-                            </Text.Label>}
-                        </Text.MiddleLine>
-                        <Form.Select placeholder="Post your information"
-                            disabled={!isEdit}
-                            value={input.gender}
-                            style={{
-                                textAlign: 'left',
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                textIndent: '5px',
+                                transform: 'translate(10px,24px)',
                                 fontWeight: 800,
-                                width: '100%',
-                                height: '35px',
-                                paddingLeft: "10px",
-                                border: "1px solid #163D3C",
-                                borderRadius: "10px",
-                            }}
-                            onChange={inputHandler}
-                            name={'gender'}
-                        >
-                            <Form.Option style={{ marginLeft: "10px" }} value={'male'}>Male</Form.Option>
-                            <Form.Option style={{ marginLeft: "10px" }} value={'female'}>Female</Form.Option>
-                        </Form.Select>
-                        {/* Date of birth */}
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            transform: 'translate(10px,24px)',
-                            fontWeight: 800
-                        }}>
-                            <Text.Label style={{ padding: "6px" }}>
-                                {isEdit ? 'Day of Birth' : 'Age'}
-                            </Text.Label>
-                        </Text.MiddleLine>
-                        <Form.Input
-                            type={isEdit ? "date" : "text"}
-                            onChange={inputHandler}
-                            name={'birth'}
-                            disabled={!isEdit}
-                            value={!isEdit ? input.age : input.birth}
-                            style={{
-                                textAlign: 'right',
-                                border: "1px solid #163D3C",
-                                borderRadius: "10px",
-                                height: "fir-content"
-                            }}></Form.Input>
-
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            textIndent: '5px',
-                            transform: 'translate(10px,24px)',
-                            fontWeight: 800
-                        }}>
-                            <Text.Label>
-                                Email
-                            </Text.Label>
-                        </Text.MiddleLine>
-                        <Form.Input style={{
-                            textAlign: 'right',
-                            border: "1px solid #163D3C",
-                            borderRadius: "10px"
-                        }}
-                            name="email"
-                            onChange={inputHandler}
-                            value={user.email}
-                            disabled={true}></Form.Input>
-
-                        <Text.MiddleLine style={{
-                            lineHeight: 0,
-                            textIndent: '5px',
-                            transform: 'translate(10px,24px)',
-                            fontWeight: 800
-                        }}>
-                            <Text.Label>
-                                Department
-                            </Text.Label>
-                        </Text.MiddleLine>
-                        <Form.Input placeholder="your position"
-                            value={workspace.workTitle}
-                            name='department'
-                            disabled={true}
-                            style={{
+                            }}>
+                                <Text.Label>
+                                    First name
+                                </Text.Label>
+                            </Text.MiddleLine>
+                            <Form.Input style={{
                                 textAlign: 'right',
                                 border: "1px solid #163D3C",
                                 borderRadius: "10px"
-                            }}></Form.Input>
-                        <Text.RightLine>
-                            {isEdit && <>
-                                <Form.Input
-                                    type='submit'
-                                    style={{ display: 'none' }}
-                                    onClick={(e) => {
-                                        submitHandler(e);
-                                    }}>
-                                </Form.Input>
-                                <Text.Line>
-                                    <Text.MiddleLine>
-                                        <ButtonComponent
-                                            className="personal__edit"
-                                            style={{ cursor: 'pointer', marginBottom: '25px', transform: "translateX(-10%)" }}
-                                            onClick={() => setIsEdit(false)}>
-                                            Cancel
-                                        </ButtonComponent>
-                                    </Text.MiddleLine>
-                                    <Text.MiddleLine>
-                                        <ButtonComponent className="personal__edit" style={{ cursor: 'pointer', marginBottom: '25px' }}
-                                            onClick={() => { document.querySelector('input[type=submit]').click(); }}
-                                        >
-                                            Save
-                                        </ButtonComponent>
-                                    </Text.MiddleLine>
-                                </Text.Line>
-                            </>
-                                ||
-                                <ButtonComponent
-                                    className="personal__edit"
-                                    style={{ cursor: 'pointer', marginBottom: '25px' }}
-                                    onClick={() => setIsEdit(true)}>
-                                    Edit
-                                </ButtonComponent>
-                            }
-                        </Text.RightLine>
-                        {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
-                    </ContainerComponent.Pane>
+                            }}
+                                name="firstName"
+                                onChange={inputHandler}
+                                value={input.firstName}
+                                disabled={!isEdit}></Form.Input>
+
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                textIndent: '5px',
+                                transform: 'translate(10px,24px)',
+                                fontWeight: 800
+                            }}>
+                                <Text.Label>
+                                    Last name
+                                </Text.Label>
+                            </Text.MiddleLine>
+                            <Form.Input style={{
+                                textAlign: 'right',
+                                border: "1px solid #163D3C",
+                                borderRadius: "10px"
+                            }}
+                                name="lastName"
+                                onChange={inputHandler}
+                                value={input.lastName}
+                                disabled={!isEdit}></Form.Input>
+
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                textIndent: '5px',
+                                transform: 'translate(10px,24px)',
+                                fontWeight: 800
+                            }}>
+                                <Text.Label>
+                                    Phone
+                                </Text.Label>
+                            </Text.MiddleLine>
+                            <Form.Input style={{
+                                textAlign: 'right',
+                                border: "1px solid #163D3C",
+                                borderRadius: "10px"
+                            }}
+                                name="phone"
+                                onChange={inputHandler}
+                                value={input.phone}
+                                disabled={!isEdit}></Form.Input>
+
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                textIndent: '5px',
+                                transform: 'translate(10px,24px)',
+                                fontWeight: 800
+                            }}>
+                                <Text.Label>
+                                    Address
+                                </Text.Label>
+                            </Text.MiddleLine>
+                            <Form.Input style={{
+                                textAlign: 'right',
+                                border: "1px solid #163D3C",
+                                borderRadius: "10px"
+                            }}
+                                name="address"
+                                onChange={inputHandler}
+                                value={input.address}
+                                disabled={!isEdit}></Form.Input>
+
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                textIndent: '5px',
+                                // transform: 'translate(10px,25px)',
+                                fontWeight: 800
+                            }}>
+                                {<Text.Label style={{ color: "#163D3C" }}>
+                                    Gender
+                                </Text.Label>}
+                            </Text.MiddleLine>
+                            <Form.Select placeholder="Post your information"
+                                disabled={!isEdit}
+                                value={input.gender}
+                                style={{
+                                    textAlign: 'left',
+                                    fontWeight: 800,
+                                    width: '100%',
+                                    height: '35px',
+                                    paddingLeft: "10px",
+                                    border: "1px solid #163D3C",
+                                    borderRadius: "10px",
+                                }}
+                                onChange={inputHandler}
+                                name={'gender'}
+                            >
+                                <Form.Option style={{ marginLeft: "10px" }} value={'male'}>Male</Form.Option>
+                                <Form.Option style={{ marginLeft: "10px" }} value={'female'}>Female</Form.Option>
+                            </Form.Select>
+                            {/* Date of birth */}
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                transform: 'translate(10px,24px)',
+                                fontWeight: 800
+                            }}>
+                                <Text.Label style={{ padding: "6px" }}>
+                                    {isEdit ? 'Day of Birth' : 'Age'}
+                                </Text.Label>
+                            </Text.MiddleLine>
+                            <Form.Input
+                                type={isEdit ? "date" : "text"}
+                                onChange={inputHandler}
+                                name={'birth'}
+                                disabled={!isEdit}
+                                value={!isEdit ? input.age : input.birth}
+                                style={{
+                                    textAlign: 'right',
+                                    border: "1px solid #163D3C",
+                                    borderRadius: "10px",
+                                    height: "fir-content"
+                                }}></Form.Input>
+
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                textIndent: '5px',
+                                transform: 'translate(10px,24px)',
+                                fontWeight: 800
+                            }}>
+                                <Text.Label>
+                                    Email
+                                </Text.Label>
+                            </Text.MiddleLine>
+                            <Form.Input style={{
+                                textAlign: 'right',
+                                border: "1px solid #163D3C",
+                                borderRadius: "10px"
+                            }}
+                                name="email"
+                                onChange={inputHandler}
+                                value={user.email}
+                                disabled={true}></Form.Input>
+
+                            <Text.MiddleLine style={{
+                                lineHeight: 0,
+                                textIndent: '5px',
+                                transform: 'translate(10px,24px)',
+                                fontWeight: 800
+                            }}>
+                                <Text.Label>
+                                    Department
+                                </Text.Label>
+                            </Text.MiddleLine>
+                            <Form.Input placeholder="your position"
+                                value={workspace.workTitle}
+                                name='department'
+                                disabled={true}
+                                style={{
+                                    textAlign: 'right',
+                                    border: "1px solid #163D3C",
+                                    borderRadius: "10px"
+                                }}></Form.Input>
+                            <Text.RightLine>
+                                {isEdit && <>
+                                    <Form.Input
+                                        type='submit'
+                                        style={{ display: 'none' }}
+                                        onClick={(e) => {
+                                            submitHandler(e);
+                                        }}>
+                                    </Form.Input>
+                                    <Text.Line>
+                                        <Text.MiddleLine>
+                                            <ButtonComponent
+                                                className="personal__edit"
+                                                style={{ cursor: 'pointer', marginBottom: '25px', transform: "translateX(-10%)" }}
+                                                onClick={() => setIsEdit(false)}>
+                                                Cancel
+                                            </ButtonComponent>
+                                        </Text.MiddleLine>
+                                        <Text.MiddleLine>
+                                            <ButtonComponent className="personal__edit" style={{ cursor: 'pointer', marginBottom: '25px' }}
+                                                onClick={() => { document.querySelector('input[type=submit]').click(); }}
+                                            >
+                                                Save
+                                            </ButtonComponent>
+                                        </Text.MiddleLine>
+                                    </Text.Line>
+                                </>
+                                    ||
+                                    <ButtonComponent
+                                        className="personal__edit"
+                                        style={{ cursor: 'pointer', marginBottom: '25px' }}
+                                        onClick={() => setIsEdit(true)}>
+                                        Edit
+                                    </ButtonComponent>
+                                }
+                            </Text.RightLine>
+                            {error && <Form.ErrorMessage style={{ textAlign: "center", color: "red" }}>{error}</Form.ErrorMessage>}
+                        </ContainerComponent.Pane>
+                    </AnimateComponent.TextFadeIn>
                 </ContainerComponent.Inner>
             </Form>
+
         </ContainerComponent.Inner>
     </ContainerComponent>
 }

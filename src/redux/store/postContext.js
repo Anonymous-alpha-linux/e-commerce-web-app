@@ -70,20 +70,19 @@ export default React.memo(function PostContext({ children }) {
   const [error, setError] = useState("");
   // Global states getter
   const { user, socket, pushToast } = useAuthorizationContext();
-  const { workspace } = useWorkspaceContext();
+
   const [postAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
-  const cancelTokenSource = axios.CancelToken.source();
 
-  useEffect(() => {
-    getPosts();
-    getPostCategories();
-    return () => {
-      cancelTokenSource.cancel();
-    };
-  }, [workspace]);
+  // useEffect(() => {
+  //   getPosts();
+  //   getPostCategories();
+  //   return () => {
+  //     cancelTokenSource.cancel();
+  //   };
+  // }, [workspace]);
   useEffect(() => {
     receiveRealtimeComment();
     receiveRealTimeLike();
@@ -237,7 +236,6 @@ export default React.memo(function PostContext({ children }) {
       });
   }
   function updateSinglePost(postId, cb) {
-    console.log(postId);
     return axios
       .get(postAPI, {
         headers: {
@@ -452,8 +450,26 @@ export default React.memo(function PostContext({ children }) {
       isDisliked,
     });
   }
+  function searchPost(query, cb) {
+    return axios
+      .get(postAPI, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        params: {
+          view: "search",
+          query: query,
+        },
+      })
+      .then((res) => {
+        cb(res.data);
+      })
+      .catch((error) => {
+        cb({ error: error.message });
+      });
+  }
   // 2. Posts for profile
-  function getOwnPosts() {
+  function getOwnPosts(cb) {
     return axios
       .get(postAPI, {
         headers: {
@@ -727,12 +743,14 @@ export default React.memo(function PostContext({ children }) {
           commentId: commentId,
           count: 10,
         });
-      })
-      .then((success) => {
-        cb();
+        cb(res.data.response);
       })
       .catch((error) => {
-        setError(error.message);
+        pushToast({
+          error: error.message,
+          type: toastTypes.ERROR,
+        });
+        cb({ error: "Cannot get comment replies" });
       });
   }
   function loadNextReplies(postId, commentId, cb) {
@@ -1181,7 +1199,9 @@ export default React.memo(function PostContext({ children }) {
         // Clean up and remove the link
         link.parentNode.removeChild(link);
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => {
+        pushToast({ error: err.message, type: toastTypes.ERROR });
+      });
   }
   // 9. Category
   function getNewCategory(data) {
@@ -1208,6 +1228,7 @@ export default React.memo(function PostContext({ children }) {
     setError,
     setShowUpdate,
     getFile,
+    searchPost,
     postIdea,
     getSinglePost,
     deleteSinglePost,
@@ -1221,6 +1242,8 @@ export default React.memo(function PostContext({ children }) {
     interactPost,
     getGzipFile,
     downloadHandler,
+    getPosts,
+    getPostCategories,
     getOwnPosts,
     getPostComments,
     loadNextComments,

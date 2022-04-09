@@ -36,6 +36,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
   const interactRef = useRef(interactPost);
   const getComment = useRef(getPostComments);
   const host = process.env.REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_HOST : mainAPI.CLOUD_HOST;
+  const navigate = useNavigate();
 
   const [openComment, setOpenComment] = useState(false);
 
@@ -214,9 +215,14 @@ export default function Post({ postHeader, postBody, postFooter }) {
             <Text.Paragraph style={{ padding: "0px 10px" }}>
               {postBody.content}
             </Text.Paragraph>
-            {!!postBody.attachment.length && <Link to={`/post_detail/${postHeader.id}`}>
-              <GridPreview files={postBody.attachment}></GridPreview>
-            </Link>}
+            {!!postBody.attachment.length &&
+              <GridPreview onClick={() => {
+                console.log("go to");
+                navigate(`/post_detail/${postHeader.id}`, {
+                  state: { ...postHeader, ...postBody, ...postFooter }
+                });
+              }}
+                files={postBody.attachment}></GridPreview>}
           </ContainerComponent.Pane>
 
           <ContainerComponent.Pane className="post__footer" style={{ background: '#DCE7D7', boxShadow: '1px 1px .5px solid #000', borderRadius: "10px" }}>

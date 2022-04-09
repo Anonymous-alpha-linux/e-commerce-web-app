@@ -22,7 +22,8 @@ const navigators = [
     {
         icon: <FaUsers></FaUsers>,
         label: 'workspace',
-        link: '/management/workspace_member/',
+        // link: '/management/workspace_member/',
+        link: '/workspace',
         destination: true,
         // trigger: true,
     },

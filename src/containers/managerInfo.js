@@ -5,6 +5,7 @@ import {
   ButtonComponent,
   Form,
   Text,
+  AnimateComponent,
 } from "../components";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
 
@@ -28,66 +29,68 @@ export default function ManagerInfo() {
     if (workspace.manager) {
       setLoading(true);
       getProfile(workspace.manager, (data) => {
-        setLoading(false);
-        console.log(data);
         if (!data.error) {
           setProfile((o) => ({ ...o, ...data }));
         }
+        setLoading(false);
       });
     }
   }, [workspace]);
 
   return (
     <ContainerComponent>
+
       <ContainerComponent.Inner className="personal__green">
-        <ContainerComponent.Pane className="personal__frameAva" style={{ position: "relative", }}>
-          <Text.CenterLine
-            style={{ position: "relative", zIndex: 1, height: "27.5px" }}
-          >
-            <Icon.CircleIcon
-              style={{
-                display: "inline-block",
-                overflow: "hidden",
-                width: "57px",
-                height: "57px",
-                zIndex: 1,
-              }}
+        <AnimateComponent.Zoom>
+          <ContainerComponent.Pane className="personal__frameAva" style={{ position: "relative", }}>
+            <Text.CenterLine
+              style={{ position: "relative", zIndex: 1, height: "27.5px" }}
             >
-              <Icon.Image
-                src={`${profile.profileImage ||
-                  process.env.PUBLIC_URL + "/add-avatar.jpg"
-                  }`}
-                alt={`Avatar`}
-                style={{ objectFit: "fill" }}
-              ></Icon.Image>
-            </Icon.CircleIcon>
-            <Text.CenterLine style={{ paddingTop: "10px" }}>
-              <Text.Title>{`${profile.lastName || "Anonymous"} ${profile.firstName || "Nguyen"
-                }`}</Text.Title>
-              <Text.Subtitle
+              <Icon.CircleIcon
                 style={{
-                  textTransform: "capitalize",
-                  opacity: 0.5,
-                  fontWeight: 500,
+                  display: "inline-block",
+                  overflow: "hidden",
+                  width: "57px",
+                  height: "57px",
+                  zIndex: 1,
                 }}
               >
-                {profile.roleName || "QA Coordinator"}
-              </Text.Subtitle>
+                <Icon.Image
+                  src={`${profile.profileImage ||
+                    process.env.PUBLIC_URL + "/add-avatar.jpg"
+                    }`}
+                  alt={`Avatar`}
+                  style={{ objectFit: "fill" }}
+                ></Icon.Image>
+              </Icon.CircleIcon>
+              <Text.CenterLine style={{ paddingTop: "10px" }}>
+                <Text.Title>{`${profile.lastName || "Anonymous"} ${profile.firstName || "Nguyen"
+                  }`}</Text.Title>
+                <Text.Subtitle
+                  style={{
+                    textTransform: "capitalize",
+                    opacity: 0.5,
+                    fontWeight: 500,
+                  }}
+                >
+                  {profile.roleName || "QA Coordinator"}
+                </Text.Subtitle>
+              </Text.CenterLine>
             </Text.CenterLine>
-          </Text.CenterLine>
-          <Text.Line
-            style={{
-              width: "100%",
-              height: "141px",
-              borderRadius: "10px",
-              boxShadow: "1px 1px 5px 2px black",
-              position: "relative",
-              bottom: 0,
-              background: "#fff",
-              border: "1px solid #163d3c",
-            }}
-          ></Text.Line>
-        </ContainerComponent.Pane>
+            <Text.Line
+              style={{
+                width: "100%",
+                height: "141px",
+                borderRadius: "10px",
+                boxShadow: "1px 1px 5px 2px black",
+                position: "relative",
+                bottom: 0,
+                background: "#fff",
+                border: "1px solid #163d3c",
+              }}
+            ></Text.Line>
+          </ContainerComponent.Pane>
+        </AnimateComponent.Zoom>
       </ContainerComponent.Inner>
 
       <ContainerComponent.Inner>
@@ -127,7 +130,7 @@ export default function ManagerInfo() {
               style={{
                 border: "1px solid #163D3C",
                 textAlign: "right",
-                borderRadius:"10px"
+                borderRadius: "10px"
               }}
             ></Form.Input>
           </ContainerComponent.Inner>

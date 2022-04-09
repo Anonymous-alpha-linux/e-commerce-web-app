@@ -1,6 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  ButtonComponent,
   ContainerComponent,
   List,
   AnimateComponent,
@@ -11,9 +10,8 @@ import {
   PostContainer,
   PostForm,
   Timespan,
-  Toast,
 } from "../../containers";
-import { toastTypes } from "../../fixtures";
+
 import { mainAPI } from "../../config";
 import {
   useAuthorizationContext,
@@ -21,20 +19,24 @@ import {
   usePostContext,
   useWorkspaceContext,
 } from "../../redux";
+import axios from "axios";
 
 export default function Workspace() {
   const { user } = useAuthorizationContext();
   const { workspace } = useWorkspaceContext();
-  const { posts, removeIdea, loadNextPosts, filterPost } = usePostContext();
-  const { sendMessageToSpecificPerson } = useNotifyContext(true);
+  const { posts, getPosts, getPostCategories, loadNextPosts, filterPost } = usePostContext();
 
   const [blockWorkspace, setBlockWorkspace] = useState(false);
-
-  const [postAPI, host] =
-    process.env.REACT_APP_ENVIRONMENT === "development"
-      ? [mainAPI.LOCALHOST_STAFF, mainAPI.LOCALHOST_HOST]
-      : [mainAPI.CLOUD_API_STAFF, mainAPI.CLOUD_HOST];
   const listRef = useRef();
+  const cancelTokenSource = axios.CancelToken.source();
+
+  useEffect(() => {
+    getPosts();
+    getPostCategories();
+    return () => {
+      cancelTokenSource.cancel();
+    }
+  }, [workspace]);
 
   return (
     <ContainerComponent className="workspace" id="workspace">
@@ -46,8 +48,7 @@ export default function Workspace() {
             setBlockWorkspace={setBlockWorkspace}
           ></Timespan>
           {!blockWorkspace && <PostForm></PostForm>}
-          <Filter
-            loader={filterPost}
+          <Filter loader={filterPost}
             selectOptions={[
               {
                 label: "Most Recent",

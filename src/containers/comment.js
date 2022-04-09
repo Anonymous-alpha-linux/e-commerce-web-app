@@ -3,20 +3,26 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
 import { IoIosSend } from 'react-icons/io';
 
-import { ContainerComponent, Text, Icon, Form, ButtonComponent } from "../components";
+import { ContainerComponent, Text, Icon, Form, ButtonComponent, AnimateComponent } from "../components";
 import { useAuthorizationContext, useNotifyContext, usePostContext, useWorkspaceContext, } from "../redux";
 import { notifyData, socketTargets } from '../fixtures';
 import { InteractFooter, TriggerLoading } from ".";
 
-export default function Comment({ postAuthor, postId, commentLogs, setPost }) {
+export default function Comment({ postAuthor, commentLogs, postId }) {
   const { workspace } = useWorkspaceContext();
-  const { posts, loadNextComments, filterPostComment } = usePostContext();
-  const filterRef = useRef(filterPostComment);
+  const { posts, myPosts, loadNextComments, filterPostComment } = usePostContext();
+  // const filterRef = useRef(filterPostComment);
+  // React.useEffect(() => {
+  //   getPostComments(postId, res => {
+  //     setCommentLogs(res);
+  //   });
+  // }, []);
+
   const calcRemainingEventTime = (time) => {
-    const date = new Date(new Date().setDate(30)).getTime();
+    const date = new Date(time).getTime();
     const now = new Date().getTime();
 
-    const timeleft = date - now;
+    const timeleft = Math.abs(date - now);
 
     // var years = Math.floor(timeleft / (1000 * 60));
     // var months = Math.floor(timeleft / (1000 * 60 * 60 * 24));
@@ -24,8 +30,7 @@ export default function Comment({ postAuthor, postId, commentLogs, setPost }) {
     var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
     var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
-    // if (years) return years + " years";
-    // if (months) return months + " months";
+
     if (days) return days + " days";
     if (hours) return hours + " hours";
     if (minutes) return minutes + " minutes";
@@ -33,7 +38,7 @@ export default function Comment({ postAuthor, postId, commentLogs, setPost }) {
     return "Closed";
   };
   const filterComment = (e) => {
-    filterRef.current(postId, e.target.value);
+    filterPostComment(postId, e.target.value);
   };
   return (
     <ContainerComponent.Section
@@ -69,14 +74,13 @@ export default function Comment({ postAuthor, postId, commentLogs, setPost }) {
 
       <TriggerLoading
         loader={() => loadNextComments(postId)}
-        loadMore={posts.find((post) => post._id === postId).loadMore}
+        loadMore={posts.find((post) => post._id === postId)?.loadMore || posts.find((post) => post._id === postId)?.loadMore}
       >
         <ContainerComponent.Pane
           className="comment__log">
           {commentLogs.map((comment) => {
-            return <Comment.Tab
+            return <Comment.Tab key={comment._id}
               postId={postId}
-              key={comment._id}
               comment={comment}
             ></Comment.Tab>
           })}
@@ -88,8 +92,9 @@ export default function Comment({ postAuthor, postId, commentLogs, setPost }) {
 Comment.Tab = function CommentTab({ ...props }) {
   const { user } = useAuthorizationContext();
   const { interactPost, getCommentReplies, loadNextReplies } = usePostContext();
+
   const {
-    _id,
+    _id: commentId,
     body,
     createdAt,
     hideAuthor,
@@ -102,6 +107,8 @@ Comment.Tab = function CommentTab({ ...props }) {
     account: { _id: targetId, username, profileImage },
     loadMore,
   } = props.comment;
+  const { postId } = props;
+
   const parseTime = (time) => {
     const now = new Date(Date.now());
     const end = new Date(time);
@@ -116,7 +123,7 @@ Comment.Tab = function CommentTab({ ...props }) {
     return `${new Date(time).toLocaleString("en-us", { dateStyle: "full" })}`;
   };
   const isFirstRender = useRef(true);
-  const addRepliesRef = useRef(getCommentReplies);
+  const getCommentRepliesRef = useRef(getCommentReplies);
   const loadMoreRepliesRef = useRef(loadNextReplies);
   const inputRef = useRef();
   const [openReplyInput, setOpenReply] = useState(false);
@@ -126,7 +133,7 @@ Comment.Tab = function CommentTab({ ...props }) {
     isFirstRender.current = false;
   }, []);
   React.useEffect(() => {
-    addRepliesRef.current = getCommentReplies;
+    getCommentRepliesRef.current = getCommentReplies;
   }, [getCommentReplies]);
   React.useEffect(() => {
     loadMoreRepliesRef.current = loadNextReplies;
@@ -136,95 +143,104 @@ Comment.Tab = function CommentTab({ ...props }) {
       inputRef.current.focus();
     }
   }, [openReplyInput]);
+
   return (
-    <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', background: "#DCE7D7", margin: '12px 0', padding: '10px' }} onMouseLeave={() => setOpenReply(false)}>
-      <ContainerComponent.Flex style={{ flexWrap: 'nowrap' }}>
-        <ContainerComponent.Item>
-          <Text.MiddleLine className="comment__header">
-            <Icon.CircleIcon
-              style={{ width: "30px", height: "30px", padding: 0, }}>
-              <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
-            </Icon.CircleIcon>
+    <AnimateComponent.Zoom>
+      <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${commentId}`} style={{ borderRadius: '10px', background: "#DCE7D7", margin: '12px 0', padding: '10px' }} onMouseLeave={() => setOpenReply(false)}>
+        <ContainerComponent.Flex style={{ flexWrap: 'nowrap' }}>
+          <ContainerComponent.Item>
+            <Text.MiddleLine className="comment__header">
+              <Icon.CircleIcon
+                style={{ width: "30px", height: "30px", padding: 0, }}>
+                <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
+              </Icon.CircleIcon>
+            </Text.MiddleLine>
+          </ContainerComponent.Item>
+          <ContainerComponent.Item>
+            <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
+              <Text.MiddleLine style={{ maxWidth: "120px", overflowX: "clip" }}>
+                <Text.Bold style={{ margin: 0 }}>
+                  <Text>{!hideAuthor ? username : "Anonymous"}</Text>
+                </Text.Bold>
+              </Text.MiddleLine>
+
+              <Text.MiddleLine>
+                <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
+              </Text.MiddleLine>
+
+              <Text.Line>
+                <Text.Paragraph style={{ margin: "8px 0" }}>
+                  {body}
+                </Text.Paragraph>
+              </Text.Line>
+            </Text.MiddleLine>
+          </ContainerComponent.Item>
+        </ContainerComponent.Flex>
+
+        <InteractFooter className="comment__interacts"
+          interactLoader={(input) => interactPost(postId, "rate comment", input)}
+          entity={props.comment}
+          like={like}
+          dislike={dislike}
+          isLiked={likedAccounts.indexOf(user.accountId) !== -1}
+          isDisliked={dislikedAccounts.indexOf(user.accountId) !== -1}
+          likedAccounts={likedAccounts}
+          dislikedAccounts={dislikedAccounts}
+        >
+          <Text.MiddleLine className="comment__replyBtn"
+            onClick={() => {
+              setOpenReply(!openReplyInput);
+              if (openReplyInput) {
+                document.getElementById(`comment__tab-${commentId}`).addEventListener('mouseenter', () => {
+                });
+              }
+              else {
+                document.getElementById(`comment__tab-${commentId}`).removeEventListener('mouseenter', () => {
+                });
+              }
+            }}>
+            Reply ({reply})
           </Text.MiddleLine>
-        </ContainerComponent.Item>
-        <ContainerComponent.Item>
-          <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
-            <Text.MiddleLine style={{ maxWidth: "120px", overflowX: "clip" }}>
-              <Text.Bold style={{ margin: 0 }}>
-                <Text>{!hideAuthor ? username : "Anonymous"}</Text>
-              </Text.Bold>
-            </Text.MiddleLine>
+        </InteractFooter>
 
-            <Text.MiddleLine>
-              <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
-            </Text.MiddleLine>
+        <Text.Line className="comment__reply">
+          {openReplyInput && <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={postId} commentId={commentId} hideAuthor={hideAuthor}
+          ></Comment.TabReplyInput>}
+        </Text.Line>
 
-            <Text.Line>
-              <Text.Paragraph style={{ margin: "8px 0" }}>
-                {body}
-              </Text.Paragraph>
+        <ContainerComponent.Pane className="comment__reply">
+          {!openReplyLog &&
+            <Text.Line onClick={() => {
+              getCommentReplies(postId, commentId, data => {
+                setOpenReplyLog(true);
+              });
+              // getCommentRepliesRef.current(postId, commentId, (data) => {
+              //   setOpenReplyLog(true);
+              // });
+            }}>
+              {!!reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle>}
             </Text.Line>
-          </Text.MiddleLine>
-        </ContainerComponent.Item>
-      </ContainerComponent.Flex>
-
-      <InteractFooter className="comment__interacts"
-        interactLoader={(input) => interactPost(props.postId, "rate comment", input)}
-        entity={props.comment}
-        like={like}
-        dislike={dislike}
-        isLiked={likedAccounts.indexOf(user.accountId) !== -1}
-        isDisliked={dislikedAccounts.indexOf(user.accountId) !== -1}
-        likedAccounts={likedAccounts}
-        dislikedAccounts={dislikedAccounts}
-      >
-        <Text.MiddleLine className="comment__replyBtn"
-          onClick={() => {
-            setOpenReply(!openReplyInput);
-            if (openReplyInput) {
-              document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
-              });
-            }
-            else {
-              document.getElementById(`comment__tab-${_id}`).removeEventListener('mouseenter', () => {
-              });
-            }
-          }}>
-          Reply ({reply})
-        </Text.MiddleLine>
-      </InteractFooter>
-
-      <Text.Line className="comment__reply">
-        {openReplyInput && <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={props.postId} commentId={_id} hideAuthor={hideAuthor}
-        // forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={rootComment}
-        ></Comment.TabReplyInput>}
-      </Text.Line>
-
-      <ContainerComponent.Pane className="comment__reply">
-        {!openReplyLog && <Text.Line onClick={async () => {
-          await addRepliesRef.current(props.postId, _id, () => {
-            setOpenReplyLog(true);
-          });
-        }}>
-          {!!reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle>}
-        </Text.Line> || <TriggerLoading loader={() => loadMoreRepliesRef.current(props.postId, _id, () => { })} loadMore={loadMore}>
-            <ContainerComponent className="comment-reply__log" style={{ borderRadius: "15px" }}>
-              {replies?.length && replies.map(reply => {
-                return <Comment.ReplyTab
-                  rootComment={_id}
-                  comment={reply}
-                  key={reply._id}
-                  postId={props.postId}>
-                </Comment.ReplyTab>
-              })}
-            </ContainerComponent>
-          </TriggerLoading>}
+            ||
+            <TriggerLoading loader={() => loadNextReplies(postId, commentId, () => { })} loadMore={loadMore}>
+              <ContainerComponent className="comment-reply__log" style={{ borderRadius: "15px" }}>
+                {replies?.map(reply => {
+                  return <Comment.ReplyTab
+                    rootComment={commentId}
+                    comment={reply}
+                    key={reply._id}
+                    postId={props.postId}>
+                  </Comment.ReplyTab>
+                })}
+              </ContainerComponent>
+            </TriggerLoading>}
+        </ContainerComponent.Pane>
       </ContainerComponent.Pane>
-    </ContainerComponent.Pane>
+    </AnimateComponent.Zoom>
   );
 };
 Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, postAuthor, postId, commentId }) {
   const { user } = useAuthorizationContext();
+  const { workspace } = useWorkspaceContext();
   const { interactPost } = usePostContext();
   const { sendNotification } = useNotifyContext();
 
@@ -234,8 +250,18 @@ Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, 
     private: false,
     commentid: commentId,
   });
+  const [blockEvent, setBlockEvent] = useState(false);
+
   const postInputRef = useRef(interactPost);
 
+  React.useEffect(() => {
+    let interval = setInterval(() => {
+      calcRemainingEventTime(workspace.eventTime);
+    }, 180000);
+    return () => {
+      clearInterval(interval);
+    }
+  }, []);
   React.useEffect(() => {
     postInputRef.current = interactPost;
   }, [interactPost]);
@@ -268,48 +294,59 @@ Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, 
       private: false,
     });
   };
+  const calcRemainingEventTime = (time) => {
+    const date = new Date(time).getTime();
+    const now = new Date().getTime();
 
-  return (
-    <ContainerComponent.Pane>
-      <Text.Line>
-        <Text.MiddleLine style={{ marginRight: "10px" }}>
-          <Icon.CircleIcon
-            style={{
-              background: "#163d3c",
-              color: "#fff",
-              padding: 0,
-            }}
-          >
-            <Icon.Image src={user.profileImage}></Icon.Image>
-          </Icon.CircleIcon>
-        </Text.MiddleLine>
-        <Text.MiddleLine style={{ marginRight: "12px" }}>
-          <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
-        </Text.MiddleLine>
-        <Text.MiddleLine style={{ float: 'right' }}>
-          <ButtonComponent.Toggle
-            onText="Hide"
-            offText="Show"
-            id="private"
-            name="private"
-            value={input.private}
-            onChange={checkedHandler}
-          ></ButtonComponent.Toggle>
-        </Text.MiddleLine>
-      </Text.Line>
-      <Text.Line>
-        <Form method="POST" style={{ width: "100%", padding: "5px 0 0 0", margin: "0" }} onSubmit={submitHandler}>
-          <Form.Input ref={forwardedRef} name="content" style={{ width: "100%", marginTop: "4px", border: "1px solid #C4C4C4" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
-          ></Form.Input>
-          <input type="submit" style={{ display: "none" }} onSubmit={submitHandler}></input>
-          {/* <Text.MiddleLine>
-            <Icon.CircleIcon onClick={submitHandler}>
-            </Icon.CircleIcon>
-          </Text.MiddleLine> */}
-        </Form>
-      </Text.Line>
-    </ContainerComponent.Pane>
-  );
+    const timeleft = date - now;
+
+    var days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+
+    if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+      setBlockEvent(false);
+      return;
+    }
+    setBlockEvent(true);
+  };
+
+  return !blockEvent ? <ContainerComponent.Pane>
+    <Text.Line>
+      <Text.MiddleLine style={{ marginRight: "10px" }}>
+        <Icon.CircleIcon
+          style={{
+            background: "#163d3c",
+            color: "#fff",
+            padding: 0,
+          }}
+        >
+          <Icon.Image src={user.profileImage}></Icon.Image>
+        </Icon.CircleIcon>
+      </Text.MiddleLine>
+      <Text.MiddleLine style={{ marginRight: "12px" }}>
+        <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
+      </Text.MiddleLine>
+      <Text.MiddleLine style={{ float: 'right' }}>
+        <ButtonComponent.Toggle
+          onText="Hide"
+          offText="Show"
+          id="private"
+          name="private"
+          value={input.private}
+          onChange={checkedHandler}
+        ></ButtonComponent.Toggle>
+      </Text.MiddleLine>
+    </Text.Line>
+    <Text.Line>
+      <Form style={{ width: "100%", padding: "5px 0 0 0", margin: "0" }} onSubmit={submitHandler}>
+        <Form.Input ref={forwardedRef} name="content" style={{ width: "100%", marginTop: "4px", border: "1px solid #C4C4C4" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
+        ></Form.Input>
+        <input type="submit" style={{ display: "none" }} onSubmit={submitHandler}></input>
+      </Form>
+    </Text.Line>
+  </ContainerComponent.Pane> : null;
 };
 Comment.ReplyTab = function ReplyTab({ ...props }) {
   const { user } = useAuthorizationContext();
@@ -329,6 +366,26 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
     loadMore,
   } = props.comment;
   const { rootComment, postId } = props;
+
+  const isFirstRender = useRef(true);
+  const inputRef = useRef();
+  const addRepliesRef = useRef(getCommentReplies);
+
+  const [openReplyInput, setOpenReply] = useState(false);
+  const [openReplyLog, setOpenReplyLog] = useState(false);
+
+  React.useEffect(() => {
+    isFirstRender.current = false;
+  }, []);
+  React.useEffect(() => {
+    addRepliesRef.current = getCommentReplies;
+  }, [getCommentReplies]);
+  React.useEffect(() => {
+    if (openReplyInput) {
+      inputRef.current.focus();
+    }
+  }, [openReplyInput]);
+
   const parseTime = (time) => {
     const now = new Date(Date.now());
     const end = new Date(time);
@@ -342,108 +399,93 @@ Comment.ReplyTab = function ReplyTab({ ...props }) {
     if (diff.getUTCDate() < 30) return diff.getUTCDate() + " days ago";
     return `${new Date(time).toLocaleString("en-us", { dateStyle: "full" })}`;
   };
-
-  const isFirstRender = useRef(true);
-  const addRepliesRef = useRef(getCommentReplies);
-  const inputRef = useRef();
-  const [openReplyInput, setOpenReply] = useState(false);
-  const [openReplyLog, setOpenReplyLog] = useState(false);
-  React.useEffect(() => {
-    isFirstRender.current = false;
-  }, []);
-  React.useEffect(() => {
-    addRepliesRef.current = getCommentReplies;
-  }, [getCommentReplies]);
-  React.useEffect(() => {
-    if (openReplyInput) {
-      inputRef.current.focus();
-    }
-  }, [openReplyInput]);
   return (
-    <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${_id}`} style={{ borderRadius: '10px', margin: '12px 0', padding: '10px 10px' }} onMouseLeave={() => setOpenReply(false)}>
-      <ContainerComponent.Flex style={{ flexWrap: 'nowrap' }}>
-        <ContainerComponent.Item>
-          <Text.MiddleLine className="comment__header">
-            <Icon.CircleIcon style={{ width: "30px", height: "30px", padding: 0, }}>
-              <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
-            </Icon.CircleIcon>
-          </Text.MiddleLine>
-        </ContainerComponent.Item>
-        <ContainerComponent.Item>
-          <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
-            <Text.MiddleLine>
-              <Text.Bold style={{ margin: 0 }}>
-                <Text>{!hideAuthor ? username : "Anonymous"}</Text>
-              </Text.Bold>
+    <AnimateComponent.Zoom>
+      <ContainerComponent.Pane className="comment__tab" id={`comment__tab-${reply._id}`} style={{ borderRadius: '10px', margin: '12px 0', padding: '10px 10px' }} onMouseLeave={() => setOpenReply(false)}>
+        <ContainerComponent.Flex style={{ flexWrap: 'nowrap' }}>
+          <ContainerComponent.Item>
+            <Text.MiddleLine className="comment__header">
+              <Icon.CircleIcon style={{ width: "30px", height: "30px", padding: 0, }}>
+                <Icon.Image src={profileImage} alt={"avatar"}></Icon.Image>
+              </Icon.CircleIcon>
             </Text.MiddleLine>
+          </ContainerComponent.Item>
+          <ContainerComponent.Item>
+            <Text.MiddleLine className="comment__body" style={{ padding: "0 10px" }}>
+              <Text.MiddleLine>
+                <Text.Bold style={{ margin: 0 }}>
+                  <Text>{!hideAuthor ? username : "Anonymous"}</Text>
+                </Text.Bold>
+              </Text.MiddleLine>
 
-            <Text.MiddleLine>
-              <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
+              <Text.MiddleLine>
+                <Text.Date style={{ textIndent: '10px' }}>{parseTime(createdAt)}</Text.Date>
+              </Text.MiddleLine>
+
+              <Text.Line>
+                <Text.Paragraph style={{ margin: "8px 0" }}>
+                  {body}
+                </Text.Paragraph>
+              </Text.Line>
             </Text.MiddleLine>
+          </ContainerComponent.Item>
+        </ContainerComponent.Flex>
 
-            <Text.Line>
-              <Text.Paragraph style={{ margin: "8px 0" }}>
-                {body}
-              </Text.Paragraph>
-            </Text.Line>
+        <InteractFooter className="comment__interacts"
+          entity={{ commentId: rootComment, replyId: _id }}
+          like={like}
+          dislike={dislike}
+          likedAccounts={likedAccounts}
+          dislikedAccounts={dislikedAccounts}
+          isLiked={likedAccounts.indexOf(user.accountId) !== -1}
+          isDisliked={dislikedAccounts.indexOf(user.accountId) !== -1}
+          // interactLoader={(interact) => interactPost(props.postId, "rate reply", interact)}
+          interactLoader={input => interactPost(props.postId, "rate reply", input)}
+        >
+          <Text.MiddleLine className="comment__replyBtn"
+            onClick={() => {
+              setOpenReply(!openReplyInput);
+              if (openReplyInput) {
+                document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
+                });
+              }
+              else {
+                document.getElementById(`comment__tab-${_id}`).removeEventListener('mouseenter', () => {
+                });
+              }
+            }}>
+            Reply
           </Text.MiddleLine>
-        </ContainerComponent.Item>
-      </ContainerComponent.Flex>
+        </InteractFooter>
 
-      <InteractFooter className="comment__interacts"
-        entity={{ commentId: rootComment, replyId: _id }}
-        like={like}
-        dislike={dislike}
-        likedAccounts={likedAccounts}
-        dislikedAccounts={dislikedAccounts}
-        isLiked={likedAccounts.indexOf(user.accountId) !== -1}
-        isDisliked={dislikedAccounts.indexOf(user.accountId) !== -1}
-        // interactLoader={(interact) => interactPost(props.postId, "rate reply", interact)}
-        interactLoader={input => interactPost(props.postId, "rate reply", input)}
-      >
-        <Text.MiddleLine className="comment__replyBtn"
-          onClick={() => {
-            setOpenReply(!openReplyInput);
-            if (openReplyInput) {
-              document.getElementById(`comment__tab-${_id}`).addEventListener('mouseenter', () => {
-              });
-            }
-            else {
-              document.getElementById(`comment__tab-${_id}`).removeEventListener('mouseenter', () => {
-              });
-            }
+        <Text.Line>
+          {openReplyInput &&
+            <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={rootComment} hideAuthor={hideAuthor}></Comment.TabReplyInput>
+          }
+        </Text.Line>
+
+        <ContainerComponent.Pane className="comment__container">
+          {!openReplyLog && <Text.Line onClick={async () => {
+            addRepliesRef.current(postId, rootComment, () => {
+              setOpenReplyLog(false);
+            });
           }}>
-          Reply
-        </Text.MiddleLine>
-      </InteractFooter>
+          </Text.Line> || <TriggerLoading loader={() => getCommentReplies(postId, _id, () => { })}
+            loadMore={replies.length < reply}>
+              <ContainerComponent className="comment-reply__log">
+                {replies.map(comment => {
+                  return <Comment.Tab
+                    comment={comment}
+                    key={comment._id}
+                    postId={props.postId}>
+                  </Comment.Tab>
+                })}
+              </ContainerComponent>
+            </TriggerLoading>}
+        </ContainerComponent.Pane>
 
-      <Text.Line>
-        {openReplyInput &&
-          <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={rootComment} hideAuthor={hideAuthor}></Comment.TabReplyInput>
-        }
-      </Text.Line>
-
-      <ContainerComponent.Pane className="comment__container">
-        {!openReplyLog && <Text.Line onClick={async () => {
-          addRepliesRef.current(postId, rootComment, () => {
-            setOpenReplyLog(false);
-          });
-        }}>
-        </Text.Line> || <TriggerLoading loader={() => getCommentReplies(postId, _id, () => { })}
-          loadMore={replies.length < reply}>
-            <ContainerComponent className="comment-reply__log">
-              {replies.map(comment => {
-                return <Comment.Tab
-                  comment={comment}
-                  key={comment._id}
-                  postId={props.postId}>
-                </Comment.Tab>
-              })}
-            </ContainerComponent>
-          </TriggerLoading>}
       </ContainerComponent.Pane>
-
-    </ContainerComponent.Pane>
+    </AnimateComponent.Zoom>
   );
 }
 Comment.TabReplyInput = function TabReplyInput({ forwardedRef, preReply = "", closeReply, postAuthor, postId, commentId, hideAuthor }) {

@@ -18,11 +18,8 @@ export default React.memo(function WorkspaceContext({ children }) {
   const [workspaceState, setWorkspace] = useReducer(workspaceReducer, initialWorkspacePage);
   const { user, pushToast } = useAuthorizationContext();
   const workspaceAPI = process.env.REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_STAFF : mainAPI.CLOUD_API_STAFF;
-  // const cancelTokenSource = axios.CancelToken.source();
+
   useEffect(() => {
-    // if (!workspaceState.page) {
-    //   localStorage.setItem("workspace", 0);
-    // }
     onLoadWorkspaceList();
   }, [user]);
 
@@ -323,7 +320,8 @@ export default React.memo(function WorkspaceContext({ children }) {
       cb();
     });
   }
-  function assignRoleToAccount() { }
+  function assignRoleToAccount() {
+  }
   function editWorkspace(workspaceId, workTitle, closureTime, eventTime, cb) {
     return axios.put(workspaceAPI, { workTitle, closureTime, eventTime }, {
       headers: {

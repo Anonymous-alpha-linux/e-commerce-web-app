@@ -1,13 +1,21 @@
+// React library
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
-import { ButtonComponent, ContainerComponent, Icon, Preview, Text } from '../components'
-import { BiChevronLeft, BiChevronRight } from 'react-icons/bi'
-import { FaThumbsDown, FaThumbsUp } from 'react-icons/fa';
-import { useAuthorizationContext, usePostContext } from '../redux';
-import Comment from './comment';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
+
+// Icon
+import { BiChevronLeft, BiChevronRight } from 'react-icons/bi'
+import { FaThumbsDown, FaThumbsUp, FaRegEdit, FaEraser } from 'react-icons/fa';
+import { IoIosArrowDown } from "react-icons/io";
+import { HiDownload } from "react-icons/hi";
+
+// Components
+import { ButtonComponent, ContainerComponent, Dropdown, Icon, Preview, Text } from '../components';
+import { DropDownButton, Comment } from '.';
+import { useAuthorizationContext, usePostContext } from '../redux';
 import { mainAPI } from '../config';
-import { toastTypes } from '../fixtures';
+import { roles, toastTypes } from '../fixtures';
+
 export default function SinglePost() {
   const { user, pushToast } = useAuthorizationContext();
   const { getSinglePost, interactPost, getPostComments, deleteSinglePost } = usePostContext();
@@ -205,9 +213,79 @@ export default function SinglePost() {
   };
 
   return (
-    <ContainerComponent>
-      <ContainerComponent.Inner>
-        {post?.content}
+    <ContainerComponent className="workspace__form" style={{ maxWidth: '680px', margin: '0 auto' }}>
+      <ContainerComponent.Inner className="workspace__innerForm" style={{ background: '#fff', padding: '10px 20px' }}>
+        <ContainerComponent.Pane className="post__header">
+          <ContainerComponent.InlineGroup>
+            <Icon.Avatar style={{
+              verticalAlign: 'middle',
+              background: '#163d3c',
+              color: '#fff',
+              width: "45px",
+              height: "45px"
+            }}>
+              <Preview.Images image={post?.image} alt={post?.alt}></Preview.Images>
+            </Icon.Avatar>
+          </ContainerComponent.InlineGroup>
+          <ContainerComponent.InlineGroup style={{
+            margin: '0 10px'
+          }}>
+            <Text.Title>{post?.hideAuthor && 'Anonymous' || post?.username}</Text.Title>
+            <ContainerComponent.Flex>
+              <Text.Date style={{
+                marginRight: '8px',
+                marginTop: "4px"
+              }}>{parseTime(post?.date)}</Text.Date>
+            </ContainerComponent.Flex>
+          </ContainerComponent.InlineGroup>
+          {(user.accountId === post?.postAuthor || [roles.QA_COORDINATOR, roles.QA_MANAGER].includes(user.role)) && <Text.RightLine>
+            <DropDownButton position="right" component={<IoIosArrowDown></IoIosArrowDown>}>
+              {post?.postAuthor === user.accountId &&
+                <Dropdown.Item>
+                  <Link to={`/portal/idea/${post?.id}`}>
+                    <Text.Line>
+                      <Text.MiddleLine>
+                        <Icon>
+                          <FaRegEdit></FaRegEdit>
+                        </Icon>
+                      </Text.MiddleLine>
+                      <Text.MiddleLine>
+                        Edit
+                      </Text.MiddleLine>
+                    </Text.Line>
+                  </Link>
+                </Dropdown.Item>
+              }
+              <Dropdown.Item>
+                <Text.Line onClick={() => deleteSinglePost(post?.id)}>
+                  <Text.MiddleLine>
+                    <Icon>
+                      <FaEraser></FaEraser>
+                    </Icon>
+                  </Text.MiddleLine>
+                  <Text.MiddleLine>
+                    Delete
+                  </Text.MiddleLine>
+                </Text.Line>
+              </Dropdown.Item>
+              {user.role === roles.QA_MANAGER && <Dropdown.Item>
+                <Text.Line onClick={downloadHandler}>
+                  <Text.MiddleLine>
+                    <Icon>
+                      <HiDownload></HiDownload>
+                    </Icon>
+                  </Text.MiddleLine>
+                  <Text.MiddleLine>
+                    Download
+                  </Text.MiddleLine>
+                </Text.Line>
+              </Dropdown.Item>}
+            </DropDownButton>
+          </Text.RightLine>}
+        </ContainerComponent.Pane>
+        <Text.Paragraph style={{ padding: "0px 10px" }}>
+          {post?.content}
+        </Text.Paragraph>
         <ContainerComponent.Pane className="post__footer" style={{ background: '#DCE7D7', boxShadow: '1px 1px .5px solid #000', borderRadius: "10px" }}>
           <ContainerComponent.GridThreeColumns style={{ margin: "15px 0 5px 0" }}>
             <ContainerComponent.Item>
@@ -260,7 +338,6 @@ export default function SinglePost() {
             <ContainerComponent.Item onClick={() => {
               if (!openComment) {
                 getComment.current(post?.id, (res) => {
-                  console.log(res);
                   setPost(post => ({ ...post, comments: res }));
                   setOpenComment(true);
                 });
@@ -286,36 +363,32 @@ export default function SinglePost() {
             setPost={setPost}
           ></Comment>
         }
+        <ContainerComponent.Flex style={{ position: "relative", overflow: "hiden" }}>
+          <ContainerComponent.Item style={{ height: '50%', width: "100%", padding: "0", flexGrow: "1", position: "relative" }}>
+            <ContainerComponent.Pane className={"side"} style={{ position: "relative", overflow: 'hidden' }}>
+              {post?.attachment?.map((imageItems, imageIndex) => {
+                return (
+                  <ContainerComponent.Item className={imageIndex === index ? 'slide active' : 'slide'} key={imageIndex} style={{ display: "flex", alignItems: "center", width: "100%", height: "100%", padding: "0", flexGrow: "1", flexBasic: "100%", flexShrink: "0", overflow: "hiden" }}>
+                    {imageIndex === index && (<Preview.Images image={imageItems.image} style={{ width: "100%", height: "100%" }}></Preview.Images>)}
+                  </ContainerComponent.Item>
+                )
+              })}
+            </ContainerComponent.Pane>
+            <ContainerComponent.Pane className={"buttonn__couple"}>
+              <ButtonComponent onClick={prevSlide} className={"buttonn"}>
+                <Icon>
+                  <BiChevronLeft></BiChevronLeft>
+                </Icon>
+              </ButtonComponent>
+              <ButtonComponent onClick={nextSlide} className={"buttonn"}>
+                <Icon>
+                  <BiChevronRight></BiChevronRight>
+                </Icon>
+              </ButtonComponent>
+            </ContainerComponent.Pane>
+          </ContainerComponent.Item>
+        </ContainerComponent.Flex>
       </ContainerComponent.Inner>
-      <ContainerComponent.Flex style={{ position: "relative", overflow: "hiden" }}>
-        <ContainerComponent.Item style={{ height: '50%', width: "100%", padding: "0", flexGrow: "1", position: "relative" }}>
-          <ContainerComponent.Pane className={"side"} style={{ position: "relative", overflow: 'hidden' }}>
-            {post?.attachment?.map((imageItems, imageIndex) => {
-              return (
-                <ContainerComponent.Item className={imageIndex === index ? 'slide active' : 'slide'} key={imageIndex} style={{ display: "flex", alignItems: "center", width: "100%", height: "100%", padding: "0", flexGrow: "1", flexBasic: "100%", flexShrink: "0", overflow: "hiden" }}>
-                  {imageIndex === index && (<Preview.Images image={imageItems.image} style={{ width: "100%", height: "100%" }}></Preview.Images>)}
-                </ContainerComponent.Item>
-              )
-            })}
-          </ContainerComponent.Pane>
-          <ContainerComponent.Pane className={"buttonn__couple"}>
-            <ButtonComponent onClick={prevSlide} className={"buttonn"}>
-              <Icon>
-                <BiChevronLeft></BiChevronLeft>
-              </Icon>
-            </ButtonComponent>
-            <ButtonComponent onClick={nextSlide} className={"buttonn"}>
-              <Icon>
-                <BiChevronRight></BiChevronRight>
-              </Icon>
-            </ButtonComponent>
-          </ContainerComponent.Pane>
-        </ContainerComponent.Item>
-        {/* <ContainerComponent.Item>
-          
-        </ContainerComponent.Item> */}
-      </ContainerComponent.Flex>
-
     </ContainerComponent>
   )
 }

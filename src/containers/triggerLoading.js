@@ -5,7 +5,7 @@ import { Text } from "../components";
 export default function TriggerLoading({
   children,
   loader,
-  loadMore,
+  loadMore = false,
   ...restProps
 }) {
   /* restProps:
@@ -23,7 +23,7 @@ export default function TriggerLoading({
   return (
     <>
       {children}
-      {loadMore === true && (
+      {loadMore && (
         <Text.Subtitle
           style={{
             textAlign: "center",

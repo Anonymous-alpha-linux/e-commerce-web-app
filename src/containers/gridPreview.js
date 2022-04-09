@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Text, ContainerComponent, ButtonComponent, Preview } from "../components";
 
 
-export default function GridPreview({ files }) {
+export default function GridPreview({ files, ...props }) {
     const [rawDoc, setRawDoc] = useState(false);
     const [data, setData] = useState(files);
 
@@ -21,7 +21,7 @@ export default function GridPreview({ files }) {
 
     return (
         <>
-            <ContainerComponent.Flex className="post_review__container" style={{ padding: '10px 0' }}>
+            <ContainerComponent.Flex className="post_review__container" style={{ padding: '10px 0' }} {...props}>
                 {data.slice(0, 4).map((file, index) => {
                     return <ContainerComponent.Item key={file._id} style={{ flexBasis: '50%', flexGrow: '1', position: 'relative' }}>
                         <ContainerComponent.Pane style={{ overflow: 'hidden', border: '1px soli #333', width: '100%', height: '100%' }}>

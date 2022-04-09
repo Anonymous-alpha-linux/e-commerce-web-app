@@ -130,7 +130,6 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setState((o) => ({
           ...o,
           attachments: {
@@ -150,7 +149,7 @@ export default function AdminContext({ children }) {
           },
         }));
         if (cb !== 'undefined')
-          cb(res.data.response);
+          cb(res.data);
       })
       .catch((error) => {
         pushToast({
@@ -192,18 +191,20 @@ export default function AdminContext({ children }) {
               loading: false,
               currentPage: page,
               fetchedPage: [...o.attachments.fetchedPage, page],
-              data: newData
+              data: newData,
+              pages: res.data.pages,
             },
           })
         });
-        cb(res.data.response);
+        if (cb !== 'undefined')
+          cb(res.data);
       })
       .catch((error) => {
-        cb([]);
         pushToast({
           message: error.message,
           type: toastTypes.ERROR
         });
+        cb({ error: 'Cannot get data now' });
       });
     // }
   }
