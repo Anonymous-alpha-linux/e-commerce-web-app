@@ -32,6 +32,7 @@ export default function Timespan({
             var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
             var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
             if (days > 0) {
+                setBlockWorkspace(false);
                 setCounterTimer({
                     days,
                     hours,
@@ -65,7 +66,7 @@ export default function Timespan({
     return <ContainerComponent.Section
         style={{
             padding: '10px 10px',
-            background:"white"
+            background: "white"
         }}
         className="timespan"
     >
@@ -75,7 +76,7 @@ export default function Timespan({
                 textAlign: 'center',
             }}
         >
-            <Text style={{fontWeight:"600",fontSize:"17px"}}>Time to close Workspace</Text>
+            <Text style={{ fontWeight: "600", fontSize: "17px" }}>Time to close Workspace</Text>
             {counterTimer.days > 0 && <ContainerComponent.Flex
                 style={{
                     // alignItems: 'center',
@@ -89,11 +90,11 @@ export default function Timespan({
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <Text style={{ transform: "translateY(14%)", fontWeight: "700", color:"#163D3C"}}>:</Text>
+                    <Text style={{ transform: "translateY(14%)", fontWeight: "700", color: "#163D3C" }}>:</Text>
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
-                    <ButtonComponent className="timeSpan__button" style={{ background:'#163D3C'}}>{`${convertTo2Digit(counterTimer.hours)}`} </ButtonComponent>
+                    <ButtonComponent className="timeSpan__button" style={{ background: '#163D3C' }}>{`${convertTo2Digit(counterTimer.hours)}`} </ButtonComponent>
                     <Text.Bold style={{ color: '#163D3C' }}>Hours</Text.Bold>
                 </ContainerComponent.Item>
 

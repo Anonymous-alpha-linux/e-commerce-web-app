@@ -384,16 +384,12 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Edit Idea Successful",
-          type: toastTypes.SUCCESS,
-        });
         updateSinglePost(res.data.response[0]._id);
         cb(res.data.response[0]._id);
       })
       .catch((error) => {
         pushToast({
-          message: "Edit Post Failed",
+          message: "Edit Post successfully",
           type: toastTypes.ERROR,
         });
       });
@@ -573,9 +569,6 @@ export default React.memo(function PostContext({ children }) {
         });
         cb(res.data.response);
       })
-      .then((success) => {
-        cb();
-      })
       .catch((error) => {
         setError(error.message);
       });
@@ -596,7 +589,7 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        return setPost({
+        setPost({
           type: actions.FILTER_POST_COMMENT,
           payload: res.data.response,
           postid: postId,
@@ -1237,9 +1230,6 @@ export default React.memo(function PostContext({ children }) {
     getNewCategory,
     removeCategory,
   };
-
-  if (postState.postLoading)
-    return <Loading className="post__loading"></Loading>;
 
   return (
     <PostContextAPI.Provider value={contextValues}>

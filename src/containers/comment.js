@@ -8,7 +8,7 @@ import { useAuthorizationContext, useNotifyContext, usePostContext, useWorkspace
 import { notifyData, socketTargets } from '../fixtures';
 import { InteractFooter, TriggerLoading } from ".";
 
-export default function Comment({ postAuthor, postId, commentLogs }) {
+export default function Comment({ postAuthor, postId, commentLogs, setPost }) {
   const { workspace } = useWorkspaceContext();
   const { posts, loadNextComments, filterPostComment } = usePostContext();
   const filterRef = useRef(filterPostComment);
@@ -193,6 +193,7 @@ Comment.Tab = function CommentTab({ ...props }) {
           Reply ({reply})
         </Text.MiddleLine>
       </InteractFooter>
+
       <Text.Line className="comment__reply">
         {openReplyInput && <Comment.TabReplyInput forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postAuthor={targetId} postId={props.postId} commentId={_id} hideAuthor={hideAuthor}
         // forwardedRef={inputRef} preReply={username} closeReply={() => setOpenReply(false)} postId={props.postId} commentId={rootComment}
@@ -208,7 +209,7 @@ Comment.Tab = function CommentTab({ ...props }) {
           {!!reply && <Text.Subtitle style={{ padding: '10px 0', cursor: 'pointer' }}>Read {reply} replies...  </Text.Subtitle>}
         </Text.Line> || <TriggerLoading loader={() => loadMoreRepliesRef.current(props.postId, _id, () => { })} loadMore={loadMore}>
             <ContainerComponent className="comment-reply__log" style={{ borderRadius: "15px" }}>
-              {replies.map(reply => {
+              {replies?.length && replies.map(reply => {
                 return <Comment.ReplyTab
                   rootComment={_id}
                   comment={reply}

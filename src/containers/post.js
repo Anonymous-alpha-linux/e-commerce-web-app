@@ -16,13 +16,13 @@ import {
   usePostContext,
 } from "../redux";
 import { Link, useNavigate } from "react-router-dom";
-import { roles } from "../fixtures";
+import { roles, toastTypes } from "../fixtures";
 import axios from "axios";
 import { mainAPI } from "../config";
 // import { notifyData, socketTargets } from "../fixtures";
 
 export default function Post({ postHeader, postBody, postFooter }) {
-  const { user } = useAuthorizationContext();
+  const { user, pushToast } = useAuthorizationContext();
   const { interactPost, getPostComments, deleteSinglePost } = usePostContext();
   const {
     like,
@@ -32,11 +32,10 @@ export default function Post({ postHeader, postBody, postFooter }) {
     likedAccounts,
     dislikedAccounts,
   } = postFooter;
-
-  const { sendNotification } = useNotifyContext();
   const isFirstRender = useRef(true);
   const interactRef = useRef(interactPost);
   const getComment = useRef(getPostComments);
+  const host = process.env.REACT_APP_ENVIRONMENT === "development" ? mainAPI.LOCALHOST_HOST : mainAPI.CLOUD_HOST;
 
   const [openComment, setOpenComment] = useState(false);
 
@@ -78,7 +77,7 @@ export default function Post({ postHeader, postBody, postFooter }) {
   };
   const downloadHandler = async (e) => {
     return axios
-      .get(`${mainAPI.LOCALHOST_HOST}/api/v1/download`, {
+      .get(`${host}/api/v1/download`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -100,20 +99,24 @@ export default function Post({ postHeader, postBody, postFooter }) {
         // Clean up and remove the link
         link.parentNode.removeChild(link);
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => pushToast({
+        message: 'Cannot download this item',
+        type: toastTypes.ERROR,
+      }));
   };
   const parseTime = (time) => {
-    const now = new Date(Date.now());
-    const end = new Date(time);
-    const diff = new Date(now.getTime() - end.getTime());
+    const today = new Date();
+    const endDate = new Date(time);
 
-    if (diff.getUTCDate() - 1 === 0) {
-      if (diff.getUTCHours() > 1) return diff.getUTCHours() + " hours ago";
-      if (diff.getUTCMinutes() > 1)
-        return diff.getUTCMinutes() + " minutes ago";
-      return diff.getUTCSeconds() + " seconds ago";
-    }
-    if (diff.getUTCDate() < 30) return diff.getUTCDate() + " days ago";
+    const days = parseInt(Math.abs(endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const hours = parseInt(Math.abs(endDate.getTime() - today.getTime()) / (1000 * 60 * 60));
+    const minutes = parseInt(Math.abs(endDate.getTime() - today.getTime()) / (1000 * 60));
+    const seconds = parseInt(Math.abs(endDate.getTime() - today.getTime()) / (1000));
+
+    if (seconds < 60) return `${seconds} second ago`;
+    else if (minutes < 60) return `${minutes} minutes ago`;
+    else if (hours < 60) return `${hours} hours ago`;
+    else if (days < 10) return `${days} days ago`;
     return `${new Date(time).toLocaleString("en-us", { dateStyle: "full" })}`;
   };
 
@@ -211,7 +214,9 @@ export default function Post({ postHeader, postBody, postFooter }) {
             <Text.Paragraph style={{ padding: "0px 10px" }}>
               {postBody.content}
             </Text.Paragraph>
-            {!!postBody.attachment.length && <GridPreview files={postBody.attachment}></GridPreview>}
+            {!!postBody.attachment.length && <Link to={`/post_detail/${postHeader.id}`}>
+              <GridPreview files={postBody.attachment}></GridPreview>
+            </Link>}
           </ContainerComponent.Pane>
 
           <ContainerComponent.Pane className="post__footer" style={{ background: '#DCE7D7', boxShadow: '1px 1px .5px solid #000', borderRadius: "10px" }}>
