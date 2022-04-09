@@ -181,14 +181,12 @@ function App() {
                   <Route path="portal/" element={<Portal></Portal>}>
                     <Route path="idea" element={<PostModal />}></Route>
                     <Route path="idea/:id" element={<PostModal />}></Route>
-                    <Route
-                      path="notification"
+                    <Route path="notification"
                       element={
                         <NotificationContainer></NotificationContainer>
                       }
                     />
-                    <Route
-                      path="message"
+                    <Route path="message"
                       element={<MessageContainer></MessageContainer>}
                     >
                       <Route
@@ -202,15 +200,19 @@ function App() {
                       element={<AddGroupContainer></AddGroupContainer>}
                     />
                   </Route>
+                  <Route path="workspace" element={<WorkspaceGroup></WorkspaceGroup>} />
+                  <Route path="/management/workspace">
+                    <Route path=":id" element={<UserAll></UserAll>} />
+                  </Route>
                   <Route path="/management/category"
                     element={<CategoryManagement></CategoryManagement>}
-                  />
-                  <Route path="/management/member"
-                    element={<ListMember></ListMember>}
                   />
                   <Route path="/management/workspace_member">
                     <Route path=":id" element={<ListMember></ListMember>} />
                   </Route>
+                  {/* <Route path="/management/member"
+                    element={<ListMember></ListMember>}
+                  /> */}
                 </Route>
               )) ||
               // 4. Staff

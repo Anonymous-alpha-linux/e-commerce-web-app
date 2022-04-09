@@ -21,7 +21,8 @@ export default React.memo(function WorkspaceContext({ children }) {
 
   useEffect(() => {
     onLoadWorkspaceList();
-  }, [user]);
+    onLoadWorkspace();
+  }, [user.accessToken]);
 
 
   function onLoadWorkspaceList() {
@@ -37,20 +38,11 @@ export default React.memo(function WorkspaceContext({ children }) {
         },
       })
       .then((res) => {
-        if (res.status > 199 && res.status <= 299) {
-          setWorkspace({
-            type: actions.GET_WORKSPACE_LIST,
-            payload: res.data.response,
-            others: { totalWorkspace: res.data.totalWorkspace, loadMore: res.data.response.length === workspaceState.count }
-          });
-          onLoadWorkspace();
-        }
-        else {
-          pushToast({
-            message: 'Get workspace information failed',
-            type: toastTypes.ERROR
-          });
-        }
+        setWorkspace({
+          type: actions.GET_WORKSPACE_LIST,
+          payload: res.data.response,
+          others: { totalWorkspace: res.data.totalWorkspace, loadMore: res.data.response.length === workspaceState.count, page: 0, count: 2 }
+        });
       })
       .catch((error) => {
         pushToast({
@@ -72,15 +64,11 @@ export default React.memo(function WorkspaceContext({ children }) {
         },
       })
       .then((res) => {
-        if (res.status > 199 && res.status <= 299) {
-          setWorkspace({
-            type: actions.LOAD_MORE_WORKSPACE,
-            payload: res.data.response,
-            others: { totalWorkspace: res.data.totalWorkspace, page: workspaceState.page + 1, loadMore: res.data.response.length === workspaceState.count }
-          });
-          onLoadWorkspace();
-        }
-        else throw new Error(res.data);
+        setWorkspace({
+          type: actions.LOAD_MORE_WORKSPACE,
+          payload: res.data.response,
+          others: { totalWorkspace: res.data.totalWorkspace, page: workspaceState.page + 1, loadMore: res.data.response.length === workspaceState.count }
+        });
       })
       .catch((error) => {
         setWorkspace({
@@ -102,8 +90,7 @@ export default React.memo(function WorkspaceContext({ children }) {
       setWorkspace({
         type: actions.GET_WORKSPACE,
         payload: res.data.response
-      })
-      // onLoadManagerInfo(res.data.response.manger);
+      });
     }).catch(err => {
       pushToast({ error: err.message, type: toastTypes.ERROR });
     })
@@ -181,44 +168,12 @@ export default React.memo(function WorkspaceContext({ children }) {
         pushToast({ error: error.message, type: toastTypes.ERROR });
       });
   }
-  // function selectWorkspace(workspaceId, cb) {
-  //   return axios.put(workspaceAPI, {
-  //     workspaceid: workspaceId
-  //   }, {
-  //     headers: {
-  //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //     },
-  //     params: {
-  //       view: "accountWorkspace"
-  //     },
-  //   }).then(res => {
-  //     setWorkspace({
-  //       type: actions.GET_WORKSPACE,
-  //       payload: res.data.response
-  //     });
-  //   }).catch(err => {
-
-  //   })
-  // }
   function createWorkspace(workspace) {
     setWorkspace({
       type: actions.CREATE_WORKSPACE,
       payload: workspace,
     });
   }
-  // function getWorkspaceForManager() {
-  //   return axios.get(mainAPI.LOCALHOST_MANAGER, {
-  //     headers: {
-  //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //     },
-  //     params: {
-  //       view: "workspace",
-  //     }
-  //   }).then(res => setWorkspace({
-  //     type: actions.GET_MANAGER_WORKSPACE,
-  //     payload: res.data.response
-  //   }))
-  // }
   function assignCoordinatorToWorkspace(workspaceId, accountId, cb) {
     return axios.put(workspaceAPI, {
       accountid: accountId
@@ -332,27 +287,24 @@ export default React.memo(function WorkspaceContext({ children }) {
         workspaceid: workspaceId,
       }
     }).then(res => {
-      if (res.status > 199 && res.status <= 299) {
-        setWorkspace({
-          type: actions.EDIT_WORKSPACE,
-          payload: {
-            workTitle,
-            expireTime: new Date(closureTime),
-            eventTime: new Date(eventTime)
-          },
-          workspaceId
-        });
-        pushToast({
-          message: "Edited workspace successfully",
-          type: toastTypes.SUCCESS,
-        });
-        if (typeof cb !== 'undefined')
-          cb();
-      }
-      else throw new Error(res.data.error);
+      setWorkspace({
+        type: actions.EDIT_WORKSPACE,
+        payload: {
+          workTitle,
+          expireTime: new Date(closureTime),
+          eventTime: new Date(eventTime)
+        },
+        workspaceId
+      });
+      pushToast({
+        message: "Edited workspace successfully",
+        type: toastTypes.SUCCESS,
+      });
+      if (typeof cb !== 'undefined')
+        cb();
     }).catch(err => {
       pushToast({
-        message: err.message,
+        message: "Cannot edit now !",
         type: toastTypes.ERROR
       });
       if (typeof cb !== 'undefined')

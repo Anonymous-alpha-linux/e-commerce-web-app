@@ -61,7 +61,7 @@ export default function Comment({ postAuthor, commentLogs, postId }) {
             <Form.Select
               onChange={filterComment}
             >
-              <Form.Option value={0}>Most Popular</Form.Option>
+              <Form.Option value={0}>Newest Comments</Form.Option>
               <Form.Option value={1}>Most Favorite</Form.Option>
             </Form.Select>
           </ContainerComponent.Item>
@@ -313,39 +313,43 @@ Comment.TabInput = function TabInput({ forwardedRef, preReply = "", closeReply, 
   };
 
   return !blockEvent ? <ContainerComponent.Pane>
-    <Text.Line>
-      <Text.MiddleLine style={{ marginRight: "10px" }}>
-        <Icon.CircleIcon
-          style={{
-            background: "#163d3c",
-            color: "#fff",
-            padding: 0,
-          }}
-        >
-          <Icon.Image src={user.profileImage}></Icon.Image>
-        </Icon.CircleIcon>
-      </Text.MiddleLine>
-      <Text.MiddleLine style={{ marginRight: "12px" }}>
-        <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
-      </Text.MiddleLine>
-      <Text.MiddleLine style={{ float: 'right' }}>
-        <ButtonComponent.Toggle
-          onText="Hide"
-          offText="Show"
-          id="private"
-          name="private"
-          value={input.private}
-          onChange={checkedHandler}
-        ></ButtonComponent.Toggle>
-      </Text.MiddleLine>
-    </Text.Line>
-    <Text.Line>
-      <Form style={{ width: "100%", padding: "5px 0 0 0", margin: "0" }} onSubmit={submitHandler}>
-        <Form.Input ref={forwardedRef} name="content" style={{ width: "100%", marginTop: "4px", border: "1px solid #C4C4C4" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
-        ></Form.Input>
-        <input type="submit" style={{ display: "none" }} onSubmit={submitHandler}></input>
-      </Form>
-    </Text.Line>
+    <AnimateComponent.TextFadeIn duration={300}>
+      <Text.Line>
+        <Text.MiddleLine style={{ marginRight: "10px" }}>
+          <Icon.CircleIcon
+            style={{
+              background: "#163d3c",
+              color: "#fff",
+              padding: 0,
+            }}
+          >
+            <Icon.Image src={user.profileImage}></Icon.Image>
+          </Icon.CircleIcon>
+        </Text.MiddleLine>
+        <Text.MiddleLine style={{ marginRight: "12px" }}>
+          <Text.Bold>{!input.private ? user.account : "Anonymous"}</Text.Bold>
+        </Text.MiddleLine>
+        <Text.MiddleLine style={{ float: 'right' }}>
+          <ButtonComponent.Toggle
+            onText="Hide"
+            offText="Show"
+            id="private"
+            name="private"
+            value={input.private}
+            onChange={checkedHandler}
+          ></ButtonComponent.Toggle>
+        </Text.MiddleLine>
+      </Text.Line>
+
+      <Text.Line>
+        <Form style={{ width: "100%", padding: "5px 0 0 0", margin: "0" }} onSubmit={submitHandler}>
+          <Form.Input ref={forwardedRef} name="content" style={{ width: "100%", marginTop: "4px", border: "1px solid #C4C4C4" }} value={input.content} onChange={inputHandler} placeholder="Leave your comment"
+          ></Form.Input>
+          <input type="submit" style={{ display: "none" }} onSubmit={submitHandler}></input>
+        </Form>
+      </Text.Line>
+    </AnimateComponent.TextFadeIn>
+
   </ContainerComponent.Pane> : null;
 };
 Comment.ReplyTab = function ReplyTab({ ...props }) {

@@ -1091,7 +1091,7 @@ export default React.memo(function PostContext({ children }) {
     }
   }
   // 5. Get the list of categories
-  async function getPostCategories() {
+  async function getPostCategories(cb) {
     setCategory({
       type: actions.SET_LOADING,
     });
@@ -1109,6 +1109,7 @@ export default React.memo(function PostContext({ children }) {
           type: actions.GET_POST_CATEGORIES,
           payload: res.data.response,
         });
+        cb(res.data.response);
       })
       .catch((error) => {
         setCategory({

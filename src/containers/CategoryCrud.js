@@ -13,7 +13,7 @@ export default function Crud() {
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
   let PageSize = 8;
-  const { categories, removeCategory, categoryLoading } = usePostContext();
+  const { categories, removeCategory, categoryLoading, getPostCategories } = usePostContext();
   const [modal, setModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
@@ -21,6 +21,9 @@ export default function Crud() {
   const [dataRecords, setDataRecords] = useState([]);
   // console.log("re-render crud", categories);
 
+  useEffect(() => {
+    getPostCategories();
+  }, []);
   useEffect(() => {
     setDataRecords((e) => {
       const firstPageIndex = (currentPage - 1) * PageSize;
@@ -51,11 +54,11 @@ export default function Crud() {
       })
       .catch((error) => console.log(error.message));
   }
-  return (<ContainerComponent style={{ display: "flex", justifyContent: "center", background:"#A9C39E"}}>
-    <ContainerComponent.Inner style={{ margin: "30px", flexGrow: "1", padding: '20px 20px 20px 20px', maxWidth: "820px", height: "fit-content", borderRadius: "10px", background:"#DCE7D7",overflow:"hidden"}}>
-      <div className="categoryCRUD__root" style={{ width: "100%", maxWidth: "800px", background:"#DCE7D7"}}>
-        <ContainerComponent.Inner className="categoryCRUD__inner" style={{ margin: '0 auto', height: "100%",background:"white",borderRadius:"10px",paddingBottom:"1px"}}>
-          <button className="btn__category" style={{margin:"15px"}}  onClick={() => setModal(!modal)}>
+  return (<ContainerComponent style={{ display: "flex", justifyContent: "center", background: "#A9C39E" }}>
+    <ContainerComponent.Inner style={{ margin: "30px", flexGrow: "1", padding: '20px 20px 20px 20px', maxWidth: "820px", height: "fit-content", borderRadius: "10px", background: "#DCE7D7", overflow: "hidden" }}>
+      <div className="categoryCRUD__root" style={{ width: "100%", maxWidth: "800px", background: "#DCE7D7" }}>
+        <ContainerComponent.Inner className="categoryCRUD__inner" style={{ margin: '0 auto', height: "100%", background: "white", borderRadius: "10px", paddingBottom: "1px" }}>
+          <button className="btn__category" style={{ margin: "15px" }} onClick={() => setModal(!modal)}>
             Create New Category
           </button>
           {modal && (
@@ -64,14 +67,14 @@ export default function Crud() {
             </div>
           )}
 
-          <div className="table__container" style={{width:"100%",background:"white",overflow:"scroll",paddingBottom:"1px",marginTop:"10px"}}>
-            <table className="table table-style" style={{ minWidth: "550px",}}>
+          <div className="table__container" style={{ width: "100%", background: "white", overflow: "scroll", paddingBottom: "1px", marginTop: "10px" }}>
+            <table className="table table-style" style={{ minWidth: "550px", }}>
               <thead>
-                <tr style={{background: "#f2f8fb"}}>
+                <tr style={{ background: "#f2f8fb" }}>
                   <th scope="col" style={{ textAlign: "center", width: "40%" }}>
                     ID
                   </th>
-                  <th scope="col" style={{ textAlign: "center", width: "40%"}}>
+                  <th scope="col" style={{ textAlign: "center", width: "40%" }}>
                     Title
                   </th>
                   <th>
@@ -117,13 +120,13 @@ export default function Crud() {
               </tbody>
             </table>
           </div>
-              <Pagination
-                className="pagination-bar"
-                currentPage={currentPage}
-                totalCount={categories.length}
-                pageSize={PageSize}
-                onPageChange={(page) => setCurrentPage(page)}
-              />
+          <Pagination
+            className="pagination-bar"
+            currentPage={currentPage}
+            totalCount={categories.length}
+            pageSize={PageSize}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
         </ContainerComponent.Inner>
       </div>
     </ContainerComponent.Inner>

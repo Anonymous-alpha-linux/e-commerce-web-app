@@ -59,7 +59,21 @@ AnimateComponent.SlideRight = function AnimatedSlideRight({
     </>
   );
 };
-
+AnimateComponent.FadeInRight = function AnimatedFadeInRight({ children, initialPosition = { x: 200, y: 200 }, style }) {
+  let { x, y } = initialPosition;
+  const transition = useTransition(children, {
+    // keys: (item) => item.key,
+    keys: children.key,
+    from: { transform: `translate(${x}, ${y})`, opacity: 0 },
+    enter: { transform: `translate(0,0)`, opacity: 1 },
+    leave: { transform: `translate(${x}, ${y})`, opacity: 0, position: 'absolute' },
+    // delay: 200,
+    reset: false
+  });
+  return transition((style, item) => item && <animated.div style={style}>
+    {item}
+  </animated.div> || <></>)
+}
 AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, triggerComponent, position = "middle", style, ...props }) {
   const [isToggled, setToggle] = useState(false);
   let menuPosition = position === 'middle' && {
@@ -67,62 +81,66 @@ AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, trigger
     left: '50%',
     transform: 'translateX(-50%)',
   } || position === 'left' && {
-    ...props.style,
+    ...style,
     left: '0'
   } || {
     ...props.style,
     right: 0
   }
-
   const menubg = useSpring({
-    // background: isToggled ? "#333" : "transparent",
     position: 'relative'
   });
   const { y } = useSpring({
     y: isToggled ? 180 : 0
   });
   const menuAppear = useSpring({
+    from: {
+      height: 0,
+      size: 0,
+    },
     to: {
       position: 'absolute',
-      transform: isToggled ? "translate3D(0,0,0)" : "translate3D(0,-120px,0)",
+      size: 'auto',
+      height: 'auto',
+      transform: isToggled ? "translate3D(0,0,0)" : "translate3D(0,-10px,0)",
       opacity: isToggled ? 1 : 0,
       ...menuPosition,
       ...style,
     }
   });
-
   return (
     <animated.div
       style={menubg}
       className="radiowrapper"
-      onClick={() => setToggle(!isToggled)}
     >
-      <Text.MiddleLine>
-        {triggerComponent}
-      </Text.MiddleLine>
-      <animated.span
-        style={{
-          transform: y.interpolate((y) => `rotateX(${y}deg)`),
-          display: 'inline-block',
-          verticalAlign: 'middle'
-        }}
-      >
-        <Icon>
-          <BsCaretDownFill></BsCaretDownFill>
-        </Icon>
-      </animated.span>
-      <animated.div style={menuAppear}>
-        {isToggled ?
-          <OutsideAlert toggleShowing={() => setToggle(o => !o)}>
+      <OutsideAlert toggleShowing={() => setToggle(false)}>
+        <Text.Line onClick={() => setToggle(o => !o)}>
+          <Text.MiddleLine>
+            {triggerComponent}
+          </Text.MiddleLine>
+          <animated.span
+            style={{
+              transform: y.interpolate((y) => `rotateX(${y}deg)`),
+              display: 'inline-block',
+              verticalAlign: 'middle'
+            }}>
+            <Icon>
+              <BsCaretDownFill></BsCaretDownFill>
+            </Icon>
+          </animated.span>
+        </Text.Line>
+
+        <animated.div style={menuAppear}>
+          {isToggled ? <>
             {children}
-          </OutsideAlert>
-          : null}
-      </animated.div>
+          </>
+            : null}
+        </animated.div>
+      </OutsideAlert>
     </animated.div>
 
   );
 }
-
 AnimateComponent.DropdownHover = function AnimatedDropdownHover({ children, state, triggerComponent, position = "middle", style, ...props }) {
   const [isToggled, setToggle] = useState(false);
   const menubg = useSpring({
@@ -184,7 +202,6 @@ AnimateComponent.DropdownHover = function AnimatedDropdownHover({ children, stat
     </>
   );
 }
-
 AnimateComponent.DropdownClick = function AnimatedDropdownClick({
   children,
   style,
@@ -210,7 +227,6 @@ AnimateComponent.DropdownClick = function AnimatedDropdownClick({
       )
   );
 };
-
 AnimateComponent.Rotate = function AnimatedRotate({
   children,
   state,

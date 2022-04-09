@@ -434,10 +434,6 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       clearInterval(interval);
     };
   }, []);
-
-  function calculateBlockTime() {
-
-  }
   function convertTo2Digit(number) {
     return number.toLocaleString("en-US", {
       minimumIntegerDigits: 2,

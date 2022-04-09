@@ -1,10 +1,9 @@
 import React from 'react'
 import { ContainerComponent } from '../../components'
+import { useWorkspaceContext } from '../../redux';
 
 function WorkspaceOverview() {
-
-
-
+    console.log(useWorkspaceContext());
     return (
         <ContainerComponent>
             <ContainerComponent.GridThreeColumns>

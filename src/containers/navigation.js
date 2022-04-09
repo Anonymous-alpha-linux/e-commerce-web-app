@@ -8,8 +8,8 @@ import { GrStackOverflow } from "react-icons/gr";
 import { ImSpinner } from "react-icons/im";
 
 import { AnimateComponent, ButtonComponent, ContainerComponent, Form, Icon, Text } from "../components";
+import { Modal, DropDownButton, NotificationContainer, Logo, TriggerLoading } from ".";
 import { ListMember } from "../pages";
-import { Modal, DropDownButton, NotificationContainer, Logo } from ".";
 
 import { useAuthorizationContext, useNotifyContext, useWorkspaceContext } from "../redux";
 import { useMedia, useModal, OutsideAlert } from "../hooks";
@@ -126,18 +126,7 @@ export default function Navigation() {
                 </Link>
               </ContainerComponent.Item>
 
-              {/* <DropDownButton position="middle" style={{ paddingTop: '16px', background: 'rgb(22, 61, 60)', color: '#fff' }} component={<>
-                <Text style={{ marginRight: '5px' }}>Workspace</Text>
-                <Text.MiddleLine>
-                  <Icon>
-                    <BsCaretDownFill></BsCaretDownFill>
-                  </Icon>
-                </Text.MiddleLine>
-              </>}>
-                <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
-              </DropDownButton> */}
-
-              <AnimateComponent.Dropdown style={{ marginTop: '16px' }} triggerComponent={<Text className="navigation__text" style={{ marginRight: '5px' }}>Workspace</Text>}>
+              <AnimateComponent.Dropdown style={{ marginTop: '16px', marginRight: '5px', maxHeight: '320px', overflowY: 'scroll' }} triggerComponent={<Text className="navigation__text">Workspace</Text>}>
                 <WorkspaceList toggleMemberModal={toggleMemberModal}></WorkspaceList>
               </AnimateComponent.Dropdown>
               {
@@ -354,41 +343,42 @@ const AuthStatus = React.memo(function AuthStatus({
 });
 const WorkspaceList = ({ toggleMemberModal }) => {
   const { user } = useAuthorizationContext();
-  const { workspaces } = useWorkspaceContext();
+  const { workspaces, loadMore, loadMoreWorkspaceList } = useWorkspaceContext();
   return (
-    <>
-      {!!workspaces.length &&
-        workspaces.map((item, index) => {
-          const disabled = user.workspace === item._id;
-          const disabledStyled = () => ({
-            background: `${disabled ? "#fff" : "rgb(22, 61, 60)"}`,
-            color: `${disabled ? "#000" : "#fff"}`,
-          });
+    <ContainerComponent.Section className="workspaceList__container" style={{ background: '#fff', color: '#000', padding: '0 10px' }}>
+      <TriggerLoading loader={loadMoreWorkspaceList} loadMore={loadMore}>
+        {!!workspaces.length &&
+          workspaces.map((item, index) => {
+            const disabled = user.workspace === item._id;
+            const disabledStyled = () => ({
+              background: `${disabled ? "#fff" : "rgb(22, 61, 60)"}`,
+              color: `${disabled ? "#000" : "#fff"}`,
+            });
+            return (
+              <ContainerComponent.Item
+                className="workspaceList__item"
+                key={index + 1}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  minWidth: "280px",
+                  ...disabledStyled(),
+                }}
+              >
+                <WorkspaceItem
+                  item={item}
+                  toggleMemberModal={toggleMemberModal}
+                ></WorkspaceItem>
+              </ContainerComponent.Item>
+            );
+          })}
+      </TriggerLoading>
+    </ContainerComponent.Section>
 
-          return (
-            <ContainerComponent.Item
-              className="workspaceList__item"
-              key={index + 1}
-              style={{
-                width: "100%",
-                padding: "10px",
-                minWidth: "280px",
-                ...disabledStyled(),
-              }}
-            >
-              <WorkspaceItem
-                item={item}
-                toggleMemberModal={toggleMemberModal}
-              ></WorkspaceItem>
-            </ContainerComponent.Item>
-          );
-        })}
-    </>
   );
 };
 function WorkspaceItem({ item, toggleMemberModal }) {
   const { user, editCurrentWorkspace } = useAuthorizationContext();
-  const { workspace } = useWorkspaceContext();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -401,7 +391,6 @@ function WorkspaceItem({ item, toggleMemberModal }) {
       navigate(location.pathname);
     });
   }
-
   if (loading) return <Text.CenterLine style={{ height: '50px', fontSize: '40px' }}>
     <Icon.Spinner>
       <ImSpinner></ImSpinner>
@@ -430,15 +419,16 @@ function WorkspaceItem({ item, toggleMemberModal }) {
     </Text.MiddleLine>
 
     <Text.MiddleLine>
-      {user.accountId === item.manager && <DropDownButton position="left" component={<ContainerComponent.Pane>
-        <Icon>
-          <AiFillCaretDown></AiFillCaretDown>
-        </Icon>
-      </ContainerComponent.Pane>}>
-        <ButtonComponent onClick={() => {
-          toggleMemberModal();
-        }}>Add member</ButtonComponent>
-      </DropDownButton>
+      {user.accountId === item.manager &&
+        <AnimateComponent.Dropdown position="right" triggerComponent={<ContainerComponent.Pane>
+        </ContainerComponent.Pane>}>
+          <ButtonComponent style={{ textOverflow: 'clip', whiteSpace: 'nowrap', background: '' }}
+            onClick={() => {
+              toggleMemberModal();
+            }}>
+            Add member
+          </ButtonComponent>
+        </AnimateComponent.Dropdown>
       }
     </Text.MiddleLine>
   </ContainerComponent.Flex>
@@ -471,7 +461,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       );
       var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
-      if (days > 0) {
+      if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+        setBlockWorkspace(false);
         setCounterTimer({
           days,
           hours,
@@ -505,7 +496,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       <ContainerComponent.Inner
         style={{ margin: "0 auto", textAlign: "center" }}
       >
-        {(counterTimer.days > 0 && (
+        {(!blockWorkspace && (
           <ContainerComponent.Flex
             style={{
               // alignItems: 'center',
@@ -556,7 +547,10 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
               >{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
             </ContainerComponent.Item>
           </ContainerComponent.Flex>
-        )) || <ContainerComponent.Pane>Closed</ContainerComponent.Pane>}
+        ))
+          ||
+          <ContainerComponent.Pane style={{ color: "red", fontWeight: 500, fontSize: "0.8em" }}
+          >Closed</ContainerComponent.Pane>}
       </ContainerComponent.Inner>
     </ContainerComponent.Section>
   );

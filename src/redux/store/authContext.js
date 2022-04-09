@@ -29,6 +29,7 @@ export default function AuthenticationContext({ children }) {
   React.useEffect(() => {
     onLoadUser();
   }, []);
+
   const onLoadUser = (cb) => {
     return axios
       .get(authAPI, {

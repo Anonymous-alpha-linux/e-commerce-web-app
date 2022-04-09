@@ -36,7 +36,7 @@ export default function Workspace() {
     return () => {
       cancelTokenSource.cancel();
     }
-  }, [workspace]);
+  }, [user.accessToken, user.workspace, workspace]);
 
   return (
     <ContainerComponent className="workspace" id="workspace">

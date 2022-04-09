@@ -1,49 +1,54 @@
-import { useRef, useEffect, useState } from "react";
-import ReactDOM from "react-dom";
-import { toastTypes } from "../fixtures";
-import styles from "./styles/ToastMessage.module.css";
-import { useAuthorizationContext } from "../redux";
-import { Text } from "../components";
-import { useModal } from "../hooks";
+import React, { useRef, useEffect, useState } from "react";
 
-export default function ToastMessage({
+import { toastTypes } from "../fixtures";
+import { AnimateComponent } from "../components";
+
+import styles from "./styles/ToastMessage.module.css";
+
+const ToastMessage = React.memo(({
   message,
   timeout,
   type = toastTypes.WARNING,
   pullItem,
-}) {
+}) => {
   const toastRef = useRef();
   const [isExpired, setExpired] = useState(false);
+
   useEffect(() => {
     toastRef.current.style.width = "0%";
     const timeoutVal = setTimeout(() => {
       setExpired(true);
-      pullItem(message);
-    }, timeout + 100);
+      pullItem();
+    }, timeout);
     return () => {
       clearTimeout(timeoutVal);
     };
   }, []);
 
   return !isExpired ? (
-    <div className={`${styles.ToastMessage} ${styles[type]}`}>
-      <h5
-        style={{
-          color: `${type === toastTypes.ERROR ? "red" : "green"}`,
-          textTransform: "uppercase",
-          margin: 0,
-        }}
-      >
-        {type}
-      </h5>
-      <span>{message}</span>
-      <div className={styles.Loader}>
-        <div
-          className={styles.Bar}
-          ref={toastRef}
-          style={{ "--timeout": `${timeout / 1000}s` }}
-        ></div>
+    <AnimateComponent.FadeInRight initialPosition={{ x: '1000px', y: 0 }}>
+      <div className={`${styles.ToastMessage} ${styles[type]}`}>
+        <h5
+          style={{
+            color: `${type === toastTypes.ERROR ? "red" : "green"}`,
+            textTransform: "uppercase",
+            margin: 0,
+          }}
+        >
+          {type}
+        </h5>
+        <span>{message}</span>
+        <div className={styles.Loader}>
+          <div
+            className={styles.Bar}
+            ref={toastRef}
+            style={{ "--timeout": `${timeout / 1000}s` }}
+          ></div>
+        </div>
       </div>
-    </div>
-  ) : null;
-}
+    </AnimateComponent.FadeInRight>
+  ) : <></>;
+});
+
+
+export default ToastMessage;

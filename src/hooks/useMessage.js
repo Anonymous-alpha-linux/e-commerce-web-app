@@ -1,15 +1,19 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export default function useMessage() {
-    const [message, setMessage] = useState([]);
-    function pushNotify(newMessage) {
-        setMessage(message => [...message, newMessage]);
-    }
-    function pullNotify() {
-        setMessage((message, index) => {
-            const newMessage = message.slice(index, message.length - 1);
-            return newMessage;
+    const [message, setMessage] = useState({
+        arrays: []
+    });
+    const pushNotify = useCallback((newMessage) => {
+        setMessage(oldMessages => ({
+            arrays: [...oldMessages.arrays, newMessage]
+        }));
+    }, []);
+
+    function pullNotify(index) {
+        setMessage((message) => {
+            return { arrays: message.arrays.filter((_, id) => id !== index) };
         });
     }
-    return [message, pushNotify, pullNotify];
+    return [message.arrays, pushNotify, pullNotify];
 }

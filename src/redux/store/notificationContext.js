@@ -14,7 +14,6 @@ export default function NotificationContext({ children }) {
     const [notify, setNotify] = useReducer(notifyReducer, initialNotify);
     const { user, socket } = useAuthorizationContext();
     const [notifyAPI, host] = process.env.REACT_APP_ENVIRONMENT === 'development' ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST] : [mainAPI.CLOUD_API_AUTH, mainAPI.CLOUD_HOST];
-    // const cancelTokenSource = axios.CancelToken.source();
 
     useEffect(() => {
         if (socket) {
@@ -43,10 +42,6 @@ export default function NotificationContext({ children }) {
             }
         })
             .then(res => {
-                pushToast({
-                    message: 'Successful',
-                    type: toastTypes.SUCCESS
-                })
                 setNotify({
                     type: actions.GET_NOTIFICATIONS,
                     payload: res.data.response

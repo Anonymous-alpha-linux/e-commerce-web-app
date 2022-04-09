@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { ContainerComponent } from '../components'
 import { Toast } from '../containers'
@@ -12,24 +12,30 @@ export default function Layout() {
     }
 
     return <>
-        <ContainerComponent.Section style={{
-            position: 'fixed',
-            bottom: '0',
-            right: '10px',
-            zIndex: 100,
-            padding: '10px',
-            maxHeight: '200px'
-        }}>
-            <ContainerComponent.Flex style={{
-                position: 'absolute',
-                flexDirection: 'column',
-                gap: '10px',
-            }}>
-                {toastList.map((toast, index) => {
-                    return <Toast key={index + 1} message={toast.message} type={toast.type} timeout={toast.timeout || 3000} pullItem={pullToast} />
-                })}
-            </ContainerComponent.Flex>
-        </ContainerComponent.Section>
+        <MessageList toastList={toastList} pullToast={pullToast}></MessageList>
         <Outlet></Outlet>
     </>
 }
+
+const MessageList = React.memo(({ toastList, pullToast }) => {
+
+    return <ContainerComponent.Section style={{
+        position: 'fixed',
+        top: '50px',
+        right: '10px',
+        zIndex: 1000,
+        // padding: '10px',
+        maxHeight: '200px'
+    }}>
+        <ContainerComponent.Flex style={{
+            position: 'absolute',
+            right: 0,
+            flexDirection: 'column',
+            gap: '10px',
+        }}>
+            {toastList.map((toast, index) => {
+                return <Toast message={toast.message} key={index + 1} type={toast.type} timeout={toast.timeout || 3000} pullItem={() => pullToast(index)} />
+            })}
+        </ContainerComponent.Flex>
+    </ContainerComponent.Section>
+})

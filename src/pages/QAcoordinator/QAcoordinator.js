@@ -6,8 +6,8 @@ import { AdminContext } from '../../redux';
 export default function QACoordinator() {
     return <AdminContext>
         <Nav></Nav>
-        <ContainerComponent className="qa-coordinator__root">
+        <ContainerComponent className="qa-coordinator__root" style={{ minHeight: '100vh', background: 'rgb(169, 195, 158)' }}>
             <Outlet></Outlet>
-        </ContainerComponent>;
+        </ContainerComponent>
     </AdminContext>
 }
