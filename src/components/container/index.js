@@ -15,8 +15,8 @@ ContainerComponent.Absolute = function ({ children, ...restProps }) {
         {children}
     </div>
 }
-ContainerComponent.Flex = function ({ children, ...restProps }) {
-    return <div  {...restProps} className={`container__flex ${restProps.className}`}>
+ContainerComponent.Flex = function ({ children, forwardRef, ...restProps }) {
+    return <div  {...restProps} ref={forwardRef} className={`container__flex ${restProps.className}`}>
         {children}
     </div>
 }

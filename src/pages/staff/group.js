@@ -8,7 +8,7 @@ import { AiFillCaretDown, AiOutlineArrowLeft } from 'react-icons/ai'
 import { AnimateComponent, ButtonComponent, ContainerComponent, Icon, Text } from '../../components';
 import { DropDownButton, TriggerLoading } from '../../containers';
 import { useAuthorizationContext, useWorkspaceContext } from '../../redux';
-import { useMedia } from '../../hooks';
+import { OutsideAlert, useMedia } from '../../hooks';
 
 export default function Group() {
     const { user } = useAuthorizationContext();
@@ -17,7 +17,7 @@ export default function Group() {
 
     return (
         <ContainerComponent style={{ maxWidth: '680px', padding: '10px' }}>
-            <Text.Line className="back__btn" style={{ marginBottom: '20px' }}>
+            <Text.Line className="back__btn" style={{ marginBottom: '20px', cursor: 'pointer' }}>
                 <Text.MiddleLine className="back__icon">
                     <Icon>
                         <AiOutlineArrowLeft></AiOutlineArrowLeft>
@@ -37,22 +37,22 @@ export default function Group() {
                             color: `${disabled ? "#000" : "#fff"}`,
                         });
                         return (
-                            <AnimateComponent.FadeInRight key={index + 1}>
-                                <ContainerComponent.Item
-                                    className="workspaceList__item"
-                                    style={{
-                                        width: "100%",
-                                        padding: "10px",
-                                        minWidth: "280px",
-                                        ...disabledStyled(),
-                                    }}
-                                >
-                                    <WorkspaceItem
-                                        item={item}
-                                    // toggleMemberModal={toggleMemberModal}
-                                    ></WorkspaceItem>
-                                </ContainerComponent.Item>
-                            </AnimateComponent.FadeInRight>
+                            <ContainerComponent.Item
+                                key={index + 1}
+                                className="workspaceList__item"
+                                style={{
+                                    width: "100%",
+                                    padding: "10px",
+                                    minWidth: "280px",
+                                    ...disabledStyled(),
+                                }}
+                            >
+                                <WorkspaceItem
+                                    item={item}
+                                // toggleMemberModal={toggleMemberModal}
+                                ></WorkspaceItem>
+                            </ContainerComponent.Item>
+
                         );
                     })}
             </TriggerLoading>
@@ -65,6 +65,7 @@ function WorkspaceItem({ item, toggleMemberModal }) {
     const location = useLocation();
 
     const [loading, setLoading] = useState(false);
+    const [openButtonGroup, setButtonGroup] = useState(false);
     const device = useMedia(680, 1050);
 
     const disabled = user.workspace === item._id;
@@ -83,49 +84,66 @@ function WorkspaceItem({ item, toggleMemberModal }) {
         </Icon.Spinner>
     </Text.CenterLine>
 
-    return <ContainerComponent.Flex onClick={(e) => {
-        e.stopPropagation();
-        if (!disabled) {
-            selectHandler(item._id);
-        }
-    }
-    } style={{ alignItems: "center", justifyContent: "space-between", textAlign: 'center' }}>
-        <Text.MiddleLine>
-            <Icon style={{ fontSize: "25px" }}>
-                <GrStackOverflow></GrStackOverflow>
-            </Icon>
-        </Text.MiddleLine>
-
-        <Text.MiddleLine>
-            <ContainerComponent.Pane>
-                <Text.Title style={{ textAlign: "center", textTransform: 'capitalize' }}>
-                    {item.workTitle}
-                </Text.Title>
-                <TimespanChild expireTime={item.expireTime}></TimespanChild>
-            </ContainerComponent.Pane>
-        </Text.MiddleLine>
-
-        <Text.MiddleLine>
-            {user.accountId === item.manager && <DropDownButton position={"right"} component={<ContainerComponent.Pane>
-                <Icon>
-                    <AiFillCaretDown></AiFillCaretDown>
-                </Icon>
-            </ContainerComponent.Pane>}>
-                <ButtonComponent>
-                    <Link to="/management/workspace_member">
-                        Add member
-                    </Link>
-                </ButtonComponent>
-                <ButtonComponent>
-                    Edit time
-                </ButtonComponent>
-                <ButtonComponent>
-                    Workspace detail
-                </ButtonComponent>
-            </DropDownButton>
+    return <ContainerComponent.Pane>
+        <ContainerComponent.Flex onClick={(e) => {
+            e.stopPropagation();
+            if (!disabled) {
+                selectHandler(item._id);
             }
-        </Text.MiddleLine>
-    </ContainerComponent.Flex>
+        }
+        } style={{ alignItems: "center", justifyContent: "space-between", textAlign: 'center' }}>
+            <Text.MiddleLine className="workspace-item__icon">
+                <Icon style={{ fontSize: "25px" }}>
+                    <GrStackOverflow></GrStackOverflow>
+                </Icon>
+            </Text.MiddleLine>
+
+            <Text.MiddleLine className="workspace-item__timespan">
+                <ContainerComponent.Pane>
+                    <Text.Title style={{ textAlign: "center", textTransform: 'capitalize' }}>
+                        {item.workTitle}
+                    </Text.Title>
+                    <TimespanChild expireTime={item.expireTime}></TimespanChild>
+                </ContainerComponent.Pane>
+            </Text.MiddleLine>
+
+            <Text.MiddleLine className="workspace-item__dropdownIcon" style={{ cursor: 'pointer' }}>
+                {user.accountId === item.manager &&
+                    <>
+                        <Icon onClick={() => setButtonGroup(o => !o)}>
+                            <AiFillCaretDown></AiFillCaretDown>
+                        </Icon>
+                    </>
+                }
+            </Text.MiddleLine>
+        </ContainerComponent.Flex>
+        {openButtonGroup && <OutsideAlert toggleShowing={() => setButtonGroup(false)}>
+            <ContainerComponent.Pane style={{ marginTop: '20px' }}>
+                <Text.Line style={{ lineHeight: '2' }}>
+                    <Link to={`/management/workspace_member/${item._id}`} style={{ color: 'inherit' }}>
+                        <Text.CenterLine>
+                            Add member
+                        </Text.CenterLine>
+                    </Link>
+                </Text.Line>
+                <Text.Line style={{ lineHeight: '2' }}>
+                    <Link to="">
+                        <Text.CenterLine>
+                            Edit time
+                        </Text.CenterLine>
+                    </Link>
+                </Text.Line>
+                <Text.Line style={{ lineHeight: '2' }}>
+                    <Link to="/workspace_detail" style={{ color: 'inherit' }}>
+                        <Text.CenterLine>
+                            Workspace detail
+                        </Text.CenterLine>
+                    </Link>
+                </Text.Line>
+            </ContainerComponent.Pane>
+        </OutsideAlert>
+        }
+    </ContainerComponent.Pane>
 }
 function TimespanChild({ startTime = Date.now(), expireTime }) {
     const startDate = new Date(startTime).getTime();

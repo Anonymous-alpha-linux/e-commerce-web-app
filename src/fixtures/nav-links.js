@@ -1,13 +1,17 @@
-import { IoHomeSharp } from 'react-icons/io5';
+import { roles } from '../fixtures';
+
+const entryRoles = Object.values(roles);
 
 const navLinks = [
     {
         name: 'Profile',
-        path: '/profile/personal'
+        path: '/profile/personal',
+        authorized: entryRoles
     },
     {
         name: 'My Posts',
-        path: '/history'
+        path: '/history',
+        authorized: entryRoles
     }
 ];
 

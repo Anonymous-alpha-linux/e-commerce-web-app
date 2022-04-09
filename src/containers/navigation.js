@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { AiFillCaretDown } from "react-icons/ai";
@@ -19,6 +19,8 @@ import { navigator as navigators, navData, media } from '../fixtures';
 
 export default function Navigation() {
   const { user } = useAuthorizationContext();
+  const { workspace } = useWorkspaceContext();
+
   const [screenColumn, setScreenColumn] = useState(2);
   const [openNavigator, setOpenNavigator] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
@@ -115,7 +117,7 @@ export default function Navigation() {
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
 
-        {screenColumn > 2 && (
+        {device === media.PC && (
           <ContainerComponent.Item style={{ color: "#fff" }}>
             <ContainerComponent.MiddleInner
               style={{ flexDirection: "row", height: "100%", gap: "2.5rem" }}
@@ -132,24 +134,28 @@ export default function Navigation() {
               {
                 navData.map((link, index) => {
                   return <ContainerComponent.Item key={index + 1}>
-                    {link.path && <Link to={link.path}
-                      style={{ color: '#fff' }}>
-                      <Text className="navigation__text">
-                        {link.name}
-                      </Text>
-                    </Link> || <>
-                        {/* <Text.MiddleLine style={{ marginRight: '5px' }}>
-                          <Icon>{link.icon}</Icon>
-                        </Text.MiddleLine> */}
+                    {link.authorized.includes(user.role) && (
+                      (link.path && <Link to={link.path}
+                        style={{ color: '#fff' }}>
                         <Text className="navigation__text">
                           {link.name}
                         </Text>
-                      </>
+                      </Link>) ||
+                      <Text className="navigation__text">
+                        {link.name}
+                      </Text>) || <></>
                     }
-                    {link.subDocs && <DropDownButton component={<></>}></DropDownButton>}
                   </ContainerComponent.Item>
                 })
               }
+
+              {workspace.manager === user.accountId && <ContainerComponent.Item>
+                <Link to="/workspace_detail">
+                  <Text className="navigation__text">
+                    My dashboard
+                  </Text>
+                </Link>
+              </ContainerComponent.Item>}
             </ContainerComponent.MiddleInner>
 
             <Modal isShowing={openMemberModal} toggle={toggleMemberModal}>
@@ -160,7 +166,6 @@ export default function Navigation() {
         }
         <ContainerComponent.Item>
           <AuthStatus
-            screenColumn={screenColumn}
             openNavigator={() => setOpenNavigator(true)}
           ></AuthStatus>
         </ContainerComponent.Item>
@@ -282,10 +287,10 @@ const Navigator = ({ closeNavigator }) => {
   );
 };
 const AuthStatus = React.memo(function AuthStatus({
-  screenColumn,
   openNavigator,
 }) {
   const { user, logout } = useAuthorizationContext();
+  const device = useMedia(480, 1050);
 
   if (!user.isLoggedIn) {
     return (
@@ -321,7 +326,7 @@ const AuthStatus = React.memo(function AuthStatus({
       </ContainerComponent.Item>
       <ContainerComponent.Item>
         {
-          screenColumn < 3 &&
+          device !== media.PC &&
           <Icon.CircleIcon onClick={openNavigator}>
             <BsList style={{ fontWeight: "600", fontSize: "20px" }}></BsList>
           </Icon.CircleIcon>
@@ -345,15 +350,20 @@ const WorkspaceList = ({ toggleMemberModal }) => {
   const { user } = useAuthorizationContext();
   const { workspaces, loadMore, loadMoreWorkspaceList } = useWorkspaceContext();
   return (
-    <ContainerComponent.Section className="workspaceList__container" style={{ background: '#fff', color: '#000', padding: '0 10px' }}>
+    <ContainerComponent.Section className="workspaceList__container" style={{ background: '#fff', color: '#000', padding: '2px 5px' }}>
       <TriggerLoading loader={loadMoreWorkspaceList} loadMore={loadMore}>
         {!!workspaces.length &&
           workspaces.map((item, index) => {
             const disabled = user.workspace === item._id;
-            const disabledStyled = () => ({
-              background: `${disabled ? "#fff" : "rgb(22, 61, 60)"}`,
-              color: `${disabled ? "#000" : "#fff"}`,
-            });
+            const disabledStyled = disabled ? {
+              background: "#fff",
+              color: "#000",
+              cursor: 'unset'
+            } : {
+              background: "rgb(22, 61, 60)",
+              color: "#fff",
+              cursor: 'pointer'
+            };
             return (
               <ContainerComponent.Item
                 className="workspaceList__item"
@@ -362,7 +372,7 @@ const WorkspaceList = ({ toggleMemberModal }) => {
                   width: "100%",
                   padding: "10px",
                   minWidth: "280px",
-                  ...disabledStyled(),
+                  ...disabledStyled,
                 }}
               >
                 <WorkspaceItem
@@ -379,10 +389,20 @@ const WorkspaceList = ({ toggleMemberModal }) => {
 };
 function WorkspaceItem({ item, toggleMemberModal }) {
   const { user, editCurrentWorkspace } = useAuthorizationContext();
+
   const [loading, setLoading] = useState(false);
+  const [openButtonGroup, setButtonGroup] = useState(false);
+  const ref = useRef(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const disabled = user.workspace === item._id;
+
+  useEffect(() => {
+    if (openButtonGroup && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [ref.current, openButtonGroup]);
 
   function selectHandler(workspaceId) {
     setLoading(true);
@@ -396,42 +416,61 @@ function WorkspaceItem({ item, toggleMemberModal }) {
       <ImSpinner></ImSpinner>
     </Icon.Spinner>
   </Text.CenterLine>
-  return <ContainerComponent.Flex onClick={(e) => {
-    e.stopPropagation();
-    if (!disabled) {
-      selectHandler(item._id);
+  return <OutsideAlert toggleShowing={() => setButtonGroup(false)}>
+    <ContainerComponent.Flex onClick={(e) => {
+      e.stopPropagation();
+      if (!disabled) {
+        selectHandler(item._id);
+      }
     }
-  }
-  } style={{ alignItems: "center", justifyContent: "space-between", textAlign: 'center' }}>
-    <Text.MiddleLine>
-      <Icon style={{ fontSize: "25px" }}>
-        <GrStackOverflow></GrStackOverflow>
-      </Icon>
-    </Text.MiddleLine>
+    } style={{ alignItems: "center", justifyContent: "space-between", textAlign: 'center' }}>
+      <Text.MiddleLine className="workspace-item__icon">
+        <Icon style={{ fontSize: "25px" }}>
+          <GrStackOverflow></GrStackOverflow>
+        </Icon>
+      </Text.MiddleLine>
 
-    <Text.MiddleLine>
-      <ContainerComponent.Pane>
-        <Text.Title style={{ textAlign: "center", textTransform: 'capitalize' }}>
-          {item.workTitle}
-        </Text.Title>
-        <TimespanChild expireTime={item.expireTime}></TimespanChild>
-      </ContainerComponent.Pane>
-    </Text.MiddleLine>
+      <Text.MiddleLine className="workspace-item__timespan">
+        <ContainerComponent.Pane>
+          <Text.Title style={{ textAlign: "center", textTransform: 'capitalize' }}>
+            {item.workTitle}
+          </Text.Title>
+          <TimespanChild expireTime={item.expireTime}></TimespanChild>
+        </ContainerComponent.Pane>
+      </Text.MiddleLine>
 
-    <Text.MiddleLine>
-      {user.accountId === item.manager &&
-        <AnimateComponent.Dropdown position="right" triggerComponent={<ContainerComponent.Pane>
-        </ContainerComponent.Pane>}>
-          <ButtonComponent style={{ textOverflow: 'clip', whiteSpace: 'nowrap', background: '' }}
+      <Text.MiddleLine className="workspace-item__dropdownIcon">
+        {user.accountId === item.manager &&
+          <>
+            <ContainerComponent.Pane>
+              <Icon onClick={() => setButtonGroup(o => !o)}>
+                <AiFillCaretDown></AiFillCaretDown>
+              </Icon>
+            </ContainerComponent.Pane>
+          </>
+        }
+      </Text.MiddleLine>
+    </ContainerComponent.Flex>
+    {openButtonGroup &&
+      <ContainerComponent.Flex forwardRef={ref} style={{ flexDirection: 'column', scrollsSnapAlign: 'start' }}>
+        <ContainerComponent.Item style={{ cursor: 'pointer' }}>
+          <ButtonComponent style={{ textOverflow: 'clip', whiteSpace: 'nowrap' }}
             onClick={() => {
               toggleMemberModal();
             }}>
             Add member
           </ButtonComponent>
-        </AnimateComponent.Dropdown>
-      }
-    </Text.MiddleLine>
-  </ContainerComponent.Flex>
+        </ContainerComponent.Item>
+        <ContainerComponent.Item style={{ cursor: 'pointer' }}>
+          <ButtonComponent style={{ textOverflow: 'clip', whiteSpace: 'nowrap', background: '' }}
+            onClick={() => {
+              navigate('/workspace_detail');
+            }}>
+            Workspace report
+          </ButtonComponent>
+        </ContainerComponent.Item>
+      </ContainerComponent.Flex>}
+  </OutsideAlert>
 }
 function TimespanChild({ startTime = Date.now(), expireTime }) {
   const startDate = new Date(startTime).getTime();
@@ -449,9 +488,11 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
     minutes,
     seconds,
   });
+  const [loading, setLoading] = useState(false);
   const [blockWorkspace, setBlockWorkspace] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const interval = setInterval(() => {
       const now = new Date().getTime();
       var timeleft = expireDate - now;
@@ -478,6 +519,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
           seconds: 0,
         });
       }
+      setLoading(false);
     }, 1000);
 
     return () => {
@@ -496,58 +538,64 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       <ContainerComponent.Inner
         style={{ margin: "0 auto", textAlign: "center" }}
       >
-        {(!blockWorkspace && (
-          <ContainerComponent.Flex
-            style={{
-              // alignItems: 'center',
-              justifyContent: "center",
-            }}
-          >
-            <ContainerComponent.Item
-              style={{ fontSize: "13px", padding: "5px 0" }}
+        {(loading && <Text.MiddleLine>
+          <Icon.Spinner>
+            <ImSpinner></ImSpinner>
+          </Icon.Spinner>
+        </Text.MiddleLine>)
+          ||
+          (!blockWorkspace && (
+            <ContainerComponent.Flex
+              style={{
+                // alignItems: 'center',
+                justifyContent: "center",
+              }}
             >
-              <ButtonComponent style={{ padding: "5px 15px" }}>
-                {`${counterTimer.days}`}
-              </ButtonComponent>
-            </ContainerComponent.Item>
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent style={{ padding: "5px 15px" }}>
+                  {`${counterTimer.days}`}
+                </ButtonComponent>
+              </ContainerComponent.Item>
 
-            <ContainerComponent.Item>
-              <Text>:</Text>
-            </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                <Text>:</Text>
+              </ContainerComponent.Item>
 
-            <ContainerComponent.Item
-              style={{ fontSize: "13px", padding: "5px 0" }}
-            >
-              <ButtonComponent
-                style={{ padding: "5px 10px" }}
-              >{`${convertTo2Digit(counterTimer.hours)}`}</ButtonComponent>
-            </ContainerComponent.Item>
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent
+                  style={{ padding: "5px 10px" }}
+                >{`${convertTo2Digit(counterTimer.hours)}`}</ButtonComponent>
+              </ContainerComponent.Item>
 
-            <ContainerComponent.Item>
-              <Text>:</Text>
-            </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                <Text>:</Text>
+              </ContainerComponent.Item>
 
-            <ContainerComponent.Item
-              style={{ fontSize: "13px", padding: "5px 0" }}
-            >
-              <ButtonComponent
-                style={{ padding: "5px 10px" }}
-              >{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
-            </ContainerComponent.Item>
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent
+                  style={{ padding: "5px 10px" }}
+                >{`${convertTo2Digit(counterTimer.minutes)}`}</ButtonComponent>
+              </ContainerComponent.Item>
 
-            <ContainerComponent.Item>
-              <Text>:</Text>
-            </ContainerComponent.Item>
+              <ContainerComponent.Item>
+                <Text>:</Text>
+              </ContainerComponent.Item>
 
-            <ContainerComponent.Item
-              style={{ fontSize: "13px", padding: "5px 0" }}
-            >
-              <ButtonComponent
-                style={{ padding: "5px 10px" }}
-              >{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
-            </ContainerComponent.Item>
-          </ContainerComponent.Flex>
-        ))
+              <ContainerComponent.Item
+                style={{ fontSize: "13px", padding: "5px 0" }}
+              >
+                <ButtonComponent
+                  style={{ padding: "5px 10px" }}
+                >{`${convertTo2Digit(counterTimer.seconds)}`}</ButtonComponent>
+              </ContainerComponent.Item>
+            </ContainerComponent.Flex>
+          ))
           ||
           <ContainerComponent.Pane style={{ color: "red", fontWeight: 500, fontSize: "0.8em" }}
           >Closed</ContainerComponent.Pane>}
@@ -579,13 +627,14 @@ function Notification() {
           </Link>
         </Icon.CircleIcon>
       )) || (
-          <DropDownButton
+          <AnimateComponent.Dropdown
             position="right"
-            component={
+            triggerComponent={
               <Icon.CircleIcon onClick={turnOffBadge}>
                 <IoNotificationsOutline></IoNotificationsOutline>
               </Icon.CircleIcon>
             }
+            hideArrow={true}
             style={{
               minWidth: "420px",
               maxHeight: "567px",
@@ -594,7 +643,7 @@ function Notification() {
             }}
           >
             <NotificationContainer></NotificationContainer>
-          </DropDownButton>
+          </AnimateComponent.Dropdown>
         )}
       {isNew && <Icon.Badge></Icon.Badge>}
     </>

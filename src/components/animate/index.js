@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import { useSpring, animated, useTransition } from "react-spring";
 import { BsCaretDownFill } from 'react-icons/bs';
@@ -74,7 +74,7 @@ AnimateComponent.FadeInRight = function AnimatedFadeInRight({ children, initialP
     {item}
   </animated.div> || <></>)
 }
-AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, triggerComponent, position = "middle", style, ...props }) {
+AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, triggerComponent, position = "middle", style, hideArrow = false, ...props }) {
   const [isToggled, setToggle] = useState(false);
   let menuPosition = position === 'middle' && {
     ...props.style,
@@ -114,11 +114,11 @@ AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, trigger
       className="radiowrapper"
     >
       <OutsideAlert toggleShowing={() => setToggle(false)}>
-        <Text.Line onClick={() => setToggle(o => !o)}>
+        <Text.Line onClick={() => setToggle(o => !o)} style={{ cursor: 'pointer' }}>
           <Text.MiddleLine>
             {triggerComponent}
           </Text.MiddleLine>
-          <animated.span
+          {!hideArrow && <animated.span
             style={{
               transform: y.interpolate((y) => `rotateX(${y}deg)`),
               display: 'inline-block',
@@ -127,7 +127,7 @@ AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, trigger
             <Icon>
               <BsCaretDownFill></BsCaretDownFill>
             </Icon>
-          </animated.span>
+          </animated.span>}
         </Text.Line>
 
         <animated.div style={menuAppear}>
@@ -138,7 +138,6 @@ AnimateComponent.Dropdown = function AnimatedDropdown({ children, state, trigger
         </animated.div>
       </OutsideAlert>
     </animated.div>
-
   );
 }
 AnimateComponent.DropdownHover = function AnimatedDropdownHover({ children, state, triggerComponent, position = "middle", style, ...props }) {
@@ -227,6 +226,15 @@ AnimateComponent.DropdownClick = function AnimatedDropdownClick({
       )
   );
 };
+AnimateComponent.Height = function AnimatedDropdownTrigger({ state, children }) {
+  const ref = useRef(null);
+  const heightStyle = useSpring({
+    height: (state ? ref.current.offsetHeight : 0) + 'px',
+  });
+  return <animated.div ref={ref}>
+    {children}
+  </animated.div>
+}
 AnimateComponent.Rotate = function AnimatedRotate({
   children,
   state,

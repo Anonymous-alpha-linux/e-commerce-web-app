@@ -1,17 +1,22 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
-import { ContainerComponent, Form, Text } from '../components'
+import { ImSpinner } from 'react-icons/im';
+import { ContainerComponent, Form, Icon, Text } from '../components'
 import { usePostContext } from '../redux';
 
-export default function Searchbar({ }) {
+export default function Searchbar() {
     const { searchPost } = usePostContext();
+
     const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
 
     function submitSearchQuery(e) {
         e.preventDefault();
+        setLoading(true);
         searchPost(input, data => {
             setSearchResults(data.response);
+            setLoading(false);
         });
     }
 
@@ -24,8 +29,10 @@ export default function Searchbar({ }) {
                 </Form>
 
                 <ContainerComponent.Pane className="search__results">
+                    <Text.CenterLine>
+                        There are {searchResults.length} results {loading && <Icon.Spinner><ImSpinner></ImSpinner></Icon.Spinner>}
+                    </Text.CenterLine>
                     {searchResults.map(result => {
-                        console.log(result);
                         return <ContainerComponent.Pane>
                             <Link to={`/post_detail/${result._id}`}>{result.content.length > 100 ? `${result.content.substring(1, 100)}...` : result.content}</Link>
                         </ContainerComponent.Pane>

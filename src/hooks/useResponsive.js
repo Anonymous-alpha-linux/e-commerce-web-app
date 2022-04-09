@@ -16,7 +16,7 @@ export default function useMedia(min = 768, max = 1023) {
         );
         const handleSetDevice = () => {
             setDevice(() => {
-                if (matchMediaRef.current.matches) return `tablet`;
+                if (matchMediaRef.current.matches) return media.TABLET;
                 else if (!matchMediaRef.current.matches && window.innerWidth <= min - 1)
                     return media.MOBILE;
                 else if (!matchMediaRef.current.matches && window.innerWidth >= max + 1)

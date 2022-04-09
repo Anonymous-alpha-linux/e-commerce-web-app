@@ -23,7 +23,9 @@ import {
   ListMember,
   UserAll,
   AdminDashBoard,
-  EmailConfirmation
+  EmailConfirmation,
+  QACoordinatorWorkspaceOverview,
+  QACoordinatorDashboard
 } from "./pages";
 
 import {
@@ -201,6 +203,7 @@ function App() {
                     />
                   </Route>
                   <Route path="workspace" element={<WorkspaceGroup></WorkspaceGroup>} />
+                  <Route path='workspace_detail' element={<QACoordinatorDashboard></QACoordinatorDashboard>} />
                   <Route path="/management/workspace">
                     <Route path=":id" element={<UserAll></UserAll>} />
                   </Route>
@@ -210,9 +213,7 @@ function App() {
                   <Route path="/management/workspace_member">
                     <Route path=":id" element={<ListMember></ListMember>} />
                   </Route>
-                  {/* <Route path="/management/member"
-                    element={<ListMember></ListMember>}
-                  /> */}
+                  <Route path="post_detail/:postId" element={<SinglePost></SinglePost>} />
                 </Route>
               )) ||
               // 4. Staff

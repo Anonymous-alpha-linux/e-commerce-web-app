@@ -219,20 +219,17 @@ export default React.memo(function WorkspaceContext({ children }) {
         workspaceid: workspaceId,
       }
     }).then(res => {
-      if (res.status > 199 && res.status <= 299) {
-        setWorkspace({
-          type: actions.ASSIGN_MEMBER_TO_WORKSPACE,
-          payload: res.data.response,
-          workspaceId,
-          accountId
-        });
-        pushToast({
-          message: 'Assign member successfully',
-          type: toastTypes.SUCCESS
-        });
-        cb();
-      }
-      else throw new Error(res.data.error);
+      setWorkspace({
+        type: actions.ASSIGN_MEMBER_TO_WORKSPACE,
+        payload: res.data.response,
+        workspaceId,
+        accountId
+      });
+      pushToast({
+        message: 'Assign member successfully',
+        type: toastTypes.SUCCESS
+      });
+      cb();
     }).catch(err => {
       pushToast({
         message: err.message,
@@ -242,6 +239,14 @@ export default React.memo(function WorkspaceContext({ children }) {
     });
   }
   function unassignMemberToWorkspace(workspaceId, accountId, cb) {
+    if (accountId === user.accountId) {
+      pushToast({
+        message: "Cannot remove yourself ",
+        type: toastTypes.ERROR
+      });
+      cb();
+      return;
+    }
     return axios.put(workspaceAPI, {
       accountid: accountId
     }, {
@@ -317,6 +322,7 @@ export default React.memo(function WorkspaceContext({ children }) {
     workspace: workspaceState.workspace,
     workspaces: workspaceState.workspaces,
     loading: workspaceState.workspaceLoading,
+    onLoadWorkspace,
     createWorkspace,
     getWorkspaceMembers,
     assignCoordinatorToWorkspace,

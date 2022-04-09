@@ -126,7 +126,7 @@ export default React.memo(function PostContext({ children }) {
         });
       });
   }
-  function filterPost(filter) {
+  function filterPost(filter, cb) {
     // setPost({
     //   type: actions.SET_LOADING,
     // });
@@ -143,11 +143,13 @@ export default React.memo(function PostContext({ children }) {
         },
       })
       .then((res) => {
-        return setPost({
+        setPost({
           type: actions.FILTER_POST_LIST,
           payload: res.data.response,
           filter: filter,
         });
+        if (typeof cb === 'function')
+          cb(res.data.response);
       })
       .catch((error) => {
         setPost({
@@ -157,6 +159,8 @@ export default React.memo(function PostContext({ children }) {
           message: "Filter Failed",
           type: toastTypes.ERROR
         });
+        if (typeof cb === 'function')
+          cb({ error: error });
       });
   }
   function loadNextPosts(cb) {

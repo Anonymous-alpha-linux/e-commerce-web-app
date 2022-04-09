@@ -6,7 +6,7 @@ import { FaSearch, FaFilter } from "react-icons/fa";
 import { ImSpinner6 } from 'react-icons/im';
 import { TiUserDelete } from "react-icons/ti";
 
-import { useAdminContext, useWorkspaceContext } from "../../redux";
+import { useAdminContext, useAuthorizationContext, useWorkspaceContext } from "../../redux";
 import { ContainerComponent, Form, Icon, Message, Text, } from "../../components";
 import { toastTypes, roles } from "../../fixtures";
 
@@ -66,20 +66,6 @@ export default function MemberList({ workspaceId }) {
                 }}
                 >
                     <Text.Title style={{ margin: '10px', fontSize: '1rem' }}>List of Member - <Text style={{ fontSize: '1rem', textTransform: 'uppercase' }}>{workspaces.find(w => { return w._id === workspaceid })?.workTitle}</Text></Text.Title>
-                    {/* <Link to="/addMemebr">
-                        <Text.Line style={{ display: "block", backgroundColor: "silver", padding: "5px", borderRadius: "10px", position: 'absolute', right: '0%', transform: 'translate(-10%,-50%)' }}>
-                            <Text.MiddleLine>
-                                <Icon>
-                                    <FaFilter></FaFilter>
-                                </Icon>
-                            </Text.MiddleLine>
-                            <Text.MiddleLine>
-                                <Text.Subtitle style={{ margin: 0 }}>
-                                    Add Member
-                                </Text.Subtitle>
-                            </Text.MiddleLine>
-                        </Text.Line>
-                    </Link> */}
                 </ContainerComponent.Item>
 
                 <ContainerComponent.Item>
@@ -146,9 +132,12 @@ function MemberListData({ dataList, memberList, workspaceId, addMember, removeMe
         </ContainerComponent.Item>
 }
 function MemberItem({ data, workspaceId, memberList, addMember, removeMember }) {
-    return memberList.map(member => member._id).includes(data._id) && <JoinedMember data={data} workspaceId={workspaceId} removeMember={removeMember}></JoinedMember> || <UnjoinedMember data={data} workspaceId={workspaceId} addMember={addMember}></UnjoinedMember>
+    return memberList.map(member => member._id).includes(data._id) &&
+        <JoinedMember data={data} workspaceId={workspaceId} removeMember={removeMember}></JoinedMember> ||
+        <UnjoinedMember data={data} workspaceId={workspaceId} addMember={addMember}></UnjoinedMember>
 }
 function JoinedMember({ data, workspaceId, removeMember }) {
+    const { user } = useAuthorizationContext();
     const { unassignMemberToWorkspace } = useWorkspaceContext();
     const [loading, setLoading] = useState(false);
 
@@ -156,10 +145,12 @@ function JoinedMember({ data, workspaceId, removeMember }) {
         setLoading(true);
         unassignMemberToWorkspace(workspaceId, accountId, () => {
             setLoading(false);
-            removeMember(accountId);
+            if (accountId !== user.accountId) {
+                removeMember(accountId);
+            }
         });
     }
-    return <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
+    return <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1", cursor: "pointer" }}>
         <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
             <ContainerComponent.Item
                 style={{
@@ -196,7 +187,7 @@ function UnjoinedMember({ data, workspaceId, addMember }) {
         });
     }
 
-    return <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1" }}>
+    return <ContainerComponent.Inner style={{ height: "50px", display: "flex", justifyContent: "space-between", flexGrow: "1", cursor: "pointer" }}>
         <ContainerComponent.Pane style={{ display: "flex", alignItems: "center" }}>
             <ContainerComponent.Item
                 style={{
