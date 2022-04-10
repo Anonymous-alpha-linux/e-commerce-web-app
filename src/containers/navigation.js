@@ -471,7 +471,7 @@ function WorkspaceItem({ item, toggleMemberModal }) {
         </ContainerComponent.Item>
       </ContainerComponent.Flex>}
   </OutsideAlert>
-}
+};
 function TimespanChild({ startTime = Date.now(), expireTime }) {
   const startDate = new Date(startTime).getTime();
   const expireDate = new Date(expireTime).getTime();
@@ -533,6 +533,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       useGrouping: false,
     });
   }
+
   return (
     <ContainerComponent.Section className="timespan__container">
       <ContainerComponent.Inner
@@ -602,7 +603,7 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
       </ContainerComponent.Inner>
     </ContainerComponent.Section>
   );
-}
+};
 function Notification() {
   const { notify } = useNotifyContext();
   const device = useMedia(480, 1080);
@@ -648,4 +649,4 @@ function Notification() {
       {isNew && <Icon.Badge></Icon.Badge>}
     </>
   );
-}
+};

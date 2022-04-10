@@ -260,7 +260,7 @@ const EditToggle = ({ item, clickLoader }) => {
         <AnimateComponent.DropdownClick>
           {openDropdown && (
             <ContainerComponent.Flex style={{ flexDirection: "column" }}>
-              <ContainerComponent.Item>
+              <ContainerComponent.Item style={{ cursor: 'pointer' }}>
                 {(device === media.MOBILE && (
                   <ButtonComponent>
                     <Link
@@ -281,7 +281,7 @@ const EditToggle = ({ item, clickLoader }) => {
                     </ButtonComponent>
                   )}
               </ContainerComponent.Item>
-              <ContainerComponent.Item>
+              <ContainerComponent.Item style={{ cursor: 'pointer' }}>
                 {(device === media.MOBILE && (
                   <ButtonComponent>
                     <Link
@@ -302,7 +302,7 @@ const EditToggle = ({ item, clickLoader }) => {
                     </ButtonComponent>
                   )}
               </ContainerComponent.Item>
-              <ContainerComponent.Item>
+              <ContainerComponent.Item style={{ cursor: 'pointer' }}>
                 {(device === media.MOBILE && (
                   <ButtonComponent>
                     <Text.Line style={{ textAlign: "center" }}>
@@ -313,23 +313,6 @@ const EditToggle = ({ item, clickLoader }) => {
                     <ButtonComponent onClick={toggleWorkspaceModal}>
                       <Text.Line style={{ textAlign: "center" }}>
                         <Text.NoWrapText>Edit Time/Title</Text.NoWrapText>
-                      </Text.Line>
-                    </ButtonComponent>
-                  )}
-              </ContainerComponent.Item>
-              <ContainerComponent.Item>
-                {(device === media.MOBILE && (
-                  <ButtonComponent>
-                    <Text.Line style={{ textAlign: "center" }}>
-                      <Link to="/workspace_overview">
-                        <Text.NoWrapText>Detail workspace</Text.NoWrapText>
-                      </Link>
-                    </Text.Line>
-                  </ButtonComponent>
-                )) || (
-                    <ButtonComponent onClick={toggleWorkspaceModal}>
-                      <Text.Line style={{ textAlign: "center" }}>
-                        <Text.NoWrapText>Workspace report</Text.NoWrapText>
                       </Text.Line>
                     </ButtonComponent>
                   )}

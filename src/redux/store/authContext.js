@@ -12,7 +12,7 @@ const AuthenticationContextAPI = createContext();
 
 export default function AuthenticationContext({ children }) {
   const [user, setUser] = useReducer(authReducer, initialAuth);
-  // const [loading, setLoading] = useState(false);
+
   const [authAPI, host] =
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_AUTH, mainAPI.LOCALHOST_HOST]

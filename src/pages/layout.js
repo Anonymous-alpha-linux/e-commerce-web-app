@@ -18,7 +18,6 @@ export default function Layout() {
 }
 
 const MessageList = React.memo(({ toastList, pullToast }) => {
-
     return <ContainerComponent.Section style={{
         position: 'fixed',
         top: '50px',
@@ -34,7 +33,7 @@ const MessageList = React.memo(({ toastList, pullToast }) => {
             gap: '10px',
         }}>
             {toastList.map((toast, index) => {
-                return <Toast message={toast.message} key={index + 1} type={toast.type} timeout={toast.timeout || 3000} pullItem={() => pullToast(index)} />
+                return <Toast message={toast.message} key={index + 1} type={toast.type} timeout={toast.timeout || 3000} pullItem={pullToast} />
             })}
         </ContainerComponent.Flex>
     </ContainerComponent.Section>

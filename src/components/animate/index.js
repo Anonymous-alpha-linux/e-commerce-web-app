@@ -59,11 +59,10 @@ AnimateComponent.SlideRight = function AnimatedSlideRight({
     </>
   );
 };
-AnimateComponent.FadeInRight = function AnimatedFadeInRight({ children, initialPosition = { x: 200, y: 200 }, style }) {
+AnimateComponent.FadeInRight = function AnimatedFadeInRight({ children, initialPosition = { x: 200, y: 200 }, style, ...props }) {
   let { x, y } = initialPosition;
   const transition = useTransition(children, {
-    // keys: (item) => item.key,
-    keys: children.key,
+    keys: item => item.key,
     from: { transform: `translate(${x}, ${y})`, opacity: 0 },
     enter: { transform: `translate(0,0)`, opacity: 1 },
     leave: { transform: `translate(${x}, ${y})`, opacity: 0, position: 'absolute' },

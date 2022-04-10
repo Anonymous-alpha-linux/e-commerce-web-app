@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 
+
 import { toastTypes } from "../fixtures";
 import { AnimateComponent } from "../components";
 
@@ -10,6 +11,7 @@ const ToastMessage = React.memo(({
   timeout,
   type = toastTypes.WARNING,
   pullItem,
+  ...props
 }) => {
   const toastRef = useRef();
   const [isExpired, setExpired] = useState(false);
@@ -27,7 +29,7 @@ const ToastMessage = React.memo(({
 
   return !isExpired ? (
     <AnimateComponent.FadeInRight initialPosition={{ x: '1000px', y: 0 }}>
-      <div className={`${styles.ToastMessage} ${styles[type]}`}>
+      <div {...props} className={`${styles.ToastMessage} ${styles[type]}`}>
         <h5
           style={{
             color: `${type === toastTypes.ERROR ? "red" : "green"}`,
@@ -47,7 +49,7 @@ const ToastMessage = React.memo(({
         </div>
       </div>
     </AnimateComponent.FadeInRight>
-  ) : <></>;
+  ) : null;
 });
 
 
