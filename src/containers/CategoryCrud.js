@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import Pagination from "./Pagination";
-import { usePostContext } from "../redux";
+import { usePostContext, useAuthorizationContext } from "../redux";
 import axios from "axios";
 import { mainAPI } from "../config";
 import Loader from "./loader";
 import { ContainerComponent } from "../components";
+import { toastTypes } from "../fixtures";
 
 export default function Crud() {
   const [API, host] =
@@ -141,8 +142,10 @@ function ModalAddFormCategory({ setModal, modal }) {
     process.env.REACT_APP_ENVIRONMENT === "development"
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
-  const { getNewCategory, categoryLoading } = usePostContext();
+  const { getNewCategory } = usePostContext();
+  const { pushToast } = useAuthorizationContext();
   const getNewCategoryRef = useRef(getNewCategory);
+
   useEffect(() => {
     getNewCategoryRef.current = getNewCategory;
   }, [getNewCategory]);
@@ -164,6 +167,10 @@ function ModalAddFormCategory({ setModal, modal }) {
         },
       })
       .then((res) => {
+        pushToast({
+          message: 'New category created successfully!',
+          type: toastTypes.SUCCESS
+        })
         getNewCategory(res.data.response);
         setModal(false);
       })

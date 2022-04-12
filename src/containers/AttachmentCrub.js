@@ -16,7 +16,7 @@ export default function AttachmentCRUD() {
       ? [mainAPI.LOCALHOST_MANAGER, mainAPI.LOCALHOST_HOST]
       : [mainAPI.CLOUD_API_MANAGER, mainAPI.CLOUD_HOST];
 
-  const { attachments, getAttachmentByPage, getAttachmentList, deleteSingleAttachment } = useAdminContext();
+  const { attachments, getAttachmentByPage, deleteSingleAttachment } = useAdminContext();
   const getAttachmentByPageRef = useRef(getAttachmentByPage);
 
   const [searchInput, setSearchInput] = useState("");
@@ -27,18 +27,10 @@ export default function AttachmentCRUD() {
 
   const [currentPage, changeCurrentPage] = usePagination2(0);
 
-
-  // useEffect(() => {
-  //   setDataRecords(attachments.data);
-  // }, [attachments]);
-
-  // useEffect(() => {
-  //   getAttachmentList(data => {
-  //   });
-  // }, []);
   useEffect(() => {
-    getAttachmentByPageRef.current(currentPage, data => {
-      setDataRecords(data.response);
+    getAttachmentByPageRef.current(currentPage, function (data) {
+      if (!data?.error)
+        setDataRecords(data.response);
     });
   }, [currentPage]);
 
@@ -158,7 +150,7 @@ export default function AttachmentCRUD() {
             firstPage={1}
             lastPage={attachments.pages}
             onChangePage={changeCurrentPage}
-            onLoadData={getAttachmentByPageRef.current}
+          // onLoadData={getAttachmentByPageRef.current}
           ></SecondPagination>
           {/* <SecondPagination page={currentPage} pages={attachments.pages} changePage={changeCurrentPage}></SecondPagination> */}
         </ContainerComponent.Inner>

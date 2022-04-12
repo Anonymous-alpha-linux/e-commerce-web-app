@@ -100,10 +100,10 @@ export default function AdminContext({ children }) {
         },
       })
       .then((res) => {
-        pushToast({
-          message: "Get Role List Successful",
-          type: toastTypes.SUCCESS
-        });
+        // pushToast({
+        //   message: "Get Role List Successful",
+        //   type: toastTypes.SUCCESS
+        // });
         setState((o) => ({
           ...o,
           roles: res.data.response,
@@ -112,7 +112,7 @@ export default function AdminContext({ children }) {
           cb(res.data.response);
       })
       .catch((error) => {
-        pushToast({ message: "Get Role List Failed", type: toastTypes.ERROR });
+        // pushToast({ message: "Get Role List Failed", type: toastTypes.ERROR });
         if (cb !== 'undefined')
           cb({ error: "Get role list failed" });
       });
@@ -200,11 +200,12 @@ export default function AdminContext({ children }) {
           cb(res.data);
       })
       .catch((error) => {
-        pushToast({
-          message: error.message,
-          type: toastTypes.ERROR
-        });
-        cb({ error: 'Cannot get data now' });
+        // pushToast({
+        //   message: error.message,
+        //   type: toastTypes.ERROR
+        // });
+        if (cb !== 'undefined')
+          cb({ error: 'Cannot get data now' });
       });
     // }
   }

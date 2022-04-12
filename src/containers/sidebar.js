@@ -16,11 +16,12 @@ import {
   Preview,
   Text,
   AnimateComponent,
+  Form,
 } from "../components";
 import { UserAll, ListMember } from "../pages";
-import { sidebarData, media } from "../fixtures";
+import { sidebarData, media, toastTypes } from "../fixtures";
 import { useAuthorizationContext, useWorkspaceContext } from "../redux";
-import { useModal, useMedia } from "../hooks";
+import { useModal, useMedia, useValidate } from "../hooks";
 
 import { AddFromWorkspace, TriggerLoading, Modal } from ".";
 import { Dropdown } from "../components";
@@ -176,14 +177,13 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
                     loadMore={loadMore}
                     loader={loadMoreWorkspaceList}
                   >
-                    {workspaces &&
-                      workspaces.map((item, index) => (
-                        <EditToggle
-                          item={item}
-                          key={index + 1}
-                          clickLoader={closeSidebar}
-                        ></EditToggle>
-                      ))}
+                    {workspaces && workspaces.map((item, index) => {
+                      return <EditToggle
+                        item={item}
+                        key={index + 1}
+                        clickLoader={closeSidebar}
+                      ></EditToggle>
+                    })}
                   </TriggerLoading>
                 </ContainerComponent.Item>
               </ContainerComponent.Toggle>
@@ -215,12 +215,16 @@ export default function Sidebar({ closeSidebar, forwardRef }) {
     </>
   );
 }
-const EditToggle = ({ item, clickLoader }) => {
+function EditToggle({ item, clickLoader }) {
   const [modal, toggleModal] = useModal();
   const [memberModal, toggleMemberModal] = useModal();
   const [workspaceModal, toggleWorkspaceModal] = useModal();
   const [openDropdown, setDropdown] = useState(false);
   const device = useMedia(480, 1080);
+
+  // const { onLoadWorkspace } = useWorkspaceContext();
+  const { editCurrentWorkspace } = useAuthorizationContext();
+
   return (
     <>
       <ContainerComponent.Item
@@ -244,7 +248,7 @@ const EditToggle = ({ item, clickLoader }) => {
               >
                 {item.workTitle}
               </Text.Title>
-              <TimespanChild expireTime={item.expireTime}></TimespanChild>
+              <TimespanChild expireTime={(new Date(item.expireTime)).toISOString()}></TimespanChild>
             </ContainerComponent.Pane>
           </Text.MiddleLine>
           <AnimateComponent.Rotate state={openDropdown} deg={-180}>
@@ -316,6 +320,15 @@ const EditToggle = ({ item, clickLoader }) => {
                       </Text.Line>
                     </ButtonComponent>
                   )}
+              </ContainerComponent.Item>
+              <ContainerComponent.Item style={{ cursor: 'pointer' }}>
+                <ButtonComponent onClick={() => editCurrentWorkspace(item._id)}>
+                  <Link to="/workspace">
+                    <Text.Line style={{ textAlign: "center" }}>
+                      <Text.NoWrapText>See workspace</Text.NoWrapText>
+                    </Text.Line>
+                  </Link>
+                </ButtonComponent>
               </ContainerComponent.Item>
             </ContainerComponent.Flex>
           )}
@@ -416,7 +429,8 @@ function TimespanChild({ startTime = Date.now(), expireTime }) {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [expireTime]);
+
   function convertTo2Digit(number) {
     return number.toLocaleString("en-US", {
       minimumIntegerDigits: 2,
@@ -509,6 +523,9 @@ function WorkspaceModal({ workspaceId, workTitle, toggleModal }) {
     eventTime: Date.now(),
     expireTime: Date.now(),
   });
+  const { pushToast } = useAuthorizationContext();
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { editWorkspace } = useWorkspaceContext();
@@ -519,17 +536,43 @@ function WorkspaceModal({ workspaceId, workTitle, toggleModal }) {
   async function onSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    editWorkspace(
-      workspaceId,
-      workspaceInfo.workTitle,
-      workspaceInfo.expireTime,
-      workspaceInfo.eventTime,
-      () => {
+
+    validateInput((data) => {
+      if (data?.error) {
         setLoading(false);
-        toggleModal();
       }
-    );
+      else {
+        editWorkspace(
+          workspaceId,
+          workspaceInfo.workTitle,
+          workspaceInfo.expireTime,
+          workspaceInfo.eventTime,
+          () => {
+            setLoading(false);
+            toggleModal();
+          }
+        );
+      }
+    });
   }
+  async function validateInput(cb) {
+    try {
+      await Object.entries(workspaceInfo).forEach((entry) => {
+        const key = entry[0];
+        const value = entry[1];
+        const validate = new useValidate(value);
+
+        if (key === "workTitle") validate.isEmpty();
+        else if (key === "eventTime") validate.isEmpty();
+        else if (key === "expireTime") validate.isEmpty();
+      });
+      cb();
+    } catch (error) {
+      setError(error.message);
+      setMessage("");
+      cb({ error: error.message });
+    }
+  };
   return (
     <div className="c-modal__container">
       {(loading && (
@@ -578,11 +621,14 @@ function WorkspaceModal({ workspaceId, workTitle, toggleModal }) {
                 <button type="submit" className="submit_category">
                   Add
                 </button>
-                <button className="btn-trans-Cancel" onClick={toggleModal}>
+                {/* <button className="btn-trans-Cancel" type="button" onClick={toggleModal}>
                   Close
-                </button>
+                </button> */}
               </div>
             </div>
+            {error && <Form.ErrorMessage style={{ fontWeight: '700', color: 'red', textAlign: 'center' }}>
+              {error}
+            </Form.ErrorMessage>}
           </form>
         )}
     </div>

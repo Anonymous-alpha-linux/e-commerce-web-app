@@ -122,7 +122,7 @@ export default function AccountCrud() {
     </ContainerComponent>
   );
 }
-function AccFormEdit({ modalEdit, setModalEdit, data }) {
+function AccFormEdit({ setModalEdit, data }) {
   const {
     roles: ROLES,
     editUsername,
@@ -631,14 +631,14 @@ function AccountData({ data, index }) {
             data={data}
           />
         </Modal>
-        {(user.accountId !== data._id || user.role !== roles.ADMIN) &&
+        {/* {(user.accountId !== data._id || user.role !== roles.ADMIN) &&
           <button
             onClick={(e) => blockAccount(e, data._id)}
             className={block ? "btn-gray" : "btn-red"}
           >
             {block ? <span>Unblock</span> : <span>Block</span>}
           </button>
-        }
+        } */}
       </td>
     </tr>
   );

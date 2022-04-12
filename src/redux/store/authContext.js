@@ -203,11 +203,12 @@ export default function AuthenticationContext({ children }) {
         })
         cb();
       }).catch((err) => {
-        pushToast({
-          message: err.message,
-          type: toastTypes.ERROR,
-          timeout: 10000,
-        });
+        // pushToast({
+        //   message: err.message,
+        //   type: toastTypes.ERROR,
+        //   timeout: 10000,
+        // });
+        cb({ error: err.message });
       });;
   }
   function changeAvatar(file) {

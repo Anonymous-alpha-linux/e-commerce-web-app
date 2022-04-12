@@ -160,6 +160,7 @@ function App() {
                       element={<AddGroupContainer></AddGroupContainer>}
                     />
                   </Route>
+                  <Route path="post_detail/:postId" element={<SinglePost></SinglePost>} />
                 </Route>
               )) ||
               // 3. QA coordinator

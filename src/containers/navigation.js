@@ -83,7 +83,7 @@ export default function Navigation() {
             </ContainerComponent.Item>
 
             <ContainerComponent.Item>
-              {device !== media.MOBILE ?
+              {/* {device !== media.MOBILE ?
                 <AnimateComponent.Width>
                   {openSearch && (
                     <OutsideAlert
@@ -98,21 +98,22 @@ export default function Navigation() {
                     </Icon>
                   )}
                 </AnimateComponent.Width>
-                :
-                <Link to="/portal/search"
-                  style={{
-                    paddingLeft: "0",
-                    color: "#fff",
-                    display: "inline-block",
-                    verticalAlign: "middle",
-                    lineHeight: "100%",
-                    margin: 0,
-                  }}
-                >
-                  <Icon>
-                    <IoSearchSharp></IoSearchSharp>
-                  </Icon>
-                </Link>}
+                : */}
+              <Link to="/portal/search"
+                style={{
+                  paddingLeft: "0",
+                  color: "#fff",
+                  display: "inline-block",
+                  verticalAlign: "middle",
+                  lineHeight: "100%",
+                  margin: 0,
+                }}
+              >
+                <Icon>
+                  <IoSearchSharp></IoSearchSharp>
+                </Icon>
+              </Link>
+              {/* } */}
             </ContainerComponent.Item>
           </ContainerComponent.Flex>
         </ContainerComponent.Item>
@@ -643,7 +644,7 @@ function Notification() {
               marginTop: "10px",
             }}
           >
-            <NotificationContainer></NotificationContainer>
+            <NotificationContainer onClick={turnOffBadge}></NotificationContainer>
           </AnimateComponent.Dropdown>
         )}
       {isNew && <Icon.Badge></Icon.Badge>}
